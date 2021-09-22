@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>CompiledBindings.WPF</id>
+    <version>1.0.0</version>
+    <title>x:Bind Compiled Bindings for WPF</title>
+    <authors>leshy06</authors>
+    <owners>leshy06</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>x:Bind Compiled Bindings for WPF</description>
+  </metadata>
+
+  <files>
+    <file src="..\Targets\CompiledBindings.WPF.targets" target="build" />
+    <file src="..\..\..\..\bin\WPF\CompiledBindings.WPF.dll" target="build" />
+    <file src="..\..\..\..\bin\WPF\CompiledBindings.Core.dll" target="build" />
+    <file src="..\..\..\..\bin\WPF\Mono.Cecil.dll" target="build" />
+    <file src="..\..\..\..\bin\WPF\Mono.Cecil.Mdb.dll" target="build" />
+    <file src="..\..\..\..\bin\WPF\Mono.Cecil.Pdb.dll" target="build" />
+    <file src="..\..\..\..\bin\WPF\Mono.Cecil.Rocks.dll" target="build" />
+
+    <file src="..\..\..\..\bin\net35\CompiledBindings.dll" target="lib\net35\" />
+    <file src="..\..\..\..\bin\netcoreapp3.0\CompiledBindings.dll" target="lib\netcoreapp3.0\" />
+  </files>
+</package>

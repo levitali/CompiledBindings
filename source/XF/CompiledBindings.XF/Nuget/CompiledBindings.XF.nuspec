@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>CompiledBindings.XF</id>
+    <version>1.0.0</version>
+    <title>x:Bind Compiled Bindings for Xamarin Forms</title>
+    <authors>leshy06</authors>
+    <owners>leshy06</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>x:Bind Compiled Bindings for Xamarin Forms</description>
+  </metadata>
+  <files>
+    <file src="..\Targets\CompiledBindings.XF.targets" target="build" />
+    <file src="..\..\..\..\bin\XF\CompiledBindings.XF.dll" target="build" />
+    <file src="..\..\..\..\bin\XF\CompiledBindings.Core.dll" target="build" />
+    <file src="..\..\..\..\bin\XF\Mono.Cecil.dll" target="build" />
+    <file src="..\..\..\..\bin\XF\Mono.Cecil.Mdb.dll" target="build" />
+    <file src="..\..\..\..\bin\XF\Mono.Cecil.Pdb.dll" target="build" />
+    <file src="..\..\..\..\bin\XF\Mono.Cecil.Rocks.dll" target="build" />
+
+    <file src="..\..\..\..\bin\netstandard2.0\CompiledBindings.dll" target="lib\netstandard2.0\" />
+  </files>
+</package>
