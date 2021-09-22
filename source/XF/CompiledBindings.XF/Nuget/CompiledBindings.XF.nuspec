@@ -4,10 +4,13 @@
     <id>CompiledBindings.XF</id>
     <version>1.0.0</version>
     <title>x:Bind Compiled Bindings for Xamarin Forms</title>
-    <authors>leshy06</authors>
-    <owners>leshy06</owners>
+    <authors>levitali</authors>
+    <owners>levitali</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>x:Bind Compiled Bindings for Xamarin Forms</description>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/levitali/CompiledBindings</projectUrl>
   </metadata>
   <files>
     <file src="..\Targets\CompiledBindings.XF.targets" target="build" />
