@@ -31,7 +31,7 @@ For CLR-Namespaces you can also use the "using" syntax. For example
 
 If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
 
-### x:Bind Usage by Examples
+### x:Bind usage by examples
 
 Note, that in some examples bellow the TextBlock (WPF) control is used, in others Label (Xamarin Forms).
 
@@ -59,6 +59,10 @@ Property pahs
  ```xaml
 <Label IsVisible="{x:Bind not IsChanged}"/>
  ```
+  - logical operators: && (and), || (or)
+ ```xaml
+<Label IsVisible="{x:Bind NoTitle and IsChanged}"/>
+ ```
  - coalesce operator
  ```xaml
 <TextBlock Visibility="{x:Bind IsChange ? Collapsed : Visible}"/>
@@ -69,3 +73,14 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
  ```xaml
 <Label IsVisible="{x:Bind Movie.Title ?? '<no title>'}"/>
  ```
+
+### x:Bind other parameters
+
+- **Mode** Specifies the binding mode, as one of these strings: "OneTime", "OneWay", "TwoWay" or "OneWayToSource". The default is "OneWay" 
+- **Converter** Specifies the converter. The value must be a StaticResource expression.
+- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter. The only difference is, that it is never observed whethere the values in the converter parameter expression are changed.
+- **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
+
+## x:Set Markup Extension
+
+This library also provide {x:Set} Markup Extension. It has an expression parameter, similar like {x:Bind}, and no other parameters. The data source of {x:Set} is always the root page/control/window itself. The expression is evaluated and set only once at the end of constructors of the page/control/window. If an expression is a static property of some type, than it is similar to {x:Static} Markup Extension.
