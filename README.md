@@ -50,7 +50,7 @@ Property pahs
  The first example above is the call of instance method Trim(). The second is the call of static method GenerateSongTitle of MainPage class.
  
  The expression of the {x:Bind} can also have the following operators:
- - binary operators (in round brackets alternatives, which are better for XML): +, -, \*, /, = (eq), != (ne), < (lt), > (gt), <= (let), >= (get) 
+ - binary operators (in round brackets alternatives, which are better for XML): +, -, \*, /, = (eq), != (ne), < (lt), > (gt), <= (le), >= (ge) 
   ```xaml
 <Label IsVisible="{x:Bind Movie.Year gt 2000}"/>
  ```
@@ -58,4 +58,14 @@ Property pahs
   - unary operators: -, +, ! (not)
  ```xaml
 <Label IsVisible="{x:Bind not IsChanged}"/>
+ ```
+ - coalesce operator
+ ```xaml
+<TextBlock Visibility="{x:Bind IsChange ? Collapsed : Visible}"/>
+ ```
+Note, that the Collapsed and Visible values here are inferred from Visibility property.
+
+ - null check operator
+ ```xaml
+<Label IsVisible="{x:Bind Movie.Title ?? '<no title>'}"/>
  ```
