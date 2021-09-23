@@ -11,7 +11,7 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 If not specified, the data source of {x:Bind} is the root control/page/window itself. In Xamarin Forms you can specify the data source type with x:DataType attribute.
 
 Because x:DataType attribute is not available for WPF, you can do the following.
-- Declare this namespace http://compiledbindings.com/x.  For example
+- Declare namespace http://compiledbindings.com/x.  For example
 ```xaml
   xmlns:mx="http://compiledbindings.com/x"
 ```
@@ -84,3 +84,36 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 ## x:Set Markup Extension
 
 This library also provide {x:Set} Markup Extension. It has an expression parameter, similar like {x:Bind}, and no other parameters. The data source of {x:Set} is always the root page/control/window itself. The expression is evaluated and set only once at the end of constructors of the page/control/window. If an expression is a static property of some type, than it is similar to {x:Static} Markup Extension.
+
+## Binding to methods and extension methods
+
+Instead of a property, you can use a method or an extension method as target of {x:Bind} or {x:Set} Markup Extension. If an instance method is used as a target, it must have only one parameter. An extension method must have two parameters where the first one is the "this" parameter of the control, and the second is the parameter, to which the {x:Bind} or {x:Set} expression is set. To use it you do the following
+
+- Declare namespace http://compiledbindings.com.  For example
+```xaml
+  xmlns:m="http://compiledbindings.com/"
+```
+- Set the prefix of the namespace as ingorable
+```xaml
+  mc:Ignorable="d m mx"
+  ```
+  - For extension methods, the corresponding namespace of the extension class must be specified
+```xaml
+  xmlns:extension="using:CompiledBindingsDemo.Extensions"
+  ```
+  - Now use can use methods as target like this
+```xaml
+  <Entry m:SetFocused="{x:Bind IsNameFocused} "/>
+  ```
+  
+The extension method for example above can look like this:
+ ```c#
+public static void SetFocused(this VisualElement visualElement, bool focused)
+{
+		if (focused)
+		{
+				visualElement.Focus();
+		}
+}
+``` 
+  
