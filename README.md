@@ -86,6 +86,7 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
  ```
  
 You can use following constants in the expression:
+- numbers with or wihout decimal seperator (point). For example 2.3
 - true, false
 - null
 - this
