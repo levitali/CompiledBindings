@@ -8,6 +8,8 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 
 {x:Bind} Markup Extension must have an expression (without Path attribute) as its first parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
 
+### Data source type
+
 If not specified, the data source of {x:Bind} is the root control/page/window itself. In Xamarin Forms you can specify the data source type with x:DataType attribute.
 
 Because x:DataType attribute is not available for WPF, you can do the following.
@@ -30,6 +32,8 @@ For CLR-Namespaces you can also use the "using" syntax. For example
   ```
 
 If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
+
+You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also you x:Null as DataType, except in DataTemplates, to reset the data type.
 
 ### x:Bind usage by examples
 
@@ -73,6 +77,12 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
  ```xaml
 <Label IsVisible="{x:Bind Movie.Title ?? '<no title>'}"/>
  ```
+ 
+ - cast operator. The class, to which cast is made, must be fully specified with namespace (the namespace must be declared)
+ ```xaml
+<CollectionView x:Name="itemsList"/>
+<Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
+ ```
 
 ### x:Bind other parameters
 
@@ -80,6 +90,10 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 - **Converter** Specifies the converter. The value must be a StaticResource expression.
 - **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter. The only difference is, that it is never observed whethere the values in the converter parameter expression are changed.
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
+
+### Observing changes
+
+If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
 
 ## x:Set Markup Extension
 
