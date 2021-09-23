@@ -8,7 +8,7 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 
 {x:Bind} Markup Extension must have an expression (without Path attribute) as its first parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
 
-### Data source type
+### Data source
 
 If not specified, the data source of {x:Bind} is the root control/page/window itself. In Xamarin Forms you can specify the data source type with x:DataType attribute.
 
