@@ -6,7 +6,7 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 
 ## x:Bind Markup Extension
 
-{x:Bind} Markup Extension must have an expression (without Path attribute) as its first parameter, following other parameters like Mode, BindBack, Converter, ConverterParameter.
+{x:Bind} Markup Extension must have an expression (without Path attribute) as its first parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
 
 If not specified, the data source of {x:Bind} is the root control/page/window itself. In Xamarin Forms you can specify the data source type with x:DataType attribute.
 
@@ -50,7 +50,12 @@ Property pahs
  The first example above is the call of instance method Trim(). The second is the call of static method GenerateSongTitle of MainPage class.
  
  The expression of the {x:Bind} can also have the following operators:
- - binary operators +, -, /, * <, >, <=, >=, or thier alternatives, which are better for XML gt (grater than), lt (lower than), get (greater equal than), let (lower equal than)
+ - binary operators (in round brackets alternatives, which are better for XML): +, -, \*, /, = (eq), != (ne), < (lt), > (gt), <= (let), >= (get) 
   ```xaml
 <Label IsVisible="{x:Bind Movie.Year gt 2000}"/>
+ ```
+ 
+  - unary operators: -, +, ! (not)
+ ```xaml
+<Label IsVisible="{x:Bind not IsChanged}"/>
  ```
