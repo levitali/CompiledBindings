@@ -15,7 +15,7 @@ Because x:DataType attribute is not available for WPF, you can do the following.
 ```xaml
   xmlns:mx="http://compiledbindings.com/x"
 ```
-- Set the prefix of the namespace as ingorable (in the example together with d namespace)
+- Set the prefix of the namespace as ignorable (in the example together with d namespace)
 ```xaml
   mc:Ignorable="d mx"
   ```
@@ -93,7 +93,7 @@ Instead of a property, you can use a method or an extension method as target of 
 ```xaml
   xmlns:m="http://compiledbindings.com/"
 ```
-- Set the prefix of the namespace as ingorable
+- Set the prefix of the namespace as ignorable
 ```xaml
   mc:Ignorable="d m mx"
   ```
