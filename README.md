@@ -30,10 +30,11 @@ For CLR-Namespaces you can also use the "using" syntax. For example
  ```xaml
   xmlns:local="using:CompiledBindingsDemo"
   ```
+Note, that if the data source is specified, the {x:Bind} extensions are only applied if the DataContext (or BindingContext in XF) of the root or corresponding controls is set to an object of the specified type.
 
 If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
 
-You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also you x:Null as DataType, except in DataTemplates, to reset the data type.
+You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
 
 ### x:Bind usage by examples
 
@@ -83,6 +84,14 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 <CollectionView x:Name="itemsList"/>
 <Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
  ```
+ 
+You can use following constants in the expression:
+- true, false
+- null
+- this
+- strings. For example 'some string'
+- characters. The same as strings, for example 'a'. Which type is actually used is mostly inferred during compilation. In case of ambiquity, the cast operator must be used.
+
 
 ### x:Bind other parameters
 
@@ -101,7 +110,7 @@ This library also provides {x:Set} Markup Extension. It has an expression parame
 
 ## Binding to methods and extension methods
 
-Instead of a property, you can use a method or an extension method as target of {x:Bind} or {x:Set} Markup Extension. If an instance method is used as a target, it must have only one parameter. An extension method must have two parameters where the first one is the "this" parameter of the control, and the second is the parameter, to which the {x:Bind} or {x:Set} expression is set. To use it you do the following
+Instead of a property, you can use a method or an extension method as target of {x:Bind} or {x:Set} Markup Extension with OneTime and OneWay modes. If an instance method is used as a target, it must have only one parameter. An extension method must have two parameters where the first one is the "this" parameter of the control, and the second is the parameter, to which the {x:Bind} or {x:Set} expression is set. To use it you do the following
 
 - Declare namespace http://compiledbindings.com.  For example
 ```xaml
