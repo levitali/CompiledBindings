@@ -29,3 +29,5 @@
 /source/XF/XFTest/obj
 /source/XF/XFTest.UWP/bin/x86/Debug
 /source/XF/XFTest.UWP/obj
+/source/WPF/CompiledBindings.WPF/Nuget/CompiledBindings.WPF.1.0.2.nupkg
+/source/XF/CompiledBindings.XF/Nuget/CompiledBindings.XF.1.0.1.nupkg

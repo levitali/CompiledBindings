@@ -701,7 +701,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 					string sourceTypeFullName = sourceType.Type.GetCSharpFullName();
 					string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
 					string parameter = bind.ConverterParameter?.ToString() ?? "null";
-					setExpr = GenerateConvertBackCall(memberExpr ?? "this", bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
+					setExpr = GenerateConvertBackCall("_targetRoot", bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
 				}
 				else if (sourceType.Type.FullName == "System.String" && bind.Property.MemberType.Type.FullName != "System.String")
 				{
@@ -863,6 +863,11 @@ $@"}}");
 
 		protected virtual void GenerateDependencyPropertyChangedCallback(StringBuilder output, string methodName, string? a = null)
 		{
+		}
+
+		protected virtual string GenerateConvertBackCall(string targetRoot, string converterName, string value, string targetType, string parameter, string? cast)
+		{
+			return $"{cast}{targetRoot}.{converterName}.ConvertBack({value}, typeof(global::{targetType}), {parameter}, null)";
 		}
 	}
 }

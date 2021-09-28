@@ -483,10 +483,5 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 								global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()}))
 							.RemoveValueChanged({cacheVar}, {methodName});");
 		}
-
-		protected override string GenerateConvertBackCall(string memberExpr, string converterName, string value, string targetType, string parameter, string? cast)
-		{
-			return $"{cast}((global::System.Windows.Data.IValueConverter){memberExpr}.Resources[\"{converterName}\"]).ConvertBack({value}, typeof(global::{targetType}), {parameter}, null)";
-		}
 	}
 }

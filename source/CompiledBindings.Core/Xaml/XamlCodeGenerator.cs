@@ -224,10 +224,5 @@ $@"{align}			var {variable.Name} = {variable.Expression};");
 				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, align);
 			}
 		}
-
-		protected virtual string GenerateConvertBackCall(string memberExpr, string converterName, string value, string targetType, string parameter, string? cast)
-		{
-			throw new NotSupportedException();
-		}
 	}
 }
