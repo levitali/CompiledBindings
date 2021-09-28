@@ -15,3 +15,17 @@
 /source/CompiledBindings.Core/obj/project.nuget.cache
 /source/CompiledBindings.Core/obj/project.assets.json
 /source/CompiledBindings.Core/obj
+/.vs
+/source/CompiledBindings.Core/bin/Debug
+/source/CompiledBindings.Tests/bin
+/source/CompiledBindings.Tests/obj
+*.user
+*.vspscc
+/source/WPF/WPFTest/bin/Debug
+/source/WPF/WPFTest/obj
+/source/XF/CompiledBindings.XF/Nuget/nuget.exe
+/source/XF/CompiledBindings.XF/Nuget/CompiledBindings.XF.1.0.0.nupkg
+/source/XF/XFTest/bin/Debug/netstandard2.0
+/source/XF/XFTest/obj
+/source/XF/XFTest.UWP/bin/x86/Debug
+/source/XF/XFTest.UWP/obj

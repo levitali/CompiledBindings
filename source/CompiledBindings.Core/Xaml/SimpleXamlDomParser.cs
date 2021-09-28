@@ -24,6 +24,8 @@ namespace CompiledBindings
 
 		public TypeInfo? DependencyObjectType;
 
+		public HashSet<string>? UsedNames { get; private set; }
+
 		public SimpleXamlDomParser(XNamespace xmlns, XNamespace xNs, Func<string, IEnumerable<string>> getClrNsFromXmlNs) : base(xmlns, xNs)
 		{
 			DataTemplate = DefaultNamespace + "DataTemplate";
@@ -35,7 +37,7 @@ namespace CompiledBindings
 		{
 			File = file;
 
-			var usedNames = new HashSet<string>(xamlDoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
+			UsedNames = new HashSet<string>(xamlDoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
 
 			TargetType = DataType = GetRootType(xamlDoc.Root);
 			var result = new SimpleXamlDom(xamlDoc.Root)
@@ -100,7 +102,7 @@ namespace CompiledBindings
 						viewName = xelement.Attribute(xName)?.Value ?? xelement.Attribute(NameAttr)?.Value;
 						if (viewName == null && xelement != xamlDoc.Root)
 						{
-							viewName = XamlDomParser.GenerateName(xelement, usedNames);
+							viewName = XamlDomParser.GenerateName(xelement, UsedNames);
 						}
 						else
 						{

@@ -118,53 +118,70 @@ namespace CompiledBindings
 										}
 
 										// Process DataTemplates
-										string? mbuiNsPrefix = null, classNsPrefix = null;
-										int dataTemplateIndex = 0, nsIndex = 0;
-										foreach (var dataTemplate in xdoc.Descendants(xamlDomParser.DataTemplate))
+										var dataTemplates = xdoc.Descendants(xamlDomParser.DataTemplate)
+											.Where(e => e.Descendants().SelectMany(e =>
+												e.Attributes()).Any(a => xamlDomParser.IsMemExtension(a)))
+											.ToList();
+										if (dataTemplates.Count > 0)
 										{
-											if (!dataTemplate.Descendants().SelectMany(e => e.Attributes()).Any(a =>
-												xamlDomParser.IsMemExtension(a) &&
-												EnumerableExtensions.SelectSequence(a.Parent, e => e.Parent, true).First(e => e.Name == xamlDomParser.DataTemplate) == dataTemplate))
+											string rootName;
+											var xNameAttr = xdoc.Root.Attribute(xamlDomParser.xName);
+											if (xNameAttr != null)
+												rootName = xNameAttr.Value;
+											else
 											{
-												continue;
+												rootName = XamlDomParser.GenerateName(xdoc.Root, usedNames);
+												InsertAtEnd(xdoc.Root, $@" x:Name=""{rootName}""");
 											}
-
-											if (mbuiNsPrefix == null)
+											string? compiledBindingsNsPrefix = null, classNsPrefix = null;
+											int dataTemplateIndex = 0, nsIndex = 0;
+											foreach (var dataTemplate in dataTemplates)
 											{
-												mbuiNsPrefix = SearchNsPrefix("CompiledBindings");
-												classNsPrefix = SearchNsPrefix(classNs);
-
-												string SearchNsPrefix(string clrNs)
+												if (!dataTemplate.Descendants().SelectMany(e => e.Attributes()).Any(a =>
+													xamlDomParser.IsMemExtension(a) &&
+													EnumerableExtensions.SelectSequence(a.Parent, e => e.Parent, true).First(e => e.Name == xamlDomParser.DataTemplate) == dataTemplate))
 												{
-													var searchedUsingNs = "using:" + clrNs;
-													var searchedClrNs = "clr-namespace:" + clrNs;
-													string prefix;
-
-													var attr = xdoc.Root.Attributes().FirstOrDefault(a =>
-														a.Name.Namespace == XNamespace.Xmlns &&
-														(a.Value == searchedUsingNs || a.Value == searchedClrNs));
-													if (attr != null)
-													{
-														prefix = attr.Name.LocalName;
-													}
-													else
-													{
-														do
-														{
-															prefix = "g" + nsIndex++;
-														}
-														while (xdoc.Root.Attributes().Any(a =>
-															a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == prefix));
-
-														InsertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"using:{clrNs}\"");
-													}
-
-													return prefix;
+													continue;
 												}
-											}
 
-											var rootElement = dataTemplate.Elements().First();
-											InsertAtEnd(rootElement, $" {mbuiNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{className}_DataTemplate{dataTemplateIndex++}}}\"");
+												if (compiledBindingsNsPrefix == null)
+												{
+													compiledBindingsNsPrefix = SearchNsPrefix("CompiledBindings");
+													classNsPrefix = SearchNsPrefix(classNs);
+
+													string SearchNsPrefix(string clrNs)
+													{
+														var searchedUsingNs = "using:" + clrNs;
+														var searchedClrNs = "clr-namespace:" + clrNs;
+														string prefix;
+
+														var attr = xdoc.Root.Attributes().FirstOrDefault(a =>
+															a.Name.Namespace == XNamespace.Xmlns &&
+															(a.Value == searchedUsingNs || a.Value == searchedClrNs));
+														if (attr != null)
+														{
+															prefix = attr.Name.LocalName;
+														}
+														else
+														{
+															do
+															{
+																prefix = "g" + nsIndex++;
+															}
+															while (xdoc.Root.Attributes().Any(a =>
+																a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == prefix));
+
+															InsertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"using:{clrNs}\"");
+														}
+
+														return prefix;
+													}
+												}
+
+												var rootElement = dataTemplate.Elements().First();
+												InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Root=\"{{Binding Source={{x:Reference {rootName}}}}}\"");
+												InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{className}_DataTemplate{dataTemplateIndex++}}}\"");
+											}
 										}
 									}
 

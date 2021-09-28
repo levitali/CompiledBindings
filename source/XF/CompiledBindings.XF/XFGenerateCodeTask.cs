@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -150,6 +151,19 @@ namespace CompiledBindings
 			@object.SetValue(BindingsProperty, value);
 		}
 
+		public static readonly BindableProperty RootProperty =
+			BindableProperty.CreateAttached(""Root"", typeof(VisualElement), typeof(DataTemplateBindings), null);
+
+		public static VisualElement GetRoot(BindableObject @object)
+		{
+			return (VisualElement)@object.GetValue(RootProperty);
+		}
+
+		public static void SetRoot(BindableObject @object, VisualElement value)
+		{
+			@object.SetValue(RootProperty, value);
+		}
+
 		static void BindingsChanged(BindableObject bindable, object oldValue, object newValue)
 		{
 			((IGeneratedDataTemplate)newValue).Initialize((Element)bindable);
@@ -206,19 +220,12 @@ namespace CompiledBindings
 
 		protected override Expression GenerateConvertExpression(Bind bind)
 		{
-			var objectType = TypeInfoUtils.GetTypeThrow(typeof(object));
-			var visualElementType = TypeInfoUtils.GetTypeThrow("Xamarin.Forms.VisualElement");
-			var resourceDictionaryType = TypeInfoUtils.GetTypeThrow("Xamarin.Forms.ResourceDictionary");
-			var resourcesProp = visualElementType.Properties.Single(p => p.Name == "Resources");
 			var converterType = TypeInfoUtils.GetTypeThrow("Xamarin.Forms.IValueConverter");
 			var convertMethod = converterType.Methods.First(m => m.Name == "Convert");
-			var objectField = new FieldDefinition(bind.Property.Object.Name, FieldAttributes.Private, TargetType);
+			var converterField = new FieldDefinition(bind.Converter, FieldAttributes.Private, converterType);
 
 			Expression expression = new ParameterExpression(new TypeInfo(TargetType, false), "targetRoot");
-			expression = new MemberExpression(expression, objectField, new TypeInfo(converterType, false));
-			expression = new MemberExpression(expression, resourcesProp, new TypeInfo(resourceDictionaryType, false));
-			expression = new ElementAccessExpression(new TypeInfo(objectType, false), expression, new Expression[] { new ConstantExpression(bind.Converter) });
-			expression = new CastExpression(expression, new TypeInfo(converterType, false));
+			expression = new MemberExpression(expression, converterField, new TypeInfo(converterType, false));
 			expression = new CallExpression(expression, convertMethod, new Expression[]
 			{
 				bind.Expression,
@@ -246,6 +253,45 @@ namespace CompiledBindings
 				   true,
 				   true)
 		{
+		}
+
+		protected override void GenerateConverterDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+		{
+			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct();
+			foreach (var converter in converters)
+			{
+				output.AppendLine(
+$@"		global::Xamarin.Forms.IValueConverter {converter};");
+			}
+		}
+
+		protected override void GenerateInitializeConverters(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+		{
+			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct().ToList();
+			if (converters.Count > 0)
+			{
+				string root1, root2;
+				if (isDataTemplate)
+				{
+					output.AppendLine(
+$@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElement});");
+					root1 = "root?";
+					root2 = "root";
+				}
+				else
+				{
+					root1 = "this";
+					root2 = "this";
+				}
+
+				foreach (var converter in converters)
+				{
+					output.AppendLine(
+$@"			{converter} = (global::Xamarin.Forms.IValueConverter)({root1}.Resources.ContainsKey(""{converter}"") == true ? {root2}.Resources[""{converter}""] : global::Xamarin.Forms.Application.Current.Resources[""{converter}""]);");
+				}
+
+				output.AppendLine();
+			}
 		}
 	}
 }

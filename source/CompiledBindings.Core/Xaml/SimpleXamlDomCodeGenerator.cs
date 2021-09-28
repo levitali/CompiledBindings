@@ -85,36 +85,12 @@ $@"	}}");
 			return output.ToString();
 		}
 
-		public string GenerateVariableDeclarationCode(SimpleXamlDom parseResult)
+		protected virtual void GenerateConverterDeclarations(StringBuilder output, SimpleXamlDom parseResult)
 		{
-			var output = new StringBuilder();
+		}
 
-			if (parseResult.TargetType!.Type.Namespace != null)
-			{
-				output.AppendLine(
-$@"namespace {parseResult.TargetType.Type.Namespace}
-{{");
-			}
-
-			output.AppendLine(
-$@"	partial class {parseResult.TargetType.Type.Name}
-	{{");
-			foreach (var obj in parseResult.XamlObjects.Where(o => !o.NameExplicitlySet))
-			{
-				output.AppendLine(
-$@"		global::{obj.Type.Type.GetCSharpFullName()} {obj.Name};");
-			}
-
-			output.AppendLine(
-$@"	}}");
-
-			if (parseResult.TargetType.Type.Namespace != null)
-			{
-				output.AppendLine(
-"}");
-			}
-
-			return output.ToString();
+		protected virtual void GenerateInitializeConverters(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+		{
 		}
 
 		private void GenerateInitializeMethod(StringBuilder output, SimpleXamlDom parseResult)
@@ -123,6 +99,7 @@ $@"	}}");
 			{
 				GenerateVariablesDeclarations(output, parseResult, true);
 			}
+			GenerateConverterDeclarations(output, parseResult);
 
 			output.AppendLine(
 $@"		private bool _generatedCodeInitialized;
@@ -232,6 +209,8 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 				output.AppendLine();
 			}
 
+			GenerateInitializeConverters(output, parseResult, rootElement, isDataTemplate);
+
 			_bindingsCodeGenerator.GenerateUpdateMethodBody(output, parseResult.StaticUpdate);
 			output.AppendLine();
 
@@ -284,6 +263,7 @@ $@"
 	{{");
 
 			GenerateVariablesDeclarations(output, parseResult, false);
+			GenerateConverterDeclarations(output, parseResult);
 
 			output.AppendLine(
 $@"

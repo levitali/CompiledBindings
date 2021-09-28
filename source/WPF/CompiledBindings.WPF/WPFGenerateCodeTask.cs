@@ -156,6 +156,21 @@ namespace CompiledBindings
 
 								if (parseResult.DataTemplates.Count > 0)
 								{
+									string? rootName = null;
+									if (parseResult.DataTemplates.SelectMany(dt => dt.EnumerateAllProperties()).Any(p => p.Value.BindValue?.Converter != null))
+									{
+										var xNameAttr = xdoc.Root.Attribute(xamlDomParser.xName);
+										if (xNameAttr != null)
+										{
+											rootName = xNameAttr.Value;
+										}
+										else
+										{
+											rootName = XamlDomParser.GenerateName(xdoc.Root, xamlDomParser.UsedNames!);
+											xdoc.Root.Add(new XAttribute(xamlDomParser.xName, rootName));
+										}
+									}
+
 									var compiledBindingsNs = "clr-namespace:CompiledBindings";
 									var localNs = "clr-namespace:" + parseResult.TargetType!.Type.Namespace;
 
@@ -187,6 +202,12 @@ namespace CompiledBindings
 									{
 										var dataTemplate = parseResult.DataTemplates[i];
 										var rootElement = dataTemplate.RootElement.Elements().First();
+										if (dataTemplate.EnumerateAllProperties().Any(p => p.Value.BindValue?.Converter != null))
+										{
+											rootElement.Add(
+												new XAttribute(mbui + "DataTemplateBindings.Root",
+													$"{{Binding ElementName={rootName}}}"));
+										}
 										rootElement.Add(
 											new XElement(mbui + "DataTemplateBindings.Bindings",
 												new XElement(local + $"{parseResult.TargetType.Type.Name}_DataTemplate{i}")));
@@ -283,6 +304,19 @@ $@"namespace CompiledBindings
 		{{
 			((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
 		}}
+
+		public static readonly DependencyProperty RootProperty =
+			DependencyProperty.RegisterAttached(""Root"", typeof(FrameworkElement), typeof(DataTemplateBindings), new PropertyMetadata(null));
+
+		public static FrameworkElement GetRoot(DependencyObject @object)
+		{{
+			return (FrameworkElement)@object.GetValue(RootProperty);
+		}}
+
+		public static void SetRoot(DependencyObject @object, FrameworkElement value)
+		{{
+			@object.SetValue(RootProperty, value);
+		}}
 	}}
 
 	public interface IGeneratedDataTemplate
@@ -331,19 +365,12 @@ $@"namespace CompiledBindings
 
 		protected override Expression GenerateConvertExpression(Bind bind)
 		{
-			var objectType = TypeInfoUtils.GetTypeThrow(typeof(object));
-			var frameworkElementType = TypeInfoUtils.GetTypeThrow("System.Windows.FrameworkElement");
-			var resourceDictionaryType = TypeInfoUtils.GetTypeThrow("System.Windows.ResourceDictionary");
-			var resourcesProp = frameworkElementType.Properties.Single(p => p.Name == "Resources");
 			var converterType = TypeInfoUtils.GetTypeThrow("System.Windows.Data.IValueConverter");
 			var convertMethod = converterType.Methods.First(m => m.Name == "Convert");
-			var objectField = new FieldDefinition(bind.Property.Object.Name, FieldAttributes.Private, TargetType);
+			var converterField = new FieldDefinition(bind.Converter, FieldAttributes.Private, converterType);
 
 			Expression expression = new ParameterExpression(new TypeInfo(TargetType, false), "targetRoot");
-			expression = new MemberExpression(expression, objectField, new TypeInfo(converterType, false));
-			expression = new MemberExpression(expression, resourcesProp, new TypeInfo(resourceDictionaryType, false));
-			expression = new ElementAccessExpression(new TypeInfo(objectType, false), expression, new Expression[] { new ConstantExpression(bind.Converter) });
-			expression = new CastExpression(expression, new TypeInfo(converterType, false));
+			expression = new MemberExpression(expression, converterField, new TypeInfo(converterType, false));
 			expression = new CallExpression(expression, convertMethod, new Expression[]
 			{
 				bind.Expression,
@@ -371,6 +398,43 @@ $@"namespace CompiledBindings
 				   false,
 				   false)
 		{
+		}
+
+		protected override void GenerateConverterDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+		{
+			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct();
+			foreach (var converter in converters)
+			{
+				output.AppendLine(
+$@"		global::System.Windows.Data.IValueConverter {converter};");
+			}
+		}
+
+		protected override void GenerateInitializeConverters(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+		{
+			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct().ToList();
+			if (converters.Count > 0)
+			{
+				string root;
+				if (isDataTemplate)
+				{
+					output.AppendLine(
+$@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElement});");
+					root = "root?";
+				}
+				else
+				{
+					root = "this";
+				}
+
+				foreach (var converter in converters)
+				{
+					output.AppendLine(
+$@"			{converter} = (global::System.Windows.Data.IValueConverter)({root}.Resources[""{converter}""] ?? global::System.Windows.Application.Current.Resources[""{converter}""] ?? throw new global::System.Exception(""Resource '{converter}' not found."") );");
+				}
+
+				output.AppendLine();
+			}
 		}
 	}
 
