@@ -430,7 +430,7 @@ $@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElem
 				foreach (var converter in converters)
 				{
 					output.AppendLine(
-$@"			{converter} = (global::System.Windows.Data.IValueConverter)({root}.Resources[""{converter}""] ?? global::System.Windows.Application.Current.Resources[""{converter}""] ?? throw new global::System.Exception(""Resource '{converter}' not found."") );");
+$@"			{converter} = (global::System.Windows.Data.IValueConverter)({root}.Resources[""{converter}""] ?? global::System.Windows.Application.Current.Resources[""{converter}""] ?? throw new global::System.Exception(""Resource '{converter}' not found.""));");
 				}
 
 				output.AppendLine();

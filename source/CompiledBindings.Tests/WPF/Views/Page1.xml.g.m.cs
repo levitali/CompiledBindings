@@ -21,8 +21,8 @@ namespace WPFTest.Views
 
 			_generatedCodeInitialized = true;
 
-			TrueToVisibleConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["TrueToVisibleConverter"] ?? global::System.Windows.Application.Current.Resources["TrueToVisibleConverter"] ?? throw new global::System.Exception("Resource 'TrueToVisibleConverter' not found.") );
-			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found.") );
+			TrueToVisibleConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["TrueToVisibleConverter"] ?? global::System.Windows.Application.Current.Resources["TrueToVisibleConverter"] ?? throw new global::System.Exception("Resource 'TrueToVisibleConverter' not found."));
+			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
 
 			var value1 = WPFTest.Strings.Instance;
 			Title = value1?.Title;
@@ -337,7 +337,7 @@ namespace WPFTest.Views
 					_settingBinding5 = true;
 					try
 					{
-						dataRoot.BoolInput = (global::System.Boolean)((global::System.Windows.Data.IValueConverter)_targetRoot.checkBox1.Resources["InverseBooleanConverter"]).ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp?.Length > 0, null);
+						dataRoot.BoolInput = (global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp?.Length > 0, null);
 					}
 					catch
 					{
@@ -504,7 +504,7 @@ namespace WPFTest.Views
 			textBlock3 = (global::System.Windows.Controls.TextBlock)rootElement.FindName("textBlock3");
 
 			var root = global::CompiledBindings.DataTemplateBindings.GetRoot(rootElement);
-			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(root?.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found.") );
+			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(root?.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
 
 
 			rootElement.DataContextChanged += rootElement_DataContextChanged;

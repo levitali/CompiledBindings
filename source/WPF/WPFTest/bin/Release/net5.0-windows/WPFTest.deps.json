@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "WPFTest/1.0.0": {
+        "dependencies": {
+          "CompiledBindings": "1.0.0"
+        },
+        "runtime": {
+          "WPFTest.dll": {}
+        }
+      },
+      "CompiledBindings/1.0.0": {
+        "runtime": {
+          "CompiledBindings.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "WPFTest/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CompiledBindings/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
