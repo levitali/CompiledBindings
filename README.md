@@ -40,7 +40,7 @@ You can change the data type anywhere in XAML by setting x:DataType (mx:DataType
 
 Note, that in some examples bellow the TextBlock (WPF) control is used, in others Label (Xamarin Forms).
 
-Property pahs
+Property paths
  ```xaml
 <TextBlock Text="{x:Bind Title}"/>
 <TextBlock Text="{x:Bind Movie.Year}"/>
