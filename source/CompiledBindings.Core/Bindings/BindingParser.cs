@@ -115,7 +115,19 @@ namespace CompiledBindings
 
 					if (name == "Mode")
 					{
-						mode = (BindingMode)Enum.Parse(typeof(BindingMode), value);
+						if (Enum.TryParse<BindingMode>(value, out var mode2))
+						{
+							mode = mode2;
+						}
+						else
+						{
+							var msg = $"Mode is invalid: {value}.";
+							if (expression == null)
+							{
+								msg += " Use 'eq' instead of '=' to compare 'Mode' in expression.";
+							}
+							throw new ParseException(msg, pos1);
+						}
 					}
 					else if (name == "Converter")
 					{

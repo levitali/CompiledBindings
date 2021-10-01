@@ -9,6 +9,10 @@ namespace CompiledBindings
 {
 	public class BindingsCodeGenerator : XamlCodeGenerator
 	{
+		public BindingsCodeGenerator(string langVersion) : base(langVersion)
+		{
+		}
+
 		public void GenerateCode(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
 		{
 			if (targetClassName == null)

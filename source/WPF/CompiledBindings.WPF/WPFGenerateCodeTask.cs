@@ -19,6 +19,9 @@ namespace CompiledBindings
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 		[Required]
+		public string LangVersion { get; set; }
+		
+		[Required]
 		public ITaskItem[] ReferenceAssemblies { get; set; }
 
 		[Required]
@@ -139,7 +142,7 @@ namespace CompiledBindings
 							{
 								parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 
-								var codeGenerator = new WpfCodeGenerator();
+								var codeGenerator = new WpfCodeGenerator(LangVersion);
 								string code = codeGenerator.GenerateCode(parseResult);
 
 								bool dataTemplates = parseResult.DataTemplates.Count > 0;
@@ -389,14 +392,15 @@ $@"namespace CompiledBindings
 
 	public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 	{
-		public WpfCodeGenerator()
-			: base(new WpfBindingsCodeGenerator(),
+		public WpfCodeGenerator(string langVersion)
+			: base(new WpfBindingsCodeGenerator(langVersion),
 				   "Data",
 				   "System.Windows.DependencyPropertyChangedEventArgs",
 				   "System.Windows.FrameworkElement",
 				   "(global::{0}){1}.FindName(\"{2}\")",
 				   false,
-				   false)
+				   false,
+				   langVersion)
 		{
 		}
 
@@ -440,6 +444,11 @@ $@"			{converter} = (global::System.Windows.Data.IValueConverter)({root}.Resourc
 
 	public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 	{
+		public WpfBindingsCodeGenerator(string langVersion) : base(langVersion)
+		{
+
+		}
+
 		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
 		{
 			var prop = ev.Bindings[0].Property;

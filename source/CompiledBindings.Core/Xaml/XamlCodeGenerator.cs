@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Mono.Cecil;
@@ -9,6 +10,15 @@ namespace CompiledBindings
 {
 	public class XamlCodeGenerator
 	{
+		public XamlCodeGenerator(string langVersion)
+		{
+			LangNullables =
+				langVersion is "latest" or "preview" ||
+				(float.TryParse(langVersion, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var version) && version >= 8);
+		}
+
+		public bool LangNullables { get; }
+
 		public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, string? bindingsAccess, ref int localVarIndex, string? a)
 		{
 			var memberExpr = targetRootVariable;

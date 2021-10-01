@@ -8,10 +8,10 @@ using Xamarin.Forms.Xaml;
 
 namespace CompiledBindings.Markup
 {
-	[ContentProperty("Expression")]
+	[ContentProperty("Path")]
 	public class BindExtension : IMarkupExtension
 	{
-		public string? Expression { get; set; }
+		public string? Path { get; set; }
 
 		public BindingMode Mode { get; set; }
 

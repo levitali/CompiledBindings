@@ -6,7 +6,7 @@ using System.Text;
 
 namespace CompiledBindings
 {
-	public class SimpleXamlDomCodeGenerator
+	public class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	{
 		BindingsCodeGenerator _bindingsCodeGenerator;
 		string _bindingContextStart;
@@ -22,7 +22,9 @@ namespace CompiledBindings
 										  string bindableObject,
 										  string findByNameFormat,
 										  bool generateVariableDeclarations,
-										  bool generateVariableInitialization)
+										  bool generateVariableInitialization,
+										  string langVersion)
+			: base(langVersion)
 		{
 			_bindingsCodeGenerator = bindingsCodeGenerator;
 			_bindingContextStart = bindingContextStart;
@@ -55,12 +57,14 @@ $@"	using {ns};");
 				output.AppendLine();
 			}
 
-			output.AppendLine(
-$@"#pragma warning disable 8600
-#pragma warning disable 8603
-#pragma warning disable 8618
-#pragma warning disable 8625
+			if (LangNullables)
+			{
+				output.AppendLine(
+$@"#nullable disable");
+			}
 
+			output.AppendLine(
+$@"
 	[System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
 	partial class {parseResult.TargetType.Type.Name}
 	{{");

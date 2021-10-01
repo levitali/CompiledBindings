@@ -2,10 +2,7 @@ namespace WPFTest.Views
 {
 	using WPFTest.Views;
 
-#pragma warning disable 8600
-#pragma warning disable 8603
-#pragma warning disable 8618
-#pragma warning disable 8625
+#nullable disable
 
 	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page1

@@ -19,6 +19,9 @@ namespace CompiledBindings
 		private CancellationTokenSource? _cancellationTokenSource;
 
 		[Required]
+		public string LangVersion { get; set; }
+		
+		[Required]
 		public ITaskItem[] ReferenceAssemblies { get; set; }
 
 		[Required]
@@ -72,7 +75,7 @@ namespace CompiledBindings
 
 							if (parseResult.GenerateCode)
 							{
-								var codeGenerator = new XFCodeGenerator();
+								var codeGenerator = new XFCodeGenerator(LangVersion);
 								string code = codeGenerator.GenerateCode(parseResult);
 
 								bool dataTemplates = parseResult.DataTemplates.Count > 0;
@@ -244,14 +247,15 @@ namespace CompiledBindings
 
 	public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	{
-		public XFCodeGenerator()
-			: base(new BindingsCodeGenerator(),
+		public XFCodeGenerator(string langVersion)
+			: base(new BindingsCodeGenerator(langVersion),
 				   "Binding",
 				   "System.EventArgs",
 				   "Xamarin.Forms.Element",
 				   "global::Xamarin.Forms.NameScopeExtensions.FindByName<global::{0}>({1}, \"{2}\")",
 				   true,
-				   true)
+				   true,
+				   langVersion)
 		{
 		}
 

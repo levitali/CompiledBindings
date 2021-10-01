@@ -120,7 +120,8 @@
                          Pages="@(Page)"
                          ReferenceAssemblies="@(ReferencePath)"
                          LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
-                         IntermediateOutputPath="$(IntermediateOutputPath)">
+                         IntermediateOutputPath="$(IntermediateOutputPath)"
+                         LangVersion="$(LangVersion)">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
       <Output ItemName="NewPages" TaskParameter="NewPages" />

@@ -22,7 +22,7 @@
     <PropertyGroup>
       <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
     </PropertyGroup>
-    <WPFGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" AttachDebugger="true">
+    <WPFGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" AttachDebugger="true">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
       <Output ItemName="NewPages" TaskParameter="NewPages" />

@@ -8,9 +8,11 @@ namespace CompiledBindings.Markup
 {
 	public class BindExtension : MarkupExtension
 	{
-		public BindExtension(string expression)
+		public BindExtension(string path)
 		{
 		}
+
+		public string Path { get; set; }
 
 		public string BindBack { get; set; }
 

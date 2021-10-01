@@ -40,7 +40,7 @@ namespace CompiledBindings.Tests.XF
 			var xamlDomParser = new XFXamlDomParser();
 			var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
 
-			var codeGenerator = new XFCodeGenerator();
+			var codeGenerator = new XFCodeGenerator("latest");
 			var code = codeGenerator.GenerateCode(parseResult);
 
 			var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");

@@ -42,7 +42,7 @@ namespace CompiledBindings.Tests.WPF
 			var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
 			parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 
-			var codeGenerator = new WpfCodeGenerator();
+			var codeGenerator = new WpfCodeGenerator("latest");
 			var code = codeGenerator.GenerateCode(parseResult);
 
 			var csharpFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml.g.m.cs");
