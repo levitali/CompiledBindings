@@ -78,7 +78,7 @@ namespace CompiledBindings
 					}
 				}
 
-				rootResult.StaticUpdate = BindingParser.CreateStaticUpdateMethod(rootResult.XamlObjects);
+				rootResult.StaticUpdate = ExpressionUtils.CreateStaticUpdateMethod(rootResult.XamlObjects);
 
 				XamlObject? ProcessElement(XElement xelement, BindingScope currentBindingScope)
 				{

@@ -29,7 +29,7 @@
     <TextBlock Name="header1"
                m:Text="{x:Set local:Strings.Instance.Header1}"
                m:Visibility="{x:Bind BooleanProp ? Visible : Collapsed}" />
-    <TextBlock Visibility="{x:Bind BooleanProp, Converter={StaticResource TrueToVisibleConverter}}" m:Text="{x:Bind DecimalProp}" />
+    <TextBlock Visibility="{x:Bind Converter={StaticResource TrueToVisibleConverter}, Path=BooleanProp}" m:Text="{x:Bind DecimalProp}" />
     <TextBlock m:Text="{x:Bind DecimalProp + 1}" />
     <TextBox m:Text="{x:Bind OrderInput, Mode=TwoWay}" />
     <CheckBox m:IsChecked="{x:Bind BoolInput, Mode=TwoWay, Converter={StaticResource InverseBooleanConverter}, ConverterParameter=ArrayProp.Length > 0}" />

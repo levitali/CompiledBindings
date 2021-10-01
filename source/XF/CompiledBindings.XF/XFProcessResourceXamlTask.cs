@@ -83,6 +83,10 @@ namespace CompiledBindings
 								var mxAttrs = xdoc.Descendants().SelectMany(e => e.Attributes()).Where(a => a.Name.Namespace == SimpleXamlDomParser.mxNamespace).ToList();
 								if (mAttrs.Count > 0 || mxAttrs.Count > 0)
 								{
+									// Note! Here XAML is modified, but not with XDocument.
+									// XDocument on save breaks original formatting completely.
+									// It is important to keep original formatting, because there can
+									// be errors in XAML.
 									var lines = new List<TextLine>();
 									var stringReader = new StringReader(xaml);
 									string ln;

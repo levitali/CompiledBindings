@@ -420,7 +420,7 @@ namespace CompiledBindings
 									.Select(e => e.Attribute(xDefaultBindMode))
 									.FirstOrDefault(a => a != null);
 						var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-						value.BindValue = BindingParser.CreatBinding(objProp, DataType, "dataRoot", defaultBindMode, this);
+						value.BindValue = BindingParser.Parse(objProp, DataType, "dataRoot", defaultBindMode, this);
 						if (value.BindValue.Converter == null)
 						{
 							value.BindValue.SourceExpression = CorrectSourceExpression(value.BindValue.Expression, objProp);

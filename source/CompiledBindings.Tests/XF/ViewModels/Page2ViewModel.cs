@@ -8,6 +8,10 @@ namespace XFTest.ViewModels
 {
 	public class Page2ViewModel : INotifyPropertyChanged
 	{
+		public decimal StringProp { get; set; }
+
+		public decimal DecimalProp { get; set; }
+
 		public DateTime DateTimeProp { get; set; }
 
 		public ItemViewModel? CurrentItem { get; set; }

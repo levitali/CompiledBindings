@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Globalization;
 using Xamarin.Forms;
 
 [assembly: XmlnsDefinition("http://xamarin.com/schemas/2014/forms", "Xamarin.Forms")]
@@ -65,6 +66,12 @@ namespace Xamarin.Forms
 
 	public class DataTemplate
 	{
+	}
+
+	public interface IValueConverter
+	{
+		object Convert(object value, Type targetType, object parameter, CultureInfo culture);
+		object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture);
 	}
 }
 

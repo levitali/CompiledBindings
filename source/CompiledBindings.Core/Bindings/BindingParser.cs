@@ -14,7 +14,7 @@ namespace CompiledBindings
 {
 	public static class BindingParser
 	{
-		public static Bind CreatBinding(XamlObjectProperty prop, TypeInfo sourceType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser)
+		public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser)
 		{
 			var xBind = prop.XamlNode.Children[0];
 			var str = xBind.Value;
@@ -25,19 +25,17 @@ namespace CompiledBindings
 
 			var namespaces = XamlNode.GetClrNamespaces(prop.XamlNode.Element).ToList();
 
-			// Parse expression
-			var expression = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out var includeNamespaces, out var pos1);
-			includeNamespaces.ForEach(ns => prop.IncludeNamespaces.Add(ns.ClrNamespace!));
-
 			// Parse other Bind parameters
-			BindingMode? mode = null;
+			Expression? expression = null;
 			Expression? bindBackExpression = null;
-			string? converter = null;
 			Expression? converterParameter = null;
+			BindingMode? mode = null;
+			string? converter = null;
 			UpdateSourceTrigger updateSourceTrigger = UpdateSourceTrigger.Event;
 			EventDefinition? targetChangedEvent = null;
 			XamlObjectValue? designValue = null;
 
+			int pos1 = 0;
 			while (true)
 			{
 				if (pos1 == str!.Length)
@@ -51,20 +49,44 @@ namespace CompiledBindings
 					break;
 				}
 
-				var match = Regex.Match(str, @"^\s*(\w+)\s*=\s*(.+)\s*$");
+				bool parseExpression = false;
+				var match = Regex.Match(str, @"^\s*(Path|BindBack|Converter|ConverterParameter|Mode|UpdateSourceTrigger|DesignValue)\s*=\s*(.+)\s*$");
 				if (!match.Success)
 				{
-					throw new ParseException($"Syntax error.");
+					if (expression == null)
+					{
+						parseExpression = true;
+					}
+					else
+					{
+						throw new ParseException($"Syntax error.");
+					}
 				}
 
-				var name = match.Groups[1].Value;
-				str = match.Groups[2].Value;
-
-				if (name is "BindBack" or "ConverterParameter")
+				string name;
+				if (parseExpression)
 				{
-					var expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces, out pos1);
+					if (expression != null)
+					{
+						throw new ParseException($"Syntax error.");
+					}
+					name = "Path";
+				}
+				else
+				{
+					name = match.Groups[1].Value;
+					str = match.Groups[2].Value;
+				}
+
+				if (name is "Path" or "BindBack" or "ConverterParameter")
+				{
+					var expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out var includeNamespaces, out pos1);
 					includeNamespaces.ForEach(ns => prop.IncludeNamespaces.Add(ns.ClrNamespace!));
-					if (name == "BindBack")
+					if (name == "Path")
+					{
+						expression = expr;
+					}
+					else if (name == "BindBack")
 					{
 						bindBackExpression = expr;
 						if (mode == null)
@@ -144,6 +166,11 @@ namespace CompiledBindings
 				}
 			}
 
+			if (expression == null)
+			{
+				expression = new ParameterExpression(sourceType, dataRootName);
+			}
+
 			if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && expression is not (MemberExpression or CallExpression or ElementAccessExpression))
 			{
 				throw new ParseException("The expression must be settable for TwoWay or OneWayToSource bindings.");
@@ -204,7 +231,7 @@ namespace CompiledBindings
 						{
 							Property = new PropertyInfo((PropertyDefinition)expr.Member, expr.Type),
 							Expression = expr,
-							Bindings = g2.Select(e => e.bind).ToList(),
+							Bindings = g2.Select(e => e.bind).Distinct().ToList(),
 						};
 					})
 					.ToList(),
@@ -264,7 +291,7 @@ namespace CompiledBindings
 						setExpressions.Add(new PropertySetExpressionBase(prop2.SourceExpression.CloneReplace(prop.Expression, expr)));
 					}
 
-					var localVars = GroupExpressions(setExpressions);
+					var localVars = ExpressionUtils.GroupExpressions(setExpressions);
 
 					for (int i1 = prop.Bindings.Count, i2 = 0; i2 < prop.DependentNotifyProperties.Count; i1++, i2++)
 					{
@@ -301,7 +328,7 @@ namespace CompiledBindings
 
 			List<PropertySetExpressionBase> props3 = props1.Cast<PropertySetExpressionBase>().Union(props2).ToList();
 
-			var localVars2 = GroupExpressions(props3);
+			var localVars2 = ExpressionUtils.GroupExpressions(props3);
 
 			for (int i = 0; i < props2.Count; i++)
 			{
@@ -325,75 +352,6 @@ namespace CompiledBindings
 			};
 		}
 
-		public static List<LocalVariable> GroupExpressions(IReadOnlyList<PropertySetExpressionBase> setExpressions)
-		{
-			int localVarIndex = 1;
-			List<LocalVariable> localVars = new();
-
-			while (true)
-			{
-				var group = setExpressions
-					.SelectMany(p => p.Expression.EnumerateTree()
-						.Where(e => e is not (ConstantExpression or ParameterExpression or TypeExpression or DefaultExpression or NewExpression) &&
-									(e is not MemberExpression me || (me.Member is not (MethodDefinition or FieldDefinition))))
-						.Select(e => (property: p, expr: e)))
-					.GroupBy(e => e.expr.ToString())
-					.Where(g => g.Take(2).Count() > 1)
-					.OrderByDescending(g => g.Select(p => p.property).Distinct().Count())
-					.ThenBy(g => g.First().expr, ExpressionComparer.Instance)
-					.FirstOrDefault();
-				if (group == null)
-				{
-					break;
-				}
-
-				var expression = group.First().expr;
-				var type = expression.Type;
-				if (!type.IsNullable && expression.IsNullable)
-				{
-					if (type.Type.IsValueType)
-					{
-						type = TypeInfoUtils.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
-					}
-					else
-					{
-						type = new TypeInfo(type.Type);
-					}
-				}
-
-				var localVar = new LocalVariable("value" + localVarIndex++, expression);
-				var localVarExpr = new ParameterExpression(type, localVar.Name);
-				foreach (var prop in group.Distinct(p => p.property))
-				{
-					prop.property.Expression = prop.property.Expression.CloneReplace(prop.expr, localVarExpr);
-				}
-				localVars.Add(localVar);
-			}
-
-			return localVars;
-		}
-
-		public static UpdateMethod CreateStaticUpdateMethod(IEnumerable<XamlObject> objects)
-		{
-			return CreateStaticUpdateMethod(objects.SelectMany(o => o.Properties));
-		}
-
-		public static UpdateMethod CreateStaticUpdateMethod(IEnumerable<XamlObjectProperty> properties)
-		{
-			var setExpressions = properties.Where(p => p.Value.StaticValue != null).Select(p => new PropertySetExpression(p, p.Value.StaticValue!)).ToList();
-			var setProperties = properties.Where(p => p.Value.CSharpValue != null).ToList();
-
-			var localVars = GroupExpressions(setExpressions);
-			var updateMethod = new UpdateMethod
-			{
-				LocalVariables = localVars,
-				SetExpressions = setExpressions
-			};
-
-			updateMethod.SetProperties = setProperties;
-			return updateMethod;
-		}
-
 		private static string ConvertValue(string value, TypeReference targetType)
 		{
 			if (value.StartsWith("'") && value.EndsWith("'"))
@@ -406,33 +364,6 @@ namespace CompiledBindings
 			}
 
 			return value;
-		}
-
-		private class ExpressionComparer : IComparer<Expression>
-		{
-			public static readonly ExpressionComparer Instance = new ExpressionComparer();
-
-			public int Compare(Expression x, Expression y)
-			{
-				var sx = x.ToString();
-				var sy = y.ToString();
-				if (sx == sy)
-				{
-					return 0;
-				}
-
-				if (sx.Contains(sy))
-				{
-					return -1;
-				}
-
-				if (sy.Contains(sx))
-				{
-					return 1;
-				}
-
-				return string.Compare(sx, sy);
-			}
 		}
 	}
 
