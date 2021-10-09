@@ -6,7 +6,7 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 
 ## x:Bind Markup Extension
 
-{x:Bind} Markup Extension must have an expression (without Path attribute) as its first parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
+{x:Bind} Markup Extension have an expression as its first parameter, or the expression is specified by the Path parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
 
 ### Data source
 
@@ -98,7 +98,7 @@ You can use following constants in the expression:
 
 - **Mode** Specifies the binding mode, as one of these strings: "OneTime", "OneWay", "TwoWay" or "OneWayToSource". The default is "OneWay" 
 - **Converter** Specifies the converter. The value must be a StaticResource expression.
-- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter. The only difference is, that it is never observed whethere the values in the converter parameter expression are changed.
+- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter.
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
 
 ### Observing changes
