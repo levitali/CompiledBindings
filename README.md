@@ -36,7 +36,7 @@ If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
 
-### x:Bind usage by examples
+### x:Bind usage
 
 Note, that in some examples bellow the TextBlock (WPF) control is used, in others Label (Xamarin Forms).
 
@@ -140,4 +140,21 @@ public static void SetFocused(this VisualElement visualElement, bool focused)
 		}
 }
 ``` 
-  
+
+## Using m: Namespace to bind to any property
+
+Just like binding to methods, you can use m: Namespace to bind to properties. This is usefull, if the {x:Bind} or {x:Set} expression is correct, but you still receive errors. This can happen, because some other part of the build process determins the markup extension as invalid.
+
+For example, in WPF if using single quotes in the expression, you receive the following error:
+
+```xaml
+<TextBlock Text="{x:Bind system:String.Format('{0:0.###} {1}', Quantity, Unit)}" />
+```
+```text  
+Names and Values in a MarkupExtension cannot contain quotes. The MarkupExtension arguments ' system:String.Format('{0:0.###} {1}', Quantity, Unit)}' are not valid.
+```
+
+You can overcome this problem by using m: Namespace to set the Text property:
+```xaml
+<TextBlock m:Text="{x:Bind system:String.Format('{0:0.###} {1}', Quantity, Unit)}"
+```
