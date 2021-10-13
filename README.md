@@ -76,7 +76,7 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 
  - null check operator
  ```xaml
-<Label IsVisible="{x:Bind Movie.Title ?? '<no title>'}"/>
+<Label IsVisible="{x:Bind Movie.Title ?? 'no title'}"/>
  ```
  
  - cast operator. The class, to which cast is made, must be fully specified with namespace (the namespace must be declared)
