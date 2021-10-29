@@ -6,7 +6,7 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 
 ## x:Bind Markup Extension
 
-{x:Bind} Markup Extension must have an expression (without Path attribute) as its first parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
+{x:Bind} Markup Extension have an expression as its first parameter, or the expression is specified by the Path parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
 
 ### Data source
 
@@ -36,7 +36,7 @@ If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
 
-### x:Bind usage by examples
+### x:Bind usage
 
 Note, that in some examples bellow the TextBlock (WPF) control is used, in others Label (Xamarin Forms).
 
@@ -76,7 +76,7 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 
  - null check operator
  ```xaml
-<Label IsVisible="{x:Bind Movie.Title ?? '<no title>'}"/>
+<Label IsVisible="{x:Bind Movie.Title ?? 'no title'}"/>
  ```
  
  - cast operator. The class, to which cast is made, must be fully specified with namespace (the namespace must be declared)
@@ -98,7 +98,7 @@ You can use following constants in the expression:
 
 - **Mode** Specifies the binding mode, as one of these strings: "OneTime", "OneWay", "TwoWay" or "OneWayToSource". The default is "OneWay" 
 - **Converter** Specifies the converter. The value must be a StaticResource expression.
-- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter. The only difference is, that it is never observed whethere the values in the converter parameter expression are changed.
+- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter.
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
 
 ### Observing changes
@@ -140,4 +140,21 @@ public static void SetFocused(this VisualElement visualElement, bool focused)
 		}
 }
 ``` 
-  
+
+## Using m: Namespace to bind to any property
+
+Just like binding to methods, you can use m: Namespace to bind to properties. This is usefull, if the {x:Bind} or {x:Set} expression is correct, but you still receive errors. This can happen, because some other part of the build process determins the markup extension as invalid.
+
+For example, in WPF if using single quotes in the expression, you receive the following error:
+
+```xaml
+<TextBlock Text="{x:Bind system:String.Format('{0:0.###} {1}', Quantity, Unit)}" />
+```
+```text  
+Names and Values in a MarkupExtension cannot contain quotes. The MarkupExtension arguments ' system:String.Format('{0:0.###} {1}', Quantity, Unit)}' are not valid.
+```
+
+You can overcome this problem by using m: Namespace to set the Text property:
+```xaml
+<TextBlock m:Text="{x:Bind system:String.Format('{0:0.###} {1}', Quantity, Unit)}"
+```
