@@ -26,6 +26,7 @@ namespace CompiledBindings
 			"else", "long", "static",  "enum", "namespace", "string"
 		};
 		private static List<AssemblyDefinition>? _assemblies;
+		private static Dictionary<string, TypeDefinition>? _allTypes;
 		private static readonly Dictionary<string, TypeDefinition> _typeCache = new Dictionary<string, TypeDefinition>(StringComparer.OrdinalIgnoreCase);
 		private static readonly Dictionary<TypeReference, TypeDefinition> _resolveCache = new Dictionary<TypeReference, TypeDefinition>();
 		private static readonly Dictionary<TypeReference, TypeReference> _baseTypeCache = new Dictionary<TypeReference, TypeReference>();
@@ -46,6 +47,8 @@ namespace CompiledBindings
 			}
 
 			_assemblies.Add(assembly);
+			_allTypes = null;
+			
 			return assembly;
 		}
 
@@ -56,7 +59,16 @@ namespace CompiledBindings
 				AssemblyResolver = new AssemblyResolver(),
 			};
 			_assemblies = assemblies.Select(f => AssemblyDefinition.ReadAssembly(f, prm)).ToList();
-			var duplicates = _assemblies.GroupBy(a => a.Name.Name).Where(g => g.Take(2).Count() > 1).ToList();
+			_allTypes = null;
+		}
+
+		private static bool TryGetType(string fullName, out TypeDefinition type)
+		{
+			if (_allTypes == null)
+			{
+				_allTypes = EnumerateAllTypes().Distinct(t => t.FullName.ToUpper()).ToDictionary(t => t.FullName, StringComparer.OrdinalIgnoreCase);
+			}
+			return _allTypes.TryGetValue(fullName, out type);
 		}
 
 		public static void Cleanup()
@@ -69,6 +81,7 @@ namespace CompiledBindings
 			_typeCache.Clear();
 			_resolveCache.Clear();
 			_baseTypeCache.Clear();
+			_allTypes = null;
 		}
 
 		public static IEnumerable<TypeDefinition> EnumerateAllTypes()
@@ -82,8 +95,7 @@ namespace CompiledBindings
 			{
 				return type;
 			}
-			type = EnumerateAllTypes().FirstOrDefault(t => string.Compare(t.FullName, typeName, ignoreCase) == 0);
-			if (type != null)
+			if (TryGetType(typeName, out type) && (!ignoreCase || type.FullName == typeName))
 			{
 				_typeCache[typeName] = type;
 			}
@@ -144,10 +156,7 @@ namespace CompiledBindings
 					return null;
 				}
 
-				string name = type.FullName;
-				typeDefinition = EnumerateAllTypes().FirstOrDefault(t => t.FullName == name);
-
-				if (typeDefinition != null)
+				if (TryGetType(type.FullName, out typeDefinition))
 				{
 					_resolveCache[type] = typeDefinition;
 				}

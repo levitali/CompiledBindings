@@ -193,6 +193,7 @@ namespace WPFTest.Views
 					}
 
 					var targetRoot = bindings._targetRoot;
+					var dataRoot = bindings._targetRoot;
 					var typedSender = (global::System.Windows.Controls.ListView)sender;
 					targetRoot.button1.IsEnabled = typedSender.SelectedItem != null;
 				}

@@ -37,7 +37,7 @@ namespace CompiledBindings
 			}
 			else
 			{
-				Debug.Assert(_toString == ToStringCore());
+				//Debug.Assert(_toString == ToStringCore());
 			}
 			return _toString;
 		}

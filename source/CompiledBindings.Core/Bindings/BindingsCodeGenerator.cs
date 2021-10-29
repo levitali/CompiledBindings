@@ -591,6 +591,7 @@ $@"					var bindings = TryGetBindings();
 					}}
 
 					var targetRoot = bindings._targetRoot;
+					var dataRoot = bindings.{(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
 					var typedSender = (global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()})sender;");
 
 							GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", align: "\t\t");

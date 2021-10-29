@@ -116,41 +116,17 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Android\Membrain.BuildTasks.Android\Membrain.Generators.Android.csproj">
-      <Project>{36849eb6-d343-4aea-bfcd-a24ce26901a9}</Project>
-      <Name>Membrain.Generators.Android</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CF\Membrain.Generators.CF\Membrain.Generators.CF.csproj">
-      <Project>{83d9a793-02c2-42c2-bec6-0637967ce3c8}</Project>
-      <Name>Membrain.Generators.CF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CompiledBindings.Core\CompiledBindings.Core.csproj">
       <Project>{5c7e00fd-1c0d-45d1-b4e8-b18c729c2fd8}</Project>
       <Name>CompiledBindings.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Membrain.BuildTasks.Core\Membrain.BuildTasks.Core.csproj">
-      <Project>{3620699f-b711-451c-a65e-a12a355b1a49}</Project>
-      <Name>Membrain.BuildTasks.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Serialization\Membrain.Generators.Serialization\Membrain.Generators.Serialization.csproj">
-      <Project>{80885d21-d063-4e33-be04-46f470e12c9a}</Project>
-      <Name>Membrain.Generators.Serialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\WPF\CompiledBindings.WPF\CompiledBindings.WPF.csproj">
       <Project>{2260c42c-97ef-496e-9614-4bedffebcdf6}</Project>
       <Name>CompiledBindings.WPF</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WPF\Membrain.Generators.WPF\Membrain.Generators.WPF.csproj">
-      <Project>{2afdf8fa-9b8e-4887-b0a2-4040010785f8}</Project>
-      <Name>Membrain.Generators.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\XF\CompiledBindings.XF\CompiledBindings.XF.csproj">
       <Project>{db845705-796a-414a-b3c3-849b15006f50}</Project>
       <Name>CompiledBindings.XF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XF\Membrain.Generators.XF\Membrain.Generators.XF.csproj">
-      <Project>{f1e3ba18-2284-44ac-9c5b-cf2aa740e307}</Project>
-      <Name>Membrain.Generators.XF</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

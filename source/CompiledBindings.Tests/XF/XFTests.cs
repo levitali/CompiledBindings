@@ -33,20 +33,26 @@ namespace CompiledBindings.Tests.XF
 				typeof(INotifyPropertyChanged).Assembly.CodeBase.Substring(substr),
 				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
 			});
+			try
+			{
+				var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
+				var xdoc = XDocument.Load(xamlFile);
 
-			var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
-			var xdoc = XDocument.Load(xamlFile);
+				var xamlDomParser = new XFXamlDomParser();
+				var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
 
-			var xamlDomParser = new XFXamlDomParser();
-			var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
+				var codeGenerator = new XFCodeGenerator("latest");
+				var code = codeGenerator.GenerateCode(parseResult);
 
-			var codeGenerator = new XFCodeGenerator("latest");
-			var code = codeGenerator.GenerateCode(parseResult);
+				var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");
+				var expectedCode = File.ReadAllText(csharpFile);
 
-			var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");
-			var expectedCode = File.ReadAllText(csharpFile);
-
-			Assert.AreEqual(code, expectedCode);
+				Assert.AreEqual(code, expectedCode);
+			}
+			finally
+			{
+				TypeInfoUtils.Cleanup();
+			}
 		}
 	}
 }

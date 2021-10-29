@@ -34,21 +34,27 @@ namespace CompiledBindings.Tests.WPF
 				typeof(System.Windows.DependencyObject).Assembly.CodeBase.Substring(substr),
 				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
 			});
+			try
+			{
+				var xamlFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml");
+				var xdoc = XDocument.Load(xamlFile);
 
-			var xamlFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml");
-			var xdoc = XDocument.Load(xamlFile);
+				var xamlDomParser = new WpfXamlDomParser();
+				var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
+				parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 
-			var xamlDomParser = new WpfXamlDomParser();
-			var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
-			parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
+				var codeGenerator = new WpfCodeGenerator("latest");
+				var code = codeGenerator.GenerateCode(parseResult);
 
-			var codeGenerator = new WpfCodeGenerator("latest");
-			var code = codeGenerator.GenerateCode(parseResult);
+				var csharpFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml.g.m.cs");
+				var expectedCode = File.ReadAllText(csharpFile);
 
-			var csharpFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml.g.m.cs");
-			var expectedCode = File.ReadAllText(csharpFile);
-
-			Assert.AreEqual(code, expectedCode);
+				Assert.AreEqual(code, expectedCode);
+			}
+			finally
+			{
+				TypeInfoUtils.Cleanup();
+			}
 		}
 	}
 }
