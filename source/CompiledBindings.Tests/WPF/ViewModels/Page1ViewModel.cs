@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace WPFTest.ViewModels
 {
@@ -13,6 +15,8 @@ namespace WPFTest.ViewModels
 
 		public bool BooleanProp { get; }
 
+		public Pag1ModifyViewModel? ModifyViewModel { get; }
+
 		public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
 		{
 			new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
@@ -21,6 +25,15 @@ namespace WPFTest.ViewModels
 		public int[] ArrayProp { get; }
 
 		public event PropertyChangedEventHandler PropertyChanged;
+
+		public Task<string> TaskProp => Task.FromResult(string.Empty);
+
+		public Task<ImageSource> LoadImageAsync() => null;
+	}
+
+	public class Pag1ModifyViewModel
+	{
+		public string Input1 { get; set; }
 	}
 
 	public class EntityViewModel : INotifyPropertyChanged

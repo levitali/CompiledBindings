@@ -282,28 +282,58 @@ namespace WPFTest.Views
 				var value1 = dataRoot.ArrayProp?.Length > 0;
 				var value2 = dataRoot.BooleanProp;
 				var value3 = dataRoot.DecimalProp;
+				var value4 = dataRoot.ModifyViewModel;
 				targetRoot.header1.Visibility = (value2 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
 				targetRoot.textBlock5.Visibility = ((global::System.Windows.Visibility)targetRoot.TrueToVisibleConverter.Convert(value2, typeof(global::System.Windows.Visibility), null, null));
 				targetRoot.textBlock5.Text = value3.ToString();
 				targetRoot.textBlock6.Text = (value3 + 1).ToString();
 				if (!_settingBinding4)
 				{
-					var value4 = dataRoot.OrderInput;
-					if (!object.Equals(targetRoot.textBox1.Text, value4))
+					var value5 = dataRoot.OrderInput;
+					if (!object.Equals(targetRoot.textBox1.Text, value5))
 					{
-						targetRoot.textBox1.Text = value4;
+						targetRoot.textBox1.Text = value5;
 					}
 				}
 				if (!_settingBinding5)
 				{
-					var value5 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
-					if (!object.Equals(targetRoot.checkBox1.IsChecked, value5))
+					var value6 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
+					if (!object.Equals(targetRoot.checkBox1.IsChecked, value6))
 					{
-						targetRoot.checkBox1.IsChecked = value5;
+						targetRoot.checkBox1.IsChecked = value6;
 					}
 				}
 				targetRoot.listView.ItemsSource = dataRoot.ListProp;
 				targetRoot.listView.SetVisible(value1);
+				targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
+				targetRoot.textBlock8.Text = value4?.Input1 ?? "aaa";
+				Set0();
+				async void Set0()
+				{
+					try
+					{
+						var task = dataRoot.TaskProp;
+						if (!task.IsCompleted)
+						{
+							targetRoot.textBlock9.Text = "Loading...";
+						}
+						targetRoot.textBlock9.Text = await task;
+					}
+					catch
+					{
+					}
+				}
+				Set1();
+				async void Set1()
+				{
+					try
+					{
+						targetRoot.image1.Source = await dataRoot.LoadImageAsync();
+					}
+					catch
+					{
+					}
+				}
 
 			}
 
@@ -463,6 +493,39 @@ namespace WPFTest.Views
 					if (notifyAll || e.PropertyName == "ListProp")
 					{
 						targetRoot.listView.ItemsSource = typedSender.ListProp;
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+					if (notifyAll || e.PropertyName == "ModifyViewModel")
+					{
+						var value1 = typedSender.ModifyViewModel;
+						targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
+						targetRoot.textBlock8.Text = value1?.Input1 ?? "aaa";
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+					if (notifyAll || e.PropertyName == "TaskProp")
+					{
+						Set0();
+						async void Set0()
+						{
+							try
+							{
+								var task = typedSender.TaskProp;
+								if (!task.IsCompleted)
+								{
+									targetRoot.textBlock9.Text = "Loading...";
+								}
+								targetRoot.textBlock9.Text = await task;
+							}
+							catch
+							{
+							}
+						}
 						if (!notifyAll)
 						{
 							return;

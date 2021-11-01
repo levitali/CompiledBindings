@@ -26,6 +26,8 @@ namespace CompiledBindings
 
 		private static readonly XName NameAttr = XNamespace.None + "Name";
 
+		private int _localVarIndex;
+
 		public XamlDomParser(XNamespace defaultNamespace, XNamespace xNamespace) :
 			this(defaultNamespace, xNamespace, defaultNamespace + "VisualStateManager.VisualStateGroups", defaultNamespace + "VisualStateGroup", defaultNamespace + "VisualState")
 		{
@@ -70,6 +72,7 @@ namespace CompiledBindings
 		public string File;
 		public TypeInfo TargetType;
 		public TypeInfo DataType;
+		public TypeInfo ConverterType;
 		public HashSet<string> KnownContentTypes;
 		public Dictionary<string, string> KnownContentProperties;
 		public Dictionary<XName, string> KnownTypeMappings;
@@ -420,16 +423,15 @@ namespace CompiledBindings
 									.Select(e => e.Attribute(xDefaultBindMode))
 									.FirstOrDefault(a => a != null);
 						var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-						value.BindValue = BindingParser.Parse(objProp, DataType, "dataRoot", defaultBindMode, this);
-						if (value.BindValue.Converter == null)
+						value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, ConverterType, ref _localVarIndex);
+						if (value.BindValue.SourceExpression != null)
 						{
-							value.BindValue.SourceExpression = CorrectSourceExpression(value.BindValue.Expression, objProp);
+							if (value.BindValue.Converter == null)
+							{
+								value.BindValue.SourceExpression = CorrectSourceExpression(value.BindValue.SourceExpression, objProp);
+							}
+							CorrectMethod(objProp, value.BindValue.SourceExpression.Type);
 						}
-						else
-						{
-							value.BindValue.SourceExpression = GenerateConvertExpression(value.BindValue);
-						}
-						CorrectMethod(objProp, value.BindValue.Expression.Type);
 						obj.GenerateMember = true;
 					}
 					catch (ParseException ex)
@@ -485,6 +487,7 @@ namespace CompiledBindings
 		private static Expression CorrectSourceExpression(Expression expression, XamlObjectProperty prop)
 		{
 			if (expression is not (ConstantExpression or DefaultExpression) &&
+				!TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
 				prop.MemberType?.Type.FullName == "System.String" && expression.Type.Type.FullName != "System.String")
 			{
 				var method = TypeInfoUtils.GetTypeThrow(typeof(object)).Methods.First(m => m.Name == "ToString");
@@ -849,11 +852,6 @@ namespace CompiledBindings
 				}
 			}
 			return value;
-		}
-
-		protected virtual Expression GenerateConvertExpression(Bind bind)
-		{
-			throw new NotImplementedException("Converter is not implemented.");
 		}
 	}
 

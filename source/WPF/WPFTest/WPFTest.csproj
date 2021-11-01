@@ -6,12 +6,27 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Images\download.png" />
+    <None Remove="WPFTest.csproj.vspscc" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\download.png" />
+  </ItemGroup>
+
   <UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="..\..\..\bin\WPF\CompiledBindings.WPF.dll" />
   <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\WPF\CompiledBindings.Core.dll" />
   <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\WPF\CompiledBindings.Core.dll" />
+  
   <PropertyGroup>
     <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
   </PropertyGroup>
+  
   <Target Name="WPFGenerateCodeTask" BeforeTargets="MarkupCompilePass1" Condition="'$(DesignTimeBuild)' != 'True'">
     <MarkupCompilePass1 Language="$(Language)" UICulture="$(UICulture)" ApplicationMarkup="@(ApplicationDefinition)" SplashScreen="@(SplashScreen)" LanguageSourceExtension="$(DefaultLanguageSourceExtension)" PageMarkup="@(Page)" ContentFiles="@(Content)" AssemblyName="$(AssemblyName)" OutputType="$(OutputType)" AssemblyVersion="$(AssemblyVersion)" AssemblyPublicKeyToken="$(AssemblyPublicKeyToken)" References="@(ReferencePath)" RootNamespace="$(RootNamespace)" KnownReferencePaths="$(MSBuildBinPath);$(TargetFrameworkDirectory);@(_TargetFrameworkSDKDirectoryItem);@(KnownReferencePaths)" AssembliesGeneratedDuringBuild="@(AssembliesGeneratedDuringBuild)" AlwaysCompileMarkupFilesInSeparateDomain="$(AlwaysCompileMarkupFilesInSeparateDomain)" HostInBrowser="$(HostInBrowser)" LocalizationDirectivesToLocFile="$(LocalizationDirectivesToLocFile)" ContinueOnError="false" SourceCodeFiles="@(Compile)" DefineConstants="$(DefineConstants)" ExtraBuildControlFiles="@(ExtraBuildControlFiles)" XamlDebuggingInformation="$(XamlDebuggingInformation)" IsRunningInVisualStudio="$(BuildingInsideVisualStudio)" OutputPath="$(IntermediateOutputPath)">
       <Output ItemName="Compile1" TaskParameter="GeneratedCodeFiles" />
@@ -37,9 +52,11 @@
       <Page Include="@(NewPages)" />
     </ItemGroup>
   </Target>
+  
   <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
     <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="false" />
   </Target>
+  
   <Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterBuild">
     <UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)" AttachDebugger="true">
       <Output TaskParameter="UpdatedReferenceCopyLocalFiles" ItemName="UpdatedReferenceCopyLocalPaths" />
@@ -49,11 +66,5 @@
       <ReferenceCopyLocalPaths Include="@(UpdatedReferenceCopyLocalFiles)" />
     </ItemGroup>
   </Target>
-  <ItemGroup>
-    <None Remove="WPFTest.csproj.vspscc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
-  </ItemGroup>
 
 </Project>

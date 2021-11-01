@@ -6,7 +6,7 @@
       xmlns:mx="http://compiledbindings.com/x"
       xmlns:viewModels="using:WPFTest.ViewModels"
       xmlns:views="clr-namespace:WPFTest.Views"
-      mc:Ignorable="b mx"
+      mc:Ignorable="d mx"
       x:Class="WPFTest.Views.Page1"
       mx:DataType="viewModels:Page1ViewModel"
       m:Title="{x:Set local:Strings.Instance.Title}">
@@ -35,9 +35,13 @@
     <CheckBox m:IsChecked="{x:Bind BoolInput, Mode=TwoWay, Converter={StaticResource InverseBooleanConverter}, ConverterParameter=ArrayProp.Length > 0}" />
     <ListView x:Name="listView"
               ItemTemplate="{StaticResource test1Template}"
-              m:ItemsSource="{x:Bind ListProp}"
+              ItemsSource="{x:Bind ListProp}"
               m:SetVisible="{x:Bind ArrayProp.Length > 0}" />
     <Button mx:DataType="{x:Null}" m:IsEnabled="{x:Bind listView.SelectedItem != null}" />
+    <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='abc'}"/>
+    <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='aaa'}"/>
+    <TextBlock Text="{x:Bind TaskProp, FallbackValue='Loading...'}"/>
+    <Image Source="{x:Bind LoadImageAsync()}"/>
   </StackPanel>
 
 </Page>

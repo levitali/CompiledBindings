@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Mono.Cecil;
-using Mono.Cecil.Rocks;
 
 #nullable enable
 
@@ -14,7 +11,7 @@ namespace CompiledBindings
 {
 	public static class BindingParser
 	{
-		public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser)
+		public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo rootType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, TypeInfo converterType, ref int localVarIndex)
 		{
 			var xBind = prop.XamlNode.Children[0];
 			var str = xBind.Value;
@@ -25,15 +22,16 @@ namespace CompiledBindings
 
 			var namespaces = XamlNode.GetClrNamespaces(prop.XamlNode.Element).ToList();
 
-			// Parse other Bind parameters
 			Expression? expression = null;
 			Expression? bindBackExpression = null;
+			Expression? converter = null;
 			Expression? converterParameter = null;
+			Expression? fallbackValue = null;
+			Expression? targetNullValue = null;
 			BindingMode? mode = null;
-			string? converter = null;
 			UpdateSourceTrigger updateSourceTrigger = UpdateSourceTrigger.Event;
 			EventDefinition? targetChangedEvent = null;
-			XamlObjectValue? designValue = null;
+			List<(string name, TypeInfo type)> resources = new();
 
 			int pos1 = 0;
 			while (true)
@@ -50,7 +48,7 @@ namespace CompiledBindings
 				}
 
 				bool parseExpression = false;
-				var match = Regex.Match(str, @"^\s*(Path|BindBack|Converter|ConverterParameter|Mode|UpdateSourceTrigger|DesignValue)\s*=\s*(.+)\s*$");
+				var match = Regex.Match(str, @"^\s*(Path|BindBack|Converter|ConverterParameter|FallbackValue|TargetNullValue|Mode|UpdateSourceTrigger)\s*=\s*(.+)\s*$");
 				if (!match.Success)
 				{
 					if (expression == null)
@@ -78,10 +76,40 @@ namespace CompiledBindings
 					str = match.Groups[2].Value;
 				}
 
-				if (name is "Path" or "BindBack" or "ConverterParameter")
+				if (name is "Path" or "BindBack" or "Converter" or "ConverterParameter" or "FallbackValue" or "TargetNullValue")
 				{
-					var expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out var includeNamespaces, out pos1);
-					includeNamespaces.ForEach(ns => prop.IncludeNamespaces.Add(ns.ClrNamespace!));
+					Expression expr;
+					if (name is "Converter" or "ConverterParameter" or "FallbackValue" or "TargetNullValue" &&
+						Regex.Match(str, @"{StaticResource\s+(\w+)}") is var match2 && match2.Success)
+					{
+						var resourceName = match2.Groups[1].Value;
+						var resourceType = name switch
+						{
+							"Converter" => converterType,
+							"FallbackValue" or "TargetNullValue" => prop.MemberType,
+							_ => TypeInfoUtils.GetTypeThrow(typeof(object))
+						};
+						resources.Add((resourceName, resourceType));
+
+						var resourceField = new FieldDefinition(resourceName, FieldAttributes.Private, converterType);
+						expr = new ParameterExpression(rootType, "targetRoot");
+						expr = new MemberExpression(expr, resourceField, new TypeInfo(converterType, false));
+
+						int pos2 = str.IndexOf(',');
+						if (pos2 == -1)
+						{
+							pos1 = pos2 = str.Length;
+						}
+						else
+						{
+							pos1 = pos2 + 1;
+						}
+					}
+					else
+					{
+						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out var includeNamespaces, out pos1);
+						includeNamespaces.ForEach(ns => prop.IncludeNamespaces.Add(ns.ClrNamespace!));
+					}
 					if (name == "Path")
 					{
 						expression = expr;
@@ -94,12 +122,24 @@ namespace CompiledBindings
 							mode = BindingMode.TwoWay;
 						}
 					}
+					else if (name == "FallbackValue")
+					{
+						fallbackValue = expr;
+					}
+					else if (name == "TargetNullValue")
+					{
+						targetNullValue = expr;
+					}
+					else if (name == "Converter")
+					{
+						converter = expr;
+					}
 					else
 					{
 						converterParameter = expr;
 					}
 				}
-				else if (name is "Mode" or "UpdateSourceTrigger" or "Converter")
+				else if (name is "Mode" or "UpdateSourceTrigger")
 				{
 					int pos2 = str.IndexOf(',');
 					if (pos2 == -1)
@@ -129,15 +169,6 @@ namespace CompiledBindings
 							throw new ParseException(msg, pos1);
 						}
 					}
-					else if (name == "Converter")
-					{
-						var match2 = Regex.Match(value, @"{StaticResource\s+(\w+)}");
-						if (!match2.Success)
-						{
-							throw new ParseException($"The converter must be a StaticResource.", pos1);
-						}
-						converter = match2.Groups[1].Value;
-					}
 					else
 					{
 						if (value == "Explicit")
@@ -154,24 +185,6 @@ namespace CompiledBindings
 						}
 					}
 				}
-				else if (name == "DesignValue")
-				{
-					string value;
-					match = Regex.Match(str, @"^(.+?)(?<!\\),");
-					if (match.Success)
-					{
-						value = match.Groups[1].Value;
-						pos1 = value.Length + 1;
-					}
-					else
-					{
-						value = str;
-						pos1 = str.Length;
-					}
-					value = value.Replace("\\,", ",");
-
-					designValue = new XamlObjectValue(prop) { CSharpValue = xamlDomParser.GetCSharpValue(value, prop.XamlNode, prop.MemberType) };
-				}
 				else
 				{
 					throw new ParseException($"Property {name} is not valid for x:Bind"); //TODO!! position
@@ -180,7 +193,14 @@ namespace CompiledBindings
 
 			if (expression == null)
 			{
-				expression = new ParameterExpression(sourceType, dataRootName);
+				if (mode != BindingMode.OneWayToSource)
+				{
+					throw new ParseException("Missing expression.");
+				}
+				if (bindBackExpression == null)
+				{
+					throw new ParseException("Missing Path or BindBack expression.");
+				}
 			}
 
 			if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && expression is not (MemberExpression or CallExpression or ElementAccessExpression))
@@ -200,6 +220,39 @@ namespace CompiledBindings
 			// The platform generator can add default events for some controls.
 			// Whether an event is set, is checked in code generator.
 
+			var sourceExpression = expression;
+
+			if (sourceExpression != null && converter != null)
+			{
+				var convertMethod = converterType.Methods.First(m => m.Definition.Name == "Convert");
+				sourceExpression = new CallExpression(converter, convertMethod.Definition, new Expression[]
+				{
+					sourceExpression,
+					new TypeofExpression(new TypeExpression(prop.MemberType)),
+					converterParameter ?? Expression.NullExpression,
+					Expression.NullExpression
+				});
+				if (prop.MemberType.Type.FullName != "System.Object")
+				{
+					sourceExpression = new CastExpression(sourceExpression, prop.MemberType, false);
+				}
+			}
+
+			if (sourceExpression?.IsNullable == true && targetNullValue != null)
+			{
+				sourceExpression = new CoalesceExpression(sourceExpression, targetNullValue);
+			}
+
+			if (sourceExpression != null && fallbackValue != null)
+			{
+				var expr = sourceExpression.EnumerateTree().Reverse().OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+				if (expr != null)
+				{
+					var localVarName = "v" + localVarIndex++;
+					sourceExpression = new FallbackExpression(expr.Expression, fallbackValue, expr.CloneReplaceExpression(new ParameterExpression(new TypeInfo(sourceExpression.Type, false), localVarName)), localVarName, sourceExpression.Type);
+				}
+			}
+
 			return new Bind
 			{
 				Property = prop,
@@ -207,10 +260,12 @@ namespace CompiledBindings
 				BindBackExpression = bindBackExpression,
 				Converter = converter,
 				ConverterParameter = converterParameter,
+				FallbackValue = fallbackValue,
 				Mode = mode ?? defaultBindMode,
 				UpdateSourceTrigger = updateSourceTrigger,
 				TargetChangedEvent = targetChangedEvent,
-				DesignValue = designValue
+				Resources = resources,
+				SourceExpression = sourceExpression,
 			};
 		}
 
@@ -229,8 +284,8 @@ namespace CompiledBindings
 			var iNotifyPropertyChangedType = TypeInfoUtils.GetTypeThrow(typeof(INotifyPropertyChanged));
 
 			var notifyPropertyChangedList = binds
-				.Where(b => b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
-				.SelectMany(b => b.SourceExpression.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
+				.Where(b => b.SourceExpression != null && b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
+				.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 				.Where(e => CheckPropertyNotifiable(e.expr))
 				.GroupBy(e => e.expr.Expression.ToString())
 				.Select(g => new NotifyPropertyChangedData()
@@ -294,7 +349,7 @@ namespace CompiledBindings
 					var expr = new MemberExpression(typedSender, prop.Property.Definition, prop.Property.PropertyType);
 					var setExpressions = prop.Bindings.Select(b =>
 					{
-						var expression = b.SourceExpression.CloneReplace(prop.Expression, expr);
+						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
 						return (PropertySetExpressionBase)new PropertySetExpression(b.Property, expression);
 					}).ToList();
 
@@ -330,7 +385,7 @@ namespace CompiledBindings
 
 			var props1 = binds
 				.Where(b => b.Mode != BindingMode.OneWayToSource)
-				.Select(b => new PropertySetExpression(b.Property, b.SourceExpression)).ToList();
+				.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!)).ToList();
 
 			var props2 = new List<PropertySetExpressionBase>();
 			foreach (var group in notifyPropertyChangedList)
@@ -408,7 +463,7 @@ namespace CompiledBindings
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 		public PropertyInfo Property { get; init; }
-		public Expression Expression { get; set; }
+		public Expression Expression { get; init; }
 		public List<Bind> Bindings { get; init; }
 		public UpdateMethod UpdateMethod { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -425,16 +480,18 @@ namespace CompiledBindings
 	{
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 		public XamlObjectProperty Property { get; init; }
-		public Expression Expression { get; init; }
+		public Expression? Expression { get; init; }
 		public Expression? BindBackExpression { get; init; }
 		public BindingMode Mode { get; init; }
-		public string? Converter { get; init; }
+		public Expression? Converter { get; init; }
 		public Expression? ConverterParameter { get; init; }
+		public Expression? FallbackValue { get; init; }
 		public UpdateSourceTrigger? UpdateSourceTrigger { get; init; }
 		public EventDefinition? TargetChangedEvent { get; set; }
 		public XamlObjectValue? DesignValue { get; init; }
+		public List<(string name, TypeInfo type)> Resources { get; init; }
 
-		public Expression SourceExpression { get; set; }
+		public Expression? SourceExpression { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 		public bool IsDPChangeEvent;

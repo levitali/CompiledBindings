@@ -402,7 +402,8 @@ $@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].T
 
 				output.AppendLine(
 $@"			{{
-				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
+				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
+				var targetRoot = _targetRoot;");
 
 				if (first.TargetChangedEvent?.Name == "PropertyChanged")
 				{
@@ -681,7 +682,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 
 			void GenerateSetSource(Bind bind, string? a)
 			{
-				var expr = bind.BindBackExpression ?? bind.Expression;
+				var expr = bind.BindBackExpression ?? bind.Expression!;
 				var me = expr as MemberExpression;
 
 				string memberExpr = "_targetRoot";
@@ -706,7 +707,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 					string sourceTypeFullName = sourceType.Type.GetCSharpFullName();
 					string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
 					string parameter = bind.ConverterParameter?.ToString() ?? "null";
-					setExpr = GenerateConvertBackCall("_targetRoot", bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
+					setExpr = GenerateConvertBackCall(bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
 				}
 				else if (sourceType.Type.FullName == "System.String" && bind.Property.MemberType.Type.FullName != "System.String")
 				{
@@ -725,7 +726,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 					}
 					else
 					{
-						setExpr = $"({typeName})global::System.Convert.ChangeType({setExpr}, typeof({typeName}), null)";
+						setExpr = $"({typeName})System.Convert.ChangeType({setExpr}, typeof({typeName}), null)";
 					}
 				}
 
@@ -870,9 +871,9 @@ $@"}}");
 		{
 		}
 
-		protected virtual string GenerateConvertBackCall(string targetRoot, string converterName, string value, string targetType, string parameter, string? cast)
+		protected virtual string GenerateConvertBackCall(Expression converter, string value, string targetType, string parameter, string? cast)
 		{
-			return $"{cast}{targetRoot}.{converterName}.ConvertBack({value}, typeof(global::{targetType}), {parameter}, null)";
+			return $"{cast}{converter}.ConvertBack({value}, typeof(global::{targetType}), {parameter}, null)";
 		}
 	}
 }

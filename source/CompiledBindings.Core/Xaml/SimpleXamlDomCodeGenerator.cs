@@ -89,11 +89,51 @@ $@"	}}");
 			return output.ToString();
 		}
 
-		protected virtual void GenerateConverterDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+		public string GenerateVariableDeclarationCode(SimpleXamlDom parseResult)
 		{
+			var output = new StringBuilder();
+
+			if (parseResult.TargetType!.Type.Namespace != null)
+			{
+				output.AppendLine(
+$@"namespace {parseResult.TargetType.Type.Namespace}
+{{");
+			}
+
+			output.AppendLine(
+$@"	partial class {parseResult.TargetType.Type.Name}
+	{{");
+			foreach (var obj in parseResult.XamlObjects.Where(o => !o.NameExplicitlySet))
+			{
+				output.AppendLine(
+$@"		global::{obj.Type.Type.GetCSharpFullName()} {obj.Name};");
+			}
+
+			GenerateResourceDeclarations(output, parseResult);
+
+			output.AppendLine(
+$@"	}}");
+
+			if (parseResult.TargetType.Type.Namespace != null)
+			{
+				output.AppendLine(
+"}");
+			}
+
+			return output.ToString();
 		}
 
-		protected virtual void GenerateInitializeConverters(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+		private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+		{
+			var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
+			foreach (var resource in resources)
+			{
+				output.AppendLine(
+$@"		global::{resource.type.Type.GetCSharpFullName()} {resource.name};");
+			}
+		}
+
+		protected virtual void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
 		{
 		}
 
@@ -103,7 +143,7 @@ $@"	}}");
 			{
 				GenerateVariablesDeclarations(output, parseResult, true);
 			}
-			GenerateConverterDeclarations(output, parseResult);
+			GenerateResourceDeclarations(output, parseResult);
 
 			output.AppendLine(
 $@"		private bool _generatedCodeInitialized;
@@ -213,7 +253,7 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 				output.AppendLine();
 			}
 
-			GenerateInitializeConverters(output, parseResult, rootElement, isDataTemplate);
+			GenerateInitializeResources(output, parseResult, rootElement, isDataTemplate);
 
 			_bindingsCodeGenerator.GenerateUpdateMethodBody(output, parseResult.StaticUpdate);
 			output.AppendLine();
@@ -267,7 +307,7 @@ $@"
 	{{");
 
 			GenerateVariablesDeclarations(output, parseResult, false);
-			GenerateConverterDeclarations(output, parseResult);
+			GenerateResourceDeclarations(output, parseResult);
 
 			output.AppendLine(
 $@"

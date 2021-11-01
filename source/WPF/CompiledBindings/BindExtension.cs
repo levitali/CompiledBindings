@@ -8,7 +8,43 @@ namespace CompiledBindings.Markup
 {
 	public class BindExtension : MarkupExtension
 	{
-		public BindExtension(string path)
+		public BindExtension(string arg1)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4, string arg5)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9)
+		{
+		}
+
+		public BindExtension(string arg1, string arg2, string arg3, string arg4, string arg5, string arg6, string arg7, string arg8, string arg9, string arg10)
 		{
 		}
 
@@ -22,21 +58,14 @@ namespace CompiledBindings.Markup
 
 		public object ConverterParameter { get; set; }
 
-		//public object DesignValue { get; set; }
+		public object FallbackValue { get; set; }
+
+		public object TargetNullValue { get; set; }
 
 		public override object ProvideValue(IServiceProvider serviceProvider)
 		{
 			var provideValueTarget = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
 			var propertyType = (provideValueTarget.TargetProperty as DependencyProperty)?.PropertyType;
-
-			//if (DesignValue != null)
-			//{
-			//	if (propertyType.IsEnum && DesignValue is string str)
-			//	{
-			//		return Enum.Parse(propertyType, str);
-			//	}
-			//	return Convert.ChangeType(DesignValue, propertyType);
-			//}
 
 			if (propertyType?.IsValueType == true)
 			{

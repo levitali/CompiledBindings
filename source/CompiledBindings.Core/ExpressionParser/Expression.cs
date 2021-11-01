@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using Mono.Cecil;
@@ -88,23 +87,14 @@ namespace CompiledBindings
 
 		protected override string ToStringCore()
 		{
-			if (Value == null)
+			return Value switch
 			{
-				return "null";
-			}
-			if (Value is string str)
-			{
-				return $"\"{str}\"";
-			}
-			if (Value is bool b)
-			{
-				return b ? "true" : "false";
-			}
-			if (Value is char c)
-			{
-				return $"'{c}'";
-			}
-			return Convert.ToString(Value, CultureInfo.InvariantCulture);
+				null => "null",
+				string str => $"\"{str}\"",
+				bool b => b ? "true" : "false",
+				char c => $"'{c}'",
+				_ => Convert.ToString(Value, CultureInfo.InvariantCulture),
+			};
 		}
 
 		public override IEnumerable<Expression> Enumerate()
@@ -162,7 +152,7 @@ namespace CompiledBindings
 		}
 	}
 
-	public class MemberExpression : Expression
+	public class MemberExpression : Expression, IAccessExpression
 	{
 		public MemberExpression(Expression expression, IMemberDefinition member, TypeInfo type) : base(type)
 		{
@@ -204,6 +194,11 @@ namespace CompiledBindings
 		{
 			return expression is not (TypeExpression or NewExpression) &&
 				expression.Type.IsNullable && (expression is not ParameterExpression pe || pe.IsNullable);
+		}
+
+		public Expression CloneReplaceExpression(Expression expression)
+		{
+			return new MemberExpression(expression, Member, Type);
 		}
 	}
 
@@ -253,7 +248,7 @@ namespace CompiledBindings
 		{
 			string left = Left.ToString();
 			string right = Right.ToString();
-			if (Operand == "&&" || Operand == "||")
+			if (Operand is "&&" or "||")
 			{
 				if (Left.IsNullable)
 				{
@@ -309,7 +304,7 @@ namespace CompiledBindings
 		}
 	}
 
-	public class CallExpression : Expression
+	public class CallExpression : Expression, IAccessExpression
 	{
 		public CallExpression(Expression expression, MethodDefinition method, Expression[] args) : base(method.ReturnType)
 		{
@@ -356,9 +351,14 @@ namespace CompiledBindings
 			}
 			return clone;
 		}
+
+		public Expression CloneReplaceExpression(Expression expression)
+		{
+			return new CallExpression(expression, Method, Args);
+		}
 	}
 
-	public class InvokeExpression : Expression
+	public class InvokeExpression : Expression, IAccessExpression
 	{
 		public InvokeExpression(Expression expression, Expression[] args, TypeInfo resultType) : base(resultType)
 		{
@@ -371,7 +371,15 @@ namespace CompiledBindings
 
 		protected override string ToStringCore()
 		{
-			return $"{Expression}({string.Join(", ", Args.Select(a => a.ToString()))})";
+			string res = Expression.ToString();
+			if (res != null)
+			{
+				if (MemberExpression.CheckExpressionNullable(Expression))
+				{
+					res += "?.Invoke";
+				}
+			}
+			return $"{res}({string.Join(", ", Args.Select(a => a.ToString()))})";
 		}
 
 		public override IEnumerable<Expression> Enumerate()
@@ -393,6 +401,11 @@ namespace CompiledBindings
 				clone.Args[i] = Args[i].CloneReplace(current, replace);
 			}
 			return clone;
+		}
+
+		public Expression CloneReplaceExpression(Expression expression)
+		{
+			return new InvokeExpression(expression, Args, Type);
 		}
 
 		public override bool IsNullable => Type.IsNullable;
@@ -457,7 +470,7 @@ namespace CompiledBindings
 
 	public class CastExpression : Expression
 	{
-		private bool _checkNull;
+		private readonly bool _checkNull;
 
 		public CastExpression(Expression expression, TypeInfo castType, bool checkNull = true) : base(castType)
 		{
@@ -517,21 +530,21 @@ namespace CompiledBindings
 		}
 	}
 
-	public class ElementAccessExpression : Expression
+	public class ElementAccessExpression : Expression, IAccessExpression
 	{
 		public ElementAccessExpression(TypeInfo elementType, Expression instance, Expression[] parameters) : base(elementType)
 		{
-			Instance = instance;
+			Expression = instance;
 			Parameters = parameters;
 		}
 
-		public Expression Instance { get; private set; }
+		public Expression Expression { get; private set; }
 		public Expression[] Parameters { get; private set; }
 
 		protected override string ToStringCore()
 		{
-			var instance = Instance.ToString();
-			if (Instance.IsNullable)
+			var instance = Expression.ToString();
+			if (Expression.IsNullable)
 			{
 				instance += "?";
 			}
@@ -540,7 +553,7 @@ namespace CompiledBindings
 
 		public override IEnumerable<Expression> Enumerate()
 		{
-			yield return Instance;
+			yield return Expression;
 			foreach (var prm in Parameters)
 			{
 				yield return prm;
@@ -550,13 +563,18 @@ namespace CompiledBindings
 		protected override Expression CloneReplaceCore(Expression current, Expression replace)
 		{
 			var clone = (ElementAccessExpression)base.CloneReplaceCore(current, replace);
-			clone.Instance = Instance.CloneReplace(current, replace);
+			clone.Expression = Expression.CloneReplace(current, replace);
 			clone.Parameters = new Expression[Parameters.Length];
 			for (int i = 0; i < Parameters.Length; i++)
 			{
 				clone.Parameters[i] = Parameters[i].CloneReplace(current, replace);
 			}
 			return clone;
+		}
+
+		public Expression CloneReplaceExpression(Expression expression)
+		{
+			return new ElementAccessExpression(Type, expression, Parameters);
 		}
 	}
 
@@ -660,5 +678,50 @@ namespace CompiledBindings
 		}
 
 		public override bool IsNullable => false;
+	}
+
+	public class FallbackExpression : Expression
+	{
+		private string _localVarName;
+
+		public FallbackExpression(Expression expression, Expression fallbackExpression, Expression notNullExpression, string localVarName, TypeInfo type) : base(type)
+		{
+			Expression = expression;
+			Fallback = fallbackExpression;
+			NotNull = notNullExpression;
+			_localVarName = localVarName;
+		}
+
+		public Expression Expression { get; private set; }
+		public Expression Fallback { get; private set; }
+		public Expression NotNull { get; private set; }
+
+		public override IEnumerable<Expression> Enumerate()
+		{
+			yield return Expression;
+			yield return Fallback;
+			yield return NotNull;
+		}
+
+		protected override Expression CloneReplaceCore(Expression current, Expression replace)
+		{
+			var clone = (FallbackExpression)MemberwiseClone();
+			clone.Expression  = Expression.CloneReplace(current, replace);
+			clone.Fallback = Fallback.CloneReplace(current, replace);
+			clone.NotNull = NotNull.CloneReplace(current, replace);
+			return clone;
+		}
+
+		protected override string ToStringCore()
+		{
+			return $"{Expression} is var {_localVarName} && {_localVarName} != null ? {NotNull} : {Fallback}";
+		}
+	}
+
+	public interface IAccessExpression
+	{
+		Expression Expression { get; }
+
+		Expression CloneReplaceExpression(Expression expression);
 	}
 }

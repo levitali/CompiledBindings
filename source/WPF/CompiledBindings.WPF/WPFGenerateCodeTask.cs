@@ -160,7 +160,7 @@ namespace CompiledBindings
 								if (parseResult.DataTemplates.Count > 0)
 								{
 									string? rootName = null;
-									if (parseResult.DataTemplates.SelectMany(dt => dt.EnumerateAllProperties()).Any(p => p.Value.BindValue?.Converter != null))
+									if (parseResult.DataTemplates.SelectMany(dt => dt.EnumerateAllProperties()).Any(p => p.Value.BindValue?.Resources.Count > 0))
 									{
 										var xNameAttr = xdoc.Root.Attribute(xamlDomParser.xName);
 										if (xNameAttr != null)
@@ -205,7 +205,7 @@ namespace CompiledBindings
 									{
 										var dataTemplate = parseResult.DataTemplates[i];
 										var rootElement = dataTemplate.RootElement.Elements().First();
-										if (dataTemplate.EnumerateAllProperties().Any(p => p.Value.BindValue?.Converter != null))
+										if (dataTemplate.EnumerateAllProperties().Any(p => p.Value.BindValue?.Resources.Count > 0))
 										{
 											rootElement.Add(
 												new XAttribute(mbui + "DataTemplateBindings.Root",
@@ -359,34 +359,12 @@ $@"namespace CompiledBindings
 					})
 		{
 			DependencyObjectType = TypeInfoUtils.GetTypeThrow("System.Windows.DependencyObject");
+			ConverterType = TypeInfoUtils.GetTypeThrow("System.Windows.Data.IValueConverter");
 		}
 
 		public override bool IsMemExtension(XAttribute a)
 		{
 			return base.IsMemExtension(a) || a.Value.StartsWith("{x:Bind ");
-		}
-
-		protected override Expression GenerateConvertExpression(Bind bind)
-		{
-			var converterType = TypeInfoUtils.GetTypeThrow("System.Windows.Data.IValueConverter");
-			var convertMethod = converterType.Methods.First(m => m.Name == "Convert");
-			var converterField = new FieldDefinition(bind.Converter, FieldAttributes.Private, converterType);
-
-			Expression expression = new ParameterExpression(new TypeInfo(TargetType, false), "targetRoot");
-			expression = new MemberExpression(expression, converterField, new TypeInfo(converterType, false));
-			expression = new CallExpression(expression, convertMethod, new Expression[]
-			{
-				bind.Expression,
-				new TypeofExpression(new TypeExpression(bind.Property.MemberType)),
-				bind.ConverterParameter ?? Expression.NullExpression,
-				Expression.NullExpression
-			});
-			if (bind.Property.MemberType.Type.FullName != "System.Object")
-			{
-				expression = new CastExpression(expression, bind.Property.MemberType, false);
-			}
-
-			return expression;
 		}
 	}
 
@@ -404,20 +382,10 @@ $@"namespace CompiledBindings
 		{
 		}
 
-		protected override void GenerateConverterDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+		protected override void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
 		{
-			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct();
-			foreach (var converter in converters)
-			{
-				output.AppendLine(
-$@"		global::System.Windows.Data.IValueConverter {converter};");
-			}
-		}
-
-		protected override void GenerateInitializeConverters(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
-		{
-			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct().ToList();
-			if (converters.Count > 0)
+			var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
+			if (resources.Count > 0)
 			{
 				string root;
 				if (isDataTemplate)
@@ -431,10 +399,10 @@ $@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElem
 					root = "this";
 				}
 
-				foreach (var converter in converters)
+				foreach (var resource in resources)
 				{
 					output.AppendLine(
-$@"			{converter} = (global::System.Windows.Data.IValueConverter)({root}.Resources[""{converter}""] ?? global::System.Windows.Application.Current.Resources[""{converter}""] ?? throw new global::System.Exception(""Resource '{converter}' not found.""));");
+$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root}.Resources[""{resource.name}""] ?? global::System.Windows.Application.Current.Resources[""{resource.name}""] ?? throw new global::System.Exception(""Resource '{resource.name}' not found.""));");
 				}
 
 				output.AppendLine();

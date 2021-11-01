@@ -17,6 +17,8 @@
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="booleanToVisibilityConverter" />
 
+    <BitmapImage x:Key="defaultImage" UriSource="/Images/download.png" />
+
     <DataTemplate x:Key="test1Template" DataType="viewModels:EntityViewModel">
       <Grid>
         <StackPanel>
@@ -31,6 +33,14 @@
     <TextBox Text="{x:Bind OrderInput, Mode=TwoWay}" />
     <TextBlock Text="{x:Set local:Strings.Instance.Header1}" />
     <TextBlock Text="{x:Bind DecimalProp}" Visibility="{x:Bind BooleanProp, Converter={StaticResource booleanToVisibilityConverter}}" />
+    <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='aaa'}"/>
+    <TextBlock Text="{x:Bind ModifyViewModel.Input2, FallbackValue='aaa'}"/>
+    <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='ccc'}"/>
+    <TextBlock Text="{x:Bind TaskProp}"/>
+    <TextBlock mx:DataType="{x:Null}" m:Text="{x:Bind InstanceFunction(1, 2)}"/>
+
+    <Image Width="200" Source="{x:Bind LoadImageAsync(), FallbackValue={StaticResource defaultImage}}" />
+
     <ListView x:Name="listView"
               ItemTemplate="{StaticResource test1Template}"
               ItemsSource="{x:Bind ListProp}"

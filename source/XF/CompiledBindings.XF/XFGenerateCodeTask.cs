@@ -7,7 +7,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Mono.Cecil;
 
 #nullable enable
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -214,34 +213,12 @@ namespace CompiledBindings
 				return _nsMappings[xmlNs];
 			})
 		{
+			ConverterType = TypeInfoUtils.GetTypeThrow("Xamarin.Forms.IValueConverter");
 		}
 
 		public override bool IsMemExtension(XAttribute a)
 		{
 			return base.IsMemExtension(a) || a.Value.StartsWith("{x:Bind ");
-		}
-
-		protected override Expression GenerateConvertExpression(Bind bind)
-		{
-			var converterType = TypeInfoUtils.GetTypeThrow("Xamarin.Forms.IValueConverter");
-			var convertMethod = converterType.Methods.First(m => m.Name == "Convert");
-			var converterField = new FieldDefinition(bind.Converter, FieldAttributes.Private, converterType);
-
-			Expression expression = new ParameterExpression(new TypeInfo(TargetType, false), "targetRoot");
-			expression = new MemberExpression(expression, converterField, new TypeInfo(converterType, false));
-			expression = new CallExpression(expression, convertMethod, new Expression[]
-			{
-				bind.Expression,
-				new TypeofExpression(new TypeExpression(bind.Property.MemberType)),
-				bind.ConverterParameter ?? Expression.NullExpression,
-				Expression.NullExpression
-			});
-			if (bind.Property.MemberType.Type.FullName != "System.Object")
-			{
-				expression = new CastExpression(expression, bind.Property.MemberType, false);
-			}
-
-			return expression;
 		}
 	}
 
@@ -259,20 +236,10 @@ namespace CompiledBindings
 		{
 		}
 
-		protected override void GenerateConverterDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+		protected override void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
 		{
-			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct();
-			foreach (var converter in converters)
-			{
-				output.AppendLine(
-$@"		global::Xamarin.Forms.IValueConverter {converter};");
-			}
-		}
-
-		protected override void GenerateInitializeConverters(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
-		{
-			var converters = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue?.Converter).Where(c => c != null).Distinct().ToList();
-			if (converters.Count > 0)
+			var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
+			if (resources.Count > 0)
 			{
 				string root1, root2;
 				if (isDataTemplate)
@@ -288,10 +255,10 @@ $@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElem
 					root2 = "this";
 				}
 
-				foreach (var converter in converters)
+				foreach (var resource in resources)
 				{
 					output.AppendLine(
-$@"			{converter} = (global::Xamarin.Forms.IValueConverter)({root1}.Resources.ContainsKey(""{converter}"") == true ? {root2}.Resources[""{converter}""] : global::Xamarin.Forms.Application.Current.Resources[""{converter}""]);");
+$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root1}.Resources.ContainsKey(""{resource.name}"") == true ? {root2}.Resources[""{resource.name}""] : global::Xamarin.Forms.Application.Current.Resources[""{resource.name}""]);");
 				}
 
 				output.AppendLine();

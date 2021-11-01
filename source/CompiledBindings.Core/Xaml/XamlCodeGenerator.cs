@@ -19,7 +19,7 @@ namespace CompiledBindings
 
 		public bool LangNullables { get; }
 
-		public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, string? bindingsAccess, ref int localVarIndex, string? a)
+		public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, string? bindingsAccess, ref int localVarIndex, ref int localFuncIndex, string? a)
 		{
 			var memberExpr = targetRootVariable;
 			if (property.Object.Name != null && !property.Object.IsRoot)
@@ -56,6 +56,13 @@ namespace CompiledBindings
 			else
 			{
 				throw new NotSupportedException();
+			}
+
+			bool isAsync = false;
+			var taskType = TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			if (expression != null && taskType.IsAssignableFrom(expression.Type))
+			{
+				isAsync = !taskType.IsAssignableFrom(property.MemberType);
 			}
 
 			if (property.TargetEvent != null)
@@ -146,8 +153,7 @@ $@"{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Defin
 				}
 				else
 				{
-					output.AppendLine(
-$@"{a}			{setExpr}({value});");
+					GenerateSet(true, ref localFuncIndex);
 				}
 			}
 			// For two-way bindings set value only if the current value of the target is different.
@@ -179,8 +185,43 @@ $@"{a}				if (!object.Equals({setExpr}, {varName}))
 			}
 			else
 			{
-				output.AppendLine(
-$@"{a}			{setExpr} = {value};");
+				GenerateSet(false, ref localFuncIndex);
+			}
+
+			void GenerateSet(bool isMethodCall, ref int localFuncIndex)
+			{
+				if (isAsync)
+				{
+					output.AppendLine(
+$@"{a}			Set{localFuncIndex}();
+{a}			async void Set{localFuncIndex++}()
+{a}			{{
+{a}				try
+{a}				{{");
+					var fallbackValue = property.Value.BindValue?.FallbackValue;
+					if (fallbackValue != null)
+					{
+						output.AppendLine(
+$@"{a}					var task = {value};
+{a}					if (!task.IsCompleted)
+{a}					{{
+{a}						{setExpr}{(isMethodCall ? $"({fallbackValue})" : $" = {fallbackValue}")};
+{a}					}}");
+						value = "task";
+					}
+					output.AppendLine(
+$@"{a}					{setExpr}{(isMethodCall ? $"(await {value})" : $" = await {value}")};
+{a}				}}
+{a}				catch
+{a}				{{
+{a}				}}
+{a}			}}");
+				}
+				else
+				{
+					output.AppendLine(
+$@"{a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
+				}
 			}
 		}
 
@@ -214,12 +255,13 @@ $@"			}}");
 		public void GenerateUpdateMethodBody(StringBuilder output, UpdateMethod updateMethod, string? targetRootVariable = null, string? bindingsAccess = null, string? align = null)
 		{
 			int localVarIndex = updateMethod.LocalVariables.Count + 1;
+			int localFuncIndex = 0;
 
 			if (updateMethod.SetProperties != null)
 			{
 				foreach (var prop in updateMethod.SetProperties)
 				{
-					GenerateSetValue(output, prop, null, targetRootVariable, bindingsAccess, ref localVarIndex, align);
+					GenerateSetValue(output, prop, null, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, align);
 				}
 			}
 
@@ -231,7 +273,7 @@ $@"{align}			var {variable.Name} = {variable.Expression};");
 
 			foreach (var prop in updateMethod.SetExpressions)
 			{
-				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, align);
+				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, align);
 			}
 		}
 	}
