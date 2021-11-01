@@ -340,6 +340,7 @@ namespace WPFTest.Views
 			private void OnTargetChanged0(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
+				var targetRoot = _targetRoot;
 				if (!_settingBinding4)
 				{
 					_settingBinding4 = true;
@@ -360,12 +361,13 @@ namespace WPFTest.Views
 			private void OnTargetChanged1(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
+				var targetRoot = _targetRoot;
 				if (!_settingBinding5)
 				{
 					_settingBinding5 = true;
 					try
 					{
-						dataRoot.BoolInput = (global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp?.Length > 0, null);
+						dataRoot.BoolInput = (global::System.Boolean)targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp?.Length > 0, null);
 					}
 					catch
 					{

@@ -299,6 +299,7 @@ namespace XFTest.Views
 			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
 			{
 				var dataRoot = _dataRoot;
+				var targetRoot = _targetRoot;
 				switch (p1.PropertyName)
 				{
 					case "Text":
