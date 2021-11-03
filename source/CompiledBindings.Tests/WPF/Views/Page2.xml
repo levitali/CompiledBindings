@@ -10,7 +10,7 @@
       x:Class="WPFTest.Views.Page2">
 
   <Grid>
-    <TextBlock Text="{x:Bind Prop1}"/>
+    <TextBlock Text="{x:Bind Prop1}" />
   </Grid>
 
 </Page>

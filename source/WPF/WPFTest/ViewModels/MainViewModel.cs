@@ -36,7 +36,7 @@ namespace WPFTest.ViewModels
 			await Task.Delay(1000);
 
 			var client = new HttpClient();
-			client.DefaultRequestHeaders.UserAgent.ParseAdd("levitali/1.0 (levitali@yahoo.com) bot");
+			client.DefaultRequestHeaders.UserAgent.ParseAdd("levitali/1.0 (levitali@mail.com) bot");
 
 			var img = new BitmapImage();
 			img.CacheOption = BitmapCacheOption.OnLoad;

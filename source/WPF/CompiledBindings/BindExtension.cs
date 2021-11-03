@@ -8,8 +8,13 @@ namespace CompiledBindings.Markup
 {
 	public class BindExtension : MarkupExtension
 	{
+		public BindExtension()
+		{
+		}
+
 		public BindExtension(string arg1)
 		{
+			Path = arg1;
 		}
 
 		public BindExtension(string arg1, string arg2)

@@ -38,10 +38,10 @@
               ItemsSource="{x:Bind ListProp}"
               m:SetVisible="{x:Bind ArrayProp.Length > 0}" />
     <Button mx:DataType="{x:Null}" m:IsEnabled="{x:Bind listView.SelectedItem != null}" />
-    <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='abc'}"/>
-    <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='aaa'}"/>
-    <TextBlock Text="{x:Bind TaskProp, FallbackValue='Loading...'}"/>
-    <Image Source="{x:Bind LoadImageAsync()}"/>
+    <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='abc'}" />
+    <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='aaa'}" />
+    <TextBlock Text="{x:Bind TaskProp, FallbackValue='Loading...'}" />
+    <Image Source="{x:Bind LoadImageAsync()}" />
   </StackPanel>
 
 </Page>

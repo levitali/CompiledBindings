@@ -186,6 +186,11 @@ namespace CompiledBindings
 			var parts = fullName.Split('.');
 			return (string.Join(".", parts.Take(parts.Length - 1)), parts.Last());
 		}
+
+		public override string ToString()
+		{
+			return Type.ToString();
+		}
 	}
 
 	public class PropertyInfo
