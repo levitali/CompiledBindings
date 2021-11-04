@@ -73,13 +73,12 @@ namespace CompiledBindings
 		public TypeInfo TargetType;
 		public TypeInfo DataType;
 		public TypeInfo ConverterType;
+		public IList<XamlNamespace> KnownNamespaces;
 		public HashSet<string> KnownContentTypes;
 		public Dictionary<string, string> KnownContentProperties;
 		public Dictionary<XName, string> KnownTypeMappings;
 		public Dictionary<string, (XName className, string propertyName)> KnownAttachedProperties;
 		public Dictionary<string, ICSharpTypeConverter> TypeConverters;
-
-		public IList<string> StandardNamespaces;
 
 		private Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
@@ -154,7 +153,7 @@ namespace CompiledBindings
 
 		public TypeDefinition FindType(string value, XObject xobject)
 		{
-			var typeName = XamlParser.GetTypeName(value, xobject);
+			var typeName = XamlParser.GetTypeName(value, xobject, KnownNamespaces);
 			return FindType(typeName, xobject);
 		}
 
@@ -226,7 +225,7 @@ namespace CompiledBindings
 			var value = attr.Value;
 			if (value.StartsWith("{"))
 			{
-				var xamlNode = XamlParser.ParseMarkupExtension(value, attr, File);
+				var xamlNode = XamlParser.ParseMarkupExtension(value, attr, File, KnownNamespaces);
 				if (xamlNode.Name == xNull)
 				{
 					return null;
@@ -244,7 +243,7 @@ namespace CompiledBindings
 			{
 				throw new GeneratorException($"Missing type.", File, attr);
 			}
-			return XamlParser.GetTypeName(value, attr.Parent);
+			return XamlParser.GetTypeName(value, attr.Parent, KnownNamespaces);
 		}
 
 		public TypeDefinition? FindTypeFromAttribute(XAttribute attr)
@@ -255,6 +254,16 @@ namespace CompiledBindings
 				return null;
 			}
 			return FindType(typeName, attr);
+		}
+
+		public IEnumerable<XamlNamespace> GetNamespaces(XamlNode xamlNode)
+		{
+			var namespaces = XamlNode.GetClrNamespaces(xamlNode.Element);
+			if (KnownNamespaces != null)
+			{
+				namespaces = namespaces.Union(KnownNamespaces, n => n.Prefix);
+			}
+			return namespaces;
 		}
 
 		public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode)
@@ -290,7 +299,7 @@ namespace CompiledBindings
 					if (index != -1)
 					{
 						string typeName = memberName.Substring(0, index);
-						attachedClassName = XamlParser.GetTypeName(typeName, xamlNode.Element);
+						attachedClassName = XamlParser.GetTypeName(typeName, xamlNode.Element, KnownNamespaces);
 						attachedPropertyName = memberName.Substring(index + 1);
 					}
 				}
@@ -346,7 +355,7 @@ namespace CompiledBindings
 							var method = typeInfo.Methods.FirstOrDefault(e => e.Definition.Name == memberName);
 							if (method == null)
 							{
-								foreach (var ns in XamlNode.GetClrNamespaces(xamlNode.Element))
+								foreach (var ns in GetNamespaces(xamlNode))
 								{
 									var clrNs = ns.ClrNamespace!;
 									var method2 = TypeInfoUtils.FindExtensionMethods(clrNs, memberName)
@@ -403,7 +412,7 @@ namespace CompiledBindings
 					try
 					{
 						var staticNode = xamlNode.Children[0];
-						value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, XamlNode.GetClrNamespaces(xamlNode.Element).ToList(), out var includeNamespaces, out var dummy);
+						value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
 						includeNamespaces.ForEach(ns => objProp.IncludeNamespaces.Add(ns.ClrNamespace!));
 						value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 						CorrectMethod(objProp, value.StaticValue.Type);
@@ -509,14 +518,14 @@ namespace CompiledBindings
 			return expression;
 		}
 
-		private static void CorrectMethod(XamlObjectProperty prop, TypeReference type)
+		private void CorrectMethod(XamlObjectProperty prop, TypeReference type)
 		{
 			if (prop.TargetMethod != null)
 			{
 				// Try to find best suitable method.
 				// Note! So far TypeReference.IsAssignableFrom method does not handle all cases.
 				// So it can be, that the method is not found.
-				var method = FindBestSuitableTargetMethod(prop.Object.Type.Type.ResolveEx()!, prop.TargetMethod.Definition.Name, type, XamlNode.GetClrNamespaces(prop.Object.XamlNode.Element).Select(n => n.ClrNamespace!));
+				var method = FindBestSuitableTargetMethod(prop.Object.Type.Type.ResolveEx()!, prop.TargetMethod.Definition.Name, type, GetNamespaces(prop.Object.XamlNode).Select(n => n.ClrNamespace!));
 				if (method != null)
 				{
 					prop.TargetMethod = new MethodInfo(prop.Object.Type, method);
@@ -712,7 +721,7 @@ namespace CompiledBindings
 					throw new GeneratorException("ResourceDictionary expected.", fileName, xdoc.Root);
 				}
 
-				var dictionaryXamlNode = XamlParser.ParseElement(fileName, xdoc.Root);
+				var dictionaryXamlNode = XamlParser.ParseElement(fileName, xdoc.Root, KnownNamespaces);
 
 				xamlNode = dictionaryXamlNode;
 			}
@@ -752,7 +761,7 @@ namespace CompiledBindings
 						{
 							throw new GeneratorException("Missing TargetType.", resource);
 						}
-						var typeName = XamlParser.GetTypeName(targetTypeAttr.Value, targetTypeAttr.Element);
+						var typeName = XamlParser.GetTypeName(targetTypeAttr.Value, targetTypeAttr.Element, KnownNamespaces);
 						var targetType = FindType(targetTypeAttr.Value, resource.Element);
 
 						var style = new Style(key?.Value, targetType);
@@ -828,7 +837,7 @@ namespace CompiledBindings
 		{
 			if (type.FullName == "System.Type")
 			{
-				var xmlTypeName = XamlParser.GetTypeName(value, xamlNode.Element);
+				var xmlTypeName = XamlParser.GetTypeName(value, xamlNode.Element, KnownNamespaces);
 				var clrFullTypeName = FindFullTypeName(xmlTypeName, xamlNode.Element);
 				value = $"typeof({clrFullTypeName})";
 			}

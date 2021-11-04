@@ -68,25 +68,24 @@ namespace CompiledBindings
 				var newPages = new List<ITaskItem>();
 				bool generateDataTemplateBindings = false;
 
+				var allXaml = Pages.ToList();
 				if (ApplicationDefinition != null)
 				{
-					NewApplicationDefinition = ProcessXaml(ApplicationDefinition);
-				}
-				foreach (var page in Pages)
-				{
-					if (_cancellationTokenSource.IsCancellationRequested)
-					{
-						return true;
-					}
-
-					newPages.Add(ProcessXaml(page));
+					allXaml.Add(ApplicationDefinition);
 				}
 
-				ITaskItem ProcessXaml(ITaskItem xaml)
+				var xamlFiles = allXaml
+					.Distinct(f => f.GetMetadata("FullPath"))
+					.Select(f => (xaml: f, file: f.GetMetadata("FullPath")))
+					.Select(e => (e.xaml, e.file, xdoc: XDocument.Load(e.file, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo)))
+					.ToList();
+
+				var globalNamespaces = XamlNamespace.GetGlobalNamespaces(xamlFiles.Select(e => e.xdoc));
+				xamlDomParser.KnownNamespaces = globalNamespaces;
+				
+				foreach (var (xaml, file, xdoc) in xamlFiles)
 				{
 					var newXaml = xaml;
-
-					var file = xaml.GetMetadata("FullPath");
 
 					var targetRelativePath = xaml.GetMetadata("Link");
 					if (string.IsNullOrEmpty(targetRelativePath))
@@ -123,7 +122,8 @@ namespace CompiledBindings
 										xaml.CopyMetadataTo(newXaml);
 										newXaml.SetMetadata("Link", targetRelativePath);
 
-										return newXaml;
+										SetNewXaml();
+										continue;
 									}
 								}
 							}
@@ -132,7 +132,6 @@ namespace CompiledBindings
 
 					try
 					{
-						var xdoc = XDocument.Load(file, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 						var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
 						if (xclass != null)
 						{
@@ -241,7 +240,19 @@ namespace CompiledBindings
 						throw new GeneratorException(ex.Message, file, 0, 0, 0);
 					}
 
-					return newXaml;
+					SetNewXaml();
+
+					void SetNewXaml()
+					{
+						if (xaml == ApplicationDefinition)
+						{
+							NewApplicationDefinition = newXaml;
+						}
+						else
+						{
+							newPages.Add(newXaml);
+						}
+					}
 				}
 
 				if (generateDataTemplateBindings)

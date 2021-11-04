@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
-
 
 #nullable enable
 
@@ -9,12 +9,12 @@ namespace CompiledBindings
 {
 	public class XamlParser
 	{
-		public static XamlNode ParseElement(string file, XElement element)
+		public static XamlNode ParseElement(string file, XElement element, IList<XamlNamespace> knownNamespaces)
 		{
-			return ParseElement(file, element, element.Name.LocalName);
+			return ParseElement(file, element, element.Name.LocalName, knownNamespaces);
 		}
 
-		private static XamlNode ParseElement(string file, XElement element, string name)
+		private static XamlNode ParseElement(string file, XElement element, string name, IList<XamlNamespace> knownNamespaces)
 		{
 			var node = new XamlNode(file, element, element.Name.Namespace + name)
 			{
@@ -23,7 +23,7 @@ namespace CompiledBindings
 
 			foreach (var attribute in element.Attributes().Where(a => a.Name != "xmlns" && a.Name.Namespace != XNamespace.Xmlns))
 			{
-				node.Properties.Add(ParseAttribute(file, attribute));
+				node.Properties.Add(ParseAttribute(file, attribute, knownNamespaces));
 			}
 
 			string propertyStartPart = node.Name.LocalName + ".";
@@ -31,18 +31,18 @@ namespace CompiledBindings
 			{
 				if (child.Name.LocalName.StartsWith(propertyStartPart))
 				{
-					node.Properties.Add(ParseElement(file, child, child.Name.LocalName.Substring(propertyStartPart.Length)));
+					node.Properties.Add(ParseElement(file, child, child.Name.LocalName.Substring(propertyStartPart.Length), knownNamespaces));
 				}
 				else
 				{
-					node.Children.Add(ParseElement(file, child, child.Name.LocalName));
+					node.Children.Add(ParseElement(file, child, child.Name.LocalName, knownNamespaces));
 				}
 			}
 
 			return node;
 		}
 
-		public static XamlNode ParseAttribute(string file, XAttribute attribute)
+		public static XamlNode ParseAttribute(string file, XAttribute attribute, IList<XamlNamespace> knownNamespaces)
 		{
 			var node = new XamlNode(file, attribute, attribute.Name);
 
@@ -55,7 +55,7 @@ namespace CompiledBindings
 				{
 					throw new ParseException($"Expected {expecedBracket}", str.Length);
 				}
-				node.Children.Add(ParseMarkupExtension(attribute, file));
+				node.Children.Add(ParseMarkupExtension(attribute, file, knownNamespaces));
 			}
 			else
 			{
@@ -65,12 +65,12 @@ namespace CompiledBindings
 			return node;
 		}
 
-		private static XamlNode ParseMarkupExtension(XAttribute attribute, string file)
+		private static XamlNode ParseMarkupExtension(XAttribute attribute, string file, IList<XamlNamespace> knownNamespaces)
 		{
-			return ParseMarkupExtension(attribute.Value.Trim(), attribute, file);
+			return ParseMarkupExtension(attribute.Value.Trim(), attribute, file, knownNamespaces);
 		}
 
-		public static XamlNode ParseMarkupExtension(string str, XAttribute attribute, string file)
+		public static XamlNode ParseMarkupExtension(string str, XAttribute attribute, string file, IList<XamlNamespace> knownNamespaces)
 		{
 			string? value;
 
@@ -87,12 +87,12 @@ namespace CompiledBindings
 			}
 
 			string name = str.Substring(1, pos - 1);
-			var nodeName = GetTypeName(name, attribute.Parent);
+			var nodeName = GetTypeName(name, attribute.Parent, knownNamespaces);
 
 			return new XamlNode(file, attribute, nodeName) { Value = value };
 		}
 
-		public static XName GetTypeName(string value, XObject xobject)
+		public static XName GetTypeName(string value, XObject xobject, IList<XamlNamespace> knownNamespaces)
 		{
 			XNamespace ns;
 
@@ -114,9 +114,15 @@ namespace CompiledBindings
 					.FirstOrDefault(a => a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == prefix);
 				if (nsAttr == null)
 				{
-					throw new ParseException($"'{prefix}' is an undeclared prefix.");
+					var ns2 = knownNamespaces.FirstOrDefault(n => n.Prefix == prefix);
+					if (ns2 == null)
+						throw new ParseException($"'{prefix}' is an undeclared prefix.");
+					ns = ns2.Namespace;
 				}
-				ns = (XNamespace)nsAttr.Value;
+				else
+				{
+					ns = (XNamespace)nsAttr.Value;
+				}
 			}
 			else
 			{
@@ -174,8 +180,11 @@ namespace CompiledBindings
 			}
 		}
 	}
+
 	public class XamlNamespace
 	{
+		static readonly Regex _usingRegex = new Regex(@"^\s*(?:(global\s+))?using\s*:(.+)$");
+
 		public XamlNamespace(string prefix, XNamespace ns)
 		{
 			Prefix = prefix;
@@ -189,9 +198,10 @@ namespace CompiledBindings
 
 		public static string? GetClrNamespace(string nsName)
 		{
-			if (nsName.StartsWith("using:"))
+			var match = _usingRegex.Match(nsName);
+			if (match.Success)
 			{
-				return nsName.Substring("using:".Length);
+				return match.Groups[match.Groups.Count - 1].Value.Trim();
 			}
 			else if (nsName.StartsWith("clr-namespace:"))
 			{
@@ -202,6 +212,18 @@ namespace CompiledBindings
 				return nsName.Substring(l, ind - l);
 			}
 			return null;
+		}
+
+		public static IList<XamlNamespace> GetGlobalNamespaces(IEnumerable<XDocument> xdocs)
+		{
+			return xdocs
+				.SelectMany(xdoc => xdoc.Descendants().Attributes())
+				.Where(a => a.Name.Namespace == XNamespace.Xmlns)
+				.Select(a => (a, m: _usingRegex.Match(a.Value)))
+				.Where(e => e.m.Success)
+				.Select(e => new XamlNamespace(e.a.Name.LocalName, e.a.Value.Trim()))
+				.Distinct(n => n.Prefix)
+				.ToList();
 		}
 	}
 }

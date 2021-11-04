@@ -19,7 +19,7 @@ namespace CompiledBindings
 
 		[Required]
 		public string LangVersion { get; set; }
-		
+
 		[Required]
 		public ITaskItem[] ReferenceAssemblies { get; set; }
 
@@ -56,17 +56,24 @@ namespace CompiledBindings
 				var generatedCodeFiles = new List<TaskItem>();
 				bool generateDataTemplateBindings = false;
 
-				foreach (var xaml in XamlFiles.Distinct(f => f.GetMetadata("FullPath")))
+				var xamlFiles = XamlFiles
+					.Distinct(f => f.GetMetadata("FullPath"))
+					.Select(f => (xaml: f, file: f.GetMetadata("FullPath")))
+					.Select(e => (e.xaml, e.file, xdoc: XDocument.Load(e.file, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo)))
+					.ToList();
+
+				var globalNamespaces = XamlNamespace.GetGlobalNamespaces(xamlFiles.Select(e => e.xdoc));
+				xamlDomParser.KnownNamespaces = globalNamespaces;
+
+				foreach (var (xaml, file, xdoc) in xamlFiles)
 				{
 					if (_cancellationTokenSource.IsCancellationRequested)
 					{
 						return true;
 					}
 
-					var file = xaml.GetMetadata("FullPath");
 					try
 					{
-						var xdoc = XDocument.Load(file, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo);
 						var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
 						if (xclass != null)
 						{

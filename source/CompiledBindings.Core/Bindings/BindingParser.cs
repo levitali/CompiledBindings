@@ -20,7 +20,7 @@ namespace CompiledBindings
 				throw new ParseException("Missing expression.");
 			}
 
-			var namespaces = XamlNode.GetClrNamespaces(prop.XamlNode.Element).ToList();
+			var namespaces = xamlDomParser.GetNamespaces(prop.XamlNode).ToList();
 
 			Expression? expression = null;
 			Expression? bindBackExpression = null;

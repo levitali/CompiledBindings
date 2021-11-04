@@ -161,7 +161,7 @@ namespace CompiledBindings
 							{
 								try
 								{
-									var xamlNode = XamlParser.ParseAttribute(file, attr);
+									var xamlNode = XamlParser.ParseAttribute(file, attr, KnownNamespaces);
 									var prop = GetObjectProperty(obj, xamlNode);
 									obj.Properties.Add(prop);
 

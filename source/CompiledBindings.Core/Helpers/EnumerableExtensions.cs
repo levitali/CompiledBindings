@@ -113,6 +113,11 @@ namespace CompiledBindings
 		{
 			return source.Distinct(new ComparisonEqualityComparer<T, TKey>(keySelector));
 		}
+
+		public static IEnumerable<T> Union<T, TKey>(this IEnumerable<T> first, IEnumerable<T> second, Func<T, TKey> keySelector)
+		{
+			return first.Union(second, new ComparisonEqualityComparer<T, TKey>(keySelector));
+		}
 	}
 
 	public class ComparisonEqualityComparer<T, TKey> : IEqualityComparer<T>

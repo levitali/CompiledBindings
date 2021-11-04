@@ -234,7 +234,7 @@ namespace XFTest.Views
 			Page1 _targetRoot;
 			global::XFTest.ViewModels.Page1ViewModel _dataRoot;
 			Page1_BindingsTrackings_this _bindingsTrackings;
-			bool _settingBinding4;
+			bool _settingBinding5;
 
 			public void Initialize(Page1 targetRoot, global::XFTest.ViewModels.Page1ViewModel dataRoot)
 			{
@@ -282,7 +282,7 @@ namespace XFTest.Views
 				targetRoot.label6.Text = (value2 + 1).ToString();
 				targetRoot.label7.Text = (dataRoot.NullableIntProp ?? 0).ToString();
 				targetRoot.label8.Text = (!value1).ToString();
-				if (!_settingBinding4)
+				if (!_settingBinding5)
 				{
 					var value3 = value1.ToString();
 					if (!object.Equals(targetRoot.entry1.Text, value3))
@@ -302,10 +302,19 @@ namespace XFTest.Views
 				var targetRoot = _targetRoot;
 				switch (p1.PropertyName)
 				{
-					case "Text":
-						if (!_settingBinding4)
+					case "IsFocused":
+						try
 						{
-							_settingBinding4 = true;
+							dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1] = _targetRoot.entry1.IsFocused;
+						}
+						catch
+						{
+						}
+						break;
+					case "Text":
+						if (!_settingBinding5)
+						{
+							_settingBinding5 = true;
 							try
 							{
 								dataRoot.SetValue(_targetRoot.entry1.Text);
@@ -315,17 +324,8 @@ namespace XFTest.Views
 							}
 							finally
 							{
-								_settingBinding4 = false;
+								_settingBinding5 = false;
 							}
-						}
-						break;
-					case "IsFocused":
-						try
-						{
-							dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1] = _targetRoot.entry1.IsFocused;
-						}
-						catch
-						{
 						}
 						break;
 				}
@@ -399,7 +399,7 @@ namespace XFTest.Views
 					{
 						var value1 = typedSender.BooleanProp;
 						targetRoot.label8.Text = (!value1).ToString();
-						if (!bindings._settingBinding4)
+						if (!bindings._settingBinding5)
 						{
 							var value2 = value1.ToString();
 							if (!object.Equals(targetRoot.entry1.Text, value2))
