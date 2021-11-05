@@ -16,5 +16,6 @@ namespace WPFTest.Views
 	partial class Page2 : Page
 	{
 		public string Prop1 => "Hello";
+		public Task<string> Prop2 => Task.FromResult("Hello");
 	}
 }

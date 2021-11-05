@@ -192,9 +192,10 @@ $@"{a}				if (!object.Equals({setExpr}, {varName}))
 			{
 				if (isAsync)
 				{
+					var bindings = property.Value.BindValue != null ? "bindings." : null;
 					output.AppendLine(
-$@"{a}			Set{localFuncIndex}();
-{a}			async void Set{localFuncIndex++}()
+$@"{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
+{a}			async void Set{localFuncIndex++}(CancellationToken cancellationToken)
 {a}			{{
 {a}				try
 {a}				{{");
@@ -210,7 +211,11 @@ $@"{a}					var task = {value};
 						value = "task";
 					}
 					output.AppendLine(
-$@"{a}					{setExpr}{(isMethodCall ? $"(await {value})" : $" = await {value}")};
+$@"{a}					var value = await {value};
+{a}					if (!cancellationToken.IsCancellationRequested)
+{a}					{{
+{a}						{setExpr}{(isMethodCall ? $"(value)" : $" = value")};
+{a}					}}
 {a}				}}
 {a}				catch
 {a}				{{

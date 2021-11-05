@@ -15,6 +15,7 @@ namespace CompiledBindings
 		string _findByNameFormat;
 		bool _generateVariableDeclarations;
 		bool _generateVariableInitialization;
+		bool _asyncFunctions;
 
 		public SimpleXamlDomCodeGenerator(BindingsCodeGenerator bindingsCodeGenerator,
 										  string bindingContextStart,
@@ -39,12 +40,18 @@ namespace CompiledBindings
 		{
 			var output = new StringBuilder();
 
+			var taskType = TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			_asyncFunctions = parseResult.StaticUpdate.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
+
 			if (parseResult.TargetType!.Type.Namespace != null)
 			{
 				output.AppendLine(
 $@"namespace {parseResult.TargetType.Type.Namespace}
 {{");
 			}
+
+			output.AppendLine(
+$@"	using System.Threading;");
 
 			var usings = parseResult.EnumerateAllProperties().SelectMany(p => p.IncludeNamespaces).Distinct().ToList();
 			if (usings.Count > 0)
@@ -68,6 +75,11 @@ $@"
 	[System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
 	partial class {parseResult.TargetType.Type.Name}
 	{{");
+			if (_asyncFunctions)
+			{
+				output.AppendLine(
+$@"		CancellationTokenSource _generatedCodeDisposed = new CancellationTokenSource();");
+			}
 
 			if (parseResult.GenerateInitializeMethod)
 			{
@@ -184,6 +196,11 @@ $@"		~{parseResult.TargetType!.Type.Name}()");
 				}
 				output.AppendLine(
 $@"		{{");
+				if (_asyncFunctions)
+				{
+					output.AppendLine(
+$@"			_generatedCodeDisposed.Cancel();");
+				}
 
 				foreach (var bs in parseResult.BindingScopes)
 				{

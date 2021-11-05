@@ -25,6 +25,7 @@
   </Page.Resources>
 
   <StackPanel>
+    <Image Source="{x:Set LoadImageAsync()}"/>
     <TextBlock mx:DataType="{x:Null}" m:Text="{x:Bind _viewModel.DecimalProp}" />
     <TextBlock Name="header1"
                m:Text="{x:Set local:Strings.Instance.Header1}"

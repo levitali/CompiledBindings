@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using WPFTest.ViewModels;
 
 #nullable enable
@@ -20,6 +21,8 @@ namespace WPFTest.Views
 		private ListView listView;
 
 		public string? Title { get; set; }
+
+		public Task<ImageSource> LoadImageAsync() => null!;
 	}
 
 	static partial class UIElementExtensions

@@ -1,5 +1,6 @@
 namespace WPFTest.Views
 {
+	using System.Threading;
 	using WPFTest.Views;
 
 #nullable disable
@@ -7,6 +8,7 @@ namespace WPFTest.Views
 	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page1
 	{
+		CancellationTokenSource _generatedCodeDisposed = new CancellationTokenSource();
 		global::System.Windows.Data.IValueConverter TrueToVisibleConverter;
 		global::System.Windows.Data.IValueConverter InverseBooleanConverter;
 		private bool _generatedCodeInitialized;
@@ -23,6 +25,21 @@ namespace WPFTest.Views
 
 			var value1 = WPFTest.Strings.Instance;
 			Title = value1?.Title;
+			Set0(_generatedCodeDisposed.Token);
+			async void Set0(CancellationToken cancellationToken)
+			{
+				try
+				{
+					var value = await this.LoadImageAsync();
+					if (!cancellationToken.IsCancellationRequested)
+					{
+						image1.Source = value;
+					}
+				}
+				catch
+				{
+				}
+			}
 			header1.Text = value1?.Header1;
 
 			Bindings_.Initialize(this);
@@ -35,6 +52,7 @@ namespace WPFTest.Views
 
 		~Page1()
 		{
+			_generatedCodeDisposed.Cancel();
 			if (Bindings_ != null)
 			{
 				Bindings_.Cleanup();
@@ -224,6 +242,7 @@ namespace WPFTest.Views
 			Page1_BindingsTrackings_this _bindingsTrackings;
 			bool _settingBinding4;
 			bool _settingBinding5;
+			CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
@@ -236,6 +255,7 @@ namespace WPFTest.Views
 
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
+				_generatedCodeDisposed = new CancellationTokenSource();
 				_bindingsTrackings = new Page1_BindingsTrackings_this(this);
 
 				Update();
@@ -256,6 +276,7 @@ namespace WPFTest.Views
 			{
 				if (_targetRoot != null)
 				{
+					_generatedCodeDisposed.Cancel();
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
@@ -279,6 +300,7 @@ namespace WPFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
+				var bindings = this;
 				var value1 = dataRoot.ArrayProp?.Length > 0;
 				var value2 = dataRoot.BooleanProp;
 				var value3 = dataRoot.DecimalProp;
@@ -307,8 +329,8 @@ namespace WPFTest.Views
 				targetRoot.listView.SetVisible(value1);
 				targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
 				targetRoot.textBlock8.Text = value4?.Input1 ?? "aaa";
-				Set0();
-				async void Set0()
+				Set0(bindings._generatedCodeDisposed.Token);
+				async void Set0(CancellationToken cancellationToken)
 				{
 					try
 					{
@@ -317,18 +339,26 @@ namespace WPFTest.Views
 						{
 							targetRoot.textBlock9.Text = "Loading...";
 						}
-						targetRoot.textBlock9.Text = await task;
+						var value = await task;
+						if (!cancellationToken.IsCancellationRequested)
+						{
+							targetRoot.textBlock9.Text = value;
+						}
 					}
 					catch
 					{
 					}
 				}
-				Set1();
-				async void Set1()
+				Set1(bindings._generatedCodeDisposed.Token);
+				async void Set1(CancellationToken cancellationToken)
 				{
 					try
 					{
-						targetRoot.image1.Source = await dataRoot.LoadImageAsync();
+						var value = await dataRoot.LoadImageAsync();
+						if (!cancellationToken.IsCancellationRequested)
+						{
+							targetRoot.image2.Source = value;
+						}
 					}
 					catch
 					{
@@ -512,8 +542,8 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "TaskProp")
 					{
-						Set0();
-						async void Set0()
+						Set0(bindings._generatedCodeDisposed.Token);
+						async void Set0(CancellationToken cancellationToken)
 						{
 							try
 							{
@@ -522,7 +552,11 @@ namespace WPFTest.Views
 								{
 									targetRoot.textBlock9.Text = "Loading...";
 								}
-								targetRoot.textBlock9.Text = await task;
+								var value = await task;
+								if (!cancellationToken.IsCancellationRequested)
+								{
+									targetRoot.textBlock9.Text = value;
+								}
 							}
 							catch
 							{

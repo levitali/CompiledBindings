@@ -30,6 +30,7 @@
   </Window.Resources>
 
   <StackPanel>
+    <Image Width="200" Source="{x:Set _viewModel.LoadImageAsync()}" />
     <TextBox Text="{x:Bind OrderInput, Mode=TwoWay}" />
     <TextBlock Text="{x:Set local:Strings.Instance.Header1}" />
     <TextBlock Text="{x:Bind DecimalProp}" Visibility="{x:Bind BooleanProp, Converter={StaticResource booleanToVisibilityConverter}}" />

@@ -37,7 +37,8 @@ $@"namespace {targetNamespace}
 			output.AppendLine(
 $@"	using System;
 	using System.ComponentModel;
-	using System.Globalization;");
+	using System.Globalization;
+	using System.Threading;");
 
 			foreach (string ns in bindingsData.Bindings.SelectMany(b => b.Property.IncludeNamespaces).Distinct())
 			{
@@ -166,6 +167,15 @@ $@"			global::{binding.Property.TargetEvent!.EventType.GetCSharpFullName()} _eve
 $@"			bool _settingBinding{bind.Index};");
 			}
 
+			var taskType = TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			bool asyncFunctions = bindingsData.Bindings.Any(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type));
+
+			if (asyncFunctions)
+			{
+				output.AppendLine(
+$@"			CancellationTokenSource _generatedCodeDisposed;");
+			}
+
 			GenerateBindingsExtraFieldDeclarations(output, bindingsData);
 
 			#endregion // Fields declaration
@@ -207,6 +217,12 @@ $@"
 					throw new System.ArgumentNullException(nameof(dataRoot));
 
 				_targetRoot = dataRoot;");
+			}
+
+			if (asyncFunctions)
+			{
+				output.AppendLine(
+$@"				_generatedCodeDisposed = new CancellationTokenSource();");
 			}
 
 			if (bindingsData.NotifyPropertyChangedList.Count > 0)
@@ -272,6 +288,11 @@ $@"
 			output.AppendLine(
 $@"				if (_targetRoot != null)
 				{{");
+			if (asyncFunctions)
+			{
+				output.AppendLine(
+$@"					_generatedCodeDisposed.Cancel();");
+			}
 
 			// Unset event handlers for two-way bindings
 			foreach (var ev in bindingsData.TwoWayEvents)
@@ -345,6 +366,11 @@ $@"
 
 				var targetRoot = _targetRoot;
 				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
+			if (asyncFunctions)
+			{
+				output.AppendLine(
+$@"				var bindings = this;");
+			}
 			GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "targetRoot", align: "\t");
 
 			output.AppendLine();

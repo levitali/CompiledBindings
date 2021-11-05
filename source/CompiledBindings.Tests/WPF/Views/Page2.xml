@@ -11,6 +11,7 @@
 
   <Grid>
     <TextBlock Text="{x:Bind Prop1}" />
+    <TextBlock Text="{x:Bind Prop2}" />
   </Grid>
 
 </Page>

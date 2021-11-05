@@ -1,5 +1,6 @@
 namespace WPFTest.Views
 {
+	using System.Threading;
 #nullable disable
 
 	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
@@ -31,6 +32,7 @@ namespace WPFTest.Views
 		class Page2_Bindings_
 		{
 			Page2 _targetRoot;
+			CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page2 dataRoot)
 			{
@@ -40,6 +42,7 @@ namespace WPFTest.Views
 					throw new System.ArgumentNullException(nameof(dataRoot));
 
 				_targetRoot = dataRoot;
+				_generatedCodeDisposed = new CancellationTokenSource();
 
 				Update();
 			}
@@ -48,6 +51,7 @@ namespace WPFTest.Views
 			{
 				if (_targetRoot != null)
 				{
+					_generatedCodeDisposed.Cancel();
 					_targetRoot = null;
 				}
 			}
@@ -61,7 +65,23 @@ namespace WPFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
+				var bindings = this;
 				targetRoot.textBlock1.Text = dataRoot.Prop1;
+				Set0(bindings._generatedCodeDisposed.Token);
+				async void Set0(CancellationToken cancellationToken)
+				{
+					try
+					{
+						var value = await dataRoot.Prop2;
+						if (!cancellationToken.IsCancellationRequested)
+						{
+							targetRoot.textBlock2.Text = value;
+						}
+					}
+					catch
+					{
+					}
+				}
 
 			}
 		}
