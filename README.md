@@ -46,13 +46,13 @@ Property paths
 <TextBlock Text="{x:Bind Movie.Year}"/>
  ```
  
- Function calls
+Function calls
  ```xaml
 <TextBlock Text="{x:Bind Movie.Description.Trim()}"/>
-<TextBlock Text="{x:Bind local:MainPage.GenerateSongTitle(Title)}"/>
+<TextBlock Text="{x:Bind local:MainPage.GenerateSongTitle(Title, Description)}"/>
  ```
  
- The first example above is the call of instance method Trim(). The second is the call of static method GenerateSongTitle of MainPage class.
+The first example above is the call of instance method Trim(). The second is the call of static method GenerateSongTitle of MainPage class, wich takes two parameters (multi-binding).
  
  The expression of the {x:Bind} can also have the following operators:
  - binary operators (in round brackets alternatives, which are better for XML): +, -, \*, /, = (eq), != (ne), < (lt), > (gt), <= (le), >= (ge) 
