@@ -146,6 +146,36 @@ While waiting for the value to arrive, the {x:Bind} reports the *FallbackValue*,
 
 If an asynchronous function throws an exception, the exception is ignored. The value of the target property is not changed.
 
+### Binding to tuples.
+
+Sometimes it is needed to calculate values for many UI properties using the same logic. For example, foreground and background of a TextBlock must be set according to some state or other logic. You can define one property (function), which returns both foreground and background.
+
+``` c#
+public (Brush foreground, Brush background) Colors
+{
+	get
+	{
+		switch (this.State)
+		{
+			case EntityState.Saved:
+				return (Brushes.Beige, Brushes.Green);
+			case EntityState.NotEdited:
+				return (Brushes.White, Brushes.Black);
+					
+		       ...
+		}
+	}
+}
+```
+
+Than you can use it:
+
+``` xaml
+<TextBlock Foreground="{x:Bind Colors.foreground}" Background="{x:Bind Colors.background}"/>
+```
+
+Note, that the Color property is not called twice. Its value is taken only once, saved as local variable in the generated C# code, and than the values are set to the Control's properties.
+
 ## x:Set Markup Extension
 
 This library also provides {x:Set} Markup Extension. It has an expression parameter, similar like {x:Bind}, and no other parameters. The data source of {x:Set} is always the root page/control/window itself. The expression is evaluated and set only once at the end of constructors of the page/control/window. If an expression is a static property of some type, than it is similar to {x:Static} Markup Extension.
