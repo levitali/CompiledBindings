@@ -26,15 +26,25 @@ Because x:DataType attribute is not available for WPF, you can do the following.
   xmlns:local="clr-namespace:CompiledBindingsDemo"
   mx:DataType="local:MainViewModel"
   ```
-For CLR-Namespaces you can also use the "using" syntax. For example
- ```xaml
-  xmlns:local="using:CompiledBindingsDemo"
-  ```
+
 Note, that if the data source is specified, the {x:Bind} extensions are only applied if the DataContext (or BindingContext in XF) of the root or corresponding controls is set to an object of the specified type.
 
 If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
+
+### Declaring CLR-Namespaces namespaces with "using" and "global using"
+
+For CLR-Namespaces you can use the "using" syntax. For example
+ ```xaml
+  xmlns:local="using:CompiledBindingsDemo"
+  ```
+
+You can also declare the CLR-Namespaces globally with "global using" syntax. For {x:Bind} markup extensions in other XAML files you do not have to declare the namespace. Note, this works only for {x:Bind}. If a namespace is used for other purposes, it must be decleared locally.
+
+ ```xaml
+  xmlns:local="global using:CompiledBindingsDemo"
+  ```
 
 ### x:Bind usage
 
@@ -113,6 +123,26 @@ The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullVal
 ### Observing changes
 
 If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
+
+### Binding to asynchronous (returning Task&lt;T&gt;) properties and functions.
+
+If a property's or a function's returning type is Task&lt;T&gt;, its value is taking with await.
+
+For example, you a function LoadImageAsync in your ViewModel, which asynchronously downloads an image. You can set the image like this:
+
+ ```xaml
+<Image Source="{x:Bind LoadImageAsync()}" />
+ ```
+ 
+While waiting for the value to arrive, the {x:Bind} reports the *FallbackValue*, if one is available, or the default value of the binding target property. For example:
+
+```xaml
+<Page.Resources>
+    <BitmapImage x:Key="defaultImage" UriSource="/Images/download.png" />
+</Page.Resources>
+
+<Image Source="{x:Bind LoadImageAsync(), FallbackValue={StaticResource defaultImage}}" />
+ ```
 
 ## x:Set Markup Extension
 
