@@ -85,6 +85,11 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 <Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
  ```
  
+  - new operator. The class must be fully specified with namespace
+ ```xaml
+<Label Text="{x:Bind new SomeFunction(Property1, new local:Class1(Property2)}" />
+ ```
+ 
 You can use following constants in the expression:
 - numbers with or wihout decimal seperator (point). For example 2.3
 - true, false
@@ -97,9 +102,13 @@ You can use following constants in the expression:
 ### x:Bind other parameters
 
 - **Mode** Specifies the binding mode, as one of these strings: "OneTime", "OneWay", "TwoWay" or "OneWayToSource". The default is "OneWay" 
-- **Converter** Specifies the converter. The value must be a StaticResource expression.
-- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter.
+- **Converter** Specifies the converter.
+- **ConverterParameter** Specifies the converter parameter.
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
+- **FallbackValue** Specifies a value to display when the source or path cannot be resolved.
+- **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
+
+The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {x:Static} markup extension.
 
 ### Observing changes
 
