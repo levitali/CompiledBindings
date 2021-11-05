@@ -144,7 +144,7 @@ While waiting for the value to arrive, the {x:Bind} reports the *FallbackValue*,
 <Image Source="{x:Bind LoadImageAsync(), FallbackValue={StaticResource defaultImage}}" />
  ```
 
-If an asynchronous function ends with exception, the exception is ignored. The value of the target property is not changed.
+If an asynchronous function throws an exception, the exception is ignored. The value of the target property is not changed.
 
 ## x:Set Markup Extension
 
