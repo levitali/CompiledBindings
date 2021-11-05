@@ -97,7 +97,7 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
  
   - new operator. The class must be fully specified with namespace
  ```xaml
-<Label Text="{x:Bind new SomeFunction(Property1, new local:Class1(Property2)}" />
+<Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
  ```
  
 You can use following constants in the expression:
