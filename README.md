@@ -128,7 +128,7 @@ If the Mode is not OneTime or OneWayToSource, than a code is generated to observ
 
 If a property's or a function's returning type is Task&lt;T&gt;, its value is taking with await.
 
-For example, you a function LoadImageAsync in your ViewModel, which asynchronously downloads an image. You can set the image like this:
+For example, you have a function LoadImageAsync in your ViewModel, which asynchronously downloads an image. You can set the image like this:
 
  ```xaml
 <Image Source="{x:Bind LoadImageAsync()}" />
@@ -143,6 +143,8 @@ While waiting for the value to arrive, the {x:Bind} reports the *FallbackValue*,
 
 <Image Source="{x:Bind LoadImageAsync(), FallbackValue={StaticResource defaultImage}}" />
  ```
+
+If an asynchronous function ends with exception, the exception is ignored. The value of the target property is not changed.
 
 ## x:Set Markup Extension
 
