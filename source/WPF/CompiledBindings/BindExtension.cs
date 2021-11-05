@@ -14,7 +14,6 @@ namespace CompiledBindings.Markup
 
 		public BindExtension(string arg1)
 		{
-			Path = arg1;
 		}
 
 		public BindExtension(string arg1, string arg2)

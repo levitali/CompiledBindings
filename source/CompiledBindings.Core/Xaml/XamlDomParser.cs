@@ -258,7 +258,7 @@ namespace CompiledBindings
 
 		public IEnumerable<XamlNamespace> GetNamespaces(XamlNode xamlNode)
 		{
-			var namespaces = XamlNode.GetClrNamespaces(xamlNode.Element);
+			var namespaces = XamlNamespace.GetClrNamespaces(xamlNode.Element);
 			if (KnownNamespaces != null)
 			{
 				namespaces = namespaces.Union(KnownNamespaces, n => n.Prefix);

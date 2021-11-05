@@ -48,7 +48,7 @@ namespace CompiledBindings
 				}
 
 				bool parseExpression = false;
-				var match = Regex.Match(str, @"^\s*(Path|BindBack|Converter|ConverterParameter|FallbackValue|TargetNullValue|Mode|UpdateSourceTrigger)\s*=\s*(.+)\s*$");
+				var match = Regex.Match(str, @"^\s*(\w+)\s*=\s*(.+)\s*$");
 				if (!match.Success)
 				{
 					if (expression == null)

@@ -142,9 +142,8 @@ namespace CompiledBindings
 
 	public class XamlNode
 	{
-		public string? Value;
-		public List<XamlNode> Properties = new List<XamlNode>();
-		public List<XamlNode> Children = new List<XamlNode>();
+		private List<XamlNode>? _properties;
+		private List<XamlNode>? _children;
 
 		public XamlNode(string file, XObject element, XName name)
 		{
@@ -157,16 +156,15 @@ namespace CompiledBindings
 		public XObject Element { get; }
 		public XName Name { get; }
 
-		public static IEnumerable<XamlNamespace> GetClrNamespaces(XObject xobject)
+		public List<XamlNode> Properties => _properties ??= new List<XamlNode>();
+		
+		public List<XamlNode> Children
 		{
-			var xelement = xobject as XElement ?? xobject.Parent;
-			return EnumerableExtensions
-				.SelectSequence(xelement, e => e.Parent, true)
-				.SelectMany(e => e.Attributes())
-				.Where(a => a.Name.Namespace == XNamespace.Xmlns)
-				.Select(a => new XamlNamespace(a.Name.LocalName, a.Value))
-				.Where(n => n.ClrNamespace != null);
+			get => _children ??= new List<XamlNode>();
+			set => _children = value;
 		}
+
+		public string? Value { get; set; }
 
 		public void Remove()
 		{
@@ -212,6 +210,17 @@ namespace CompiledBindings
 				return nsName.Substring(l, ind - l);
 			}
 			return null;
+		}
+
+		public static IEnumerable<XamlNamespace> GetClrNamespaces(XObject xobject)
+		{
+			var xelement = xobject as XElement ?? xobject.Parent;
+			return EnumerableExtensions
+				.SelectSequence(xelement, e => e.Parent, true)
+				.SelectMany(e => e.Attributes())
+				.Where(a => a.Name.Namespace == XNamespace.Xmlns)
+				.Select(a => new XamlNamespace(a.Name.LocalName, a.Value))
+				.Where(n => n.ClrNamespace != null);
 		}
 
 		public static IList<XamlNamespace> GetGlobalNamespaces(IEnumerable<XDocument> xdocs)
