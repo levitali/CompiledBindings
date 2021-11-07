@@ -38,7 +38,7 @@
               ItemTemplate="{StaticResource test1Template}"
               ItemsSource="{x:Bind ListProp}"
               m:SetVisible="{x:Bind ArrayProp.Length > 0}" />
-    <Button mx:DataType="{x:Null}" m:IsEnabled="{x:Bind listView.SelectedItem != null}" />
+    <Button IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"/>
     <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='abc'}" />
     <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='aaa'}" />
     <TextBlock Text="{x:Bind TaskProp, FallbackValue='Loading...'}" />

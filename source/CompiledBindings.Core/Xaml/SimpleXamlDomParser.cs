@@ -116,7 +116,7 @@ namespace CompiledBindings
 					{
 						try
 						{
-							var type = FindTypeFromAttribute(dataTypeAttr)!;
+							var type = FindTypeFromAttribute(dataTypeAttr);
 							dataType = type == null ? null : new TypeInfo(type, false);
 						}
 						catch (Exception ex)
@@ -165,9 +165,32 @@ namespace CompiledBindings
 									var prop = GetObjectProperty(obj, xamlNode);
 									obj.Properties.Add(prop);
 
-									if (prop.Value.BindValue != null)
+									var bind = prop.Value.BindValue;
+									if (bind != null)
 									{
-										currentBindingScope.Bindings.Add(prop.Value.BindValue);
+										if (bind.DataTypeSet)
+										{
+											BindingScope? scope;
+											if (bind.DataType == null)
+											{
+												scope = rootResult.BindingScopes.FirstOrDefault(s => s.DataType == null);
+												if (scope != null)
+												{
+													scope.Bindings.Add(bind);
+													continue;
+												}
+											}
+											scope = new BindingScope
+											{
+												DataType = bind.DataType,
+												ViewName = viewName
+											};
+											rootResult.BindingScopes.Add(scope);
+										}
+										else
+										{
+											currentBindingScope.Bindings.Add(bind);
+										}
 									}
 								}
 								catch (GeneratorException ex)

@@ -116,12 +116,14 @@ namespace CompiledBindings
 				{
 					var ns2 = knownNamespaces.FirstOrDefault(n => n.Prefix == prefix);
 					if (ns2 == null)
+					{
 						throw new ParseException($"'{prefix}' is an undeclared prefix.");
+					}
 					ns = ns2.Namespace;
 				}
 				else
 				{
-					ns = (XNamespace)nsAttr.Value;
+					ns = nsAttr.Value;
 				}
 			}
 			else
@@ -157,7 +159,7 @@ namespace CompiledBindings
 		public XName Name { get; }
 
 		public List<XamlNode> Properties => _properties ??= new List<XamlNode>();
-		
+
 		public List<XamlNode> Children
 		{
 			get => _children ??= new List<XamlNode>();
@@ -181,7 +183,7 @@ namespace CompiledBindings
 
 	public class XamlNamespace
 	{
-		static readonly Regex _usingRegex = new Regex(@"^\s*(?:(global\s+))?using\s*:(.+)$");
+		private static readonly Regex _usingRegex = new Regex(@"^\s*(?:(global\s+))?using\s*:(.+)$");
 
 		public XamlNamespace(string prefix, XNamespace ns)
 		{
@@ -206,7 +208,10 @@ namespace CompiledBindings
 				const int l = 14; // length of "clr-namespace:"
 				int ind = nsName.IndexOf(';', l);
 				if (ind == -1)
+				{
 					ind = nsName.Length;
+				}
+
 				return nsName.Substring(l, ind - l);
 			}
 			return null;

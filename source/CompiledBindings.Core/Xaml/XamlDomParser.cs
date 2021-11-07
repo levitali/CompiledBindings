@@ -107,45 +107,6 @@ namespace CompiledBindings
 			}
 		}
 
-		public TypeDefinition? GetDataType(XElement root)
-		{
-			var dataTypeAttr = root.Attribute(xDataType);
-			if (dataTypeAttr != null)
-			{
-				//TODO!!
-				//string dataTypeName = dataTypeAttr.Value;
-				//if (dataTypeName.EndsWith("?"))
-				//{
-				//	isDataRootNullable = true;
-				//	dataTypeName = dataTypeName.Substring(0, dataTypeName.Length - 1);
-				//}
-				try
-				{
-					return FindTypeFromAttribute(dataTypeAttr);
-				}
-				catch (Exception ex)
-				{
-					throw new GeneratorException(ex.Message, File, dataTypeAttr, dataTypeAttr.Value.Length);
-				}
-			}
-			return null;
-		}
-
-		private IEnumerable<XamlObject> YieldXamlObjects(XamlObjectValue value)
-		{
-			if (value.ObjectValue != null)
-			{
-				yield return value.ObjectValue;
-			}
-			else if (value.CollectionValue != null)
-			{
-				foreach (var item in value.CollectionValue)
-				{
-					yield return item;
-				}
-			}
-		}
-
 		public TypeDefinition FindType(XElement xelement)
 		{
 			return FindType(xelement.Name, xelement);
@@ -220,9 +181,8 @@ namespace CompiledBindings
 			return null;
 		}
 
-		public XName? GetTypeNameFromAttribute(XAttribute attr)
+		public XName? GetTypeNameFromAttribute(string value, XAttribute attr)
 		{
-			var value = attr.Value;
 			if (value.StartsWith("{"))
 			{
 				var xamlNode = XamlParser.ParseMarkupExtension(value, attr, File, KnownNamespaces);
@@ -232,7 +192,7 @@ namespace CompiledBindings
 				}
 				else if (xamlNode.Name == xType)
 				{
-					value = xamlNode.Value;
+					value = xamlNode.Value!;
 				}
 				else
 				{
@@ -248,7 +208,12 @@ namespace CompiledBindings
 
 		public TypeDefinition? FindTypeFromAttribute(XAttribute attr)
 		{
-			var typeName = GetTypeNameFromAttribute(attr);
+			return FindType(attr.Value, attr);
+		}
+
+		public TypeDefinition? FindType(string value, XAttribute attr)
+		{
+			var typeName = GetTypeNameFromAttribute(value, attr);
 			if (typeName == null)
 			{
 				return null;

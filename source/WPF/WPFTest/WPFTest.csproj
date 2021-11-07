@@ -45,7 +45,8 @@
     <PropertyGroup>
       <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
     </PropertyGroup>
-    <WPFGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" AttachDebugger="true">
+    <WPFGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)"
+                         AttachDebugger="false">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
       <Output ItemName="NewPages" TaskParameter="NewPages" />
@@ -66,7 +67,7 @@
   </Target>
   
   <Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterBuild">
-    <UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)" AttachDebugger="true">
+    <UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)" AttachDebugger="false">
       <Output TaskParameter="UpdatedReferenceCopyLocalFiles" ItemName="UpdatedReferenceCopyLocalPaths" />
     </UpdateReferenceCopyLocalTask>
     <ItemGroup>

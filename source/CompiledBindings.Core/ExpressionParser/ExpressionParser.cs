@@ -124,11 +124,11 @@ namespace CompiledBindings
 		private Expression ParseComparison()
 		{
 			var left = ParseAdditive();
-			while (_token.id is TokenId.Equal or TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
+			while (_token.id is TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
 				 or TokenId.GreaterThan or TokenId.GreaterThanEqual or TokenId.LessThan or TokenId.LessThanEqual ||
 				ReplaceTokenIdentifier("gt", TokenId.GreaterThan) || ReplaceTokenIdentifier("ge", TokenId.GreaterThanEqual) ||
 				ReplaceTokenIdentifier("lt", TokenId.LessThan) || ReplaceTokenIdentifier("le", TokenId.LessThanEqual) ||
-				ReplaceTokenIdentifier("eq", TokenId.Equal) || ReplaceTokenIdentifier("ne", TokenId.ExclamationEqual))
+				ReplaceTokenIdentifier("eq", TokenId.DoubleEqual) || ReplaceTokenIdentifier("ne", TokenId.ExclamationEqual))
 			{
 				var savedExpectedType = _expectedType;
 				_expectedType = GetNullableUnderlyingType(left.Type);
@@ -141,7 +141,6 @@ namespace CompiledBindings
 
 				switch (op.id)
 				{
-					case TokenId.Equal:
 					case TokenId.DoubleEqual:
 						left = new BinaryExpression(left, right, "==");
 						break;

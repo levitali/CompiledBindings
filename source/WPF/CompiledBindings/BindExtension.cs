@@ -52,6 +52,8 @@ namespace CompiledBindings.Markup
 		{
 		}
 
+		public Type DataType { get; set; }
+
 		public string Path { get; set; }
 
 		public string BindBack { get; set; }

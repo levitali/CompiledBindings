@@ -46,7 +46,7 @@
               ItemTemplate="{StaticResource test1Template}"
               ItemsSource="{x:Bind ListProp}"
               m:SetVisible="{x:Bind ArrayProp.Length > 0}" />
-    <Button mx:DataType="{x:Null}" IsEnabled="{x:Bind listView.SelectedItem ne null}" />
+    <Button IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}" />
   </StackPanel>
 
 </Window>

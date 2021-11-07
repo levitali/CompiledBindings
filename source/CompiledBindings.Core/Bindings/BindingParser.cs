@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Mono.Cecil;
 
 #nullable enable
@@ -28,10 +29,29 @@ namespace CompiledBindings
 			Expression? converterParameter = null;
 			Expression? fallbackValue = null;
 			Expression? targetNullValue = null;
+			TypeInfo? dataType = null;
+			bool dataTypeSet = false;
 			BindingMode? mode = null;
 			UpdateSourceTrigger updateSourceTrigger = UpdateSourceTrigger.Event;
 			EventDefinition? targetChangedEvent = null;
 			List<(string name, TypeInfo type)> resources = new();
+
+			// TODO! how to match optional comma and not include it in the group?
+			var match = Regex.Match(str, @"^.*DataType\s*(?<!=)=(?!=)(.+)");
+			if (match.Success)
+			{
+				var typeExpr = match.Groups[1].Value.Trim();
+				var pos = typeExpr.IndexOf(',');
+				if (pos != -1)
+				{
+					typeExpr = typeExpr.Substring(0, pos);
+				}
+				var type = xamlDomParser.FindType(typeExpr, (XAttribute)prop.XamlNode.Element);
+				dataType = type == null ? null : new TypeInfo(type, false);
+				dataTypeSet = true;
+
+				sourceType = dataType ?? rootType;
+			}
 
 			int pos1 = 0;
 			while (true)
@@ -48,7 +68,7 @@ namespace CompiledBindings
 				}
 
 				bool parseExpression = false;
-				var match = Regex.Match(str, @"^\s*(\w+)\s*=\s*(.+)\s*$");
+				match = Regex.Match(str, @"^\s*(\w+)\s*=\s*(.+)\s*$");
 				if (!match.Success)
 				{
 					if (expression == null)
@@ -139,7 +159,7 @@ namespace CompiledBindings
 						converterParameter = expr;
 					}
 				}
-				else if (name is "Mode" or "UpdateSourceTrigger")
+				else if (name is "Mode" or "UpdateSourceTrigger" or "DataType")
 				{
 					int pos2 = str.IndexOf(',');
 					if (pos2 == -1)
@@ -168,6 +188,10 @@ namespace CompiledBindings
 							}
 							throw new ParseException(msg, pos1);
 						}
+					}
+					else if (name == "DataType")
+					{
+						// The DataType was processed above
 					}
 					else
 					{
@@ -256,6 +280,8 @@ namespace CompiledBindings
 			return new Bind
 			{
 				Property = prop,
+				DataType = dataType,
+				DataTypeSet = dataTypeSet,
 				Expression = expression,
 				BindBackExpression = bindBackExpression,
 				Converter = converter,
@@ -487,8 +513,9 @@ namespace CompiledBindings
 		public Expression? ConverterParameter { get; init; }
 		public Expression? FallbackValue { get; init; }
 		public UpdateSourceTrigger? UpdateSourceTrigger { get; init; }
+		public TypeInfo? DataType { get; init; }
+		public bool DataTypeSet { get; init; }
 		public EventDefinition? TargetChangedEvent { get; set; }
-		public XamlObjectValue? DesignValue { get; init; }
 		public List<(string name, TypeInfo type)> Resources { get; init; }
 
 		public Expression? SourceExpression { get; set; }
