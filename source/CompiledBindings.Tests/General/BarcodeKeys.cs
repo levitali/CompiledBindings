@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace Test
+namespace Test;
+
+class BarcodeKeys
 {
-	class BarcodeKeys
-	{
-		public static string HU = "HU";
-		public static string Batch = "BATCH";
-	}
+	public static string HU = "HU";
+	public static string Batch = "BATCH";
 }

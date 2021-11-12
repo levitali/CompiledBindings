@@ -1,9 +1,9 @@
-﻿namespace System.Runtime.CompilerServices
-{
-	using System.ComponentModel;
+﻿using System.ComponentModel;
 
-	[EditorBrowsable(EditorBrowsableState.Never)]
-	public static class IsExternalInit
-	{
-	}
+namespace System.Runtime.CompilerServices;
+
+[EditorBrowsable(EditorBrowsableState.Never)]
+public static class IsExternalInit
+{
 }
+

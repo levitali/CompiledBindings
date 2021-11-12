@@ -11,11 +11,11 @@ using WPFTest.ViewModels;
 
 #nullable enable
 
-namespace WPFTest.Views
+namespace WPFTest.Views;
+
+partial class Page2 : Page
 {
-	partial class Page2 : Page
-	{
-		public string Prop1 => "Hello";
-		public Task<string> Prop2 => Task.FromResult("Hello");
-	}
+	public string Prop1 => "Hello";
+	public Task<string> Prop2 => Task.FromResult("Hello");
 }
+

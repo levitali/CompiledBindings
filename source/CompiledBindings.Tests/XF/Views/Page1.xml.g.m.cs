@@ -33,8 +33,8 @@ namespace XFTest.Views
 			button1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Button>(this, "button1");
 
 			var value1 = XFTest.Strings.Instance;
-			Title = value1?.Title;
-			label4.Text = value1?.Header1;
+			Title = value1.Title;
+			label4.Text = value1.Header1;
 
 			Bindings_.Initialize(this);
 			this.BindingContextChanged += this_BindingContextChanged;
@@ -799,6 +799,154 @@ namespace XFTest.Views
 					if (_bindingsWeakRef != null)
 					{
 						bindings = (Page1_DataTemplate1_Bindings_rootElement)_bindingsWeakRef.Target;
+						if (bindings == null)
+						{
+							_bindingsWeakRef = null;
+							Cleanup();
+						}
+					}
+					return bindings;
+				}
+			}
+		}
+	}
+
+	class Page1_DataTemplate2 : global::CompiledBindings.IGeneratedDataTemplate
+	{
+		private global::Xamarin.Forms.Label label9;
+
+		public void Initialize(global::Xamarin.Forms.Element rootElement)
+		{
+			label9 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label9");
+
+
+			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
+			if (rootElement.BindingContext is XFTest.ViewModels.EntityViewModel dataRoot0)
+			{
+				Bindings_rootElement.Initialize(this, dataRoot0);
+			}
+		}
+
+		private void rootElement_BindingContextChanged(object sender, System.EventArgs e)
+		{
+			Bindings_rootElement.Cleanup();
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is XFTest.ViewModels.EntityViewModel dataRoot)
+			{
+				Bindings_rootElement.Initialize(this, dataRoot);
+			}
+		}
+
+		Page1_DataTemplate2_Bindings_rootElement Bindings_rootElement = new Page1_DataTemplate2_Bindings_rootElement();
+
+		class Page1_DataTemplate2_Bindings_rootElement
+		{
+			Page1_DataTemplate2 _targetRoot;
+			global::XFTest.ViewModels.EntityViewModel _dataRoot;
+			Page1_DataTemplate2_BindingsTrackings_rootElement _bindingsTrackings;
+
+			public void Initialize(Page1_DataTemplate2 targetRoot, global::XFTest.ViewModels.EntityViewModel dataRoot)
+			{
+				if (_targetRoot != null)
+					throw new System.InvalidOperationException();
+				if (targetRoot == null)
+					throw new System.ArgumentNullException(nameof(targetRoot));
+				if (dataRoot == null)
+					throw new System.ArgumentNullException(nameof(dataRoot));
+
+				_targetRoot = targetRoot;
+				_dataRoot = dataRoot;
+				_bindingsTrackings = new Page1_DataTemplate2_BindingsTrackings_rootElement(this);
+
+				Update();
+
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
+			}
+
+			public void Cleanup()
+			{
+				if (_targetRoot != null)
+				{
+					_bindingsTrackings.Cleanup();
+					_dataRoot = null;
+					_targetRoot = null;
+				}
+			}
+
+			public void Update()
+			{
+				if (_targetRoot == null)
+				{
+					throw new System.InvalidOperationException();
+				}
+
+				var targetRoot = _targetRoot;
+				var dataRoot = _dataRoot;
+				targetRoot.label9.Text = dataRoot.DecimalProp.ToString();
+
+			}
+
+			class Page1_DataTemplate2_BindingsTrackings_rootElement
+			{
+				global::System.WeakReference _bindingsWeakRef;
+				global::XFTest.ViewModels.Page1ViewModel _propertyChangeSource0;
+
+				public Page1_DataTemplate2_BindingsTrackings_rootElement(Page1_DataTemplate2_Bindings_rootElement bindings)
+				{
+					_bindingsWeakRef = new global::System.WeakReference(bindings);
+				}
+
+				public void Cleanup()
+				{
+					if (_propertyChangeSource0 != null)
+					{
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
+						_propertyChangeSource0 = null;
+					}
+				}
+
+				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.Page1ViewModel value)
+				{
+					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
+					{
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
+						_propertyChangeSource0 = null;
+					}
+					if (_propertyChangeSource0 == null && value != null)
+					{
+						_propertyChangeSource0 = value;
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
+					}
+				}
+
+				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				{
+					var bindings = TryGetBindings();
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var targetRoot = bindings._targetRoot;
+					var dataRoot = bindings._dataRoot;
+					var typedSender = (global::XFTest.ViewModels.Page1ViewModel)sender;
+					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
+
+					if (notifyAll || e.PropertyName == "DecimalProp")
+					{
+						targetRoot.label9.Text = typedSender.DecimalProp.ToString();
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+				}
+
+				Page1_DataTemplate2_Bindings_rootElement TryGetBindings()
+				{
+					Page1_DataTemplate2_Bindings_rootElement bindings = null;
+					if (_bindingsWeakRef != null)
+					{
+						bindings = (Page1_DataTemplate2_Bindings_rootElement)_bindingsWeakRef.Target;
 						if (bindings == null)
 						{
 							_bindingsWeakRef = null;

@@ -1,29 +1,28 @@
-﻿namespace UI
+﻿namespace UI;
+
+public class FocusState<T>
+	where T : struct
 {
-	public class FocusState<T>
-		where T : struct
+	public bool this[T key]
 	{
-		public bool this[T key]
+		get => object.Equals(State, key);
+		set
 		{
-			get => object.Equals(State, key);
-			set
+			if (value)
 			{
-				if (value)
-				{
-					State = key;
-				}
-				else if (object.Equals(State, key))
-				{
-					State = null;
-				}
+				State = key;
+			}
+			else if (object.Equals(State, key))
+			{
+				State = null;
 			}
 		}
+	}
 
-		public T? State { get; private set; }
+	public T? State { get; private set; }
 
-		public static implicit operator FocusState<T>(T? value)
-		{
-			return new FocusState<T>() { State = value };
-		}
+	public static implicit operator FocusState<T>(T? value)
+	{
+		return new FocusState<T>() { State = value };
 	}
 }

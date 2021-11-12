@@ -6,53 +6,53 @@ using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
-namespace CompiledBindings.Tests.XF
+namespace CompiledBindings.Tests.XF;
+
+[TestClass]
+public class XFTests
 {
-	[TestClass]
-	public class XFTests
+	[TestMethod]
+	public void Page1()
 	{
-		[TestMethod]
-		public void Page1()
-		{
-			TestPage("Page1");
-		}
+		TestPage("Page1");
+	}
 
-		[TestMethod]
-		public void Page2()
-		{
-			TestPage("Page2");
-		}
+	[TestMethod]
+	public void Page2()
+	{
+		TestPage("Page2");
+	}
 
 
-		private void TestPage(string pageName)
+	private void TestPage(string pageName)
+	{
+		int substr = "file:///".Length;
+		TypeInfoUtils.LoadReferences(new string[]
 		{
-			int substr = "file:///".Length;
-			TypeInfoUtils.LoadReferences(new string[]
-			{
 				typeof(object).Assembly.CodeBase.Substring(substr),
 				typeof(INotifyPropertyChanged).Assembly.CodeBase.Substring(substr),
 				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
-			});
-			try
-			{
-				var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
-				var xdoc = XDocument.Load(xamlFile);
+		});
+		try
+		{
+			var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
+			var xdoc = XDocument.Load(xamlFile);
 
-				var xamlDomParser = new XFXamlDomParser();
-				var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
+			var xamlDomParser = new XFXamlDomParser();
+			var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
 
-				var codeGenerator = new XFCodeGenerator("latest");
-				var code = codeGenerator.GenerateCode(parseResult);
+			var codeGenerator = new XFCodeGenerator("latest");
+			var code = codeGenerator.GenerateCode(parseResult);
 
-				var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");
-				var expectedCode = File.ReadAllText(csharpFile);
+			var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");
+			var expectedCode = File.ReadAllText(csharpFile);
 
-				Assert.AreEqual(code, expectedCode);
-			}
-			finally
-			{
-				TypeInfoUtils.Cleanup();
-			}
+			Assert.AreEqual(code, expectedCode);
+		}
+		finally
+		{
+			TypeInfoUtils.Cleanup();
 		}
 	}
 }
+

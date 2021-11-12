@@ -7,12 +7,12 @@ using Xamarin.Forms;
 
 #nullable enable
 
-namespace XFTest.Views
-{
-	partial class Page1
-	{
-		public string? Title { get; set; }
+namespace XFTest.Views;
 
-		private CollectionView list;
-	}
+partial class Page1
+{
+	public string? Title { get; set; }
+
+	private CollectionView list;
 }
+

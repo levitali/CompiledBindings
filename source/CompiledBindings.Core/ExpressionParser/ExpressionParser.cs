@@ -6,1221 +6,1207 @@ using Mono.Cecil;
 
 #nullable enable
 
-namespace CompiledBindings
+namespace CompiledBindings;
+
+public class ExpressionParser
 {
-	public class ExpressionParser
+	private static readonly Dictionary<string, Expression> _keywords = new Dictionary<string, Expression>
 	{
-		private static readonly Dictionary<string, Expression> _keywords = new Dictionary<string, Expression>
-		{
-			{ "true", new ConstantExpression(true) },
-			{ "false", new ConstantExpression(false) },
-			{ "null", Expression.NullExpression },
-		};
-		private readonly ParameterExpression _root;
-		private readonly IList<XamlNamespace> _namespaces;
-		private readonly List<XamlNamespace> _includeNamespaces = new List<XamlNamespace>();
-		private readonly string _text;
-		private int _textPos;
-		private readonly int _textLen;
-		private char _ch;
-		private Token _token;
-		private TypeReference? _expectedType;
+		{ "true", new ConstantExpression(true) },
+		{ "false", new ConstantExpression(false) },
+		{ "null", Expression.NullExpression },
+	};
+	private readonly ParameterExpression _root;
+	private readonly IList<XamlNamespace> _namespaces;
+	private readonly List<XamlNamespace> _includeNamespaces = new List<XamlNamespace>();
+	private readonly string _text;
+	private int _textPos;
+	private readonly int _textLen;
+	private char _ch;
+	private Token _token;
+	private TypeReference? _expectedType;
 
-		private ExpressionParser(ParameterExpression root, string expression, TypeReference resultType, IList<XamlNamespace> namespaces)
+	private ExpressionParser(ParameterExpression root, string expression, TypeReference resultType, IList<XamlNamespace> namespaces)
+	{
+		_root = root;
+		_namespaces = namespaces;
+		_text = expression;
+		_textLen = _text.Length;
+		_expectedType = resultType;
+		SetTextPos(0);
+		NextToken();
+	}
+
+	public static Expression Parse(TypeInfo dataType, string member, string? expression, TypeReference resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
+	{
+		if (string.IsNullOrWhiteSpace(expression))
 		{
-			_root = root;
-			_namespaces = namespaces;
-			_text = expression;
-			_textLen = _text.Length;
-			_expectedType = resultType;
-			SetTextPos(0);
-			NextToken();
+			throw new ParseException("Empty expression.", 0);
 		}
 
-		public static Expression Parse(TypeInfo dataType, string member, string? expression, TypeReference resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
+		var parser = new ExpressionParser(new ParameterExpression(dataType, member), expression!, resultType, namespaces);
+
+		var res = parser.ParseExpression();
+		if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))
 		{
-			if (string.IsNullOrWhiteSpace(expression))
-			{
-				throw new ParseException("Empty expression.", 0);
-			}
-
-			var parser = new ExpressionParser(new ParameterExpression(dataType, member), expression!, resultType, namespaces);
-
-			var res = parser.ParseExpression();
-			if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))
-			{
-				throw new ParseException(Res.SyntaxError, parser._token.pos);
-			}
-
-			includeNamespaces = parser._includeNamespaces;
-			textPos = parser._textPos;
-
-			return res;
+			throw new ParseException(Res.SyntaxError, parser._token.pos);
 		}
 
-		// ?:, ?? operator
-		private Expression ParseExpression()
-		{
-			int errorPos = _token.pos;
-			var expr = ParseLogicalOr();
+		includeNamespaces = parser._includeNamespaces;
+		textPos = parser._textPos;
 
-			if (_token.id == TokenId.Question)
-			{
-				NextToken();
-				var expr1 = ParseExpression();
-				ValidateToken(TokenId.Colon, Res.ColonExpected);
-				NextToken();
-				var expr2 = ParseExpression();
-				expr = new ConditionalExpression(expr, expr1, expr2);
-			}
-			else if (_token.id == TokenId.DoubleQuestion)
-			{
-				NextToken();
-				var right = ParseExpression();
-				expr = new CoalesceExpression(expr, right);
-			}
-			return expr;
-		}
+		return res;
+	}
 
-		// ||, or operator
-		private Expression ParseLogicalOr()
-		{
-			var left = ParseLogicalAnd();
-			while (_token.id == TokenId.DoubleBar || TokenIdentifierIs("or"))
-			{
-				var savedExpectedType = _expectedType;
-				_expectedType = GetNullableUnderlyingType(left.Type);
-				ValidateNotMethodAccess(left);
-				//var op = _token;
-				NextToken();
-				var right = ParseLogicalAnd();
-				ValidateNotMethodAccess(right);
-				left = new BinaryExpression(left, right, "||");
-				_expectedType = savedExpectedType;
-			}
-			return left;
-		}
+	// ?:, ?? operator
+	private Expression ParseExpression()
+	{
+		int errorPos = _token.pos;
+		var expr = ParseLogicalOr();
 
-		// &&, and operator
-		private Expression ParseLogicalAnd()
-		{
-			var left = ParseComparison();
-			while (_token.id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))
-			{
-				var savedExpectedType = _expectedType;
-				_expectedType = GetNullableUnderlyingType(left.Type);
-				ValidateNotMethodAccess(left);
-				//var op = _token;
-				NextToken();
-				var right = ParseComparison();
-				ValidateNotMethodAccess(right);
-				left = new BinaryExpression(left, right, "&&");
-				_expectedType = savedExpectedType;
-			}
-			return left;
-		}
-
-		// =, ==, !=, <>, >, >=, <, <= operators
-		private Expression ParseComparison()
-		{
-			var left = ParseAdditive();
-			while (_token.id is TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
-				 or TokenId.GreaterThan or TokenId.GreaterThanEqual or TokenId.LessThan or TokenId.LessThanEqual ||
-				ReplaceTokenIdentifier("gt", TokenId.GreaterThan) || ReplaceTokenIdentifier("ge", TokenId.GreaterThanEqual) ||
-				ReplaceTokenIdentifier("lt", TokenId.LessThan) || ReplaceTokenIdentifier("le", TokenId.LessThanEqual) ||
-				ReplaceTokenIdentifier("eq", TokenId.DoubleEqual) || ReplaceTokenIdentifier("ne", TokenId.ExclamationEqual))
-			{
-				var savedExpectedType = _expectedType;
-				_expectedType = GetNullableUnderlyingType(left.Type);
-				ValidateNotMethodAccess(left);
-				var op = _token;
-				NextToken();
-				var right = ParseAdditive();
-				ValidateNotMethodAccess(right);
-				_expectedType = savedExpectedType;
-
-				switch (op.id)
-				{
-					case TokenId.DoubleEqual:
-						left = new BinaryExpression(left, right, "==");
-						break;
-					case TokenId.ExclamationEqual:
-					case TokenId.LessGreater:
-						left = new BinaryExpression(left, right, "!=");
-						break;
-					case TokenId.GreaterThan:
-						left = new BinaryExpression(left, right, ">");
-						break;
-					case TokenId.GreaterThanEqual:
-						left = new BinaryExpression(left, right, ">=");
-						break;
-					case TokenId.LessThan:
-						left = new BinaryExpression(left, right, "<");
-						break;
-					case TokenId.LessThanEqual:
-						left = new BinaryExpression(left, right, "<=");
-						break;
-				}
-			}
-			return left;
-
-			bool ReplaceTokenIdentifier(string identiferId, TokenId tokenId)
-			{
-				if (!TokenIdentifierIs(identiferId))
-				{
-					return false;
-				}
-
-				_token.id = tokenId;
-				return true;
-			}
-		}
-
-		// +, -, & operators
-		private Expression ParseAdditive()
-		{
-			var left = ParseMultiplicative();
-			while (_token.id is TokenId.Plus or TokenId.Minus)
-			{
-				var savedExpectedType = _expectedType;
-				_expectedType = GetNullableUnderlyingType(left.Type);
-				ValidateNotMethodAccess(left);
-				var op = _token;
-				NextToken();
-				var right = ParseMultiplicative();
-				ValidateNotMethodAccess(right);
-				_expectedType = savedExpectedType;
-				switch (op.id)
-				{
-					case TokenId.Plus:
-						left = new BinaryExpression(left, right, "+");
-						break;
-					case TokenId.Minus:
-						left = new BinaryExpression(left, right, "-");
-						break;
-				}
-			}
-			return left;
-		}
-
-		// *, /, %, mod operators
-		private Expression ParseMultiplicative()
-		{
-			var left = ParseUnary();
-			while (_token.id is TokenId.Asterisk or TokenId.Slash or TokenId.Percent || TokenIdentifierIs("mod"))
-			{
-				var savedExpectedType = _expectedType;
-				_expectedType = GetNullableUnderlyingType(left.Type);
-				ValidateNotMethodAccess(left);
-				var op = _token;
-				NextToken();
-				var right = ParseUnary();
-				ValidateNotMethodAccess(right);
-				_expectedType = savedExpectedType;
-				switch (op.id)
-				{
-					case TokenId.Asterisk:
-						left = new BinaryExpression(left, right, "*");
-						break;
-					case TokenId.Slash:
-						left = new BinaryExpression(left, right, "/");
-						break;
-					case TokenId.Percent:
-						left = new BinaryExpression(left, right, "%");
-						break;
-				}
-			}
-			return left;
-		}
-
-		// -, !, not unary operators
-		private Expression ParseUnary()
-		{
-			if (_token.id is TokenId.Minus or TokenId.Exclamation || TokenIdentifierIs("not"))
-			{
-				var op = _token;
-				NextToken();
-				if (op.id == TokenId.Minus && (_token.id == TokenId.IntegerLiteral || _token.id == TokenId.RealLiteral))
-				{
-					_token.text = "-" + _token.text;
-					_token.pos = op.pos;
-					return ParsePrimary();
-				}
-				var expr = ParseUnary();
-				ValidateNotMethodAccess(expr);
-				if (op.id == TokenId.Minus)
-				{
-					expr = new UnaryExpression(expr, "-");
-				}
-				else
-				{
-					expr = new UnaryExpression(expr, "!");
-				}
-				return expr;
-			}
-			return ParsePrimary();
-		}
-
-		private Expression ParsePrimary()
-		{
-			var expr = ParsePrimaryStart();
-			while (true)
-			{
-				if (_token.id == TokenId.Dot)
-				{
-					ValidateNotMethodAccess(expr);
-					NextToken();
-					expr = ParseMemberAccess(expr);
-				}
-				else if (_token.id == TokenId.OpenBracket)
-				{
-					ValidateNotMethodAccess(expr);
-					expr = ParseElementAccess(expr);
-				}
-				else if (_token.id == TokenId.OpenParen)
-				{
-					expr = ParseInvoke(expr);
-				}
-				else
-				{
-					break;
-				}
-			}
-			return expr;
-		}
-
-		private MethodDefinition FindMethod(TypeReference type, string methodName, Expression[] args)
-		{
-			type = GetNullableUnderlyingType(type);
-
-			MethodDefinition? method = null;
-			var methods = type
-				.GetAllMethods()
-				.Where(m => m.Name == methodName &&
-							(m.Parameters.Count >= args.Length ||
-							 (m.Parameters.Count > 0 && m.Parameters[m.Parameters.Count - 1].CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))))
-				.ToList();
-			if (methods.Count == 0)
-			{
-				foreach (var ns in _namespaces)
-				{
-					methods = TypeInfoUtils.FindExtensionMethods(ns.ClrNamespace!, methodName).ToList();
-					if (methods.Count > 0)
-					{
-						_includeNamespaces.Add(ns);
-						break;
-					}
-				}
-			}
-			if (methods.Count == 1)
-			{
-				method = methods[0];
-				// Note! So far we do not check if parameters are assignable.
-				// If not, the generated code will not compile
-			}
-			else if (methods.Count > 1)
-			{
-				// If there are many methods, it is need to find the right one.
-				foreach (var m in methods)
-				{
-					var parameters = m.Parameters;
-					for (int i = 0; i < args.Length; i++)
-					{
-						if (!parameters[i].ParameterType.IsAssignableFrom(args[i].Type) &&
-							(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.FullName != "System.Char"))
-						{
-							goto Label_NextMethod;
-						}
-					}
-					if (m.Parameters.Count > args.Length)
-					{
-						if (!m.Parameters[args.Length].IsOptional)
-						{
-							goto Label_NextMethod;
-						}
-					}
-					method = m;
-					break;
-
-				Label_NextMethod:;
-				}
-			}
-			if (method == null)
-			{
-				throw new ParseException($"No applicable method '{methodName}' exists in type '{type.FullName}'");
-			}
-			return method;
-		}
-
-		private Expression ParseInvoke(Expression expr)
-		{
-			int errorPos = _token.pos;
-
-			var args = ParseArgumentList();
-
-			var delegateType = TypeInfoUtils.GetTypeThrow(typeof(MulticastDelegate));
-			if (!delegateType.IsAssignableFrom(expr.Type))
-			{
-				throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
-			}
-			var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
-			//TODO!! check if the arguments and the method match (parameters count, assignable)
-			if (method.Parameters.Count < args.Length)
-			{
-				throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
-			}
-
-			CorrectCharParameters(method.Definition, args, errorPos);
-			CorrectNotNullableParameters(method.Definition, args);
-
-			return new InvokeExpression(expr, args, method.ReturnType);
-		}
-
-		private static void CorrectNotNullableParameters(MethodDefinition method, Expression[] args)
-		{
-			var parameters = method.Parameters;
-			for (int i = 0; i < args.Length; i++)
-			{
-				if (i >= parameters.Count)
-				{
-					ParameterDefinition pd;
-					if (i == 0 || !(pd = parameters[parameters.Count - 1]).CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
-					{
-						throw new InvalidProgramException();
-					}
-					if (!pd.ParameterType.IsArray)
-					{
-						throw new InvalidProgramException();
-					}
-
-					bool isNullable = pd.ParameterType.GetElementType().IsNullable();
-					for (; i < args.Length; i++)
-					{
-						if (isNullable && args[i].IsNullable)
-						{
-							args[i] = new CoalesceExpression(args[i], Expression.DefaultExpression);
-						}
-					}
-					break;
-				}
-				else if (!parameters[i].ParameterType.IsNullable() && args[i].IsNullable)
-				{
-					args[i] = new CoalesceExpression(args[i], Expression.DefaultExpression);
-				}
-			}
-		}
-
-		private static void CorrectCharParameters(MethodDefinition method, Expression[] args, int errorPos)
-		{
-			bool? isParamsChar = null;
-			for (int i = 0; i < args.Length; i++)
-			{
-				if (args[i] is ConstantExpression ce && ce.Value is string)
-				{
-					if (isParamsChar == null && i == method.Parameters.Count)
-					{
-						throw new InvalidProgramException();
-					}
-
-					if (i == method.Parameters.Count - 1)
-					{
-						if (method.Parameters[i].CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
-						{
-							if (!method.Parameters[i].ParameterType.IsArray)
-							{
-								throw new InvalidProgramException();
-							}
-
-							isParamsChar = method.Parameters[i].ParameterType.GetElementType().FullName == "System.Char";
-							if (isParamsChar == false)
-							{
-								return;
-							}
-						}
-					}
-					if (isParamsChar == true || method.Parameters[i].ParameterType.FullName == "System.Char")
-					{
-						string value = (string)((ConstantExpression)args[i]).Value!;
-						if (value.Length != 1)
-						{
-							throw new ParseException($"Cannot convert '{value}' to char.", errorPos);
-						}
-
-						args[i] = new ConstantExpression(value[0]);
-					}
-				}
-			}
-		}
-
-		private Expression ParsePrimaryStart()
-		{
-			switch (_token.id)
-			{
-				case TokenId.Identifier:
-					return ParseIdentifier();
-				case TokenId.StringLiteral:
-					return ParseStringLiteral();
-				case TokenId.IntegerLiteral:
-					return ParseIntegerLiteral();
-				case TokenId.RealLiteral:
-					return ParseRealLiteral();
-				case TokenId.OpenParen:
-					return ParseParenExpression();
-				//case TokenId.Dot:// Dot at the beginning of expression means root; used actually only when the whole expression is a dot
-				//	NextToken();
-				//	return _root;
-				default:
-					throw new ParseException("Expression expected");
-			}
-		}
-
-		private Expression ParseNewExpression()
+		if (_token.id == TokenId.Question)
 		{
 			NextToken();
-
-			int errorPos = _token.pos;
-			string prefix = GetIdentifier();
-
-			NextToken();
+			var expr1 = ParseExpression();
 			ValidateToken(TokenId.Colon, Res.ColonExpected);
-
-			var typeExpr = ParseTypeExpression(prefix, errorPos);
-			var args = ParseArgumentList();
-			//TODO!! CorrectCharParameters
-			//TODO!! CorrectNotNullableParameters
-			return new NewExpression(typeExpr, args);
+			NextToken();
+			var expr2 = ParseExpression();
+			expr = new ConditionalExpression(expr, expr1, expr2);
 		}
-
-		private Expression ParseTypeofExpression()
+		else if (_token.id == TokenId.DoubleQuestion)
 		{
 			NextToken();
-			var args = ParseArgumentList();
-			if (args.Length != 1 || args[0] is not TypeExpression typeExpression)
-			{
-				throw new ParseException($"Invalid type.");
-			}
-			return new TypeofExpression(typeExpression);
+			var right = ParseExpression();
+			expr = new CoalesceExpression(expr, right);
 		}
+		return expr;
+	}
 
-		private Expression ParseStringLiteral()
+	// ||, or operator
+	private Expression ParseLogicalOr()
+	{
+		var left = ParseLogicalAnd();
+		while (_token.id == TokenId.DoubleBar || TokenIdentifierIs("or"))
 		{
-			ValidateToken(TokenId.StringLiteral);
-			char quote = _token.text[0];
-			string s = _token.text.Substring(1, _token.text.Length - 2);
-			int start = 0;
-			while (true)
+			var savedExpectedType = _expectedType;
+			_expectedType = GetNullableUnderlyingType(left.Type);
+			ValidateNotMethodAccess(left);
+			//var op = _token;
+			NextToken();
+			var right = ParseLogicalAnd();
+			ValidateNotMethodAccess(right);
+			left = new BinaryExpression(left, right, "||");
+			_expectedType = savedExpectedType;
+		}
+		return left;
+	}
+
+	// &&, and operator
+	private Expression ParseLogicalAnd()
+	{
+		var left = ParseComparison();
+		while (_token.id == TokenId.DoubleAmphersand || TokenIdentifierIs("and"))
+		{
+			var savedExpectedType = _expectedType;
+			_expectedType = GetNullableUnderlyingType(left.Type);
+			ValidateNotMethodAccess(left);
+			//var op = _token;
+			NextToken();
+			var right = ParseComparison();
+			ValidateNotMethodAccess(right);
+			left = new BinaryExpression(left, right, "&&");
+			_expectedType = savedExpectedType;
+		}
+		return left;
+	}
+
+	// =, ==, !=, <>, >, >=, <, <= operators
+	private Expression ParseComparison()
+	{
+		var left = ParseAdditive();
+		while (_token.id is TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
+			 or TokenId.GreaterThan or TokenId.GreaterThanEqual or TokenId.LessThan or TokenId.LessThanEqual ||
+			ReplaceTokenIdentifier("gt", TokenId.GreaterThan) || ReplaceTokenIdentifier("ge", TokenId.GreaterThanEqual) ||
+			ReplaceTokenIdentifier("lt", TokenId.LessThan) || ReplaceTokenIdentifier("le", TokenId.LessThanEqual) ||
+			ReplaceTokenIdentifier("eq", TokenId.DoubleEqual) || ReplaceTokenIdentifier("ne", TokenId.ExclamationEqual))
+		{
+			var savedExpectedType = _expectedType;
+			_expectedType = GetNullableUnderlyingType(left.Type);
+			ValidateNotMethodAccess(left);
+			var op = _token;
+			NextToken();
+			var right = ParseAdditive();
+			ValidateNotMethodAccess(right);
+			_expectedType = savedExpectedType;
+
+			switch (op.id)
 			{
-				int i = s.IndexOf(quote, start);
-				if (i < 0)
+				case TokenId.DoubleEqual:
+					left = new BinaryExpression(left, right, "==");
+					break;
+				case TokenId.ExclamationEqual:
+				case TokenId.LessGreater:
+					left = new BinaryExpression(left, right, "!=");
+					break;
+				case TokenId.GreaterThan:
+					left = new BinaryExpression(left, right, ">");
+					break;
+				case TokenId.GreaterThanEqual:
+					left = new BinaryExpression(left, right, ">=");
+					break;
+				case TokenId.LessThan:
+					left = new BinaryExpression(left, right, "<");
+					break;
+				case TokenId.LessThanEqual:
+					left = new BinaryExpression(left, right, "<=");
+					break;
+			}
+		}
+		return left;
+
+		bool ReplaceTokenIdentifier(string identiferId, TokenId tokenId)
+		{
+			if (!TokenIdentifierIs(identiferId))
+			{
+				return false;
+			}
+
+			_token.id = tokenId;
+			return true;
+		}
+	}
+
+	// +, -, & operators
+	private Expression ParseAdditive()
+	{
+		var left = ParseMultiplicative();
+		while (_token.id is TokenId.Plus or TokenId.Minus)
+		{
+			var savedExpectedType = _expectedType;
+			_expectedType = GetNullableUnderlyingType(left.Type);
+			ValidateNotMethodAccess(left);
+			var op = _token;
+			NextToken();
+			var right = ParseMultiplicative();
+			ValidateNotMethodAccess(right);
+			_expectedType = savedExpectedType;
+			switch (op.id)
+			{
+				case TokenId.Plus:
+					left = new BinaryExpression(left, right, "+");
+					break;
+				case TokenId.Minus:
+					left = new BinaryExpression(left, right, "-");
+					break;
+			}
+		}
+		return left;
+	}
+
+	// *, /, %, mod operators
+	private Expression ParseMultiplicative()
+	{
+		var left = ParseUnary();
+		while (_token.id is TokenId.Asterisk or TokenId.Slash or TokenId.Percent || TokenIdentifierIs("mod"))
+		{
+			var savedExpectedType = _expectedType;
+			_expectedType = GetNullableUnderlyingType(left.Type);
+			ValidateNotMethodAccess(left);
+			var op = _token;
+			NextToken();
+			var right = ParseUnary();
+			ValidateNotMethodAccess(right);
+			_expectedType = savedExpectedType;
+			switch (op.id)
+			{
+				case TokenId.Asterisk:
+					left = new BinaryExpression(left, right, "*");
+					break;
+				case TokenId.Slash:
+					left = new BinaryExpression(left, right, "/");
+					break;
+				case TokenId.Percent:
+					left = new BinaryExpression(left, right, "%");
+					break;
+			}
+		}
+		return left;
+	}
+
+	// -, !, not unary operators
+	private Expression ParseUnary()
+	{
+		if (_token.id is TokenId.Minus or TokenId.Exclamation || TokenIdentifierIs("not"))
+		{
+			var op = _token;
+			NextToken();
+			if (op.id == TokenId.Minus && (_token.id == TokenId.IntegerLiteral || _token.id == TokenId.RealLiteral))
+			{
+				_token.text = "-" + _token.text;
+				_token.pos = op.pos;
+				return ParsePrimary();
+			}
+			var expr = ParseUnary();
+			ValidateNotMethodAccess(expr);
+			if (op.id == TokenId.Minus)
+			{
+				expr = new UnaryExpression(expr, "-");
+			}
+			else
+			{
+				expr = new UnaryExpression(expr, "!");
+			}
+			return expr;
+		}
+		return ParsePrimary();
+	}
+
+	private Expression ParsePrimary()
+	{
+		var expr = ParsePrimaryStart();
+		while (true)
+		{
+			if (_token.id == TokenId.Dot)
+			{
+				ValidateNotMethodAccess(expr);
+				NextToken();
+				expr = ParseMemberAccess(expr);
+			}
+			else if (_token.id == TokenId.OpenBracket)
+			{
+				ValidateNotMethodAccess(expr);
+				expr = ParseElementAccess(expr);
+			}
+			else if (_token.id == TokenId.OpenParen)
+			{
+				expr = ParseInvoke(expr);
+			}
+			else
+			{
+				break;
+			}
+		}
+		return expr;
+	}
+
+	private MethodDefinition FindMethod(TypeReference type, string methodName, Expression[] args)
+	{
+		type = GetNullableUnderlyingType(type);
+
+		MethodDefinition? method = null;
+		var methods = type
+			.GetAllMethods()
+			.Where(m => m.Name == methodName &&
+						(m.Parameters.Count >= args.Length ||
+						 (m.Parameters.Count > 0 && m.Parameters[m.Parameters.Count - 1].CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))))
+			.ToList();
+		if (methods.Count == 0)
+		{
+			foreach (var ns in _namespaces)
+			{
+				methods = TypeInfoUtils.FindExtensionMethods(ns.ClrNamespace!, methodName).ToList();
+				if (methods.Count > 0)
 				{
+					_includeNamespaces.Add(ns);
 					break;
 				}
-
-				s = s.Remove(i, 1);
-				start = i + 1;
-			}
-			NextToken();
-			return CreateLiteral(s, s);
-		}
-
-		private Expression ParseIntegerLiteral()
-		{
-			ValidateToken(TokenId.IntegerLiteral);
-			string text = _token.text;
-			if (text[0] != '-')
-			{
-				if (!ulong.TryParse(text, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out ulong value))
-				{
-					throw new ParseException($"Invalid integer literal '{text}'");
-				}
-
-				NextToken();
-				if (value <= int.MaxValue)
-				{
-					return CreateLiteral((int)value, text);
-				}
-
-				if (value <= uint.MaxValue)
-				{
-					return CreateLiteral((uint)value, text);
-				}
-
-				if (value <= long.MaxValue)
-				{
-					return CreateLiteral((long)value, text);
-				}
-
-				return CreateLiteral(value, text);
-			}
-			else
-			{
-				if (!long.TryParse(text, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long value))
-				{
-					throw new ParseException($"Invalid integer literal '{text}'");
-				}
-
-				NextToken();
-				if (value >= int.MinValue && value <= int.MaxValue)
-				{
-					return CreateLiteral((int)value, text);
-				}
-
-				return CreateLiteral(value, text);
 			}
 		}
-
-		private Expression ParseRealLiteral()
+		if (methods.Count == 1)
 		{
-			ValidateToken(TokenId.RealLiteral);
-			string text = _token.text;
-			object? value = null;
-			char last = text[text.Length - 1];
-			if (last == 'F' || last == 'f')
+			method = methods[0];
+			// Note! So far we do not check if parameters are assignable.
+			// If not, the generated code will not compile
+		}
+		else if (methods.Count > 1)
+		{
+			// If there are many methods, it is need to find the right one.
+			foreach (var m in methods)
 			{
-				if (float.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out float f))
+				var parameters = m.Parameters;
+				for (int i = 0; i < args.Length; i++)
 				{
-					value = f;
+					if (!parameters[i].ParameterType.IsAssignableFrom(args[i].Type) &&
+						(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.FullName != "System.Char"))
+					{
+						goto Label_NextMethod;
+					}
+				}
+				if (m.Parameters.Count > args.Length)
+				{
+					if (!m.Parameters[args.Length].IsOptional)
+					{
+						goto Label_NextMethod;
+					}
+				}
+				method = m;
+				break;
+
+			Label_NextMethod:;
+			}
+		}
+		if (method == null)
+		{
+			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.FullName}'");
+		}
+		return method;
+	}
+
+	private Expression ParseInvoke(Expression expr)
+	{
+		int errorPos = _token.pos;
+
+		var args = ParseArgumentList();
+
+		var delegateType = TypeInfoUtils.GetTypeThrow(typeof(MulticastDelegate));
+		if (!delegateType.IsAssignableFrom(expr.Type))
+		{
+			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
+		}
+		var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
+		//TODO!! check if the arguments and the method match (parameters count, assignable)
+		if (method.Parameters.Count < args.Length)
+		{
+			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
+		}
+
+		CorrectCharParameters(method.Definition, args, errorPos);
+		CorrectNotNullableParameters(method.Definition, args);
+
+		return new InvokeExpression(expr, args, method.ReturnType);
+	}
+
+	private static void CorrectNotNullableParameters(MethodDefinition method, Expression[] args)
+	{
+		var parameters = method.Parameters;
+		for (int i = 0; i < args.Length; i++)
+		{
+			if (i >= parameters.Count)
+			{
+				ParameterDefinition pd;
+				if (i == 0 || !(pd = parameters[parameters.Count - 1]).CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+				{
+					throw new InvalidProgramException();
+				}
+				if (!pd.ParameterType.IsArray)
+				{
+					throw new InvalidProgramException();
+				}
+
+				bool isNullable = pd.ParameterType.GetElementType().IsNullable();
+				for (; i < args.Length; i++)
+				{
+					if (isNullable && args[i].IsNullable)
+					{
+						args[i] = new CoalesceExpression(args[i], Expression.DefaultExpression);
+					}
+				}
+				break;
+			}
+			else if (!parameters[i].ParameterType.IsNullable() && args[i].IsNullable)
+			{
+				args[i] = new CoalesceExpression(args[i], Expression.DefaultExpression);
+			}
+		}
+	}
+
+	private static void CorrectCharParameters(MethodDefinition method, Expression[] args, int errorPos)
+	{
+		bool? isParamsChar = null;
+		for (int i = 0; i < args.Length; i++)
+		{
+			if (args[i] is ConstantExpression ce && ce.Value is string)
+			{
+				if (isParamsChar == null && i == method.Parameters.Count)
+				{
+					throw new InvalidProgramException();
+				}
+
+				if (i == method.Parameters.Count - 1)
+				{
+					if (method.Parameters[i].CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+					{
+						if (!method.Parameters[i].ParameterType.IsArray)
+						{
+							throw new InvalidProgramException();
+						}
+
+						isParamsChar = method.Parameters[i].ParameterType.GetElementType().FullName == "System.Char";
+						if (isParamsChar == false)
+						{
+							return;
+						}
+					}
+				}
+				if (isParamsChar == true || method.Parameters[i].ParameterType.FullName == "System.Char")
+				{
+					string value = (string)((ConstantExpression)args[i]).Value!;
+					if (value.Length != 1)
+					{
+						throw new ParseException($"Cannot convert '{value}' to char.", errorPos);
+					}
+
+					args[i] = new ConstantExpression(value[0]);
 				}
 			}
-			else if (last == 'M' || last == 'm')
+		}
+	}
+
+	private Expression ParsePrimaryStart()
+	{
+		switch (_token.id)
+		{
+			case TokenId.Identifier:
+				return ParseIdentifier();
+			case TokenId.StringLiteral:
+				return ParseStringLiteral();
+			case TokenId.IntegerLiteral:
+				return ParseIntegerLiteral();
+			case TokenId.RealLiteral:
+				return ParseRealLiteral();
+			case TokenId.OpenParen:
+				return ParseParenExpression();
+			//case TokenId.Dot:// Dot at the beginning of expression means root; used actually only when the whole expression is a dot
+			//	NextToken();
+			//	return _root;
+			default:
+				throw new ParseException("Expression expected");
+		}
+	}
+
+	private Expression ParseNewExpression()
+	{
+		NextToken();
+
+		int errorPos = _token.pos;
+		string prefix = GetIdentifier();
+
+		NextToken();
+		ValidateToken(TokenId.Colon, Res.ColonExpected);
+
+		var typeExpr = ParseTypeExpression(prefix, errorPos);
+		var args = ParseArgumentList();
+		//TODO!! CorrectCharParameters
+		//TODO!! CorrectNotNullableParameters
+		return new NewExpression(typeExpr, args);
+	}
+
+	private Expression ParseTypeofExpression()
+	{
+		NextToken();
+		var args = ParseArgumentList();
+		if (args.Length != 1 || args[0] is not TypeExpression typeExpression)
+		{
+			throw new ParseException($"Invalid type.");
+		}
+		return new TypeofExpression(typeExpression);
+	}
+
+	private Expression ParseStringLiteral()
+	{
+		ValidateToken(TokenId.StringLiteral);
+		char quote = _token.text[0];
+		string s = _token.text.Substring(1, _token.text.Length - 2);
+		int start = 0;
+		while (true)
+		{
+			int i = s.IndexOf(quote, start);
+			if (i < 0)
 			{
-				if (decimal.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out decimal d))
-				{
-					value = d;
-				}
+				break;
 			}
-			else
+
+			s = s.Remove(i, 1);
+			start = i + 1;
+		}
+		NextToken();
+		return CreateLiteral(s, s);
+	}
+
+	private Expression ParseIntegerLiteral()
+	{
+		ValidateToken(TokenId.IntegerLiteral);
+		string text = _token.text;
+		if (text[0] != '-')
+		{
+			if (!ulong.TryParse(text, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out ulong value))
 			{
-				if (double.TryParse(text, NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out double d))
-				{
-					value = d;
-				}
-			}
-			if (value == null)
-			{
-				throw new ParseException($"Invalid real literal '{text}'");
+				throw new ParseException($"Invalid integer literal '{text}'");
 			}
 
 			NextToken();
+			if (value <= int.MaxValue)
+			{
+				return CreateLiteral((int)value, text);
+			}
+
+			if (value <= uint.MaxValue)
+			{
+				return CreateLiteral((uint)value, text);
+			}
+
+			if (value <= long.MaxValue)
+			{
+				return CreateLiteral((long)value, text);
+			}
+
 			return CreateLiteral(value, text);
 		}
-
-		private Expression CreateLiteral(object value, string text)
+		else
 		{
-			var expr = new ConstantExpression(value);
-			return expr;
+			if (!long.TryParse(text, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long value))
+			{
+				throw new ParseException($"Invalid integer literal '{text}'");
+			}
+
+			NextToken();
+			if (value >= int.MinValue && value <= int.MaxValue)
+			{
+				return CreateLiteral((int)value, text);
+			}
+
+			return CreateLiteral(value, text);
+		}
+	}
+
+	private Expression ParseRealLiteral()
+	{
+		ValidateToken(TokenId.RealLiteral);
+		string text = _token.text;
+		object? value = null;
+		char last = text[text.Length - 1];
+		if (last == 'F' || last == 'f')
+		{
+			if (float.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out float f))
+			{
+				value = f;
+			}
+		}
+		else if (last == 'M' || last == 'm')
+		{
+			if (decimal.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out decimal d))
+			{
+				value = d;
+			}
+		}
+		else
+		{
+			if (double.TryParse(text, NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out double d))
+			{
+				value = d;
+			}
+		}
+		if (value == null)
+		{
+			throw new ParseException($"Invalid real literal '{text}'");
 		}
 
-		private Expression ParseParenExpression()
+		NextToken();
+		return CreateLiteral(value, text);
+	}
+
+	private Expression CreateLiteral(object value, string text)
+	{
+		var expr = new ConstantExpression(value);
+		return expr;
+	}
+
+	private Expression ParseParenExpression()
+	{
+		ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
+		NextToken();
+		var e = ParseExpression();
+		ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
+		NextToken();
+		if (e is TypeExpression te)
 		{
-			ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
+			var expr = ParsePrimary();
+			return new CastExpression(expr, te.Type);
+		}
+		return new ParenExpression(e);
+	}
+
+	private Expression ParseIdentifier()
+	{
+		ValidateToken(TokenId.Identifier);
+
+		if (_token.text == "this")
+		{
 			NextToken();
-			var e = ParseExpression();
-			ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
-			NextToken();
-			if (e is TypeExpression te)
-			{
-				var expr = ParsePrimary();
-				return new CastExpression(expr, te.Type);
-			}
-			return new ParenExpression(e);
+			return _root;
 		}
 
-		private Expression ParseIdentifier()
+		if (_keywords.TryGetValue(_token.text, out var value))
 		{
-			ValidateToken(TokenId.Identifier);
-
-			if (_token.text == "this")
-			{
-				NextToken();
-				return _root;
-			}
-
-			if (_keywords.TryGetValue(_token.text, out var value))
-			{
-				NextToken();
-				return value;
-			}
-
-			if (_token.text == "new")
-			{
-				return ParseNewExpression();
-			}
-
-			if (_token.text == "typeof")
-			{
-				return ParseTypeofExpression();
-			}
-
-			return ParseMemberAccess(_root);
+			NextToken();
+			return value;
 		}
 
-		private Expression ParseMemberAccess(Expression instance)
+		if (_token.text == "new")
 		{
-			int errorPos = _token.pos;
-			string id = GetIdentifier();
-			NextToken();
+			return ParseNewExpression();
+		}
 
-			var type = instance.Type;
-			if (type.Type.IsValueNullable())
-			{
-				type = new TypeInfo(type = type.Type.GetGenericArguments()[0]);
-			}
+		if (_token.text == "typeof")
+		{
+			return ParseTypeofExpression();
+		}
 
-			IMemberDefinition member;
-			TypeInfo memberType;
-			var prop = type.Properties.FirstOrDefault(p => p.Definition.Name == id);
-			if (prop != null)
+		return ParseMemberAccess(_root);
+	}
+
+	private Expression ParseMemberAccess(Expression instance)
+	{
+		int errorPos = _token.pos;
+		string id = GetIdentifier();
+		NextToken();
+
+		var type = instance.Type;
+		if (type.Type.IsValueNullable())
+		{
+			type = new TypeInfo(type = type.Type.GetGenericArguments()[0]);
+		}
+
+		IMemberDefinition member;
+		TypeInfo memberType;
+		var prop = type.Properties.FirstOrDefault(p => p.Definition.Name == id);
+		if (prop != null)
+		{
+			member = prop.Definition;
+			memberType = prop.PropertyType;
+		}
+		else
+		{
+			var field = type.Fields.FirstOrDefault(f => f.Definition.Name == id);
+			if (field != null)
 			{
-				member = prop.Definition;
-				memberType = prop.PropertyType;
+				member = field.Definition;
+				memberType = field.FieldType;
 			}
 			else
 			{
-				var field = type.Fields.FirstOrDefault(f => f.Definition.Name == id);
-				if (field != null)
+				if (_token.id == TokenId.OpenParen)
 				{
-					member = field.Definition;
-					memberType = field.FieldType;
+					// Try to find the first member method with the name in order to take argument types.
+					// Afterwards the more suitable member or extension method will be found.
+					IList<TypeReference>? argumentTypes = null;
+					var methodInfo = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
+					if (methodInfo != null)
+					{
+						argumentTypes = methodInfo.Parameters.Select(p => p.ParameterType.Type).ToList();
+					}
+
+					var args = ParseArgumentList(argumentTypes);
+
+					var method = FindMethod(type, id, args);
+					CorrectCharParameters(method, args, errorPos);
+					CorrectNotNullableParameters(method, args);
+					return new CallExpression(instance, method, args);
+				}
+
+				var method2 = type.Type.GetAllMethods().FirstOrDefault(m => m.Name == id);
+				if (method2 != null)
+				{
+					member = method2;
+					memberType = TypeInfoUtils.GetTypeThrow(typeof(Delegate));
 				}
 				else
 				{
-					if (_token.id == TokenId.OpenParen)
+					TypeDefinition? typeDefinition;
+					if (instance == _root && (typeDefinition = _expectedType?.ResolveEx())?.IsEnum == true)
 					{
-						// Try to find the first member method with the name in order to take argument types.
-						// Afterwards the more suitable member or extension method will be found.
-						IList<TypeReference>? argumentTypes = null;
-						var methodInfo = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
-						if (methodInfo != null)
+						var enumField = typeDefinition.Fields.FirstOrDefault(f => f.Name == id);
+						if (enumField != null)
 						{
-							argumentTypes = methodInfo.Parameters.Select(p => p.ParameterType.Type).ToList();
+							TypeInfo typeInfo = typeDefinition;
+							return new MemberExpression(new TypeExpression(typeInfo), enumField, typeInfo);
 						}
-
-						var args = ParseArgumentList(argumentTypes);
-
-						var method = FindMethod(type, id, args);
-						CorrectCharParameters(method, args, errorPos);
-						CorrectNotNullableParameters(method, args);
-						return new CallExpression(instance, method, args);
 					}
 
-					var method2 = type.Type.GetAllMethods().FirstOrDefault(m => m.Name == id);
-					if (method2 != null)
+					if (instance == _root && _expectedType?.Name == id)
 					{
-						member = method2;
-						memberType = TypeInfoUtils.GetTypeThrow(typeof(Delegate));
+						return new TypeExpression(new TypeInfo(_expectedType));
 					}
-					else
+
+					if (type.Type.FullName.StartsWith("System.ValueTuple"))
 					{
-						TypeDefinition? typeDefinition;
-						if (instance == _root && (typeDefinition = _expectedType?.ResolveEx())?.IsEnum == true)
+						var attrs = instance switch
 						{
-							var enumField = typeDefinition.Fields.FirstOrDefault(f => f.Name == id);
-							if (enumField != null)
-							{
-								TypeInfo typeInfo = typeDefinition;
-								return new MemberExpression(new TypeExpression(typeInfo), enumField, typeInfo);
-							}
-						}
+							MemberExpression me => me.Member.CustomAttributes,
+							CallExpression ce => ce.Method.MethodReturnType.CustomAttributes,
+							_ => null
+						};
 
-						if (instance == _root && _expectedType?.Name == id)
+						var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.TupleElementNamesAttribute");
+						if (attr != null)
 						{
-							return new TypeExpression(new TypeInfo(_expectedType));
-						}
-
-						if (type.Type.FullName.StartsWith("System.ValueTuple"))
-						{
-							var attrs = instance switch
+							var names = ((CustomAttributeArgument[])attr.ConstructorArguments[0].Value).Select(a => a.Value).ToList();
+							var index = names.IndexOf(id);
+							if (index != -1)
 							{
-								MemberExpression me => me.Member.CustomAttributes,
-								CallExpression ce => ce.Method.MethodReturnType.CustomAttributes,
-								_ => null
-							};
-
-							var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.TupleElementNamesAttribute");
-							if (attr != null)
-							{
-								var names = ((CustomAttributeArgument[])attr.ConstructorArguments[0].Value).Select(a => a.Value).ToList();
-								var index = names.IndexOf(id);
-								if (index != -1)
+								var name = "Item" + (index + 1);
+								var field2 = type.Fields.FirstOrDefault(f => f.Definition.Name == name);
+								if (field2 != null)
 								{
-									var name = "Item" + (index + 1);
-									var field2 = type.Fields.FirstOrDefault(f => f.Definition.Name == name);
-									if (field2 != null)
+									if (type.Type is IGenericInstance gi)
 									{
-										if (type.Type is IGenericInstance gi)
+										var args = gi.GenericArguments;
+										if (index < args.Count)
 										{
-											var args = gi.GenericArguments;
-											if (index < args.Count)
-											{
-												member = field2.Definition;
-												memberType = args[index];
-												goto Label_CreateMemberExpression;
-											}
+											member = field2.Definition;
+											memberType = args[index];
+											goto Label_CreateMemberExpression;
 										}
 									}
 								}
 							}
 						}
-
-						if (_token.id == TokenId.Colon && instance == _root)
-						{
-							return ParseTypeExpression(id, errorPos);
-						}
-
-						throw new ParseException($"No property, field or method '{id}' exists in type '{type.Type.FullName}'", errorPos, id.Length);
 					}
+
+					if (_token.id == TokenId.Colon && instance == _root)
+					{
+						return ParseTypeExpression(id, errorPos);
+					}
+
+					throw new ParseException($"No property, field or method '{id}' exists in type '{type.Type.FullName}'", errorPos, id.Length);
 				}
 			}
-		Label_CreateMemberExpression:
-			return new MemberExpression(instance, member, memberType);
 		}
+	Label_CreateMemberExpression:
+		return new MemberExpression(instance, member, memberType);
+	}
 
-		private TypeExpression ParseTypeExpression(string prefix, int errorPos)
+	private TypeExpression ParseTypeExpression(string prefix, int errorPos)
+	{
+		NextToken();
+		string typeName = GetIdentifier();
+		NextToken();
+
+		var ns = _namespaces.FirstOrDefault(n => n.Prefix == prefix);
+		if (ns == null)
 		{
-			NextToken();
-			string typeName = GetIdentifier();
-			NextToken();
-
-			var ns = _namespaces.FirstOrDefault(n => n.Prefix == prefix);
-			if (ns == null)
-			{
-				throw new ParseException($"Namespace '{prefix}' is not defined.", errorPos);
-			}
-			if (ns.ClrNamespace == null)
-			{
-				throw new ParseException($"Namespace '{ns.Namespace.NamespaceName}' is not CLR-Namespace.", errorPos);
-			}
-			var expressionType = TypeInfoUtils.GetTypeThrow(ns.ClrNamespace + '.' + typeName);
-			return new TypeExpression(expressionType);
+			throw new ParseException($"Namespace '{prefix}' is not defined.", errorPos);
 		}
-
-		private Expression[] ParseArgumentList(IList<TypeReference>? argumentTypes = null)
+		if (ns.ClrNamespace == null)
 		{
-			ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
-			NextToken();
-			var args = _token.id != TokenId.CloseParen ? ParseArguments(argumentTypes) : new Expression[0];
-			ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
-			NextToken();
-			return args;
+			throw new ParseException($"Namespace '{ns.Namespace.NamespaceName}' is not CLR-Namespace.", errorPos);
 		}
+		var expressionType = TypeInfoUtils.GetTypeThrow(ns.ClrNamespace + '.' + typeName);
+		return new TypeExpression(expressionType);
+	}
 
-		private Expression[] ParseArguments(IList<TypeReference>? argumentTypes = null)
+	private Expression[] ParseArgumentList(IList<TypeReference>? argumentTypes = null)
+	{
+		ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
+		NextToken();
+		var args = _token.id != TokenId.CloseParen ? ParseArguments(argumentTypes) : new Expression[0];
+		ValidateToken(TokenId.CloseParen, Res.CloseParenOrCommaExpected);
+		NextToken();
+		return args;
+	}
+
+	private Expression[] ParseArguments(IList<TypeReference>? argumentTypes = null)
+	{
+		var savedExpectedType = _expectedType;
+		var argList = new List<Expression>();
+		for (int i = 0; ; i++)
 		{
-			var savedExpectedType = _expectedType;
-			var argList = new List<Expression>();
-			for (int i = 0; ; i++)
+			_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : null;
+			argList.Add(ParseExpression());
+			if (_token.id != TokenId.Comma)
 			{
-				_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : null;
-				argList.Add(ParseExpression());
-				if (_token.id != TokenId.Comma)
-				{
-					break;
-				}
-
-				NextToken();
-			}
-			_expectedType = savedExpectedType;
-			return argList.ToArray();
-		}
-
-		private Expression ParseElementAccess(Expression expr)
-		{
-			int errorPos = _token.pos;
-
-			TypeReference expressionType;
-			IList<TypeReference> argumentTypes;
-			if (expr.Type.Type.IsArray)
-			{
-				expressionType = expr.Type.Type.GetElementType();
-				argumentTypes = new[] { TypeInfoUtils.GetTypeThrow(typeof(int)) };
-			}
-			else
-			{
-				var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
-				if (prop == null)
-				{
-					throw new ParseException($"No applicable indexer exists in type '{expr.Type.Type.FullName}'", errorPos);
-				}
-				expressionType = prop.PropertyType;
-				argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).Select(t => t.Type).ToList();
+				break;
 			}
 
-			ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
 			NextToken();
-			var args = ParseArguments(argumentTypes);
-			ValidateToken(TokenId.CloseBracket, Res.CloseBracketOrCommaExpected);
-			NextToken();
-			return new ElementAccessExpression(expressionType, expr, args);
 		}
+		_expectedType = savedExpectedType;
+		return argList.ToArray();
+	}
 
-		private void SetTextPos(int pos)
+	private Expression ParseElementAccess(Expression expr)
+	{
+		int errorPos = _token.pos;
+
+		TypeReference expressionType;
+		IList<TypeReference> argumentTypes;
+		if (expr.Type.Type.IsArray)
 		{
-			_textPos = pos;
-			_ch = _textPos < _textLen ? _text[_textPos] : '\0';
+			expressionType = expr.Type.Type.GetElementType();
+			argumentTypes = new[] { TypeInfoUtils.GetTypeThrow(typeof(int)) };
 		}
-
-		private void NextChar()
+		else
 		{
-			if (_textPos < _textLen)
+			var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
+			if (prop == null)
 			{
-				_textPos++;
+				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Type.FullName}'", errorPos);
 			}
-
-			_ch = _textPos < _textLen ? _text[_textPos] : '\0';
+			expressionType = prop.PropertyType;
+			argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).Select(t => t.Type).ToList();
 		}
 
-		private void NextToken()
+		ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
+		NextToken();
+		var args = ParseArguments(argumentTypes);
+		ValidateToken(TokenId.CloseBracket, Res.CloseBracketOrCommaExpected);
+		NextToken();
+		return new ElementAccessExpression(expressionType, expr, args);
+	}
+
+	private void SetTextPos(int pos)
+	{
+		_textPos = pos;
+		_ch = _textPos < _textLen ? _text[_textPos] : '\0';
+	}
+
+	private void NextChar()
+	{
+		if (_textPos < _textLen)
 		{
-			while (char.IsWhiteSpace(_ch))
-			{
+			_textPos++;
+		}
+
+		_ch = _textPos < _textLen ? _text[_textPos] : '\0';
+	}
+
+	private void NextToken()
+	{
+		while (char.IsWhiteSpace(_ch))
+		{
+			NextChar();
+		}
+
+		TokenId t;
+		int tokenPos = _textPos;
+		switch (_ch)
+		{
+			case '!':
 				NextChar();
-			}
+				if (_ch == '=')
+				{
+					NextChar();
+					t = TokenId.ExclamationEqual;
+				}
+				else
+				{
+					t = TokenId.Exclamation;
+				}
+				break;
+			case '%':
+				NextChar();
+				t = TokenId.Percent;
+				break;
+			case '&':
+				NextChar();
+				if (_ch == '&')
+				{
+					NextChar();
+					t = TokenId.DoubleAmphersand;
+				}
+				else
+				{
+					throw new ParseException(Res.OperatorNotSupported);
+				}
+				break;
+			case '(':
+				NextChar();
+				t = TokenId.OpenParen;
+				break;
+			case ')':
+				NextChar();
+				t = TokenId.CloseParen;
+				break;
+			case '*':
+				NextChar();
+				t = TokenId.Asterisk;
+				break;
+			case '+':
+				NextChar();
+				t = TokenId.Plus;
+				break;
+			case ',':
+				NextChar();
+				t = TokenId.Comma;
+				break;
+			case '-':
+				NextChar();
+				t = TokenId.Minus;
+				break;
+			case '.':
+				NextChar();
+				t = TokenId.Dot;
+				break;
+			case '/':
+				NextChar();
+				t = TokenId.Slash;
+				break;
+			case ':':
+				NextChar();
+				t = TokenId.Colon;
+				break;
+			case '<':
+				NextChar();
+				if (_ch == '=')
+				{
+					NextChar();
+					t = TokenId.LessThanEqual;
+				}
+				else if (_ch == '>')
+				{
+					NextChar();
+					t = TokenId.LessGreater;
+				}
+				else
+				{
+					t = TokenId.LessThan;
+				}
+				break;
+			case '=':
+				NextChar();
+				if (_ch == '=')
+				{
+					NextChar();
+					t = TokenId.DoubleEqual;
+				}
+				else
+				{
+					t = TokenId.Equal;
+				}
+				break;
+			case '>':
+				NextChar();
+				if (_ch == '=')
+				{
+					NextChar();
+					t = TokenId.GreaterThanEqual;
+				}
+				else
+				{
+					t = TokenId.GreaterThan;
+				}
+				break;
+			case '?':
+				NextChar();
+				if (_ch == '?')
+				{
+					NextChar();
+					t = TokenId.DoubleQuestion;
+				}
+				else
+				{
+					t = TokenId.Question;
+				}
+				break;
+			case '[':
+				NextChar();
+				t = TokenId.OpenBracket;
+				break;
+			case ']':
+				NextChar();
+				t = TokenId.CloseBracket;
+				break;
+			case '|':
+				NextChar();
+				if (_ch == '|')
+				{
+					NextChar();
+					t = TokenId.DoubleBar;
+				}
+				else
+				{
+					t = TokenId.Bar;
+				}
+				break;
+			case '"':
+			case '\'':
+				char quote = _ch;
+				do
+				{
+					NextChar();
+					while (_textPos < _textLen && _ch != quote)
+					{
+						NextChar();
+					}
 
-			TokenId t;
-			int tokenPos = _textPos;
-			switch (_ch)
-			{
-				case '!':
-					NextChar();
-					if (_ch == '=')
+					if (_textPos == _textLen)
 					{
-						NextChar();
-						t = TokenId.ExclamationEqual;
+						throw new ParseException("Unterminated string literal", _textPos);
 					}
-					else
-					{
-						t = TokenId.Exclamation;
-					}
-					break;
-				case '%':
+
 					NextChar();
-					t = TokenId.Percent;
-					break;
-				case '&':
-					NextChar();
-					if (_ch == '&')
-					{
-						NextChar();
-						t = TokenId.DoubleAmphersand;
-					}
-					else
-					{
-						throw new ParseException(Res.OperatorNotSupported);
-					}
-					break;
-				case '(':
-					NextChar();
-					t = TokenId.OpenParen;
-					break;
-				case ')':
-					NextChar();
-					t = TokenId.CloseParen;
-					break;
-				case '*':
-					NextChar();
-					t = TokenId.Asterisk;
-					break;
-				case '+':
-					NextChar();
-					t = TokenId.Plus;
-					break;
-				case ',':
-					NextChar();
-					t = TokenId.Comma;
-					break;
-				case '-':
-					NextChar();
-					t = TokenId.Minus;
-					break;
-				case '.':
-					NextChar();
-					t = TokenId.Dot;
-					break;
-				case '/':
-					NextChar();
-					t = TokenId.Slash;
-					break;
-				case ':':
-					NextChar();
-					t = TokenId.Colon;
-					break;
-				case '<':
-					NextChar();
-					if (_ch == '=')
-					{
-						NextChar();
-						t = TokenId.LessThanEqual;
-					}
-					else if (_ch == '>')
-					{
-						NextChar();
-						t = TokenId.LessGreater;
-					}
-					else
-					{
-						t = TokenId.LessThan;
-					}
-					break;
-				case '=':
-					NextChar();
-					if (_ch == '=')
-					{
-						NextChar();
-						t = TokenId.DoubleEqual;
-					}
-					else
-					{
-						t = TokenId.Equal;
-					}
-					break;
-				case '>':
-					NextChar();
-					if (_ch == '=')
-					{
-						NextChar();
-						t = TokenId.GreaterThanEqual;
-					}
-					else
-					{
-						t = TokenId.GreaterThan;
-					}
-					break;
-				case '?':
-					NextChar();
-					if (_ch == '?')
-					{
-						NextChar();
-						t = TokenId.DoubleQuestion;
-					}
-					else
-					{
-						t = TokenId.Question;
-					}
-					break;
-				case '[':
-					NextChar();
-					t = TokenId.OpenBracket;
-					break;
-				case ']':
-					NextChar();
-					t = TokenId.CloseBracket;
-					break;
-				case '|':
-					NextChar();
-					if (_ch == '|')
-					{
-						NextChar();
-						t = TokenId.DoubleBar;
-					}
-					else
-					{
-						t = TokenId.Bar;
-					}
-					break;
-				case '"':
-				case '\'':
-					char quote = _ch;
+				} while (_ch == quote);
+				t = TokenId.StringLiteral;
+				break;
+			default:
+				if (char.IsLetter(_ch) || _ch == '_')
+				{
 					do
 					{
 						NextChar();
-						while (_textPos < _textLen && _ch != quote)
-						{
-							NextChar();
-						}
-
-						if (_textPos == _textLen)
-						{
-							throw new ParseException("Unterminated string literal", _textPos);
-						}
-
-						NextChar();
-					} while (_ch == quote);
-					t = TokenId.StringLiteral;
+					} while (char.IsLetterOrDigit(_ch) || _ch == '_');
+					t = TokenId.Identifier;
 					break;
-				default:
-					if (char.IsLetter(_ch) || _ch == '_')
+				}
+				if (char.IsDigit(_ch))
+				{
+					t = TokenId.IntegerLiteral;
+					do
 					{
-						do
-						{
-							NextChar();
-						} while (char.IsLetterOrDigit(_ch) || _ch == '_');
-						t = TokenId.Identifier;
-						break;
-					}
-					if (char.IsDigit(_ch))
+						NextChar();
+					} while (char.IsDigit(_ch));
+					if (_ch == '.')
 					{
-						t = TokenId.IntegerLiteral;
+						t = TokenId.RealLiteral;
+						NextChar();
+						ValidateDigit();
 						do
 						{
 							NextChar();
 						} while (char.IsDigit(_ch));
-						if (_ch == '.')
-						{
-							t = TokenId.RealLiteral;
-							NextChar();
-							ValidateDigit();
-							do
-							{
-								NextChar();
-							} while (char.IsDigit(_ch));
-						}
-						if (_ch == 'E' || _ch == 'e')
-						{
-							t = TokenId.RealLiteral;
-							NextChar();
-							if (_ch == '+' || _ch == '-')
-							{
-								NextChar();
-							}
-
-							ValidateDigit();
-							do
-							{
-								NextChar();
-							} while (char.IsDigit(_ch));
-						}
-						if (_ch == 'F' || _ch == 'f')
-						{
-							NextChar();
-						}
-
-						break;
 					}
-					if (_textPos == _textLen)
+					if (_ch == 'E' || _ch == 'e')
 					{
-						t = TokenId.End;
-						break;
+						t = TokenId.RealLiteral;
+						NextChar();
+						if (_ch == '+' || _ch == '-')
+						{
+							NextChar();
+						}
+
+						ValidateDigit();
+						do
+						{
+							NextChar();
+						} while (char.IsDigit(_ch));
 					}
-					throw new ParseException($"Syntax error '{_ch}'", _textPos);
-			}
+					if (_ch == 'F' || _ch == 'f')
+					{
+						NextChar();
+					}
 
-			_token.id = t;
-			_token.text = _text.Substring(tokenPos, _textPos - tokenPos);
-			_token.pos = tokenPos;
+					break;
+				}
+				if (_textPos == _textLen)
+				{
+					t = TokenId.End;
+					break;
+				}
+				throw new ParseException($"Syntax error '{_ch}'", _textPos);
 		}
 
-		private bool TokenIdentifierIs(string id)
-		{
-			return _token.id == TokenId.Identifier && string.Equals(id, _token.text, StringComparison.OrdinalIgnoreCase);
-		}
+		_token.id = t;
+		_token.text = _text.Substring(tokenPos, _textPos - tokenPos);
+		_token.pos = tokenPos;
+	}
 
-		private string GetIdentifier()
-		{
-			ValidateToken(TokenId.Identifier, Res.IdentifierExpected);
-			string id = _token.text;
-			return id;
-		}
+	private bool TokenIdentifierIs(string id)
+	{
+		return _token.id == TokenId.Identifier && string.Equals(id, _token.text, StringComparison.OrdinalIgnoreCase);
+	}
 
-		private void ValidateDigit()
-		{
-			if (!char.IsDigit(_ch))
-			{
-				throw new ParseException("Digit expected", _textPos);
-			}
-		}
+	private string GetIdentifier()
+	{
+		ValidateToken(TokenId.Identifier, Res.IdentifierExpected);
+		string id = _token.text;
+		return id;
+	}
 
-		private void ValidateNotMethodAccess(Expression expression)
+	private void ValidateDigit()
+	{
+		if (!char.IsDigit(_ch))
 		{
-			if (expression is MemberExpression me && me.Member is MethodDefinition)
-			{
-				throw new ParseException($"'{me.Expression.Type.Type.FullName}.{me.Member.Name}()' is a method, which is not valid in the given context.");
-			}
-		}
-
-		private void ValidateToken(TokenId t, string errorMessage)
-		{
-			if (_token.id != t)
-			{
-				throw new ParseException(errorMessage);
-			}
-		}
-
-		private void ValidateToken(TokenId t)
-		{
-			if (_token.id != t)
-			{
-				throw new ParseException(Res.SyntaxError);
-			}
-		}
-
-		private static TypeReference GetNullableUnderlyingType(TypeReference type)
-		{
-			if (type.IsValueNullable())
-			{
-				type = type.GetGenericArguments()[0];
-			}
-			return type;
-		}
-
-		private static class Res
-		{
-			public const string SyntaxError = "Syntax error";
-			public const string ColonExpected = "':' expected";
-			public const string OpenParenExpected = "'(' expected";
-			public const string CloseParenOrOperatorExpected = "')' or operator expected";
-			public const string CloseParenOrCommaExpected = "')' or ',' expected";
-			public const string CloseBracketOrCommaExpected = "']' or ',' expected";
-			public const string IdentifierExpected = "Identifier expected";
-			public const string OperatorNotSupported = "Operator is not supported.";
-		}
-
-		private struct Token
-		{
-			public TokenId id;
-			public string text;
-			public int pos;
-		}
-
-		private enum TokenId
-		{
-			Unknown,
-			End,
-			Identifier,
-			StringLiteral,
-			IntegerLiteral,
-			RealLiteral,
-			Exclamation,
-			Percent,
-			Amphersand,
-			OpenParen,
-			CloseParen,
-			Asterisk,
-			Plus,
-			Comma,
-			Minus,
-			Dot,
-			Slash,
-			Colon,
-			LessThan,
-			Equal,
-			GreaterThan,
-			Question,
-			DoubleQuestion,
-			OpenBracket,
-			CloseBracket,
-			Bar,
-			ExclamationEqual,
-			DoubleAmphersand,
-			LessThanEqual,
-			LessGreater,
-			DoubleEqual,
-			GreaterThanEqual,
-			DoubleBar
+			throw new ParseException("Digit expected", _textPos);
 		}
 	}
 
-	public sealed class ParseException : Exception
+	private void ValidateNotMethodAccess(Expression expression)
 	{
-		public ParseException(string message, int position = 0, int length = 0)
-			: base(message)
+		if (expression is MemberExpression me && me.Member is MethodDefinition)
 		{
-			Position = position;
-			Length = length;
+			throw new ParseException($"'{me.Expression.Type.Type.FullName}.{me.Member.Name}()' is a method, which is not valid in the given context.");
 		}
+	}
 
-		public int Position { get; }
+	private void ValidateToken(TokenId t, string errorMessage)
+	{
+		if (_token.id != t)
+		{
+			throw new ParseException(errorMessage);
+		}
+	}
 
-		public int Length { get; }
+	private void ValidateToken(TokenId t)
+	{
+		if (_token.id != t)
+		{
+			throw new ParseException(Res.SyntaxError);
+		}
+	}
+
+	private static TypeReference GetNullableUnderlyingType(TypeReference type)
+	{
+		if (type.IsValueNullable())
+		{
+			type = type.GetGenericArguments()[0];
+		}
+		return type;
+	}
+
+	private static class Res
+	{
+		public const string SyntaxError = "Syntax error";
+		public const string ColonExpected = "':' expected";
+		public const string OpenParenExpected = "'(' expected";
+		public const string CloseParenOrOperatorExpected = "')' or operator expected";
+		public const string CloseParenOrCommaExpected = "')' or ',' expected";
+		public const string CloseBracketOrCommaExpected = "']' or ',' expected";
+		public const string IdentifierExpected = "Identifier expected";
+		public const string OperatorNotSupported = "Operator is not supported.";
+	}
+
+	private struct Token
+	{
+		public TokenId id;
+		public string text;
+		public int pos;
+	}
+
+	private enum TokenId
+	{
+		Unknown,
+		End,
+		Identifier,
+		StringLiteral,
+		IntegerLiteral,
+		RealLiteral,
+		Exclamation,
+		Percent,
+		Amphersand,
+		OpenParen,
+		CloseParen,
+		Asterisk,
+		Plus,
+		Comma,
+		Minus,
+		Dot,
+		Slash,
+		Colon,
+		LessThan,
+		Equal,
+		GreaterThan,
+		Question,
+		DoubleQuestion,
+		OpenBracket,
+		CloseBracket,
+		Bar,
+		ExclamationEqual,
+		DoubleAmphersand,
+		LessThanEqual,
+		LessGreater,
+		DoubleEqual,
+		GreaterThanEqual,
+		DoubleBar
 	}
 }
+

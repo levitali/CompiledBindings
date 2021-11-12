@@ -4,6 +4,7 @@
     <TargetFrameworks>netcoreapp3.0;net35;net40</TargetFrameworks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
     <OutputPath>..\..\..\bin\</OutputPath>
   </PropertyGroup>
 

@@ -42,8 +42,15 @@
            m:SetFocused="{x:Bind FocusedField[Field1]}" />
     <CollectionView x:Name="list"
                     IsVisible="{x:Bind ArrayProp.Length > 0}"
-                    ItemTemplate="{StaticResource test1Template}"
-                    ItemsSource="{x:Bind ListProp}" />
+                    ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
+      <CollectionView.ItemTemplate>
+        <DataTemplate>
+          <Grid>
+            <Label Text="{x:Bind DecimalProp}" />
+          </Grid>
+        </DataTemplate>
+      </CollectionView.ItemTemplate>
+    </CollectionView>
     <Button x:DataType="{x:Null}" IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}" />
   </StackLayout>
 
