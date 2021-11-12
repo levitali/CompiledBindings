@@ -38,7 +38,7 @@ namespace XFTest.Views
 
 			Bindings_.Initialize(this);
 			this.BindingContextChanged += this_BindingContextChanged;
-			if (this.BindingContext is XFTest.ViewModels.Page1ViewModel dataRoot1)
+			if (this.BindingContext is global::XFTest.ViewModels.Page1ViewModel dataRoot1)
 			{
 				Bindings_this.Initialize(this, dataRoot1);
 			}
@@ -56,10 +56,10 @@ namespace XFTest.Views
 			}
 		}
 
-		private void this_BindingContextChanged(object sender, System.EventArgs e)
+		private void this_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_this.Cleanup();
-			if (((global::Xamarin.Forms.Element)sender).BindingContext is XFTest.ViewModels.Page1ViewModel dataRoot)
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.ViewModels.Page1ViewModel dataRoot)
 			{
 				Bindings_this.Initialize(this, dataRoot);
 			}
@@ -469,16 +469,16 @@ namespace XFTest.Views
 
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
-			if (rootElement.BindingContext is XFTest.ViewModels.EntityViewModel dataRoot0)
+			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
 		}
 
-		private void rootElement_BindingContextChanged(object sender, System.EventArgs e)
+		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_rootElement.Cleanup();
-			if (((global::Xamarin.Forms.Element)sender).BindingContext is XFTest.ViewModels.EntityViewModel dataRoot)
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot);
 			}
@@ -673,16 +673,16 @@ namespace XFTest.Views
 
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
-			if (rootElement.BindingContext is XFTest.ViewModels.EntityViewModel dataRoot0)
+			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
 		}
 
-		private void rootElement_BindingContextChanged(object sender, System.EventArgs e)
+		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_rootElement.Cleanup();
-			if (((global::Xamarin.Forms.Element)sender).BindingContext is XFTest.ViewModels.EntityViewModel dataRoot)
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot);
 			}
@@ -821,16 +821,16 @@ namespace XFTest.Views
 
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
-			if (rootElement.BindingContext is XFTest.ViewModels.EntityViewModel dataRoot0)
+			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
 		}
 
-		private void rootElement_BindingContextChanged(object sender, System.EventArgs e)
+		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_rootElement.Cleanup();
-			if (((global::Xamarin.Forms.Element)sender).BindingContext is XFTest.ViewModels.EntityViewModel dataRoot)
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot);
 			}
@@ -881,14 +881,14 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-				targetRoot.label9.Text = dataRoot.DecimalProp.ToString();
+				targetRoot.label9.Text = dataRoot?.DecimalProp.ToString();
 
 			}
 
 			class Page1_DataTemplate2_BindingsTrackings_rootElement
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::XFTest.ViewModels.Page1ViewModel _propertyChangeSource0;
+				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
 
 				public Page1_DataTemplate2_BindingsTrackings_rootElement(Page1_DataTemplate2_Bindings_rootElement bindings)
 				{
@@ -904,7 +904,7 @@ namespace XFTest.Views
 					}
 				}
 
-				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.Page1ViewModel value)
+				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
 				{
 					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
 					{
@@ -928,7 +928,7 @@ namespace XFTest.Views
 
 					var targetRoot = bindings._targetRoot;
 					var dataRoot = bindings._dataRoot;
-					var typedSender = (global::XFTest.ViewModels.Page1ViewModel)sender;
+					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
 					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
 
 					if (notifyAll || e.PropertyName == "DecimalProp")

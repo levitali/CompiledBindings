@@ -43,7 +43,7 @@ namespace XFTest.Views
 			button1.Clicked += this.OnClicked;
 
 			this.BindingContextChanged += this_BindingContextChanged;
-			if (this.BindingContext is XFTest.Views.Page2 dataRoot0)
+			if (this.BindingContext is global::XFTest.Views.Page2 dataRoot0)
 			{
 				Bindings_this.Initialize(this);
 			}
@@ -57,10 +57,10 @@ namespace XFTest.Views
 			}
 		}
 
-		private void this_BindingContextChanged(object sender, System.EventArgs e)
+		private void this_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_this.Cleanup();
-			if (((global::Xamarin.Forms.Element)sender).BindingContext is XFTest.Views.Page2 dataRoot)
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.Views.Page2 dataRoot)
 			{
 				Bindings_this.Initialize(this);
 			}
@@ -104,7 +104,7 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
-				var value1 = dataRoot._viewModel?.FuncProp("test");
+				var value1 = dataRoot._viewModel?.FuncProp?.Invoke("test");
 				var value2 = dataRoot._viewModel?.CurrentItem;
 				var value3 = dataRoot._viewModel?.GetIcon();
 				var value4 = dataRoot._viewModel?.Group?[0];
@@ -258,7 +258,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "FuncProp")
 					{
-						var value1 = typedSender.FuncProp("test");
+						var value1 = typedSender.FuncProp?.Invoke("test");
 						var value2 = value1?.GuidProp.ToString();
 						targetRoot.label4.Text = value2;
 						targetRoot.label5.Text = value2;
@@ -270,7 +270,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "Group")
 					{
-						var value1 = typedSender.Group[0];
+						var value1 = typedSender.Group?[0];
 						targetRoot.label6.Text = value1?.GuidProp.ToString();
 						SetPropertyChangedEventHandler3(value1);
 						if (!notifyAll)

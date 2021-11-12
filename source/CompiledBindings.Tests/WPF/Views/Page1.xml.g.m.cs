@@ -44,7 +44,7 @@ namespace WPFTest.Views
 
 			Bindings_.Initialize(this);
 			this.DataContextChanged += this_DataContextChanged;
-			if (this.DataContext is WPFTest.ViewModels.Page1ViewModel dataRoot1)
+			if (this.DataContext is global::WPFTest.ViewModels.Page1ViewModel dataRoot1)
 			{
 				Bindings_this.Initialize(this, dataRoot1);
 			}
@@ -63,10 +63,10 @@ namespace WPFTest.Views
 			}
 		}
 
-		private void this_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+		private void this_DataContextChanged(object sender, global::System.Windows.DependencyPropertyChangedEventArgs e)
 		{
 			Bindings_this.Cleanup();
-			if (((global::System.Windows.FrameworkElement)sender).DataContext is WPFTest.ViewModels.Page1ViewModel dataRoot)
+			if (((global::System.Windows.FrameworkElement)sender).DataContext is global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
 				Bindings_this.Initialize(this, dataRoot);
 			}
@@ -605,16 +605,16 @@ namespace WPFTest.Views
 
 
 			rootElement.DataContextChanged += rootElement_DataContextChanged;
-			if (rootElement.DataContext is WPFTest.ViewModels.EntityViewModel dataRoot0)
+			if (rootElement.DataContext is global::WPFTest.ViewModels.EntityViewModel dataRoot0)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
 		}
 
-		private void rootElement_DataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+		private void rootElement_DataContextChanged(object sender, global::System.Windows.DependencyPropertyChangedEventArgs e)
 		{
 			Bindings_rootElement.Cleanup();
-			if (((global::System.Windows.FrameworkElement)sender).DataContext is WPFTest.ViewModels.EntityViewModel dataRoot)
+			if (((global::System.Windows.FrameworkElement)sender).DataContext is global::WPFTest.ViewModels.EntityViewModel dataRoot)
 			{
 				Bindings_rootElement.Initialize(this, dataRoot);
 			}

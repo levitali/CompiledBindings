@@ -72,9 +72,8 @@ public class XamlCodeGenerator
 				var types = property.TargetEvent.GetEventHandlerParameterTypes().ToList();
 
 				bool wrap;
-				if (expression is MemberExpression me && me.Member is not MethodDefinition)
+				if (expression is MemberExpression me && me.Member is MethodDefinition sourceMethod)
 				{
-					var sourceMethod = (MethodDefinition)me.Member;
 					wrap = types.Count > 0 && sourceMethod.Parameters.Count == 0;
 					if (wrap)
 					{
