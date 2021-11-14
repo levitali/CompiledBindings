@@ -18,9 +18,8 @@ public class ExpressionTests
 		});
 
 		var class1Type = new TypeInfo(TypeInfoUtils.GetTypeThrow(typeof(Class1)), false);
-		var stringType = TypeInfoUtils.GetTypeThrow(typeof(string));
-		var intType = TypeInfoUtils.GetTypeThrow(typeof(int));
-		var boolType = TypeInfoUtils.GetTypeThrow(typeof(bool));
+		var stringType = new TypeInfo(TypeInfoUtils.GetTypeThrow(typeof(string)));
+		var intType = new TypeInfo(TypeInfoUtils.GetTypeThrow(typeof(int)));
 
 		var ns = new[] { new XamlNamespace("local", "using:CompiledBindings.Tests") };
 

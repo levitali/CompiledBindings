@@ -26,6 +26,7 @@ namespace Xamarin.Forms
 	{
 		public string Text { get; set; }
 		public string FontFamily { get; set; }
+		public Color TextColor { get; set; }
 	}
 
 	public class Entry : VisualElement
@@ -72,6 +73,12 @@ namespace Xamarin.Forms
 	{
 		object Convert(object value, Type targetType, object parameter, CultureInfo culture);
 		object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture);
+	}
+
+	public struct Color
+	{
+		public static Color Red { get; } = new Color();
+		public static Color Green { get; } = new Color();
 	}
 }
 

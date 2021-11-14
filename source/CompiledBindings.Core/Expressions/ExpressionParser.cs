@@ -24,9 +24,9 @@ public class ExpressionParser
 	private readonly int _textLen;
 	private char _ch;
 	private Token _token;
-	private TypeReference? _expectedType;
+	private TypeInfo? _expectedType;
 
-	private ExpressionParser(ParameterExpression root, string expression, TypeReference resultType, IList<XamlNamespace> namespaces)
+	private ExpressionParser(ParameterExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
 	{
 		_root = root;
 		_namespaces = namespaces;
@@ -37,7 +37,7 @@ public class ExpressionParser
 		NextToken();
 	}
 
-	public static Expression Parse(TypeInfo dataType, string member, string? expression, TypeReference resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
+	public static Expression Parse(TypeInfo dataType, string member, string? expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
@@ -713,17 +713,23 @@ public class ExpressionParser
 				else
 				{
 					TypeDefinition? typeDefinition;
-					if (instance == _root && (typeDefinition = _expectedType?.ResolveEx())?.IsEnum == true)
+					if (instance == _root)
 					{
-						var enumField = typeDefinition.Fields.FirstOrDefault(f => f.Name == id);
-						if (enumField != null)
+						if (_expectedType != null)
 						{
-							TypeInfo typeInfo = typeDefinition;
-							return new MemberExpression(new TypeExpression(typeInfo), enumField, typeInfo);
+							var staticFieldOrProp =
+								_expectedType.Fields.Where(f => f.Definition.IsStatic).Cast<IMemberInfo>()
+								.Concat(
+									_expectedType.Properties.Where(p => p.Definition.IsStatic()))
+								.FirstOrDefault(m => m.Definition.Name == id);
+							if (staticFieldOrProp != null)
+							{
+								return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp.Definition, staticFieldOrProp.MemberType);
+							}
 						}
 					}
 
-					if (instance == _root && _expectedType?.Name == id)
+					if (instance == _root && _expectedType?.Type.Name == id)
 					{
 						return new TypeExpression(new TypeInfo(_expectedType));
 					}
@@ -811,7 +817,7 @@ public class ExpressionParser
 		var argList = new List<Expression>();
 		for (int i = 0; ; i++)
 		{
-			_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : null;
+			_expectedType = i < argumentTypes?.Count ? new TypeInfo(argumentTypes[i]) : null;
 			argList.Add(ParseExpression());
 			if (_token.id != TokenId.Comma)
 			{

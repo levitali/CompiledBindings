@@ -235,7 +235,7 @@ namespace XFTest.Views
 			Page1 _targetRoot;
 			global::XFTest.ViewModels.Page1ViewModel _dataRoot;
 			Page1_BindingsTrackings_this _bindingsTrackings;
-			bool _settingBinding5;
+			bool _settingBinding6;
 
 			public void Initialize(Page1 targetRoot, global::XFTest.ViewModels.Page1ViewModel dataRoot)
 			{
@@ -280,10 +280,11 @@ namespace XFTest.Views
 				var value1 = dataRoot.BooleanProp;
 				var value2 = dataRoot.DecimalProp;
 				targetRoot.label5.Text = value2.ToString();
+				targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
 				targetRoot.label6.Text = (value2 + 1).ToString();
 				targetRoot.label7.Text = (dataRoot.NullableIntProp ?? 0).ToString();
 				targetRoot.label8.Text = (!value1).ToString();
-				if (!_settingBinding5)
+				if (!_settingBinding6)
 				{
 					var value3 = value1.ToString();
 					if (!object.Equals(targetRoot.entry1.Text, value3))
@@ -313,9 +314,9 @@ namespace XFTest.Views
 						}
 						break;
 					case "Text":
-						if (!_settingBinding5)
+						if (!_settingBinding6)
 						{
-							_settingBinding5 = true;
+							_settingBinding6 = true;
 							try
 							{
 								dataRoot.SetValue(_targetRoot.entry1.Text);
@@ -325,7 +326,7 @@ namespace XFTest.Views
 							}
 							finally
 							{
-								_settingBinding5 = false;
+								_settingBinding6 = false;
 							}
 						}
 						break;
@@ -388,19 +389,12 @@ namespace XFTest.Views
 							return;
 						}
 					}
-					if (notifyAll || e.PropertyName == "NullableIntProp")
-					{
-						targetRoot.label7.Text = (typedSender.NullableIntProp ?? 0).ToString();
-						if (!notifyAll)
-						{
-							return;
-						}
-					}
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
 						var value1 = typedSender.BooleanProp;
+						targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
 						targetRoot.label8.Text = (!value1).ToString();
-						if (!bindings._settingBinding5)
+						if (!bindings._settingBinding6)
 						{
 							var value2 = value1.ToString();
 							if (!object.Equals(targetRoot.entry1.Text, value2))
@@ -408,6 +402,14 @@ namespace XFTest.Views
 								targetRoot.entry1.Text = value2;
 							}
 						}
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+					if (notifyAll || e.PropertyName == "NullableIntProp")
+					{
+						targetRoot.label7.Text = (typedSender.NullableIntProp ?? 0).ToString();
 						if (!notifyAll)
 						{
 							return;

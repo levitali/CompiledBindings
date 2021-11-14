@@ -33,7 +33,7 @@
 
   <StackLayout>
     <Label Text="{x:Set local:Strings.Instance.Header1}" />
-    <Label Text="{x:Bind DecimalProp}" />
+    <Label Text="{x:Bind DecimalProp}" TextColor="{x:Bind BooleanProp ? Green : Red}" />
     <Label Text="{x:Bind DecimalProp + 1}" />
     <Label Text="{x:Bind NullableIntProp ?? 0}" />
     <Label Text="{x:Bind !BooleanProp}" />

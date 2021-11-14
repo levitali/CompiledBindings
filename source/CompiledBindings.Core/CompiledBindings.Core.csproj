@@ -52,9 +52,9 @@
     <Compile Include="Bindings\BindingsCodeGenerator.cs" />
     <Compile Include="Exceptions\GeneratorException.cs" />
     <Compile Include="Exceptions\ParseException.cs" />
-    <Compile Include="ExpressionParser\Expression.cs" />
-    <Compile Include="ExpressionParser\ExpressionParser.cs" />
-    <Compile Include="ExpressionParser\ExpressionUtils.cs" />
+    <Compile Include="Expressions\Expression.cs" />
+    <Compile Include="Expressions\ExpressionParser.cs" />
+    <Compile Include="Expressions\ExpressionUtils.cs" />
     <Compile Include="Helpers\Crc32.cs" />
     <Compile Include="Helpers\EnumerableExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

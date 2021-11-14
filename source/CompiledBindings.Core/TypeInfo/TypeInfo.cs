@@ -193,7 +193,7 @@ public class TypeInfo
 	}
 }
 
-public class PropertyInfo
+public class PropertyInfo : IMemberInfo
 {
 	public PropertyInfo(PropertyDefinition definition, TypeInfo propertyType)
 	{
@@ -203,9 +203,12 @@ public class PropertyInfo
 
 	public PropertyDefinition Definition { get; }
 	public TypeInfo PropertyType { get; }
+
+	IMemberDefinition IMemberInfo.Definition => Definition;
+	TypeInfo IMemberInfo.MemberType => PropertyType;
 }
 
-public class FieldInfo
+public class FieldInfo : IMemberInfo
 {
 	public FieldInfo(FieldDefinition definition, TypeInfo fieldType)
 	{
@@ -215,9 +218,12 @@ public class FieldInfo
 
 	public FieldDefinition Definition { get; }
 	public TypeInfo FieldType { get; }
+
+	IMemberDefinition IMemberInfo.Definition => Definition;
+	TypeInfo IMemberInfo.MemberType => FieldType;
 }
 
-public class MethodInfo
+public class MethodInfo : IMemberInfo
 {
 	public MethodInfo(TypeInfo declearingType, MethodDefinition definition)
 	{
@@ -236,6 +242,9 @@ public class MethodInfo
 	public MethodDefinition Definition { get; }
 	public IList<ParameterInfo> Parameters { get; }
 	public TypeInfo ReturnType { get; }
+
+	IMemberDefinition IMemberInfo.Definition => Definition;
+	TypeInfo IMemberInfo.MemberType => ReturnType;
 }
 
 public class ParameterInfo
@@ -248,5 +257,11 @@ public class ParameterInfo
 
 	public ParameterDefinition Definition { get; }
 	public TypeInfo ParameterType { get; }
+}
+
+public interface IMemberInfo
+{
+	IMemberDefinition Definition { get; }
+	TypeInfo MemberType { get; }
 }
 
