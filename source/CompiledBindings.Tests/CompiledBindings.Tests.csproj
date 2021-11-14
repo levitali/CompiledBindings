@@ -10,8 +10,8 @@
     <ProjectGuid>{E0BD5531-4CAF-43D9-BFF2-DC1EA7F58B21}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Membrain.BuildTasks.Tests</RootNamespace>
-    <AssemblyName>Membrain.BuildTasks.Tests</AssemblyName>
+    <RootNamespace>CompiledBindings.Tests</RootNamespace>
+    <AssemblyName>CompiledBindings.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -102,9 +102,6 @@
     <Compile Include="XF\XFTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Membrain.SDK6.Core">
-      <Version>6.3.37</Version>
-    </PackageReference>
     <PackageReference Include="Mono.Cecil">
       <Version>0.11.4</Version>
     </PackageReference>
