@@ -667,12 +667,12 @@ public class ExpressionParser
 			type = new TypeInfo(type = type.Type.GetGenericArguments()[0]);
 		}
 
-		IMemberDefinition member;
+		IMemberInfo member;
 		TypeInfo memberType;
 		var prop = type.Properties.FirstOrDefault(p => p.Definition.Name == id);
 		if (prop != null)
 		{
-			member = prop.Definition;
+			member = prop;
 			memberType = prop.PropertyType;
 		}
 		else
@@ -680,7 +680,7 @@ public class ExpressionParser
 			var field = type.Fields.FirstOrDefault(f => f.Definition.Name == id);
 			if (field != null)
 			{
-				member = field.Definition;
+				member = field;
 				memberType = field.FieldType;
 			}
 			else
@@ -704,7 +704,7 @@ public class ExpressionParser
 					return new CallExpression(instance, method, args);
 				}
 
-				var method2 = type.Type.GetAllMethods().FirstOrDefault(m => m.Name == id);
+				var method2 = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
 				if (method2 != null)
 				{
 					member = method2;
@@ -712,7 +712,6 @@ public class ExpressionParser
 				}
 				else
 				{
-					TypeDefinition? typeDefinition;
 					if (instance == _root)
 					{
 						if (_expectedType != null)
@@ -724,7 +723,7 @@ public class ExpressionParser
 								.FirstOrDefault(m => m.Definition.Name == id);
 							if (staticFieldOrProp != null)
 							{
-								return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp.Definition, staticFieldOrProp.MemberType);
+								return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp, staticFieldOrProp.MemberType);
 							}
 						}
 					}
@@ -738,7 +737,7 @@ public class ExpressionParser
 					{
 						var attrs = instance switch
 						{
-							MemberExpression me => me.Member.CustomAttributes,
+							MemberExpression me => me.Member.Definition.CustomAttributes,
 							CallExpression ce => ce.Method.MethodReturnType.CustomAttributes,
 							_ => null
 						};
@@ -759,7 +758,7 @@ public class ExpressionParser
 										var args = gi.GenericArguments;
 										if (index < args.Count)
 										{
-											member = field2.Definition;
+											member = field2;
 											memberType = args[index];
 											goto Label_CreateMemberExpression;
 										}
@@ -1128,9 +1127,9 @@ public class ExpressionParser
 
 	private void ValidateNotMethodAccess(Expression expression)
 	{
-		if (expression is MemberExpression me && me.Member is MethodDefinition)
+		if (expression is MemberExpression me && me.Member is MethodInfo)
 		{
-			throw new ParseException($"'{me.Expression.Type.Type.FullName}.{me.Member.Name}()' is a method, which is not valid in the given context.");
+			throw new ParseException($"'{me.Expression.Type.Type.FullName}.{me.Member.Definition.Name}()' is a method, which is not valid in the given context.");
 		}
 	}
 

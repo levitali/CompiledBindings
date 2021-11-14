@@ -112,7 +112,7 @@ public static class BindingParser
 					};
 					resources.Add((resourceName, resourceType));
 
-					var resourceField = new FieldDefinition(resourceName, FieldAttributes.Private, converterType);
+					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, converterType), converterType);
 					expr = new ParameterExpression(rootType, "targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(converterType, false));
 
@@ -331,12 +331,12 @@ public static class BindingParser
 			.Select(g => new NotifyPropertyChangedData()
 			{
 				SourceExpression = g.First().expr.Expression,
-				Properties = g.GroupBy(e => e.expr.Member.Name).Select(g2 =>
+				Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
 				{
 					var expr = g2.First().expr;
 					return new NotifyPropertyChangedProperty()
 					{
-						Property = new PropertyInfo((PropertyDefinition)expr.Member, expr.Type),
+						Property = (PropertyInfo)expr.Member,
 						Expression = expr,
 						Bindings = g2.Select(e => e.bind).Distinct().ToList(),
 					};
@@ -347,11 +347,11 @@ public static class BindingParser
 			.ToList();
 
 		bool CheckPropertyNotifiable(MemberExpression expr) =>
-				expr.Member is PropertyDefinition pd &&
-				!pd.IsStatic() &&
+				expr.Member is PropertyInfo pi &&
+				!pi.Definition.IsStatic() &&
 				(iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
-					(dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pd.Name + "Property"))) &&
-				!pd.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute" && (bool)a.ConstructorArguments[0].Value == true);
+					(dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
+				!pi.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute" && (bool)a.ConstructorArguments[0].Value == true);
 
 		for (int i = 0; i < notifyPropertyChangedList.Count; i++)
 		{
@@ -386,7 +386,7 @@ public static class BindingParser
 			var typedSender = new ParameterExpression(new TypeInfo(propChangeData.SourceExpression.Type.Type, false), "typedSender");
 			foreach (var prop in propChangeData.Properties)
 			{
-				var expr = new MemberExpression(typedSender, prop.Property.Definition, prop.Property.PropertyType);
+				var expr = new MemberExpression(typedSender, prop.Property, prop.Property.PropertyType);
 				var setExpressions = prop.Bindings.Select(b =>
 				{
 					var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);

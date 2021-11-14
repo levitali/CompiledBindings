@@ -154,7 +154,7 @@ public class ParameterExpression : Expression
 
 public class MemberExpression : Expression, IAccessExpression
 {
-	public MemberExpression(Expression expression, IMemberDefinition member, TypeInfo type) : base(type)
+	public MemberExpression(Expression expression, IMemberInfo member, TypeInfo type) : base(type)
 	{
 		Expression = expression;
 		Member = member;
@@ -162,7 +162,7 @@ public class MemberExpression : Expression, IAccessExpression
 
 	public Expression Expression { get; private set; }
 
-	public IMemberDefinition Member { get; }
+	public IMemberInfo Member { get; }
 
 	protected override string ToStringCore()
 	{
@@ -175,7 +175,7 @@ public class MemberExpression : Expression, IAccessExpression
 			}
 			res += '.';
 		}
-		return res + Member.Name;
+		return res + Member.Definition.Name;
 	}
 
 	public override IEnumerable<Expression> Enumerate()

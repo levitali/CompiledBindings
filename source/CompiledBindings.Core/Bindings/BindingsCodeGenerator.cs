@@ -718,9 +718,9 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			}
 
 			TypeInfo sourceType;
-			if (me?.Member is MethodDefinition)
+			if (me?.Member is MethodInfo mi)
 			{
-				sourceType = new TypeInfo(((MethodDefinition)me.Member).Parameters.Last().ParameterType.ResolveEx()!);
+				sourceType = mi.Parameters.Last().ParameterType;
 			}
 			else
 			{
@@ -776,7 +776,7 @@ $@"{a2}				try
 $@"{a2}					var value = {me!.Expression};
 {a2}					if (value != null)
 {a2}					{{");
-				GenerateSetTarget($"value.{me.Member.Name}", a2 + '\t');
+				GenerateSetTarget($"value.{me.Member.Definition.Name}", a2 + '\t');
 				output.AppendLine(
 $@"{a2}					}}");
 			}
@@ -801,7 +801,7 @@ $@"{a}					finally
 
 			void GenerateSetTarget(string expression, string? a)
 			{
-				if (me?.Member is MethodDefinition)
+				if (me?.Member is MethodInfo)
 				{
 					output.AppendLine(
 $@"{a}					{expression}({setExpr});");
