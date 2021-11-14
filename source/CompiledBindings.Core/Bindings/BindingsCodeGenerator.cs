@@ -102,7 +102,7 @@ $@"}}");
 		bool isDiffDataRoot = targetClassName != bindingsData.DataRootType.Type.Name || targetNamespace != bindingsData.DataRootType.Type.Namespace;
 		var rootGroup = bindingsData.NotifyPropertyChangedList.SingleOrDefault(g => g.SourceExpression is ParameterExpression pe && pe.Name == "dataRoot");
 
-		var iNotifyPropertyChangedType = TypeInfoUtils.GetTypeThrow(typeof(INotifyPropertyChanged));
+		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
 		#region Class Begin
 
@@ -167,7 +167,7 @@ $@"			global::{binding.Property.TargetEvent!.EventType.GetCSharpFullName()} _eve
 $@"			bool _settingBinding{bind.Index};");
 		}
 
-		var taskType = TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
 		bool asyncFunctions = bindingsData.Bindings.Any(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type));
 
 		if (asyncFunctions)

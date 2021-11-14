@@ -108,7 +108,7 @@ public static class BindingParser
 					{
 						"Converter" => converterType,
 						"FallbackValue" or "TargetNullValue" => prop.MemberType,
-						_ => TypeInfoUtils.GetTypeThrow(typeof(object))
+						_ => TypeInfo.GetTypeThrow(typeof(object))
 					};
 					resources.Add((resourceName, resourceType));
 
@@ -247,10 +247,10 @@ public static class BindingParser
 
 		if ((mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && targetChangedEvent == null && updateSourceTrigger != UpdateSourceTrigger.Explicit)
 		{
-			var iNotifyPropChanged = TypeInfoUtils.GetTypeThrow(typeof(INotifyPropertyChanged));
+			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 			if (iNotifyPropChanged.IsAssignableFrom(prop.Object.Type))
 			{
-				targetChangedEvent = iNotifyPropChanged.GetAllEvents().First();
+				targetChangedEvent = iNotifyPropChanged.Type.GetAllEvents().First();
 			}
 		}
 		// Note! It is not checked now whether an event is set for a not explicit two way binding.
@@ -321,7 +321,7 @@ public static class BindingParser
 			binds[i].Index = i;
 		}
 
-		var iNotifyPropertyChangedType = TypeInfoUtils.GetTypeThrow(typeof(INotifyPropertyChanged));
+		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
 		var notifyPropertyChangedList = binds
 			.Where(b => b.SourceExpression != null && b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))

@@ -18,7 +18,7 @@ public class TypeInfoTests
 				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
 		});
 
-		var typeInfo = new TypeInfo(TypeInfoUtils.GetTypeThrow(typeof(Class1)));
+		var typeInfo = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)));
 		var funcProp2 = typeInfo.Properties.Single(p => p.Definition.Name == nameof(Class1.FuncProp2));
 		var method = funcProp2.PropertyType.Methods.Single(m => m.Definition.Name == "Invoke");
 		var retType = method.ReturnType;

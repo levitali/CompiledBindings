@@ -78,7 +78,7 @@ public abstract class Expression
 
 public class ConstantExpression : Expression
 {
-	public ConstantExpression(object? value) : base(TypeInfoUtils.GetTypeThrow(value?.GetType().FullName ?? "System.Object"))
+	public ConstantExpression(object? value) : base(TypeInfo.GetTypeThrow(value?.GetType().FullName ?? "System.Object"))
 	{
 		Value = value;
 	}
@@ -107,7 +107,7 @@ public class ConstantExpression : Expression
 
 public class DefaultExpression : Expression
 {
-	public DefaultExpression(TypeInfo? type) : base(type ?? TypeInfoUtils.GetTypeThrow("System.Object"))
+	public DefaultExpression(TypeInfo? type) : base(type ?? TypeInfo.GetTypeThrow("System.Object"))
 	{
 	}
 
@@ -290,14 +290,14 @@ public class BinaryExpression : Expression
 			case "!=":
 			case "&&":
 			case "||":
-				return TypeInfoUtils.GetTypeThrow("System.Boolean");
+				return TypeInfo.GetTypeThrow("System.Boolean");
 		}
 		var type = left.Type;
 		if ((type.Type.IsValueType && left.IsNullable) || right.IsNullable)
 		{
 			if (!type.Type.IsValueNullable())
 			{
-				type = TypeInfoUtils.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
+				type = TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type);
 			}
 		}
 		return type;
@@ -660,7 +660,7 @@ public class CoalesceExpression : Expression
 
 public class TypeofExpression : Expression
 {
-	public TypeofExpression(TypeExpression type) : base(TypeInfoUtils.GetTypeThrow(typeof(Type)))
+	public TypeofExpression(TypeExpression type) : base(TypeInfo.GetTypeThrow(typeof(Type)))
 	{
 		ThisType = type;
 	}

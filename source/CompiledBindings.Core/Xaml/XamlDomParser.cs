@@ -98,7 +98,7 @@ public class XamlDomParser
 		try
 		{
 			//xClassAttr.Remove();
-			return new TypeInfo(TypeInfoUtils.GetTypeThrow(xClassAttr.Value), false);
+			return new TypeInfo(TypeInfo.GetTypeThrow(xClassAttr.Value), false);
 
 		}
 		catch (Exception ex)
@@ -107,27 +107,27 @@ public class XamlDomParser
 		}
 	}
 
-	public TypeDefinition FindType(XElement xelement)
+	public TypeInfo FindType(XElement xelement)
 	{
 		return FindType(xelement.Name, xelement);
 	}
 
-	public TypeDefinition FindType(string value, XObject xobject)
+	public TypeInfo FindType(string value, XObject xobject)
 	{
 		var typeName = XamlParser.GetTypeName(value, xobject, KnownNamespaces);
 		return FindType(typeName, xobject);
 	}
 
-	private TypeDefinition FindType(XName className, XObject xobject)
+	private TypeInfo FindType(XName className, XObject xobject)
 	{
 		if (KnownTypeMappings != null && KnownTypeMappings.TryGetValue(className, out var typeName))
 		{
-			return TypeInfoUtils.GetTypeThrow(typeName);
+			return TypeInfo.GetTypeThrow(typeName);
 		}
 		var clrNs = XamlNamespace.GetClrNamespace(className.NamespaceName);
 		if (clrNs != null)
 		{
-			return TypeInfoUtils.GetTypeThrow(clrNs + "." + className.LocalName);
+			return TypeInfo.GetTypeThrow(clrNs + "." + className.LocalName);
 		}
 		foreach (string clrNr2 in GetClrNsFromXmlNs(className.NamespaceName))
 		{
@@ -138,7 +138,7 @@ public class XamlDomParser
 			}
 
 			clrTypeName += className.LocalName;
-			var type = TypeInfoUtils.GetType(clrTypeName);
+			var type = TypeInfo.GetType(clrTypeName);
 			if (type != null)
 			{
 				return type;
@@ -172,10 +172,10 @@ public class XamlDomParser
 			}
 
 			clrTypeName += className.LocalName;
-			var type = TypeInfoUtils.GetType(clrTypeName);
+			var type = TypeInfo.GetType(clrTypeName);
 			if (type != null)
 			{
-				return type.GetCSharpFullName();
+				return type.Type.GetCSharpFullName();
 			}
 		}
 		return null;
@@ -206,12 +206,12 @@ public class XamlDomParser
 		return XamlParser.GetTypeName(value, attr.Parent, KnownNamespaces);
 	}
 
-	public TypeDefinition? FindTypeFromAttribute(XAttribute attr)
+	public TypeInfo? FindTypeFromAttribute(XAttribute attr)
 	{
 		return FindType(attr.Value, attr);
 	}
 
-	public TypeDefinition? FindType(string value, XAttribute attr)
+	public TypeInfo? FindType(string value, XAttribute attr)
 	{
 		var typeName = GetTypeNameFromAttribute(value, attr);
 		if (typeName == null)
@@ -274,10 +274,10 @@ public class XamlDomParser
 				var attachPropertyOwnerType = FindType(attachedClassName, xamlNode.Element);
 
 				string setMethodName = "Set" + attachedPropertyName;
-				var setPropertyMethod = attachPropertyOwnerType.Methods.FirstOrDefault(m => m.Name == setMethodName);
+				var setPropertyMethod = attachPropertyOwnerType.Methods.FirstOrDefault(m => m.Definition.Name == setMethodName);
 				if (setPropertyMethod == null)
 				{
-					throw new GeneratorException($"Invalid attached property {attachPropertyOwnerType.FullName}.{attachedPropertyName}. Missing method {setMethodName}.", xamlNode);
+					throw new GeneratorException($"Invalid attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. Missing method {setMethodName}.", xamlNode);
 				}
 				//if (!setPropertyMethod.IsStatic)
 				//{
@@ -287,16 +287,16 @@ public class XamlDomParser
 				var parameters = setPropertyMethod.Parameters;
 				if (parameters.Count != 2)
 				{
-					throw new GeneratorException($"Invalid set method for attached property {attachPropertyOwnerType.FullName}.{attachedPropertyName}. The {setMethodName} method must have two parameters.", xamlNode);
+					throw new GeneratorException($"Invalid set method for attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. The {setMethodName} method must have two parameters.", xamlNode);
 				}
 
 				if (!parameters[0].ParameterType.IsAssignableFrom(obj.Type))
 				{
-					throw new GeneratorException($"The attached property {attachPropertyOwnerType.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Type.FullName}.", xamlNode);
+					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Type.FullName}.", xamlNode);
 				}
 
 				objProp.MemberName = setMethodName;
-				objProp.TargetMethod = new MethodInfo(obj.Type, setPropertyMethod);
+				objProp.TargetMethod = setPropertyMethod;
 				objProp.IsAttached = true;
 			}
 			else
@@ -418,7 +418,7 @@ public class XamlDomParser
 				value.CSharpValue = xamlNode.Value;
 			}
 			else if (xamlNode.Children.Count > 1 ||
-				(propType.Type.FullName != "System.String" && TypeInfoUtils.GetTypeThrow(typeof(IEnumerable)).IsAssignableFrom(propType)))
+				(propType.Type.FullName != "System.String" && TypeInfo.GetTypeThrow(typeof(IEnumerable)).IsAssignableFrom(propType)))
 			{
 				value.CollectionValue = xamlNode.Children.Select(n => ParseXamlNode(obj, n, resourceDictionaries!, false)).ToList();
 			}
@@ -461,15 +461,15 @@ public class XamlDomParser
 	private static Expression CorrectSourceExpression(Expression expression, XamlObjectProperty prop)
 	{
 		if (expression is not (ConstantExpression or DefaultExpression) &&
-			!TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
+			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
 			prop.MemberType?.Type.FullName == "System.String" && expression.Type.Type.FullName != "System.String")
 		{
-			var method = TypeInfoUtils.GetTypeThrow(typeof(object)).Methods.First(m => m.Name == "ToString");
+			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
 			if (expression is (UnaryExpression or BinaryExpression or CoalesceExpression))
 			{
 				expression = new ParenExpression(expression);
 			}
-			expression = new CallExpression(expression, method, Array.Empty<Expression>());
+			expression = new CallExpression(expression, method.Definition, Array.Empty<Expression>());
 		}
 		if (expression.IsNullable && prop.MemberType?.IsNullable == false)
 		{
@@ -530,7 +530,7 @@ public class XamlDomParser
 	{
 		try
 		{
-			TypeDefinition type = rootNode ? TargetType.Type.ResolveEx()! : FindType((XElement)xamlNode.Element);
+			var type = rootNode ? TargetType.Type.ResolveEx()! : FindType((XElement)xamlNode.Element);
 
 			var xamlObj = new XamlObject(xamlNode, type);
 			xamlObj.Parent = parent;
@@ -554,7 +554,7 @@ public class XamlDomParser
 			}
 
 
-			if (/*type.IsValueType || */KnownContentTypes?.Contains(type.FullName) == true)
+			if (/*type.IsValueType || */KnownContentTypes?.Contains(type.Type.FullName) == true)
 			{
 				if (xamlNode.Value == null)
 				{
@@ -623,13 +623,13 @@ public class XamlDomParser
 						var type2 = type;
 						do
 						{
-							found = KnownContentProperties.TryGetValue(type2.FullName, out contentProperty);
+							found = KnownContentProperties.TryGetValue(type2.Type.FullName, out contentProperty);
 							if (found)
 							{
 								break;
 							}
 
-							type2 = type2.BaseType.ResolveEx();
+							type2 = type2.BaseType;
 						}
 						while (type2 != null);
 					}

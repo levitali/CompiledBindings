@@ -9,6 +9,9 @@ namespace CompiledBindings;
 
 public class TypeInfo
 {
+	private static readonly Dictionary<string, TypeInfo> _typeCache = new Dictionary<string, TypeInfo>(StringComparer.OrdinalIgnoreCase);
+
+	private TypeInfo? _baseType;
 	private IList<PropertyInfo>? _properties;
 	private IList<FieldInfo>? _fields;
 	private IList<MethodInfo>? _methods;
@@ -43,7 +46,7 @@ public class TypeInfo
 				var type = Type;
 				if (Type.IsArray)
 				{
-					type = TypeInfoUtils.GetTypeThrow(typeof(Array));
+					type = GetTypeThrow(typeof(Array));
 				}
 				else
 				{
@@ -78,7 +81,7 @@ public class TypeInfo
 				var type = Type;
 				if (Type.IsArray)
 				{
-					type = TypeInfoUtils.GetTypeThrow(typeof(Array));
+					type = GetTypeThrow(typeof(Array));
 				}
 				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetType(f.FieldType, f.DeclaringType, f.CustomAttributes, false))).ToList();
 			}
@@ -104,6 +107,9 @@ public class TypeInfo
 
 	public IList<EventDefinition>? Events => _events ??= TypeInfoUtils.GetAllEvents(Type).ToList();
 
+	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null;
+
+
 	public static implicit operator TypeInfo(TypeReference type)
 	{
 		return new TypeInfo(type);
@@ -112,6 +118,39 @@ public class TypeInfo
 	public static implicit operator TypeReference(TypeInfo typeInfo)
 	{
 		return typeInfo.Type;
+	}
+
+	public static TypeInfo? GetType(string typeName, bool ignoreCase = false)
+	{
+		if (_typeCache.TryGetValue(typeName, out var type) && (!ignoreCase || type.Type.FullName == typeName))
+		{
+			return type;
+		}
+		if (TypeInfoUtils.TryGetType(typeName, out var typeDefinition) && (!ignoreCase || typeDefinition.FullName == typeName))
+		{
+			_typeCache[typeName] = type = new TypeInfo(typeDefinition);
+		}
+		return type;
+	}
+
+	public static TypeInfo GetTypeThrow(string typeName, bool ignoreCase = false)
+	{
+		var type = GetType(typeName, ignoreCase);
+		if (type == null)
+		{
+			throw new Exception($"Type not found: {typeName}");
+		}
+		return type;
+	}
+
+	public static TypeInfo GetTypeThrow(Type type)
+	{
+		return GetTypeThrow(type.FullName);
+	}
+
+	public static void Cleanup()
+	{
+		_typeCache.Clear();
 	}
 
 	public TypeInfo GetType(TypeReference type, TypeDefinition declaringType, IEnumerable<CustomAttribute> attributes, bool knownNotNullable)

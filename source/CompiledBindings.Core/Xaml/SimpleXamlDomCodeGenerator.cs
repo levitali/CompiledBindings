@@ -40,7 +40,7 @@ public class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	{
 		var output = new StringBuilder();
 
-		var taskType = TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
 		_asyncFunctions = parseResult.StaticUpdate.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
 
 		if (parseResult.TargetType!.Type.Namespace != null)

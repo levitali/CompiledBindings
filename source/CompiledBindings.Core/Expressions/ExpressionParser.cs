@@ -358,7 +358,7 @@ public class ExpressionParser
 
 		var args = ParseArgumentList();
 
-		var delegateType = TypeInfoUtils.GetTypeThrow(typeof(MulticastDelegate));
+		var delegateType = TypeInfo.GetTypeThrow(typeof(MulticastDelegate));
 		if (!delegateType.IsAssignableFrom(expr.Type))
 		{
 			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
@@ -708,7 +708,7 @@ public class ExpressionParser
 				if (method2 != null)
 				{
 					member = method2;
-					memberType = TypeInfoUtils.GetTypeThrow(typeof(Delegate));
+					memberType = TypeInfo.GetTypeThrow(typeof(Delegate));
 				}
 				else
 				{
@@ -796,7 +796,7 @@ public class ExpressionParser
 		{
 			throw new ParseException($"Namespace '{ns.Namespace.NamespaceName}' is not CLR-Namespace.", errorPos);
 		}
-		var expressionType = TypeInfoUtils.GetTypeThrow(ns.ClrNamespace + '.' + typeName);
+		var expressionType = TypeInfo.GetTypeThrow(ns.ClrNamespace + '.' + typeName);
 		return new TypeExpression(expressionType);
 	}
 
@@ -838,7 +838,7 @@ public class ExpressionParser
 		if (expr.Type.Type.IsArray)
 		{
 			expressionType = expr.Type.Type.GetElementType();
-			argumentTypes = new[] { TypeInfoUtils.GetTypeThrow(typeof(int)) };
+			argumentTypes = new[] { TypeInfo.GetTypeThrow(typeof(int)).Type };
 		}
 		else
 		{

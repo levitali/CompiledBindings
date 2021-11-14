@@ -27,11 +27,12 @@ public static class TypeInfoUtils
 	};
 	private static List<AssemblyDefinition>? _assemblies;
 	private static Dictionary<string, TypeDefinition>? _allTypes;
-	private static readonly Dictionary<string, TypeDefinition> _typeCache = new Dictionary<string, TypeDefinition>(StringComparer.OrdinalIgnoreCase);
 	private static readonly Dictionary<TypeReference, TypeDefinition> _resolveCache = new Dictionary<TypeReference, TypeDefinition>();
 	private static readonly Dictionary<TypeReference, TypeReference> _baseTypeCache = new Dictionary<TypeReference, TypeReference>();
 
 	public static IList<AssemblyDefinition>? Assemblies => _assemblies;
+
+	public static Dictionary<string, TypeDefinition> AllTypes => _allTypes ??= TypeInfoUtils.EnumerateAllTypes().Distinct(t => t.FullName.ToUpper()).ToDictionary(t => t.FullName, StringComparer.OrdinalIgnoreCase);
 
 	public static AssemblyDefinition LoadLocalAssembly(string file)
 	{
@@ -62,15 +63,6 @@ public static class TypeInfoUtils
 		_allTypes = null;
 	}
 
-	private static bool TryGetType(string fullName, out TypeDefinition type)
-	{
-		if (_allTypes == null)
-		{
-			_allTypes = EnumerateAllTypes().Distinct(t => t.FullName.ToUpper()).ToDictionary(t => t.FullName, StringComparer.OrdinalIgnoreCase);
-		}
-		return _allTypes.TryGetValue(fullName, out type);
-	}
-
 	public static void Cleanup()
 	{
 		if (_assemblies != null)
@@ -78,43 +70,20 @@ public static class TypeInfoUtils
 			_assemblies.ForEach(a => a.Dispose());
 			_assemblies = null;
 		}
-		_typeCache.Clear();
 		_resolveCache.Clear();
 		_baseTypeCache.Clear();
 		_allTypes = null;
+		TypeInfo.Cleanup();
+	}
+
+	public static bool TryGetType(string fullName, out TypeDefinition type)
+	{
+		return AllTypes.TryGetValue(fullName, out type);
 	}
 
 	public static IEnumerable<TypeDefinition> EnumerateAllTypes()
 	{
 		return _assemblies.SelectMany(a => a.MainModule.GetAllTypes());
-	}
-
-	public static TypeDefinition? GetType(string typeName, bool ignoreCase = false)
-	{
-		if (_typeCache.TryGetValue(typeName, out var type) && (!ignoreCase || type.FullName == typeName))
-		{
-			return type;
-		}
-		if (TryGetType(typeName, out type) && (!ignoreCase || type.FullName == typeName))
-		{
-			_typeCache[typeName] = type;
-		}
-		return type;
-	}
-
-	public static TypeDefinition GetTypeThrow(Type type)
-	{
-		return GetTypeThrow(type.FullName);
-	}
-
-	public static TypeDefinition GetTypeThrow(string typeName, bool ignoreCase = false)
-	{
-		var type = GetType(typeName, ignoreCase);
-		if (type == null)
-		{
-			throw new Exception($"Type not found: {typeName}");
-		}
-		return type;
 	}
 
 	public static TypeDefinition? ResolveEx(this TypeInfo typeInfo)

@@ -220,7 +220,7 @@ public class XFXamlDomParser : SimpleXamlDomParser
 			return _nsMappings[xmlNs];
 		})
 	{
-		ConverterType = TypeInfoUtils.GetTypeThrow("Xamarin.Forms.IValueConverter");
+		ConverterType = TypeInfo.GetTypeThrow("Xamarin.Forms.IValueConverter");
 	}
 
 	public override bool IsMemExtension(XAttribute a)

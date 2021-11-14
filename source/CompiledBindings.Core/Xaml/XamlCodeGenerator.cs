@@ -59,7 +59,7 @@ public class XamlCodeGenerator
 		}
 
 		bool isAsync = false;
-		var taskType = TypeInfoUtils.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
 		if (expression != null && taskType.IsAssignableFrom(expression.Type))
 		{
 			isAsync = !taskType.IsAssignableFrom(property.MemberType);
