@@ -289,22 +289,21 @@ public class ExpressionParser
 		return expr;
 	}
 
-	private MethodDefinition FindMethod(TypeReference type, string methodName, Expression[] args)
+	private MethodInfo FindMethod(TypeInfo type, string methodName, Expression[] args)
 	{
 		type = GetNullableUnderlyingType(type);
 
-		MethodDefinition? method = null;
-		var methods = type
-			.GetAllMethods()
-			.Where(m => m.Name == methodName &&
+		MethodInfo? method = null;
+		var methods = type.Methods
+			.Where(m => m.Definition.Name == methodName &&
 						(m.Parameters.Count >= args.Length ||
-						 (m.Parameters.Count > 0 && m.Parameters[m.Parameters.Count - 1].CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))))
+						 (m.Parameters.Count > 0 && m.Parameters[m.Parameters.Count - 1].Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))))
 			.ToList();
 		if (methods.Count == 0)
 		{
 			foreach (var ns in _namespaces)
 			{
-				methods = TypeInfoUtils.FindExtensionMethods(ns.ClrNamespace!, methodName).ToList();
+				methods = TypeInfo.FindExtensionMethods(ns.ClrNamespace!, methodName).ToList();
 				if (methods.Count > 0)
 				{
 					_includeNamespaces.Add(ns);
@@ -327,14 +326,14 @@ public class ExpressionParser
 				for (int i = 0; i < args.Length; i++)
 				{
 					if (!parameters[i].ParameterType.IsAssignableFrom(args[i].Type) &&
-						(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.FullName != "System.Char"))
+						(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.Type.FullName != "System.Char"))
 					{
 						goto Label_NextMethod;
 					}
 				}
 				if (m.Parameters.Count > args.Length)
 				{
-					if (!m.Parameters[args.Length].IsOptional)
+					if (!m.Parameters[args.Length].Definition.IsOptional)
 					{
 						goto Label_NextMethod;
 					}
@@ -347,7 +346,7 @@ public class ExpressionParser
 		}
 		if (method == null)
 		{
-			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.FullName}'");
+			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Type.FullName}'");
 		}
 		return method;
 	}
@@ -370,13 +369,13 @@ public class ExpressionParser
 			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
 		}
 
-		CorrectCharParameters(method.Definition, args, errorPos);
-		CorrectNotNullableParameters(method.Definition, args);
+		CorrectCharParameters(method, args, errorPos);
+		CorrectNotNullableParameters(method, args);
 
 		return new InvokeExpression(expr, args, method.ReturnType);
 	}
 
-	private static void CorrectNotNullableParameters(MethodDefinition method, Expression[] args)
+	private static void CorrectNotNullableParameters(MethodInfo method, Expression[] args)
 	{
 		var parameters = method.Parameters;
 		for (int i = 0; i < args.Length; i++)
@@ -384,7 +383,7 @@ public class ExpressionParser
 			if (i >= parameters.Count)
 			{
 				ParameterDefinition pd;
-				if (i == 0 || !(pd = parameters[parameters.Count - 1]).CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+				if (i == 0 || !(pd = parameters[parameters.Count - 1].Definition).CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
 				{
 					throw new InvalidProgramException();
 				}
@@ -403,14 +402,14 @@ public class ExpressionParser
 				}
 				break;
 			}
-			else if (!parameters[i].ParameterType.IsNullable() && args[i].IsNullable)
+			else if (!parameters[i].ParameterType.Type.IsNullable() && args[i].IsNullable)
 			{
 				args[i] = new CoalesceExpression(args[i], Expression.DefaultExpression);
 			}
 		}
 	}
 
-	private static void CorrectCharParameters(MethodDefinition method, Expression[] args, int errorPos)
+	private static void CorrectCharParameters(MethodInfo method, Expression[] args, int errorPos)
 	{
 		bool? isParamsChar = null;
 		for (int i = 0; i < args.Length; i++)
@@ -424,21 +423,21 @@ public class ExpressionParser
 
 				if (i == method.Parameters.Count - 1)
 				{
-					if (method.Parameters[i].CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+					if (method.Parameters[i].Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
 					{
-						if (!method.Parameters[i].ParameterType.IsArray)
+						if (!method.Parameters[i].ParameterType.Type.IsArray)
 						{
 							throw new InvalidProgramException();
 						}
 
-						isParamsChar = method.Parameters[i].ParameterType.GetElementType().FullName == "System.Char";
+						isParamsChar = method.Parameters[i].ParameterType.Type.GetElementType().FullName == "System.Char";
 						if (isParamsChar == false)
 						{
 							return;
 						}
 					}
 				}
-				if (isParamsChar == true || method.Parameters[i].ParameterType.FullName == "System.Char")
+				if (isParamsChar == true || method.Parameters[i].ParameterType.Type.FullName == "System.Char")
 				{
 					string value = (string)((ConstantExpression)args[i]).Value!;
 					if (value.Length != 1)
@@ -701,7 +700,7 @@ public class ExpressionParser
 					var method = FindMethod(type, id, args);
 					CorrectCharParameters(method, args, errorPos);
 					CorrectNotNullableParameters(method, args);
-					return new CallExpression(instance, method, args);
+					return new CallExpression(instance, method.Definition, args);
 				}
 
 				var method2 = type.Methods.FirstOrDefault(m => m.Definition.Name == id);

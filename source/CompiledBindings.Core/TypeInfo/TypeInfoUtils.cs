@@ -397,20 +397,6 @@ public static class TypeInfoUtils
 		return type.Name;
 	}
 
-	public static IEnumerable<MethodDefinition> FindExtensionMethods(string ns, string name)
-	{
-		foreach (var refTyp in _assemblies.SelectMany(a => a.MainModule.GetAllTypes()).Where(t => t.Namespace == ns))
-		{
-			if (refTyp.IsSealed && refTyp.IsAbstract)
-			{
-				foreach (var method in refTyp.Methods.Where(m => m.Name == name && m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute")))
-				{
-					yield return method;
-				}
-			}
-		}
-	}
-
 	public static IEnumerable<TypeReference> GetEventHandlerParameterTypes(this EventDefinition @event)
 	{
 		if (@event.InvokeMethod != null)

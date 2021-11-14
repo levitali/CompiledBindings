@@ -323,15 +323,14 @@ public class XamlDomParser
 							foreach (var ns in GetNamespaces(xamlNode))
 							{
 								var clrNs = ns.ClrNamespace!;
-								var method2 = TypeInfoUtils.FindExtensionMethods(clrNs, memberName)
-									.FirstOrDefault(m => m.Parameters.Count == 2 && m.Parameters[0].ParameterType.IsAssignableFrom(obj.Type));
-								if (method2 != null)
+								method = TypeInfo.FindExtensionMethods(clrNs, memberName)
+										.FirstOrDefault(m => m.Parameters.Count == 2 && m.Parameters[0].ParameterType.IsAssignableFrom(obj.Type));
+								if (method != null)
 								{
 									if (!objProp.IncludeNamespaces.Contains(clrNs))
 									{
 										objProp.IncludeNamespaces.Add(clrNs);
 									}
-									method = new MethodInfo(new TypeInfo(method2.DeclaringType), method2);
 									break;
 								}
 							}
@@ -493,17 +492,17 @@ public class XamlDomParser
 			var method = FindBestSuitableTargetMethod(prop.Object.Type.Type.ResolveEx()!, prop.TargetMethod.Definition.Name, type, GetNamespaces(prop.Object.XamlNode).Select(n => n.ClrNamespace!));
 			if (method != null)
 			{
-				prop.TargetMethod = new MethodInfo(prop.Object.Type, method);
+				prop.TargetMethod = method;
 			}
 		}
 	}
 
-	private static MethodDefinition FindBestSuitableTargetMethod(TypeDefinition type, string methodName, TypeReference targetType, IEnumerable<string> namespaces)
+	private static MethodInfo FindBestSuitableTargetMethod(TypeInfo type, string methodName, TypeReference targetType, IEnumerable<string> namespaces)
 	{
 		return type.Methods
-			.Where(m => m.Name == methodName && m.Parameters.Count == 1)
-			.Union(namespaces.SelectMany(n => TypeInfoUtils.FindExtensionMethods(n, methodName)
-											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].IsOptional))))
+			.Where(m => m.Definition.Name == methodName && m.Parameters.Count == 1)
+			.Union(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName)
+											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))
 			.FirstOrDefault(m => m.Parameters[m.Parameters.Count == 1 ? 0 : 1].ParameterType.IsAssignableFrom(targetType));
 	}
 
