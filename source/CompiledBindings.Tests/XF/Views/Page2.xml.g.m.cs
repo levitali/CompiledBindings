@@ -111,7 +111,7 @@ namespace XFTest.Views
 				var value5 = value1?.GuidProp.ToString();
 				targetRoot.label1.Text = value2?.GuidProp.ToString();
 				targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel?.StringProp, typeof(global::System.String), dataRoot._viewModel?.DecimalProp + 1, null));
-				targetRoot.label3.Text = dataRoot._viewModel?.CalculateString()?.TrimNumber();
+				targetRoot.label3.Text = dataRoot._viewModel?.CalculateString().TrimNumber();
 				targetRoot.label4.Text = value5;
 				targetRoot.label5.Text = value5;
 				targetRoot.label6.Text = value4?.GuidProp.ToString();

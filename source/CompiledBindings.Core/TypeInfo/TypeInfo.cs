@@ -65,7 +65,7 @@ public class TypeInfo
 				_properties = type.GetAllProperties().Select(p =>
 				{
 					var knownNotNull = notNullabelProperties?.Contains(p.Name) == true;
-					return new PropertyInfo(p, GetType(p.PropertyType, p.DeclaringType, p.CustomAttributes, knownNotNull));
+					return new PropertyInfo(p, GetType(p.PropertyType, p.DeclaringType, knownNotNull, p.CustomAttributes));
 				}).ToList();
 			}
 			return _properties;
@@ -83,7 +83,7 @@ public class TypeInfo
 				{
 					type = GetTypeThrow(typeof(Array));
 				}
-				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetType(f.FieldType, f.DeclaringType, f.CustomAttributes, false))).ToList();
+				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetType(f.FieldType, f.DeclaringType, false, f.CustomAttributes))).ToList();
 			}
 			return _fields;
 		}
@@ -97,8 +97,8 @@ public class TypeInfo
 			{
 				_methods = Type.GetAllMethods()
 					.Select(m => new MethodInfo(m,
-						m.Parameters.Select(p => new ParameterInfo(p, GetType(p.ParameterType, m.DeclaringType, p.CustomAttributes, false))).ToList(),
-						GetType(m.ReturnType, m.DeclaringType, m.MethodReturnType.CustomAttributes, false)))
+						m.Parameters.Select(p => new ParameterInfo(p, GetType(p.ParameterType, m.DeclaringType, false, p.CustomAttributes, m.CustomAttributes))).ToList(),
+						GetType(m.ReturnType, m.DeclaringType, false, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 					.ToList();
 			}
 			return _methods;
@@ -168,9 +168,9 @@ public class TypeInfo
 		}
 	}
 
-	public TypeInfo GetType(TypeReference type, TypeDefinition declaringType, IEnumerable<CustomAttribute> attributes, bool knownNotNullable)
+	internal TypeInfo GetType(TypeReference type, TypeDefinition declaringType, bool knownNotNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
 	{
-		if (type.IsGenericParameter/* && Type.IsGenericInstance*/)
+		if (type.IsGenericParameter)
 		{
 			var type2 = Type;
 			do
@@ -206,6 +206,7 @@ public class TypeInfo
 			isNullable = true;
 			if (!type.IsValueNullable())
 			{
+				var attributes = attributesHierarchy.First();
 				byte? nullability = null;
 				var attr = attributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
 				if (attr != null)
@@ -227,12 +228,28 @@ public class TypeInfo
 				}
 				if (nullability == null)
 				{
-					nullability = ((byte?)declaringType.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute")?.ConstructorArguments[0].Value) ?? 0;
+					CustomAttribute? attr2 = null;
+					foreach (var attributes2 in attributesHierarchy.Concat(
+						EnumerableExtensions.SelectSequence(declaringType, t => t.DeclaringType, true).Select(t => t.CustomAttributes)))
+					{
+						attr2 = attributes2.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
+						if (attr2 != null)
+						{
+							break;
+						}
+					}
+
+					nullability = ((byte?)attr2?.ConstructorArguments[0].Value) ?? 0;
 				}
 				isNullable = nullability != 1;
 			}
 		}
-		return new TypeInfo(type, isNullable);
+		
+		var typeInfo = new TypeInfo(type, isNullable);
+
+
+
+		return typeInfo;
 	}
 
 	public static (string ns, string className) SplitFullName(string fullName)
@@ -282,8 +299,8 @@ public class MethodInfo : IMemberInfo
 	public MethodInfo(TypeInfo declearingType, MethodDefinition definition)
 	{
 		Definition = definition;
-		Parameters = definition.Parameters.Select(p => new ParameterInfo(p, declearingType.GetType(p.ParameterType, definition.DeclaringType, p.CustomAttributes, false))).ToList();
-		ReturnType = declearingType.GetType(definition.ReturnType, definition.DeclaringType, definition.MethodReturnType.CustomAttributes, false);
+		Parameters = definition.Parameters.Select(p => new ParameterInfo(p, declearingType.GetType(p.ParameterType, definition.DeclaringType, false, p.CustomAttributes, definition.CustomAttributes))).ToList();
+		ReturnType = declearingType.GetType(definition.ReturnType, definition.DeclaringType, false, definition.MethodReturnType.CustomAttributes, definition.CustomAttributes);
 	}
 
 	public MethodInfo(MethodDefinition definition, IList<ParameterInfo> parameters, TypeInfo returnType)

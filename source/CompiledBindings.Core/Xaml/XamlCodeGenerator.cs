@@ -77,7 +77,7 @@ public class XamlCodeGenerator
 					wrap = types.Count > 0 && sourceMethod.Parameters.Count == 0;
 					if (wrap)
 					{
-						expression = new CallExpression(me.Expression, sourceMethod.Definition, new Expression[0]);
+						expression = new CallExpression(me.Expression, sourceMethod, new Expression[0]);
 						value = expression.ToString();
 					}
 				}

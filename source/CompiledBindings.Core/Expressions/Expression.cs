@@ -278,7 +278,7 @@ public class BinaryExpression : Expression
 
 	public override bool IsNullable => Type.IsNullable;
 
-	private static TypeReference GetExpressionType(Expression left, Expression right, string operand)
+	private static TypeInfo GetExpressionType(Expression left, Expression right, string operand)
 	{
 		switch (operand)
 		{
@@ -306,7 +306,7 @@ public class BinaryExpression : Expression
 
 public class CallExpression : Expression, IAccessExpression
 {
-	public CallExpression(Expression expression, MethodDefinition method, Expression[] args) : base(method.ReturnType)
+	public CallExpression(Expression expression, MethodInfo method, Expression[] args) : base(method.ReturnType)
 	{
 		Expression = expression;
 		Method = method;
@@ -314,7 +314,7 @@ public class CallExpression : Expression, IAccessExpression
 	}
 
 	public Expression Expression { get; private set; }
-	public MethodDefinition Method { get; private set; }
+	public MethodInfo Method { get; private set; }
 	public Expression[] Args { get; private set; }
 
 	protected override string ToStringCore()
@@ -326,7 +326,7 @@ public class CallExpression : Expression, IAccessExpression
 			expr += '?';
 		}
 
-		return $"{expr}.{Method.Name}({string.Join(", ", Args.Select(a => a.ToString()))})";
+		return $"{expr}.{Method.Definition.Name}({string.Join(", ", Args.Select(a => a.ToString()))})";
 	}
 
 	public override IEnumerable<Expression> Enumerate()

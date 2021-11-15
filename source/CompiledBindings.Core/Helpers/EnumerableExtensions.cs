@@ -30,6 +30,32 @@ public static class EnumerableExtensions
 		return -1;
 	}
 
+	public static IEnumerable<T> EnumerateAt<T>(this IEnumerable<T> source, int index, T element)
+	{
+		if (source == null)
+		{
+			throw new ArgumentException("source");
+		}
+		if (index < 0)
+		{
+			throw new ArgumentOutOfRangeException("index");
+		}
+		int i = 0;
+		foreach (T item in source)
+		{
+			if (i == index)
+			{
+				yield return element;
+			}
+			yield return item;
+			i++;
+		}
+		if (i <= index)
+		{
+			yield return element;
+		}
+	}
+
 	public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
 	{
 		if (source == null)

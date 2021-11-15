@@ -262,7 +262,7 @@ public static class BindingParser
 		if (sourceExpression != null && converter != null)
 		{
 			var convertMethod = converterType.Methods.First(m => m.Definition.Name == "Convert");
-			sourceExpression = new CallExpression(converter, convertMethod.Definition, new Expression[]
+			sourceExpression = new CallExpression(converter, convertMethod, new Expression[]
 			{
 					sourceExpression,
 					new TypeofExpression(new TypeExpression(prop.MemberType)),

@@ -700,7 +700,7 @@ public class ExpressionParser
 					var method = FindMethod(type, id, args);
 					CorrectCharParameters(method, args, errorPos);
 					CorrectNotNullableParameters(method, args);
-					return new CallExpression(instance, method.Definition, args);
+					return new CallExpression(instance, method, args);
 				}
 
 				var method2 = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
@@ -737,7 +737,7 @@ public class ExpressionParser
 						var attrs = instance switch
 						{
 							MemberExpression me => me.Member.Definition.CustomAttributes,
-							CallExpression ce => ce.Method.MethodReturnType.CustomAttributes,
+							CallExpression ce => ce.Method.Definition.MethodReturnType.CustomAttributes,
 							_ => null
 						};
 
@@ -847,6 +847,7 @@ public class ExpressionParser
 				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Type.FullName}'", errorPos);
 			}
 			expressionType = prop.PropertyType;
+			//TODO!!! redo
 			argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).Select(t => t.Type).ToList();
 		}
 

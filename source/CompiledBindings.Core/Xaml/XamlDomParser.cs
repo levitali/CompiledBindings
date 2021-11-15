@@ -468,7 +468,7 @@ public class XamlDomParser
 			{
 				expression = new ParenExpression(expression);
 			}
-			expression = new CallExpression(expression, method.Definition, Array.Empty<Expression>());
+			expression = new CallExpression(expression, method, Array.Empty<Expression>());
 		}
 		if (expression.IsNullable && prop.MemberType?.IsNullable == false)
 		{
