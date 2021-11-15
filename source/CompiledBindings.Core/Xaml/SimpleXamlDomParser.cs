@@ -1,9 +1,9 @@
-﻿using Mono.Cecil;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using Mono.Cecil;
 
 #nullable enable
 
@@ -26,11 +26,10 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public HashSet<string>? UsedNames { get; private set; }
 
-	public SimpleXamlDomParser(XNamespace xmlns, XNamespace xNs, Func<string, IEnumerable<string>> getClrNsFromXmlNs) : base(xmlns, xNs)
+	public SimpleXamlDomParser(XNamespace xmlns, XNamespace xNs, Func<string, IEnumerable<string>> getClrNsFromXmlNs) 
+		: base(xmlns, xNs, getClrNsFromXmlNs)
 	{
 		DataTemplate = DefaultNamespace + "DataTemplate";
-
-		GetClrNsFromXmlNs = getClrNsFromXmlNs;
 	}
 
 	public SimpleXamlDom Parse(string file, XDocument xamlDoc)

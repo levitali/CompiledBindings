@@ -453,20 +453,6 @@ public static class BindingParser
 			UpdateMethod = updateMethod
 		};
 	}
-
-	private static string ConvertValue(string value, TypeReference targetType)
-	{
-		if (value.StartsWith("'") && value.EndsWith("'"))
-		{
-			value = value.Substring(1, value.Length - 2);
-		}
-		else if (targetType.ResolveEx()?.IsEnum == true)
-		{
-			value = targetType.FullName + "." + value;
-		}
-
-		return value;
-	}
 }
 
 public class BindingsData

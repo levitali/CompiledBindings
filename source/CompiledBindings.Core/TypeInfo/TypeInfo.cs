@@ -396,6 +396,22 @@ public class MethodInfo : IMemberInfo
 	TypeInfo IMemberInfo.MemberType => ReturnType;
 }
 
+public class EventInfo : IMemberInfo
+{
+	public EventInfo(EventDefinition definition, TypeInfo eventType)
+	{
+		Definition = definition;
+		EventType = eventType;
+	}
+
+	public EventDefinition Definition { get; }
+
+	public TypeInfo EventType { get; }
+
+	IMemberDefinition IMemberInfo.Definition => Definition;
+	TypeInfo IMemberInfo.MemberType => EventType;
+}
+
 public class ParameterInfo
 {
 	public ParameterInfo(ParameterDefinition definition, TypeInfo parameterType)

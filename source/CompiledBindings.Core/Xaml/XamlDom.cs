@@ -69,38 +69,3 @@ public class XamlObjectValue
 	public Bind? BindValue { get; set; }
 	public string? CSharpValue { get; set; }
 }
-
-public class ResourceDictionary
-{
-	public string? Source { get; set; }
-	public List<ResourceDictionary> MergedDictionaries { get; } = new List<ResourceDictionary>();
-	public List<StaticResource> Values { get; } = new List<StaticResource>();
-	public List<Style> Styles { get; } = new List<Style>();
-}
-
-public class Style
-{
-	public Style(string? key, TypeInfo targetType)
-	{
-		Key = key;
-		TargetType = targetType;
-	}
-
-	public string? Key { get; set; }
-	public TypeInfo TargetType { get; }
-
-	public Style? BasedOn { get; set; }
-	public List<XamlNode> Setters { get; } = new List<XamlNode>();
-}
-
-public class StaticResource
-{
-	public StaticResource(string? key, XamlObject obj)
-	{
-		Key = key;
-		Object = obj;
-	}
-	public string? Key { get; }
-	public XamlObject Object { get; }
-	public bool IsUsed { get; set; }
-}
