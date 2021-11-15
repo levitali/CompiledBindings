@@ -482,7 +482,7 @@ public class XamlDomParser
 		return expression;
 	}
 
-	private void CorrectMethod(XamlObjectProperty prop, TypeReference type)
+	private void CorrectMethod(XamlObjectProperty prop, TypeInfo type)
 	{
 		if (prop.TargetMethod != null)
 		{
@@ -497,7 +497,7 @@ public class XamlDomParser
 		}
 	}
 
-	private static MethodInfo FindBestSuitableTargetMethod(TypeInfo type, string methodName, TypeReference targetType, IEnumerable<string> namespaces)
+	private static MethodInfo FindBestSuitableTargetMethod(TypeInfo type, string methodName, TypeInfo targetType, IEnumerable<string> namespaces)
 	{
 		return type.Methods
 			.Where(m => m.Definition.Name == methodName && m.Parameters.Count == 1)
@@ -797,9 +797,9 @@ public class XamlDomParser
 		return resourceDictionary;
 	}
 
-	public string GetCSharpValue(string value, XamlNode xamlNode, TypeReference type)
+	public string GetCSharpValue(string value, XamlNode xamlNode, TypeInfo type)
 	{
-		if (type.FullName == "System.Type")
+		if (type.Type.FullName == "System.Type")
 		{
 			var xmlTypeName = XamlParser.GetTypeName(value, xamlNode.Element, KnownNamespaces);
 			var clrFullTypeName = FindFullTypeName(xmlTypeName, xamlNode.Element);
@@ -807,21 +807,21 @@ public class XamlDomParser
 		}
 		else
 		{
-			if (TypeConverters != null && TypeConverters.TryGetValue(type.FullName, out var converter))
+			if (TypeConverters != null && TypeConverters.TryGetValue(type.Type.FullName, out var converter))
 			{
 				value = converter.Convert(value);
 			}
-			else if (type.FullName == "System.String")
+			else if (type.Type.FullName == "System.String")
 			{
 				value = '\"' + value + '\"';
 			}
-			else if (type.FullName == "System.Char")
+			else if (type.Type.FullName == "System.Char")
 			{
 				value = '\'' + value + '\'';
 			}
-			else if (type.ResolveEx()?.IsEnum == true)
+			else if (type.Type.ResolveEx()?.IsEnum == true)
 			{
-				value = type.FullName + "." + value;
+				value = type.Type.FullName + "." + value;
 			}
 		}
 		return value;

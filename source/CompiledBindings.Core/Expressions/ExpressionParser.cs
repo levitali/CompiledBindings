@@ -663,7 +663,7 @@ public class ExpressionParser
 		var type = instance.Type;
 		if (type.Type.IsValueNullable())
 		{
-			type = new TypeInfo(type = type.Type.GetGenericArguments()[0]);
+			type = new TypeInfo(type.Type.GetGenericArguments()[0]);
 		}
 
 		IMemberInfo member;
@@ -825,7 +825,7 @@ public class ExpressionParser
 	{
 		int errorPos = _token.pos;
 
-		TypeReference expressionType;
+		TypeInfo expressionType;
 		IList<TypeInfo> argumentTypes;
 		if (expr.Type.Type.IsArray)
 		{
@@ -1142,11 +1142,11 @@ public class ExpressionParser
 		}
 	}
 
-	private static TypeReference GetNullableUnderlyingType(TypeReference type)
+	private static TypeInfo GetNullableUnderlyingType(TypeInfo type)
 	{
-		if (type.IsValueNullable())
+		if (type.Type.IsValueNullable())
 		{
-			type = type.GetGenericArguments()[0];
+			type = type.Type.GetGenericArguments()[0];
 		}
 		return type;
 	}

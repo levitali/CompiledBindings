@@ -112,7 +112,7 @@ public static class BindingParser
 					};
 					resources.Add((resourceName, resourceType));
 
-					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, converterType), converterType);
+					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, converterType.Type), converterType);
 					expr = new ParameterExpression(rootType, "targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(converterType, false));
 
@@ -307,11 +307,6 @@ public static class BindingParser
 			Resources = resources,
 			SourceExpression = sourceExpression,
 		};
-	}
-
-	public static BindingsData CreateBindingsData(IList<XamlObject> xamlObjects, TypeReference targetRootType, TypeReference dataRootType)
-	{
-		return CreateBindingsData(xamlObjects.SelectMany(o => o.EnumerateBinds()).ToList(), targetRootType, dataRootType);
 	}
 
 	public static BindingsData CreateBindingsData(IList<Bind> binds, TypeInfo? targetRootType, TypeInfo dataRootType, TypeInfo? dependencyObjectType = null)

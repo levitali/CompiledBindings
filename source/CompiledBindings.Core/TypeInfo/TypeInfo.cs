@@ -59,7 +59,7 @@ public class TypeInfo
 				var type = Type;
 				if (Type.IsArray)
 				{
-					type = GetTypeThrow(typeof(Array));
+					type = GetTypeThrow(typeof(Array)).Type;
 				}
 				else
 				{
@@ -94,7 +94,7 @@ public class TypeInfo
 				var type = Type;
 				if (Type.IsArray)
 				{
-					type = GetTypeThrow(typeof(Array));
+					type = GetTypeThrow(typeof(Array)).Type;
 				}
 				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetType(f.FieldType, f.DeclaringType, false, f.CustomAttributes))).ToList();
 			}
@@ -126,11 +126,6 @@ public class TypeInfo
 	public static implicit operator TypeInfo(TypeReference type)
 	{
 		return new TypeInfo(type);
-	}
-
-	public static implicit operator TypeReference(TypeInfo typeInfo)
-	{
-		return typeInfo.Type;
 	}
 
 	public static TypeInfo? GetType(string typeName, bool ignoreCase = false)

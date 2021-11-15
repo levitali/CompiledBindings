@@ -297,7 +297,7 @@ public class BinaryExpression : Expression
 		{
 			if (!type.Type.IsValueNullable())
 			{
-				type = TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type);
+				type = TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type);
 			}
 		}
 		return type;
