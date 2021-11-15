@@ -752,16 +752,9 @@ public class ExpressionParser
 								var field2 = type.Fields.FirstOrDefault(f => f.Definition.Name == name);
 								if (field2 != null)
 								{
-									if (type.Type is IGenericInstance gi)
-									{
-										var args = gi.GenericArguments;
-										if (index < args.Count)
-										{
-											member = field2;
-											memberType = args[index];
-											goto Label_CreateMemberExpression;
-										}
-									}
+									member = field2;
+									memberType = field2.FieldType;
+									goto Label_CreateMemberExpression;
 								}
 							}
 						}

@@ -407,8 +407,6 @@ public class InvokeExpression : Expression, IAccessExpression
 	{
 		return new InvokeExpression(expression, Args, Type);
 	}
-
-	public override bool IsNullable => Type.IsNullable;
 }
 
 public class NewExpression : Expression

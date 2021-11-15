@@ -17,6 +17,7 @@ public class TypeInfo
 	private IList<MethodInfo>? _methods;
 	private IList<EventDefinition>? _events;
 	private readonly bool _isNullable;
+	private byte[]? _nullabileFlags;
 
 	public TypeInfo(TypeReference type, bool isNullable = true)
 	{
@@ -168,7 +169,7 @@ public class TypeInfo
 		}
 	}
 
-	internal TypeInfo GetType(TypeReference type, TypeDefinition declaringType, bool knownNotNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
+	internal TypeInfo GetType(TypeReference type, TypeDefinition declaringType, bool notNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
 	{
 		if (type.IsGenericParameter)
 		{
@@ -187,6 +188,10 @@ public class TypeInfo
 					if (gp[i].Name == type.Name)
 					{
 						type = type2.GetGenericArguments()[i];
+						if (_nullabileFlags?.Length > i + 1)
+						{
+							notNullable |= _nullabileFlags[i + 1] == 1;
+						}
 						goto Lable_Break1;
 					}
 				}
@@ -196,8 +201,23 @@ public class TypeInfo
 		}
 	Lable_Break1:
 
+		byte[]? nullableFlags = null;
+		var attributes = attributesHierarchy.First();
+		var attr = attributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+		if (attr != null)
+		{
+			if (attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr)
+			{
+				nullableFlags = arr.Select(b => (byte)b.Value).ToArray();
+			}
+			else
+			{
+				nullableFlags = new[] { (byte)attr.ConstructorArguments[0].Value };
+			}
+		}
+
 		bool isNullable;
-		if (knownNotNullable)
+		if (notNullable)
 		{
 			isNullable = false;
 		}
@@ -206,27 +226,12 @@ public class TypeInfo
 			isNullable = true;
 			if (!type.IsValueNullable())
 			{
-				var attributes = attributesHierarchy.First();
-				byte? nullability = null;
-				var attr = attributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
-				if (attr != null)
+				byte? nullability;
+				if (nullableFlags?.Length > 0)
 				{
-					byte[] nullableFlags;
-					if (attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr)
-					{
-						nullableFlags = arr.Select(b => (byte)b.Value).ToArray();
-					}
-					else
-					{
-						nullableFlags = new[] { (byte)attr.ConstructorArguments[0].Value };
-					}
-
-					if (nullableFlags.Length > 0)
-					{
-						nullability = nullableFlags[0];
-					}
+					nullability = nullableFlags[0];
 				}
-				if (nullability == null)
+				else
 				{
 					CustomAttribute? attr2 = null;
 					foreach (var attributes2 in attributesHierarchy.Concat(
@@ -246,9 +251,7 @@ public class TypeInfo
 		}
 		
 		var typeInfo = new TypeInfo(type, isNullable);
-
-
-
+		typeInfo._nullabileFlags = nullableFlags;
 		return typeInfo;
 	}
 
