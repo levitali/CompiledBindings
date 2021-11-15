@@ -663,7 +663,7 @@ public class ExpressionParser
 		var type = instance.Type;
 		if (type.Type.IsValueNullable())
 		{
-			type = new TypeInfo(type.Type.GetGenericArguments()[0]);
+			type = type.GetGenericArguments()![0];
 		}
 
 		IMemberInfo member;
@@ -829,18 +829,19 @@ public class ExpressionParser
 		IList<TypeInfo> argumentTypes;
 		if (expr.Type.Type.IsArray)
 		{
-			expressionType = expr.Type.Type.GetElementType();
+			expressionType = expr.Type.GetElementType()!;
 			argumentTypes = new[] { TypeInfo.GetTypeThrow(typeof(int)) };
 		}
 		else
 		{
+			//TODO!! at least check number of parameters
 			var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
 			if (prop == null)
 			{
 				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Type.FullName}'", errorPos);
 			}
 			expressionType = prop.PropertyType;
-			//TODO!!! redo
+			//TODO!! redo
 			argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).ToList();
 		}
 
@@ -1146,7 +1147,7 @@ public class ExpressionParser
 	{
 		if (type.Type.IsValueNullable())
 		{
-			type = type.Type.GetGenericArguments()[0];
+			type = type.GetGenericArguments()![0];
 		}
 		return type;
 	}

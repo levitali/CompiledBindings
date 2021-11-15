@@ -27,7 +27,7 @@ public class ExpressionTests
 		Expression result;
 		IList<XamlNamespace> dummyNamespaces;
 		int dummyPos;
-
+		
 		expression = "(ListProp.Count - NullIntProp).ToString() ?? '-'";
 		expectedCode = "(dataRoot.ListProp?.Count - dataRoot.NullIntProp)?.ToString() ?? \"-\"";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out dummyNamespaces, out dummyPos);
@@ -52,9 +52,9 @@ public class ExpressionTests
 		expectedCode = "dataRoot.FuncProp()";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.AreEqual(result.ToString(), expectedCode);
-
+		
 		expression = "FuncProp2('test').GuidProp";
-		expectedCode = "dataRoot.FuncProp2(\"test\")?.GuidProp";
+		expectedCode = "dataRoot.FuncProp2?.Invoke(\"test\")?.GuidProp";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.AreEqual(result.ToString(), expectedCode);
 

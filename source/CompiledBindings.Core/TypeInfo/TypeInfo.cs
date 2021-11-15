@@ -16,37 +16,55 @@ public class TypeInfo
 	private IList<FieldInfo>? _fields;
 	private IList<MethodInfo>? _methods;
 	private IList<EventDefinition>? _events;
-	private readonly bool _isNullable;
-	private byte[]? _nullabileFlags;
+	private readonly bool? _isNullable;
+	private readonly byte? _nullableContext;
+	private readonly byte[]? _nullabileFlags;
 
 	public TypeInfo(TypeInfo typeInfo, bool isNullable)
 	{
 		Type = typeInfo.Type;
-		_baseType = typeInfo.BaseType;
-		_properties = typeInfo.Properties;
-		_fields = typeInfo.Fields;
-		_methods = typeInfo.Methods;
-		_events = typeInfo.Events;
+		_baseType = typeInfo._baseType;
+		_properties = typeInfo._properties;
+		_fields = typeInfo._fields;
+		_methods = typeInfo._methods;
+		_events = typeInfo._events;
 		_nullabileFlags = typeInfo._nullabileFlags;
+		_nullableContext = typeInfo._nullableContext;
+
 		_isNullable = isNullable;
 	}
 
-	public TypeInfo(TypeReference type, bool isNullable = true)
+	public TypeInfo(TypeReference type)
 	{
-		if (type == null)
-		{
-			throw new ArgumentNullException(nameof(type));
-		}
-
 		Type = type;
-		_isNullable = isNullable;
+		_nullableContext = GetNullableContext(type);
+		_nullabileFlags = GetNullableFlags(type);
+		var b = _nullabileFlags?[0] ?? _nullableContext;
+		_isNullable = b == null ? null : b == 2;
+	}
+
+	private TypeInfo(TypeReference type, bool? isNullable, byte[]? nullabileFlags, byte? nullableContext)
+	{
+		Type = type;
+		_nullableContext = nullableContext;
+		_nullabileFlags = nullabileFlags;
+
+		if (isNullable != null)
+		{
+			_isNullable = isNullable;
+		}
+		else
+		{
+			var b = _nullabileFlags?[0] ?? _nullableContext;
+			_isNullable = b == null ? null : b == 2;
+		}
 	}
 
 	public static Dictionary<string, HashSet<string>> NotNullableProperties { get; } = new Dictionary<string, HashSet<string>>();
 
 	public TypeReference Type { get; }
 
-	public bool IsNullable => _isNullable && Type.IsNullable();
+	public bool IsNullable => _isNullable != false && Type.IsNullable();
 
 	public IList<PropertyInfo> Properties
 	{
@@ -78,7 +96,7 @@ public class TypeInfo
 				_properties = type.GetAllProperties().Select(p =>
 				{
 					var knownNotNull = notNullabelProperties?.Contains(p.Name) == true;
-					return new PropertyInfo(p, GetType(p.PropertyType, p.DeclaringType, knownNotNull, p.CustomAttributes));
+					return new PropertyInfo(p, GetTypeSumElement(p.PropertyType, p.DeclaringType, knownNotNull ? false : null, p.CustomAttributes));
 				}).ToList();
 			}
 			return _properties;
@@ -96,7 +114,7 @@ public class TypeInfo
 				{
 					type = GetTypeThrow(typeof(Array)).Type;
 				}
-				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetType(f.FieldType, f.DeclaringType, false, f.CustomAttributes))).ToList();
+				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes))).ToList();
 			}
 			return _fields;
 		}
@@ -110,8 +128,8 @@ public class TypeInfo
 			{
 				_methods = Type.GetAllMethods()
 					.Select(m => new MethodInfo(m,
-						m.Parameters.Select(p => new ParameterInfo(p, GetType(p.ParameterType, m.DeclaringType, false, p.CustomAttributes, m.CustomAttributes))).ToList(),
-						GetType(m.ReturnType, m.DeclaringType, false, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
+						m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
+						GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 					.ToList();
 			}
 			return _methods;
@@ -120,12 +138,47 @@ public class TypeInfo
 
 	public IList<EventDefinition>? Events => _events ??= TypeInfoUtils.GetAllEvents(Type).ToList();
 
-	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null;
+	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO!! nullablility in base type from this one
 
-
-	public static implicit operator TypeInfo(TypeReference type)
+	public TypeInfo? GetElementType()
 	{
-		return new TypeInfo(type);
+		var elementType = Type.GetElementType();
+		if (elementType == null)
+		{
+			return null;
+		}
+		return new TypeInfo(elementType, GetIsNullableSumElement(1), GetNullableFlags(elementType), GetNullableContext(elementType) ?? _nullableContext);
+	}
+
+	public IList<TypeInfo>? GetGenericArguments()
+	{
+		var genericArguments = Type.GetGenericArguments();
+		if (genericArguments == null)
+		{
+			return null;
+		}
+
+		return genericArguments
+			.Select((ga, i) => new TypeInfo(ga, GetIsNullableSumElement(i + 1), GetNullableFlags(ga), GetNullableContext(ga) ?? _nullableContext))
+			.ToList();
+	}
+
+	public TypeInfo? GetItemType()
+	{
+		if (Type.IsArray)
+		{
+			return GetElementType();
+		}
+		else
+		{
+			var enumerableType = Type.GetAllInterfaces().FirstOrDefault(i => i.GetElementType().FullName == "System.Collections.Generic.IEnumerable`1");
+			if (enumerableType != null)
+			{
+				var itemType = enumerableType.GetGenericArguments()[0];
+				return new TypeInfo(itemType, GetIsNullableSumElement(1), GetNullableFlags(itemType), GetNullableContext(itemType) ?? _nullableContext);
+			}
+		}
+		return null;
 	}
 
 	public static TypeInfo? GetType(string typeName, bool ignoreCase = false)
@@ -176,7 +229,18 @@ public class TypeInfo
 		}
 	}
 
-	internal TypeInfo GetType(TypeReference type, TypeDefinition declaringType, bool notNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
+	public static (string ns, string className) SplitFullName(string fullName)
+	{
+		var parts = fullName.Split('.');
+		return (string.Join(".", parts.Take(parts.Length - 1)), parts.Last());
+	}
+
+	public override string ToString()
+	{
+		return Type.ToString();
+	}
+
+	internal TypeInfo GetTypeSumElement(TypeReference type, TypeDefinition declaringType, bool? isNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
 	{
 		if (type.IsGenericParameter)
 		{
@@ -195,9 +259,9 @@ public class TypeInfo
 					if (gp[i].Name == type.Name)
 					{
 						type = type2.GetGenericArguments()[i];
-						if (_nullabileFlags?.Length > i + 1)
+						if (isNullable == null)
 						{
-							notNullable |= _nullabileFlags[i + 1] == 1;
+							isNullable = GetIsNullableSumElement(i + 1);
 						}
 						goto Lable_Break1;
 					}
@@ -223,54 +287,58 @@ public class TypeInfo
 			}
 		}
 
-		bool isNullable;
-		if (notNullable)
+		byte? nullableContext = null;
+		foreach (var attributes2 in attributesHierarchy.Concat(
+			EnumerableExtensions.SelectSequence(declaringType, t => t.DeclaringType, true).Select(t => t.CustomAttributes)))
 		{
-			isNullable = false;
-		}
-		else
-		{
-			isNullable = true;
-			if (!type.IsValueNullable())
+			var attr2 = attributes2.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
+			if (attr2 != null)
 			{
-				byte? nullability;
-				if (nullableFlags?.Length > 0)
-				{
-					nullability = nullableFlags[0];
-				}
-				else
-				{
-					CustomAttribute? attr2 = null;
-					foreach (var attributes2 in attributesHierarchy.Concat(
-						EnumerableExtensions.SelectSequence(declaringType, t => t.DeclaringType, true).Select(t => t.CustomAttributes)))
-					{
-						attr2 = attributes2.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-						if (attr2 != null)
-						{
-							break;
-						}
-					}
-
-					nullability = ((byte?)attr2?.ConstructorArguments[0].Value) ?? 0;
-				}
-				isNullable = nullability != 1;
+				nullableContext = (byte)attr2.ConstructorArguments[0].Value;
+				break;
 			}
 		}
-		
-		var typeInfo = new TypeInfo(type, isNullable);
-		typeInfo._nullabileFlags = nullableFlags;
-		return typeInfo;
+
+		nullableContext ??= _nullableContext;
+
+		if (isNullable == null)
+		{
+			var b = (nullableFlags?[0] ?? nullableContext);
+			isNullable = b == null ? null : b == 2;
+		}
+
+		return new TypeInfo(type, isNullable, nullableFlags, nullableContext);
 	}
 
-	public static (string ns, string className) SplitFullName(string fullName)
+	private static byte[]? GetNullableFlags(TypeReference type)
 	{
-		var parts = fullName.Split('.');
-		return (string.Join(".", parts.Take(parts.Length - 1)), parts.Last());
+		var attrs = type.ResolveEx()?.CustomAttributes;
+		var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+		if (attr != null)
+		{
+			if (attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr)
+			{
+				return arr.Select(b => (byte)b.Value).ToArray();
+			}
+			else
+			{
+				return new[] { (byte)attr.ConstructorArguments[0].Value };
+			}
+		}
+		return null;
 	}
 
-	public override string ToString()
+	private static byte? GetNullableContext(TypeReference type)
 	{
-		return Type.ToString();
+		var attrs = type.ResolveEx()?.CustomAttributes;
+		var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
+		return (byte?)attr?.ConstructorArguments[0].Value;
+	}
+
+	private bool? GetIsNullableSumElement(int index)
+	{
+		var b = _nullabileFlags?.Skip(index).FirstOrDefault() ?? _nullableContext;
+		return b == null ? null : b == 2;
 	}
 }
 
@@ -309,8 +377,8 @@ public class MethodInfo : IMemberInfo
 	public MethodInfo(TypeInfo declearingType, MethodDefinition definition)
 	{
 		Definition = definition;
-		Parameters = definition.Parameters.Select(p => new ParameterInfo(p, declearingType.GetType(p.ParameterType, definition.DeclaringType, false, p.CustomAttributes, definition.CustomAttributes))).ToList();
-		ReturnType = declearingType.GetType(definition.ReturnType, definition.DeclaringType, false, definition.MethodReturnType.CustomAttributes, definition.CustomAttributes);
+		Parameters = definition.Parameters.Select(p => new ParameterInfo(p, declearingType.GetTypeSumElement(p.ParameterType, definition.DeclaringType, null, p.CustomAttributes, definition.CustomAttributes))).ToList();
+		ReturnType = declearingType.GetTypeSumElement(definition.ReturnType, definition.DeclaringType, null, definition.MethodReturnType.CustomAttributes, definition.CustomAttributes);
 	}
 
 	public MethodInfo(MethodDefinition definition, IList<ParameterInfo> parameters, TypeInfo returnType)

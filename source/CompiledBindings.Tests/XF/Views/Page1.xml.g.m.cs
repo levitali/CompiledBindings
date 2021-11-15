@@ -409,7 +409,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "NullableIntProp")
 					{
-						targetRoot.label7.Text = (typedSender.NullableIntProp ?? 0).ToString();
+						targetRoot.label7.Text = (typedSender.NullableIntProp).ToString();
 						if (!notifyAll)
 						{
 							return;
@@ -883,7 +883,7 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-				targetRoot.label9.Text = dataRoot?.DecimalProp.ToString();
+				targetRoot.label9.Text = dataRoot.DecimalProp.ToString();
 
 			}
 

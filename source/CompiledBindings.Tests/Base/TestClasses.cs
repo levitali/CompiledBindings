@@ -10,6 +10,8 @@ public class Class1
 {
 	public Class2? RefProp { get; set; }
 
+	public string[] ArrayProp { get; set; } = new string[0];
+
 	public IList<Class2?>? ListProp { get; set; }
 
 	public int? NullIntProp { get; set; }
@@ -18,7 +20,7 @@ public class Class1
 
 	public Func<int> FuncProp { get; set; }
 
-	public Func<string, ItemViewModel> FuncProp2 { get; set; }
+	public Func<string, ItemViewModel?>? FuncProp2 { get; set; }
 
 	public static Class2 Instance { get; } = new Class2();
 

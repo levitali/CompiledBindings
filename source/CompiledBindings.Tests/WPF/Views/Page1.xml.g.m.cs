@@ -24,7 +24,7 @@ namespace WPFTest.Views
 			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
 
 			var value1 = WPFTest.Strings.Instance;
-			Title = value1?.Title;
+			Title = value1.Title;
 			Set0(_generatedCodeDisposed.Token);
 			async void Set0(CancellationToken cancellationToken)
 			{
@@ -40,7 +40,7 @@ namespace WPFTest.Views
 				{
 				}
 			}
-			header1.Text = value1?.Header1;
+			header1.Text = value1.Header1;
 
 			Bindings_.Initialize(this);
 			this.DataContextChanged += this_DataContextChanged;

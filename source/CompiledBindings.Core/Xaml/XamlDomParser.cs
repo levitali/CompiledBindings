@@ -489,7 +489,7 @@ public class XamlDomParser
 			// Try to find best suitable method.
 			// Note! So far TypeReference.IsAssignableFrom method does not handle all cases.
 			// So it can be, that the method is not found.
-			var method = FindBestSuitableTargetMethod(prop.Object.Type.Type.ResolveEx()!, prop.TargetMethod.Definition.Name, type, GetNamespaces(prop.Object.XamlNode).Select(n => n.ClrNamespace!));
+			var method = FindBestSuitableTargetMethod(prop.Object.Type, prop.TargetMethod.Definition.Name, type, GetNamespaces(prop.Object.XamlNode).Select(n => n.ClrNamespace!));
 			if (method != null)
 			{
 				prop.TargetMethod = method;
@@ -529,7 +529,7 @@ public class XamlDomParser
 	{
 		try
 		{
-			var type = rootNode ? TargetType.Type.ResolveEx()! : FindType((XElement)xamlNode.Element);
+			var type = rootNode ? TargetType : FindType((XElement)xamlNode.Element);
 
 			var xamlObj = new XamlObject(xamlNode, type);
 			xamlObj.Parent = parent;

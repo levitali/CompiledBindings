@@ -205,12 +205,11 @@ public class SimpleXamlDomParser : XamlDomParser
 										{
 											throw new ParseException("IsItemsSource is already set in some other x:Bind of this element.");
 										}
-										var eType = bind.Expression!.Type.Type.GetItemType();
-										if (eType == null)
+										elementType = bind.Expression!.Type.GetItemType();
+										if (elementType == null)
 										{
 											throw new ParseException("Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.");
 										}
-										elementType = new TypeInfo(eType);
 									}
 								}
 							}

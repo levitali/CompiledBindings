@@ -86,16 +86,6 @@ public static class TypeInfoUtils
 		return _assemblies.SelectMany(a => a.MainModule.GetAllTypes());
 	}
 
-	public static TypeDefinition? ResolveEx(this TypeInfo typeInfo)
-	{
-		return typeInfo.Type.ResolveEx();
-	}
-
-	public static TypeDefinition ResolveThrow(this TypeReference type)
-	{
-		return type.ResolveEx() ?? throw new Exception($"Cannot resolve type {type.FullName}");
-	}
-
 	public static TypeDefinition? ResolveEx(this TypeReference type)
 	{
 		if (type == null)
@@ -132,16 +122,6 @@ public static class TypeInfoUtils
 		}
 
 		return typeDefinition;
-	}
-
-	public static string GetNamespace(this TypeReference type)
-	{
-		return EnumerableExtensions.SelectSequence(type, t => t.DeclaringType, true).Last().Namespace;
-	}
-
-	public static string GetCSharpName(this string name)
-	{
-		return (!string.IsNullOrEmpty(name) && _keywords.Contains(name.ToLower())) ? "@" + name : name;
 	}
 
 	public static bool IsAssignableFrom(this TypeInfo baseType, TypeInfo type)
@@ -356,23 +336,6 @@ public static class TypeInfoUtils
 	public static IEnumerable<CustomAttribute> GetAllAttributes(this TypeDefinition type)
 	{
 		return EnumerableExtensions.SelectSequence(type, t => t.BaseType.ResolveEx(), true).SelectMany(t => t.CustomAttributes);
-	}
-
-	public static TypeReference? GetItemType(this TypeReference type)
-	{
-		if (type.IsArray)
-		{
-			return type.GetElementType();
-		}
-		else
-		{
-			var enumerableType = type.GetAllInterfaces().FirstOrDefault(i => i.GetElementType().FullName == "System.Collections.Generic.IEnumerable`1");
-			if (enumerableType != null)
-			{
-				return enumerableType.GetGenericArguments()[0];
-			}
-		}
-		return null;
 	}
 
 	public static string GetCSharpFullName(this TypeReference type)

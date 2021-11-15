@@ -14,15 +14,18 @@ public class TypeInfoTests
 		int substr = "file:///".Length;
 		TypeInfoUtils.LoadReferences(new string[]
 		{
-				typeof(string).Assembly.CodeBase.Substring(substr),
-				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
+			typeof(string).Assembly.CodeBase.Substring(substr),
+			Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
 		});
 
-		var typeInfo = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
-		var funcProp2 = typeInfo.Properties.Single(p => p.Definition.Name == nameof(Class1.FuncProp2));
+		var class1TypeInfo = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
+		var funcProp2 = class1TypeInfo.Properties.Single(p => p.Definition.Name == nameof(Class1.FuncProp2));
 		var method = funcProp2.PropertyType.Methods.Single(m => m.Definition.Name == "Invoke");
 		var retType = method.ReturnType;
 		var prop = retType.Properties.Single(p => p.Definition.Name == nameof(ItemViewModel.GuidProp));
+
+		var arrayProp = class1TypeInfo.Properties.Single(p => p.Definition.Name == nameof(Class1.ArrayProp));
+		Assert.IsFalse(arrayProp?.PropertyType.GetElementType()?.IsNullable);
 	}
 }
 

@@ -35,7 +35,7 @@ public static class ExpressionUtils
 			{
 				if (type.Type.IsValueType)
 				{
-					type = TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type);
+					type = new TypeInfo(TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type));
 				}
 				else
 				{

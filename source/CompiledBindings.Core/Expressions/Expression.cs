@@ -297,7 +297,7 @@ public class BinaryExpression : Expression
 		{
 			if (!type.Type.IsValueNullable())
 			{
-				type = TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type);
+				type = new TypeInfo(TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type));
 			}
 		}
 		return type;
@@ -481,7 +481,7 @@ public class CastExpression : Expression
 	protected override string ToStringCore()
 	{
 		string str = $"global::{Type.Type.GetCSharpFullName()}";
-		if (_checkNull && !Type.IsNullable && Expression.IsNullable)
+		if (_checkNull && !Type.Type.IsNullable() && Expression.IsNullable)
 		{
 			str += "?";
 		}
