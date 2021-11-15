@@ -383,7 +383,7 @@ public static class BindingParser
 
 		foreach (var propChangeData in notifyPropertyChangedList)
 		{
-			var typedSender = new ParameterExpression(new TypeInfo(propChangeData.SourceExpression.Type.Type, false), "typedSender");
+			var typedSender = new ParameterExpression(new TypeInfo(propChangeData.SourceExpression.Type, false), "typedSender");
 			foreach (var prop in propChangeData.Properties)
 			{
 				var expr = new MemberExpression(typedSender, prop.Property, prop.Property.PropertyType);

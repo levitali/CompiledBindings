@@ -19,6 +19,18 @@ public class TypeInfo
 	private readonly bool _isNullable;
 	private byte[]? _nullabileFlags;
 
+	public TypeInfo(TypeInfo typeInfo, bool isNullable)
+	{
+		Type = typeInfo.Type;
+		_baseType = typeInfo.BaseType;
+		_properties = typeInfo.Properties;
+		_fields = typeInfo.Fields;
+		_methods = typeInfo.Methods;
+		_events = typeInfo.Events;
+		_nullabileFlags = typeInfo._nullabileFlags;
+		_isNullable = isNullable;
+	}
+
 	public TypeInfo(TypeReference type, bool isNullable = true)
 	{
 		if (type == null)

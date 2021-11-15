@@ -688,11 +688,11 @@ public class ExpressionParser
 				{
 					// Try to find the first member method with the name in order to take argument types.
 					// Afterwards the more suitable member or extension method will be found.
-					IList<TypeReference>? argumentTypes = null;
+					IList<TypeInfo>? argumentTypes = null;
 					var methodInfo = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
 					if (methodInfo != null)
 					{
-						argumentTypes = methodInfo.Parameters.Select(p => p.ParameterType.Type).ToList();
+						argumentTypes = methodInfo.Parameters.Select(p => p.ParameterType).ToList();
 					}
 
 					var args = ParseArgumentList(argumentTypes);
@@ -729,7 +729,7 @@ public class ExpressionParser
 
 					if (instance == _root && _expectedType?.Type.Name == id)
 					{
-						return new TypeExpression(new TypeInfo(_expectedType));
+						return new TypeExpression(_expectedType);
 					}
 
 					if (type.Type.FullName.StartsWith("System.ValueTuple"))
@@ -792,7 +792,7 @@ public class ExpressionParser
 		return new TypeExpression(expressionType);
 	}
 
-	private Expression[] ParseArgumentList(IList<TypeReference>? argumentTypes = null)
+	private Expression[] ParseArgumentList(IList<TypeInfo>? argumentTypes = null)
 	{
 		ValidateToken(TokenId.OpenParen, Res.OpenParenExpected);
 		NextToken();
@@ -802,13 +802,13 @@ public class ExpressionParser
 		return args;
 	}
 
-	private Expression[] ParseArguments(IList<TypeReference>? argumentTypes = null)
+	private Expression[] ParseArguments(IList<TypeInfo>? argumentTypes = null)
 	{
 		var savedExpectedType = _expectedType;
 		var argList = new List<Expression>();
 		for (int i = 0; ; i++)
 		{
-			_expectedType = i < argumentTypes?.Count ? new TypeInfo(argumentTypes[i]) : null;
+			_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : null;
 			argList.Add(ParseExpression());
 			if (_token.id != TokenId.Comma)
 			{
@@ -826,11 +826,11 @@ public class ExpressionParser
 		int errorPos = _token.pos;
 
 		TypeReference expressionType;
-		IList<TypeReference> argumentTypes;
+		IList<TypeInfo> argumentTypes;
 		if (expr.Type.Type.IsArray)
 		{
 			expressionType = expr.Type.Type.GetElementType();
-			argumentTypes = new[] { TypeInfo.GetTypeThrow(typeof(int)).Type };
+			argumentTypes = new[] { TypeInfo.GetTypeThrow(typeof(int)) };
 		}
 		else
 		{
@@ -841,7 +841,7 @@ public class ExpressionParser
 			}
 			expressionType = prop.PropertyType;
 			//TODO!!! redo
-			argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).Select(t => t.Type).ToList();
+			argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).ToList();
 		}
 
 		ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);
