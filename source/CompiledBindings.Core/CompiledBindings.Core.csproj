@@ -63,6 +63,7 @@
     <Compile Include="Tasks\UpdateReferenceCopyLocalTask.cs" />
     <Compile Include="TypeInfo\TypeInfo.cs" />
     <Compile Include="TypeInfo\TypeInfoUtils.cs" />
+    <Compile Include="Usings.cs" />
     <Compile Include="Xaml\SimpleXamlDomCodeGenerator.cs" />
     <Compile Include="Xaml\SimpleXamlDomParser.cs" />
     <Compile Include="Xaml\XamlCodeGenerator.cs" />

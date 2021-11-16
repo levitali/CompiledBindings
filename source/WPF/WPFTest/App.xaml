@@ -1,21 +1,25 @@
-﻿<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WPFTest"
-             xmlns:m="http://compiledbindings.com"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:mx="http://compiledbindings.com/x"
-             xmlns:viewModels="clr-namespace:WPFTest.ViewModels"
-             mc:Ignorable="mx m"
-             x:Class="WPFTest.App"
-             StartupUri="Views\MainWindow.xaml">
-  <Application.Resources>
-    <DataTemplate x:Key="GlobalTestTemplate" DataType="viewModels:EntityViewModel">
-      <Grid>
-        <StackPanel>
-          <TextBlock Text="{x:Bind Model.SByteProp}" />
-          <TextBlock Text="{x:Bind BooleanProp}" />
-        </StackPanel>
-      </Grid>
-    </DataTemplate>
-  </Application.Resources>
+﻿<Application
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WPFTest"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mx="http://compiledbindings.com/x"
+    xmlns:viewModels="clr-namespace:WPFTest.ViewModels"
+    mc:Ignorable="mx m"
+    x:Class="WPFTest.App"
+    StartupUri="Views\MainWindow.xaml">
+    
+    <Application.Resources>
+        <DataTemplate
+            x:Key="GlobalTestTemplate"
+            DataType="viewModels:EntityViewModel">
+            <Grid>
+                <StackPanel>
+                    <TextBlock Text="{x:Bind Model.SByteProp}" />
+                    <TextBlock Text="{x:Bind BooleanProp}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </Application.Resources>
 </Application>

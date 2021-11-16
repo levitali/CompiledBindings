@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Mono.Cecil;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 
@@ -841,8 +835,8 @@ public class ExpressionParser
 				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Type.FullName}'", errorPos);
 			}
 			expressionType = prop.PropertyType;
-			//TODO!! redo
-			argumentTypes = new MethodInfo(expr.Type, prop.Definition.GetMethod).Parameters.Select(p => p.ParameterType).ToList();
+			var method = expr.Type.Methods.Single(m => m.Definition == prop.Definition.GetMethod);
+			argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
 		}
 
 		ValidateToken(TokenId.OpenBracket, Res.OpenParenExpected);

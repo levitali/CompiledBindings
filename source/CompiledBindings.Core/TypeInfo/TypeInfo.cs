@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Rocks;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 
@@ -128,7 +122,7 @@ public class TypeInfo
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
 				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 			.ToList();
-	
+
 	public IList<EventInfo> Events => _events ??=
 		TypeInfoUtils.GetAllEvents(Type)
 		.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))

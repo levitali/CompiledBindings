@@ -1,9 +1,4 @@
-﻿using System;
-using System.Xml;
-using System.Xml.Linq;
-using Mono.Cecil.Cil;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 

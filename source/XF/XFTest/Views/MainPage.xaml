@@ -1,28 +1,36 @@
-﻿<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:converters="clr-namespace:XFTest.Converters"
-             xmlns:vm="clr-namespace:XFTest.ViewModels"
-             x:Class="XFTest.MainPage"
-             x:DataType="vm:Page1ViewModel">
+﻿<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converters="clr-namespace:XFTest.Converters"
+    xmlns:vm="clr-namespace:XFTest.ViewModels"
+    x:Class="XFTest.MainPage"
+    x:DataType="vm:Page1ViewModel">
 
-  <Page.Resources>
-    <converters:InverseBooleanConverter x:Key="inverseBooleanConverter" />
+    <Page.Resources>
+        <converters:InverseBooleanConverter x:Key="inverseBooleanConverter" />
 
-    <DataTemplate x:Key="test1Template" x:DataType="vm:EntityViewModel">
-      <StackLayout Orientation="Horizontal">
-        <Label Text="{x:Bind DecimalProp}" />
-        <Label IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}" Text="{x:Bind BooleanProp}" />
-      </StackLayout>
-    </DataTemplate>
-  </Page.Resources>
+        <DataTemplate
+            x:Key="test1Template"
+            x:DataType="vm:EntityViewModel">
+            <StackLayout Orientation="Horizontal">
+                <Label Text="{x:Bind DecimalProp}" />
+                <Label
+                    IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
+                    Text="{x:Bind BooleanProp}" />
+            </StackLayout>
+        </DataTemplate>
+    </Page.Resources>
 
-  <StackLayout>
+    <StackLayout>
 
-    <Label Text="{x:Set local:Strings.Instance.Header1}" />
-    <Label IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
-           Text="{x:Bind DecimalProp.ToString('0.###')}"
-           TextColor="{x:Set Color.Aqua}" />
-    <CollectionView ItemTemplate="{StaticResource test1Template}" ItemsSource="{x:Bind ListProp}" />
+        <Label Text="{x:Set local:Strings.Instance.Header1}" />
+        <Label
+            IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
+            Text="{x:Bind DecimalProp.ToString('0.###')}"
+            TextColor="{x:Set Color.Aqua}" />
+        <CollectionView
+            ItemTemplate="{StaticResource test1Template}"
+            ItemsSource="{x:Bind ListProp}" />
 
-  </StackLayout>
+    </StackLayout>
 </ContentPage>

@@ -1,12 +1,10 @@
 ﻿<forms:WindowsPage
-    x:Class="XFTest.UWP.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:forms="using:Xamarin.Forms.Platform.UWP"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:forms="using:Xamarin.Forms.Platform.UWP"
     xmlns:local="using:XFTest.UWP"
+    x:Class="XFTest.UWP.MainPage"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-
-    </Grid>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" />
 </forms:WindowsPage>

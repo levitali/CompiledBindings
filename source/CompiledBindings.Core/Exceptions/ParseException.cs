@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public sealed class ParseException : Exception
 {

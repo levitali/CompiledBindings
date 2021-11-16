@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Mono.Cecil;
-using Mono.Cecil.Rocks;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 
@@ -259,9 +251,13 @@ public static class TypeInfoUtils
 			{
 				var t = i.ResolveEx();
 				if (t != null)
+				{
 					return t;
+				}
 				if (i.IsGenericInstance)
+				{
 					return i.GetElementType().ResolveEx();
+				}
 				return null;
 			}).Where(i => i != null).SelectMany(i => i!.Properties);
 		}

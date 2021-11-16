@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 
@@ -678,7 +673,7 @@ public class TypeofExpression : Expression
 
 public class FallbackExpression : Expression
 {
-	private string _localVarName;
+	private readonly string _localVarName;
 
 	public FallbackExpression(Expression expression, Expression fallbackExpression, Expression notNullExpression, string localVarName, TypeInfo type) : base(type)
 	{

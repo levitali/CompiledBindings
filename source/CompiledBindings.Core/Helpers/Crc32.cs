@@ -1,5 +1,7 @@
 ﻿using System.IO;
 
+#nullable enable
+
 namespace CompiledBindings;
 
 public static class Crc32

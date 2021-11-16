@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
-using Mono.Cecil;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 
@@ -320,7 +312,7 @@ public static class BindingParser
 
 		var notifyPropertyChangedList = binds
 			.Where(b => b.Property.TargetEvent == null &&
-			            b.SourceExpression != null &&
+						b.SourceExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
@@ -343,12 +335,14 @@ public static class BindingParser
 			.OrderBy(g => g.SourceExpression.ToString())
 			.ToList();
 
-		bool CheckPropertyNotifiable(MemberExpression expr) =>
-				expr.Member is PropertyInfo pi &&
-				!pi.Definition.IsStatic() &&
-				(iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
-					(dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
-				!pi.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute" && (bool)a.ConstructorArguments[0].Value == true);
+		bool CheckPropertyNotifiable(MemberExpression expr)
+		{
+			return expr.Member is PropertyInfo pi &&
+				   !pi.Definition.IsStatic() &&
+				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
+				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
+				   !pi.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute" && (bool)a.ConstructorArguments[0].Value == true);
+		}
 
 		for (int i = 0; i < notifyPropertyChangedList.Count; i++)
 		{
@@ -370,9 +364,13 @@ public static class BindingParser
 				static Expression GetSourceExpr(Expression expr)
 				{
 					if (expr is ParenExpression pe)
+					{
 						return GetSourceExpr(pe.Expression);
+					}
 					else if (expr is CastExpression ce)
+					{
 						return GetSourceExpr(ce.Expression);
+					}
 					return expr;
 				}
 			}

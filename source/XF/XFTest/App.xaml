@@ -1,13 +1,17 @@
-﻿<Application xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-              xmlns:local="global using:XFTest"
-             xmlns:vm="clr-namespace:XFTest.ViewModels"
-             x:Class="XFTest.App">
-  <Application.Resources>
-    <DataTemplate x:Key="EntityTemplate" x:DataType="vm:EntityViewModel">
-      <Grid>
-        <Label Text="{x:Bind BooleanProp}" />
-      </Grid>
-    </DataTemplate>
-  </Application.Resources>
+﻿<Application
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="global using:XFTest"
+    xmlns:vm="clr-namespace:XFTest.ViewModels"
+    x:Class="XFTest.App">
+    
+    <Application.Resources>
+        <DataTemplate
+            x:Key="EntityTemplate"
+            x:DataType="vm:EntityViewModel">
+            <Grid>
+                <Label Text="{x:Bind BooleanProp}" />
+            </Grid>
+        </DataTemplate>
+    </Application.Resources>
 </Application>

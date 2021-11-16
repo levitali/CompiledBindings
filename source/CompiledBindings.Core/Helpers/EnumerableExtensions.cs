@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 
@@ -82,7 +78,9 @@ public static class EnumerableExtensions
 	public static IEnumerable<T> SelectSequence<T>(T source, Func<T, T?> parentSelector, Func<T, bool> endDetector, bool includeThis)
 	{
 		if (includeThis)
+		{
 			yield return source;
+		}
 		var parent = parentSelector(source);
 		if (parent != null && !endDetector(parent))
 		{
@@ -97,7 +95,9 @@ public static class EnumerableExtensions
 		where T : class
 	{
 		if (includeRoot)
+		{
 			yield return root;
+		}
 		var children = selector(root);
 		if (children != null)
 		{
@@ -146,8 +146,8 @@ public static class EnumerableExtensions
 
 public class ComparisonEqualityComparer<T, TKey> : IEqualityComparer<T>
 {
-	private Func<TKey, TKey, bool> _predicate;
-	private Func<T, TKey> _keySelector;
+	private readonly Func<TKey, TKey, bool> _predicate;
+	private readonly Func<T, TKey> _keySelector;
 
 	public ComparisonEqualityComparer(Func<T, TKey> keySelector)
 	{

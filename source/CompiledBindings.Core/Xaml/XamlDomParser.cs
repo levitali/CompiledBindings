@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-
-#nullable enable
+﻿#nullable enable
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 namespace CompiledBindings;
@@ -500,7 +494,7 @@ public class XamlDomParser
 			if (objProp.TargetEvent != null)
 			{
 				var expr = value.BindValue?.Expression ?? value.StaticValue;
-				if (expr != null && 
+				if (expr != null &&
 					(expr is not MemberExpression me || me.Member is not MethodInfo) &&
 					(expr is not (CallExpression or InvokeExpression)))
 				{
