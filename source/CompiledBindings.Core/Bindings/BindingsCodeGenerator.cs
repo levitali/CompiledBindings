@@ -157,7 +157,7 @@ $@"			{targetClassName}_BindingsTrackings{nameSuffix} _bindingsTrackings;");
 		foreach (var binding in bindingsData.Bindings.Where(b => b.Property.TargetEvent != null))
 		{
 			output.AppendLine(
-$@"			global::{binding.Property.TargetEvent!.EventType.GetCSharpFullName()} _eventHandler{binding.Index};");
+$@"			global::{binding.Property.TargetEvent!.EventType.Type.GetCSharpFullName()} _eventHandler{binding.Index};");
 		}
 
 		// Generate flags for two-way bindings
@@ -263,7 +263,7 @@ $@"
 				}
 				else
 				{
-					targetExpr += "." + first.TargetChangedEvent!.Name;
+					targetExpr += "." + first.TargetChangedEvent!.Definition.Name;
 
 					output.AppendLine(
 $@"				{targetExpr} += OnTargetChanged{ev.Index};");
@@ -310,7 +310,7 @@ $@"					_generatedCodeDisposed.Cancel();");
 			}
 			else
 			{
-				targetExpr += "." + first.TargetChangedEvent!.Name;
+				targetExpr += "." + first.TargetChangedEvent!.Definition.Name;
 				output.AppendLine(
 $@"					{targetExpr} -= OnTargetChanged{ev.Index};");
 			}
@@ -423,7 +423,7 @@ $@"			}}");
 			else
 			{
 				output.AppendLine(
-$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].TargetChangedEvent!.GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.GetCSharpFullName()} p{i}"))})");
+$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].TargetChangedEvent!.Definition.GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.GetCSharpFullName()} p{i}"))})");
 			}
 
 			output.AppendLine(
@@ -431,7 +431,7 @@ $@"			{{
 				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
 				var targetRoot = _targetRoot;");
 
-			if (first.TargetChangedEvent?.Name == "PropertyChanged")
+			if (first.TargetChangedEvent?.Definition.Name == "PropertyChanged")
 			{
 				output.AppendLine(
 $@"				switch (p1.PropertyName)

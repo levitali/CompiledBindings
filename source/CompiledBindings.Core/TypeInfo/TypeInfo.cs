@@ -15,7 +15,7 @@ public class TypeInfo
 	private IList<PropertyInfo>? _properties;
 	private IList<FieldInfo>? _fields;
 	private IList<MethodInfo>? _methods;
-	private IList<EventDefinition>? _events;
+	private IList<EventInfo>? _events;
 	private readonly bool? _isNullable;
 	private readonly byte? _nullableContext;
 	private readonly byte[]? _nullabileFlags;
@@ -120,23 +120,18 @@ public class TypeInfo
 		}
 	}
 
-	public IList<MethodInfo> Methods
-	{
-		get
-		{
-			if (_methods == null)
-			{
-				_methods = Type.GetAllMethods()
-					.Select(m => new MethodInfo(m,
-						m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
-						GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
-					.ToList();
-			}
-			return _methods;
-		}
-	}
-
-	public IList<EventDefinition>? Events => _events ??= TypeInfoUtils.GetAllEvents(Type).ToList();
+	public IList<MethodInfo> Methods => _methods ??=
+		Type.GetAllMethods()
+			.Select(m => new MethodInfo(
+				m,
+				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
+				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
+			.ToList();
+	
+	public IList<EventInfo> Events => _events ??=
+		TypeInfoUtils.GetAllEvents(Type)
+		.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
+		.ToList();
 
 	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO!! nullablility in base type from this one
 
@@ -227,12 +222,6 @@ public class TypeInfo
 				}
 			}
 		}
-	}
-
-	public static (string ns, string className) SplitFullName(string fullName)
-	{
-		var parts = fullName.Split('.');
-		return (string.Join(".", parts.Take(parts.Length - 1)), parts.Last());
 	}
 
 	public override string ToString()

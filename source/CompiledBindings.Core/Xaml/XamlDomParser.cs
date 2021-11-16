@@ -392,7 +392,7 @@ public class XamlDomParser
 				}
 				else
 				{
-					var @event = obj.Type.Events.FirstOrDefault(e => e.Name == memberName);
+					var @event = obj.Type.Events.FirstOrDefault(e => e.Definition.Name == memberName);
 					if (@event != null)
 					{
 						objProp.TargetEvent = @event;

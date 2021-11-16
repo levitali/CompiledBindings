@@ -48,9 +48,9 @@ public class XamlObjectProperty
 
 	public PropertyInfo? TargetProperty { get; set; }
 	public MethodInfo? TargetMethod { get; set; }
-	public EventDefinition? TargetEvent { get; set; }
+	public EventInfo? TargetEvent { get; set; }
 
-	public TypeInfo MemberType => TargetMethod?.Parameters.Last().ParameterType ?? TargetProperty?.PropertyType ?? new TypeInfo(TargetEvent!.EventType);
+	public TypeInfo MemberType => TargetMethod?.Parameters.Last().ParameterType ?? TargetProperty?.PropertyType ?? TargetEvent!.EventType;
 
 	public HashSet<string> IncludeNamespaces { get; } = new HashSet<string>();
 }

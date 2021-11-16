@@ -34,7 +34,7 @@ public static class BindingParser
 		BindingMode? mode = null;
 		bool isItemsSource = false;
 		UpdateSourceTrigger updateSourceTrigger = UpdateSourceTrigger.Event;
-		EventDefinition? targetChangedEvent = null;
+		EventInfo? targetChangedEvent = null;
 		List<(string name, TypeInfo type)> resources = new();
 
 		// TODO! how to match optional comma and not include it in the group?
@@ -209,7 +209,7 @@ public static class BindingParser
 					}
 					else
 					{
-						targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Name == value);
+						targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == value);
 						if (targetChangedEvent == null)
 						{
 							throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.");
@@ -250,7 +250,7 @@ public static class BindingParser
 			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 			if (iNotifyPropChanged.IsAssignableFrom(prop.Object.Type))
 			{
-				targetChangedEvent = iNotifyPropChanged.Type.GetAllEvents().First();
+				targetChangedEvent = iNotifyPropChanged.Events.First();
 			}
 		}
 		// Note! It is not checked now whether an event is set for a not explicit two way binding.
@@ -511,7 +511,7 @@ public class Bind
 	public UpdateSourceTrigger? UpdateSourceTrigger { get; init; }
 	public TypeInfo? DataType { get; init; }
 	public bool DataTypeSet { get; init; }
-	public EventDefinition? TargetChangedEvent { get; set; }
+	public EventInfo? TargetChangedEvent { get; set; }
 	public List<(string name, TypeInfo type)> Resources { get; init; }
 
 	public Expression? SourceExpression { get; set; }
