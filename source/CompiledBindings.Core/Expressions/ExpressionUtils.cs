@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Rocks;
 
 namespace CompiledBindings;
 
@@ -35,7 +33,7 @@ public static class ExpressionUtils
 			{
 				if (type.Type.IsValueType)
 				{
-					type = new TypeInfo(TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type));
+					type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
 				}
 				else
 				{

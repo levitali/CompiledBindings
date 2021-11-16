@@ -1,57 +1,67 @@
-﻿<Page xmlns="http://xamarin.com/schemas/2014/forms"
-      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-      xmlns:local="clr-namespace:XFTest"
-      xmlns:m="http://compiledbindings.com"
-      xmlns:system="using:System"
-      xmlns:ui="using:UI"
-      xmlns:viewModels="using:XFTest.ViewModels"
-      xmlns:views="clr-namespace:XFTest.Views"
-      x:Name="pageRoot"
-      x:Class="XFTest.Views.Page1"
-      x:DataType="viewModels:Page1ViewModel"
-      Title="{x:Set local:Strings.Instance.Title}">
-  <Page.Resources>
-    <DataTemplate x:Key="test1Template" x:DataType="viewModels:EntityViewModel">
-      <Grid>
-        <Label Text="{x:Bind Model.SByteProp}" />
-        <Label Text="{x:Bind BooleanProp}" />
-      </Grid>
-    </DataTemplate>
-
-    <DataTemplate x:Key="testNestedDataTemplate">
-      <CollectionView>
-        <CollectionView.ItemTemplate>
-          <DataTemplate x:DataType="viewModels:EntityViewModel">
+﻿<Page
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:XFTest"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:system="using:System"
+    xmlns:ui="using:UI"
+    xmlns:viewModels="using:XFTest.ViewModels"
+    xmlns:views="clr-namespace:XFTest.Views"
+    x:Name="pageRoot"
+    x:Class="XFTest.Views.Page1"
+    x:DataType="viewModels:Page1ViewModel"
+    Title="{x:Set local:Strings.Instance.Title}">
+  
+    <Page.Resources>
+        <DataTemplate
+            x:Key="test1Template"
+            x:DataType="viewModels:EntityViewModel">
             <Grid>
-              <Label Text="{x:Bind BooleanProp}" />
+                <Label Text="{x:Bind Model.SByteProp}" />
+                <Label Text="{x:Bind BooleanProp}" />
             </Grid>
-          </DataTemplate>
-        </CollectionView.ItemTemplate>
-      </CollectionView>
-    </DataTemplate>
-  </Page.Resources>
-
-  <StackLayout>
-    <Label Text="{x:Set local:Strings.Instance.Header1}" />
-    <Label Text="{x:Bind DecimalProp}" TextColor="{x:Bind BooleanProp ? Green : Red}" />
-    <Label Text="{x:Bind DecimalProp + 1}" />
-    <Label Text="{x:Bind NullableIntProp ?? 0}" />
-    <Label Text="{x:Bind !BooleanProp}" />
-    <Entry IsFocused="{x:Bind FocusedField[Field1], Mode=OneWayToSource}"
-           Text="{x:Bind BooleanProp, BindBack=SetValue}"
-           m:SetFocused="{x:Bind FocusedField[Field1]}" />
-    <CollectionView x:Name="list"
-                    IsVisible="{x:Bind ArrayProp.Length > 0}"
-                    ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
-      <CollectionView.ItemTemplate>
-        <DataTemplate>
-          <Grid>
-            <Label Text="{x:Bind DecimalProp}" />
-          </Grid>
         </DataTemplate>
-      </CollectionView.ItemTemplate>
-    </CollectionView>
-    <Button x:DataType="{x:Null}" IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}" />
-  </StackLayout>
+
+        <DataTemplate x:Key="testNestedDataTemplate">
+            <CollectionView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:EntityViewModel">
+                        <Grid>
+                            <Label Text="{x:Bind BooleanProp}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </DataTemplate>
+    </Page.Resources>
+
+    <StackLayout>
+        <Label Text="{x:Set local:Strings.Instance.Header1}" />
+        <Label
+            Text="{x:Bind DecimalProp}"
+            TextColor="{x:Bind BooleanProp ? Green : Red}" />
+        <Label Text="{x:Bind DecimalProp + 1}" />
+        <Label Text="{x:Bind NullableIntProp ?? 0}" />
+        <Label Text="{x:Bind !BooleanProp}" />
+        <Entry
+            IsFocused="{x:Bind FocusedField[Field1], Mode=OneWayToSource}"
+            Text="{x:Bind BooleanProp, BindBack=SetValue}"
+            m:SetFocused="{x:Bind FocusedField[Field1]}" />
+        <CollectionView
+            x:Name="list"
+            IsVisible="{x:Bind ArrayProp.Length > 0}"
+            ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Label Text="{x:Bind DecimalProp}" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button
+            x:DataType="{x:Null}"
+            IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}" />
+    </StackLayout>
 
 </Page>

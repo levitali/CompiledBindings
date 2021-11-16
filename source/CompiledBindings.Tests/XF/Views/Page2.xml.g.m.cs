@@ -139,26 +139,10 @@ namespace XFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource1 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
-					if (_propertyChangeSource2 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource2).PropertyChanged -= OnPropertyChanged2;
-						_propertyChangeSource2 = null;
-					}
-					if (_propertyChangeSource3 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource3).PropertyChanged -= OnPropertyChanged3;
-						_propertyChangeSource3 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
+					SetPropertyChangedEventHandler2(null);
+					SetPropertyChangedEventHandler3(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.Page2ViewModel value)

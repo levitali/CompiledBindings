@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net5.0-windows;net461</TargetFrameworks>
+    <TargetFrameworks>net6.0-windows;net461</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -18,9 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj">
-      <Private>false</Private>
-    </ProjectReference>
+    <Reference Include="CompiledBindings" Condition="'$(TargetFramework)'=='net6.0-windows'">
+      <HintPath>..\..\..\bin\netcoreapp3.0\CompiledBindings.dll</HintPath>
+    </Reference>
+    <Reference Include="CompiledBindings" Condition="'$(TargetFramework)'=='net461'">
+      <HintPath>..\..\..\bin\net40\CompiledBindings.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

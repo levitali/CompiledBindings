@@ -1,32 +1,35 @@
-﻿<Page xmlns="http://xamarin.com/schemas/2014/forms"
-      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-      xmlns:extensions="using:XFTest.Extensions"
-      xmlns:local="clr-namespace:XFTest"
-      xmlns:m="http://compiledbindings.com"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:mx="http://compiledbindings.com/x"
-      xmlns:test="using:Test"
-      xmlns:viewModels="using:XFTest.ViewModels"
-      xmlns:views="clr-namespace:XFTest.Views"
-      mc:Ignorable="m mx"
-      x:Class="XFTest.Views.Page2"
-      x:DataType="views:Page2">
+﻿<Page
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:extensions="using:XFTest.Extensions"
+    xmlns:local="clr-namespace:XFTest"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mx="http://compiledbindings.com/x"
+    xmlns:test="using:Test"
+    xmlns:viewModels="using:XFTest.ViewModels"
+    xmlns:views="clr-namespace:XFTest.Views"
+    mc:Ignorable="m mx"
+    x:Class="XFTest.Views.Page2"
+    x:DataType="views:Page2">
 
-  <Page.Resources>
-    <test:SomeConverter x:Key="someConverter" />
-  </Page.Resources>
+    <Page.Resources>
+        <test:SomeConverter x:Key="someConverter" />
+    </Page.Resources>
 
-  <StackLayout>
-    <Label Text="{x:Bind _viewModel.CurrentItem.GuidProp}" />
-    <Label Text="{x:Bind _viewModel.StringProp, Converter={StaticResource someConverter}, ConverterParameter=_viewModel.DecimalProp + 1}" />
-    <Label Text="{x:Bind _viewModel.CalculateString().TrimNumber()}" />
-    <Label Text="{x:Bind _viewModel.FuncProp('test').GuidProp}" />
-    <Label Text="{x:Bind Path=_viewModel.FuncProp('test').GuidProp}" />
-    <Label Text="{x:Bind _viewModel.Group[0].GuidProp}" />
-    <Label Text="{x:Set test:BarcodeKeys.HU + ',' + test:BarcodeKeys.Batch}" />
-    <Label FontFamily="{x:Bind _viewModel.GetIcon().fontFamily}" Text="{x:Bind _viewModel.GetIcon().glyph}" />
+    <StackLayout>
+        <Label Text="{x:Bind _viewModel.CurrentItem.GuidProp}" />
+        <Label Text="{x:Bind _viewModel.StringProp, Converter={StaticResource someConverter}, ConverterParameter=_viewModel.DecimalProp + 1}" />
+        <Label Text="{x:Bind _viewModel.CalculateString().TrimNumber()}" />
+        <Label Text="{x:Bind _viewModel.FuncProp('test').GuidProp}" />
+        <Label Text="{x:Bind Path=_viewModel.FuncProp('test').GuidProp}" />
+        <Label Text="{x:Bind _viewModel.Group[0].GuidProp}" />
+        <Label Text="{x:Set test:BarcodeKeys.HU + ',' + test:BarcodeKeys.Batch}" />
+        <Label
+            FontFamily="{x:Bind _viewModel.GetIcon().fontFamily}"
+            Text="{x:Bind _viewModel.GetIcon().glyph}" />
 
-    <Button Clicked="{x:Set OnClicked}" />
-  </StackLayout>
+        <Button Clicked="{x:Set OnClicked}" />
+    </StackLayout>
 
 </Page>

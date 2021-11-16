@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Mono.Cecil;
-using Mono.Cecil.Rocks;
 
 #nullable enable
 
@@ -297,7 +295,7 @@ public class BinaryExpression : Expression
 		{
 			if (!type.Type.IsValueNullable())
 			{
-				type = new TypeInfo(TypeInfo.GetTypeThrow("System.Nullable`1").Type.MakeGenericInstanceType(type.Type));
+				type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
 			}
 		}
 		return type;

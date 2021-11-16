@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
 
 #nullable enable
 
@@ -85,37 +84,7 @@ public class XamlCodeGenerator
 				{
 					wrap = true;
 				}
-				var ae = expression.EnumerateTree().Reverse().OfType<IAccessExpression>().FirstOrDefault();
-				bool isNullable = ae.Expression.IsNullable;
-				bool isParameterExpr = ae.Expression is ParameterExpression;
-				string? a2 = a;
-				string valueVar = isParameterExpr ? ae.Expression.ToString() : "value" + localVarIndex++;
 
-				if (property.Value.BindValue != null)
-				{
-					output.AppendLine(
-$@"{a}			if ({bindingsAccess}_eventHandler{property.Value.BindValue.Index} != null)
-{a}			{{
-{a}				{setExpr} -= {bindingsAccess}_eventHandler{property.Value.BindValue.Index};
-{a}				{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = null;
-{a}			}}");
-				}
-
-				if (isNullable)
-				{
-					if (!isParameterExpr)
-					{
-						output.AppendLine(
-$@"{a}			var {valueVar} = {ae.Expression};");
-					}
-
-					output.AppendLine(
-$@"{a}			if ({valueVar} != null)
-{a}			{{");
-
-					value = $"{valueVar}.{ae.CloneReplaceExpression(new ParameterExpression(new TypeInfo(expression.Type, false), valueVar))}";
-					a2 += "\t";
-				}
 				if (wrap)
 				{
 					value = $"({string.Join(", ", Enumerable.Range(1, types.Count).Select(i => "p" + i))}) => {value}";
@@ -124,19 +93,13 @@ $@"{a}			if ({valueVar} != null)
 				if (property.Value.BindValue != null)
 				{
 					output.AppendLine(
-$@"{a2}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
-{a2}			{setExpr} += {bindingsAccess}_eventHandler{property.Value.BindValue.Index};");
+$@"{a}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
+{a}			{setExpr} += {bindingsAccess}_eventHandler{property.Value.BindValue.Index};");
 				}
 				else
 				{
 					output.AppendLine(
-$@"{a2}			{setExpr} += {value};");
-				}
-
-				if (isNullable)
-				{
-					output.AppendLine(
-$@"{a}			}}");
+$@"{a}			{setExpr} += {value};");
 				}
 			}
 			else
@@ -240,33 +203,6 @@ $@"{a}					var value = await {value};
 			{
 				output.AppendLine(
 $@"{a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
-			}
-		}
-	}
-
-	public void GenerateUnsetEventHandler(StringBuilder output, XamlObjectProperty property)
-	{
-		if (property.Value.CSharpValue != null && property.TargetEvent != null)
-		{
-			string? setExpr = property.Object.Name;
-			if (setExpr != null)
-			{
-				setExpr += ".";
-			}
-			setExpr += property.MemberName;
-
-			if (property.Object.Name != null)
-			{
-				output.AppendLine(
-$@"			if ({property.Object.Name} != null)
-			{{");
-			}
-			output.AppendLine(
-$@"				{setExpr} -= {property.Value.CSharpValue};");
-			if (property.Object.Name != null)
-			{
-				output.AppendLine(
-$@"			}}");
 			}
 		}
 	}

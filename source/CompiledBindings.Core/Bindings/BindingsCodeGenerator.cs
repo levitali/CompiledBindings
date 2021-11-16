@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using Mono.Cecil;
 
 #nullable enable
 
@@ -11,90 +10,6 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 {
 	public BindingsCodeGenerator(string langVersion) : base(langVersion)
 	{
-	}
-
-	public void GenerateCode(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
-	{
-		if (targetClassName == null)
-		{
-			targetClassName = bindingsData.TargetRootType!.Type.Name;
-			targetNamespace = bindingsData.TargetRootType!.Type.Namespace;
-		}
-
-		#region Namespace Begin
-
-		if (targetNamespace != null)
-		{
-			output.AppendLine(
-$@"namespace {targetNamespace}
-{{");
-		}
-
-		#endregion
-
-		#region Usings
-
-		output.AppendLine(
-$@"	using System;
-	using System.ComponentModel;
-	using System.Globalization;
-	using System.Threading;");
-
-		foreach (string ns in bindingsData.Bindings.SelectMany(b => b.Property.IncludeNamespaces).Distinct())
-		{
-			output.AppendLine(
-$@"	using {ns};");
-		}
-
-		#endregion
-
-		#region Parent Class Begin
-
-		if (declaringType != null)
-		{
-			output.AppendLine(
-$@"	
-	partial class {declaringType}
-	{{");
-		}
-
-		output.AppendLine();
-
-		if (generateCodeAttr)
-		{
-			output.AppendLine(
-$@"	[System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]");
-		}
-
-		output.AppendLine(
-$@"	partial class {targetClassName}
-	{{");
-
-		#endregion
-
-		GenerateBindingsClass(output, bindingsData, targetNamespace, targetClassName, declaringType, nameSuffix, @interface, generateCodeAttr);
-
-		#region Parent Class End
-
-		if (declaringType != null)
-		{
-			output.AppendLine(
-$@"	}}");
-		}
-
-		output.AppendLine(
-$@"	}}");
-		#endregion
-
-		#region Namespace End
-
-		if (targetNamespace != null)
-		{
-			output.AppendLine(
-$@"}}");
-		}
-
-		#endregion
 	}
 
 	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
@@ -235,6 +150,18 @@ $@"				_bindingsTrackings = new {targetClassName}_BindingsTrackings{nameSuffix}(
 $@"
 				Update();");
 
+		// Generate code of event bindings
+		var eventBindings = bindingsData.Bindings.Where(b => b.Property.TargetEvent != null).ToList();
+		if (eventBindings.Count > 0)
+		{
+			int dummyLocalVar = 0, dummyLocalFunc = 0;
+			output.AppendLine();
+			foreach (var binding in eventBindings)
+			{
+				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", null, ref dummyLocalVar, ref dummyLocalFunc, "\t");
+			}
+		}
+
 		// Generate setting PropertyChanged event handler for data root
 		if (rootGroup != null)
 		{
@@ -326,11 +253,8 @@ $@"					{targetExpr} -= OnTargetChanged{ev.Index};");
 			}
 			targetExpr += $".{binding.Property.MemberName}";
 			output.AppendLine(
-$@"					if (_eventHandler{binding.Index} != null)
-					{{
-						{targetExpr} -= _eventHandler{binding.Index};
-						_eventHandler{binding.Index} = null;
-					}}");
+$@"					{targetExpr} -= _eventHandler{binding.Index};
+					_eventHandler{binding.Index} = null;");
 		}
 
 		if (bindingsData.NotifyPropertyChangedList.Count > 0)
@@ -515,12 +439,7 @@ $@"
 			foreach (var group in bindingsData.NotifyPropertyChangedList)
 			{
 				output.AppendLine(
-$@"					if (_propertyChangeSource{group.Index} != null)
-					{{");
-				GenerateUnsetPropertyChangedEventHandler(group, $"_propertyChangeSource{group.Index}", "\t");
-				output.AppendLine(
-$@"						_propertyChangeSource{group.Index} = null;
-					}}");
+$@"					SetPropertyChangedEventHandler{group.Index}(null);");
 			}
 
 			// Close the Cleanup method
@@ -815,58 +734,6 @@ $@"{a}					{expression} = {setExpr};");
 		}
 
 		#endregion
-	}
-
-	public void GenerateBindingsInterface(StringBuilder output, string dataTypeFullName, string? targetClassName = null, string? targetNamespace = null, string? declaringType = null, string? nameSuffix = null)
-	{
-		string? dataTypeParam = null;
-		if (dataTypeFullName != null)
-		{
-			dataTypeParam = $", global::{dataTypeFullName} dataRoot";
-		}
-
-		if (targetNamespace != null)
-		{
-			output.AppendLine(
-$@"namespace {targetNamespace}
-{{");
-		}
-
-
-		if (declaringType != null)
-		{
-			output.AppendLine(
-$@"	
-	partial class {declaringType}
-	{{");
-		}
-
-		output.AppendLine(
-$@"	
-	partial class {targetClassName}
-	{{
-		private I{targetClassName}_Bindings{nameSuffix} Bindings{nameSuffix};
-
-		interface I{targetClassName}_Bindings{nameSuffix}
-		{{
-			void Initialize({targetClassName} targetRoot{dataTypeParam});
-			void Update();
-			void Cleanup();
-			void UpdateSourceOfExplicitTwoWayBindings();
-		}}
-	}}");
-
-		if (declaringType != null)
-		{
-			output.AppendLine(
-$@"	}}");
-		}
-
-		if (targetNamespace != null)
-		{
-			output.AppendLine(
-$@"}}");
-		}
 	}
 
 	protected virtual void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)

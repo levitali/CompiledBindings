@@ -18,7 +18,7 @@ public class MainViewModel : INotifyPropertyChanged
 
 	public bool BooleanProp { get; set; }
 
-	public Pag1ModifyViewModel? ModifyViewModel { get; }
+	public Pag1ModifyViewModel? ModifyViewModel { get; } = new Pag1ModifyViewModel();
 
 	public Task<string> TaskProp => Task.FromResult(string.Empty);
 
@@ -51,6 +51,10 @@ public class Pag1ModifyViewModel
 {
 	public string? Input1 { get; set; }
 	public string? Input2 { get; set; }
+
+	public void OnClick(object parameter)
+	{
+	}
 }
 
 public class EntityViewModel : INotifyPropertyChanged

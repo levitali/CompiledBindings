@@ -319,7 +319,9 @@ public static class BindingParser
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
 		var notifyPropertyChangedList = binds
-			.Where(b => b.SourceExpression != null && b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
+			.Where(b => b.Property.TargetEvent == null &&
+			            b.SourceExpression != null &&
+						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
 			.GroupBy(e => e.expr.Expression.ToString())
@@ -419,7 +421,7 @@ public static class BindingParser
 			.ToList();
 
 		var props1 = binds
-			.Where(b => b.Mode != BindingMode.OneWayToSource)
+			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!)).ToList();
 
 		var props2 = new List<PropertySetExpressionBase>();

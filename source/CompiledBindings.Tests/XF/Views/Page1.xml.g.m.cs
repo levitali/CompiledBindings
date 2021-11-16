@@ -123,16 +123,8 @@ namespace XFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource1 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
@@ -345,11 +337,7 @@ namespace XFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.Page1ViewModel value)
@@ -551,16 +539,8 @@ namespace XFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource1 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
@@ -751,11 +731,7 @@ namespace XFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
@@ -899,11 +875,7 @@ namespace XFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)

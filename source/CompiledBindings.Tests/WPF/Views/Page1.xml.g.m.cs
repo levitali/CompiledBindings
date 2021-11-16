@@ -130,19 +130,8 @@ namespace WPFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource1 != null)
-					{
-						global::System.ComponentModel.DependencyPropertyDescriptor
-							.FromProperty(
-								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
-							.RemoveValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
-						_propertyChangeSource1 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.Page1ViewModel value)
@@ -240,6 +229,7 @@ namespace WPFTest.Views
 			Page1 _targetRoot;
 			global::WPFTest.ViewModels.Page1ViewModel _dataRoot;
 			Page1_BindingsTrackings_this _bindingsTrackings;
+			global::System.Windows.RoutedEventHandler _eventHandler12;
 			bool _settingBinding4;
 			bool _settingBinding5;
 			CancellationTokenSource _generatedCodeDisposed;
@@ -259,6 +249,9 @@ namespace WPFTest.Views
 				_bindingsTrackings = new Page1_BindingsTrackings_this(this);
 
 				Update();
+
+				_eventHandler12 = (p1, p2) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
+				_targetRoot.button1.Click += _eventHandler12;
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 
@@ -285,6 +278,8 @@ namespace WPFTest.Views
 						.FromProperty(
 							global::System.Windows.Controls.CheckBox.IsCheckedProperty, typeof(global::System.Windows.Controls.CheckBox))
 						.RemoveValueChanged(_targetRoot.checkBox1, OnTargetChanged1);
+					_targetRoot.button1.Click -= _eventHandler12;
+					_eventHandler12 = null;
 					_bindingsTrackings.Cleanup();
 					_dataRoot = null;
 					_targetRoot = null;
@@ -301,14 +296,14 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				var bindings = this;
-				var value1 = dataRoot.ArrayProp?.Length > 0;
-				var value2 = dataRoot.BooleanProp;
-				var value3 = dataRoot.DecimalProp;
-				var value4 = dataRoot.ModifyViewModel;
-				targetRoot.header1.Visibility = (value2 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
-				targetRoot.textBlock5.Visibility = ((global::System.Windows.Visibility)targetRoot.TrueToVisibleConverter.Convert(value2, typeof(global::System.Windows.Visibility), null, null));
-				targetRoot.textBlock5.Text = value3.ToString();
-				targetRoot.textBlock6.Text = (value3 + 1).ToString();
+				var value1 = dataRoot.ModifyViewModel;
+				var value2 = dataRoot.ArrayProp.Length > 0;
+				var value3 = dataRoot.BooleanProp;
+				var value4 = dataRoot.DecimalProp;
+				targetRoot.header1.Visibility = (value3 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
+				targetRoot.textBlock5.Text = value4.ToString();
+				targetRoot.textBlock5.Visibility = ((global::System.Windows.Visibility)targetRoot.TrueToVisibleConverter.Convert(value3, typeof(global::System.Windows.Visibility), null, null));
+				targetRoot.textBlock6.Text = (value4 + 1).ToString();
 				if (!_settingBinding4)
 				{
 					var value5 = dataRoot.OrderInput;
@@ -319,16 +314,16 @@ namespace WPFTest.Views
 				}
 				if (!_settingBinding5)
 				{
-					var value6 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
+					var value6 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value2, null));
 					if (!object.Equals(targetRoot.checkBox1.IsChecked, value6))
 					{
 						targetRoot.checkBox1.IsChecked = value6;
 					}
 				}
 				targetRoot.listView.ItemsSource = dataRoot.ListProp;
-				targetRoot.listView.SetVisible(value1);
+				targetRoot.listView.SetVisible(value2);
 				targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
-				targetRoot.textBlock8.Text = value4?.Input1 ?? "aaa";
+				targetRoot.textBlock8.Text = value1?.Input1 ?? "aaa";
 				Set0(bindings._generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
 				{
@@ -365,6 +360,7 @@ namespace WPFTest.Views
 					}
 				}
 
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
 			private void OnTargetChanged0(object sender, global::System.EventArgs e)
@@ -397,7 +393,7 @@ namespace WPFTest.Views
 					_settingBinding5 = true;
 					try
 					{
-						dataRoot.BoolInput = (global::System.Boolean)targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp?.Length > 0, null);
+						dataRoot.BoolInput = (global::System.Boolean)targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
 					}
 					catch
 					{
@@ -413,6 +409,7 @@ namespace WPFTest.Views
 			{
 				global::System.WeakReference _bindingsWeakRef;
 				global::WPFTest.ViewModels.Page1ViewModel _propertyChangeSource0;
+				global::WPFTest.ViewModels.Pag1ModifyViewModel _propertyChangeSource1;
 
 				public Page1_BindingsTrackings_this(Page1_Bindings_this bindings)
 				{
@@ -421,11 +418,8 @@ namespace WPFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.Page1ViewModel value)
@@ -439,6 +433,20 @@ namespace WPFTest.Views
 					{
 						_propertyChangeSource0 = value;
 						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
+					}
+				}
+
+				public void SetPropertyChangedEventHandler1(global::WPFTest.ViewModels.Pag1ModifyViewModel value)
+				{
+					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
+					{
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
+						_propertyChangeSource1 = null;
+					}
+					if (_propertyChangeSource1 == null && value != null)
+					{
+						_propertyChangeSource1 = value;
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged += OnPropertyChanged1;
 					}
 				}
 
@@ -494,7 +502,7 @@ namespace WPFTest.Views
 					{
 						if (!bindings._settingBinding5)
 						{
-							var value1 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(typedSender.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp?.Length > 0, null));
+							var value1 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(typedSender.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
 							if (!object.Equals(targetRoot.checkBox1.IsChecked, value1))
 							{
 								targetRoot.checkBox1.IsChecked = value1;
@@ -507,7 +515,7 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "ArrayProp")
 					{
-						var value1 = typedSender.ArrayProp?.Length > 0;
+						var value1 = typedSender.ArrayProp.Length > 0;
 						if (!bindings._settingBinding5)
 						{
 							var value2 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
@@ -535,6 +543,7 @@ namespace WPFTest.Views
 						var value1 = typedSender.ModifyViewModel;
 						targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
 						targetRoot.textBlock8.Text = value1?.Input1 ?? "aaa";
+						SetPropertyChangedEventHandler1(value1);
 						if (!notifyAll)
 						{
 							return;
@@ -562,6 +571,29 @@ namespace WPFTest.Views
 							{
 							}
 						}
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+				}
+
+				private void OnPropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				{
+					var bindings = TryGetBindings();
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var targetRoot = bindings._targetRoot;
+					var dataRoot = bindings._dataRoot;
+					var typedSender = (global::WPFTest.ViewModels.Pag1ModifyViewModel)sender;
+					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
+
+					if (notifyAll || e.PropertyName == "Input1")
+					{
+						targetRoot.textBlock8.Text = typedSender.Input1 ?? "aaa";
 						if (!notifyAll)
 						{
 							return;
@@ -667,7 +699,7 @@ namespace WPFTest.Views
 				var dataRoot = _dataRoot;
 				var value1 = dataRoot.BooleanProp;
 				var value2 = dataRoot.Model;
-				targetRoot.textBlock1.Text = value2?.SByteProp.ToString();
+				targetRoot.textBlock1.Text = value2.SByteProp.ToString();
 				targetRoot.textBlock2.Text = value1.ToString();
 				targetRoot.textBlock3.IsEnabled = ((global::System.Boolean)targetRoot.InverseBooleanConverter.Convert(value1, typeof(global::System.Boolean), null, null));
 
@@ -687,16 +719,8 @@ namespace WPFTest.Views
 
 				public void Cleanup()
 				{
-					if (_propertyChangeSource0 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource1 != null)
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
 				}
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
@@ -743,7 +767,7 @@ namespace WPFTest.Views
 					if (notifyAll || e.PropertyName == "Model")
 					{
 						var value1 = typedSender.Model;
-						targetRoot.textBlock1.Text = value1?.SByteProp.ToString();
+						targetRoot.textBlock1.Text = value1.SByteProp.ToString();
 						SetPropertyChangedEventHandler1(value1);
 						if (!notifyAll)
 						{

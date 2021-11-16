@@ -5,9 +5,11 @@ using System.Windows.Media;
 
 namespace WPFTest.ViewModels;
 
+#nullable enable
+
 public class Page1ViewModel : INotifyPropertyChanged
 {
-	public string OrderInput { get; set; }
+	public string? OrderInput { get; set; }
 
 	public bool BoolInput { get; set; }
 
@@ -18,28 +20,28 @@ public class Page1ViewModel : INotifyPropertyChanged
 	public Pag1ModifyViewModel? ModifyViewModel { get; }
 
 	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
-		{
-			new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
-		};
+	{
+		new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
+	};
 
 	public int[] ArrayProp { get; }
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public Task<string> TaskProp => Task.FromResult(string.Empty);
 
-	public Task<ImageSource> LoadImageAsync() => null;
+	public Task<ImageSource> LoadImageAsync() => null!;
 }
 
-public class Pag1ModifyViewModel// : INotifyPropertyChanged
+public class Pag1ModifyViewModel : INotifyPropertyChanged
 {
-	public string Input1 { get; set; }
+	public string? Input1 { get; set; }
 
 	public void OnClick(bool parameter)
 	{
 	}
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 }
 
 public class EntityViewModel : INotifyPropertyChanged
@@ -50,12 +52,12 @@ public class EntityViewModel : INotifyPropertyChanged
 
 	public bool BooleanProp { get; set; }
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 }
 
 public class EntityModel : INotifyPropertyChanged
 {
 	public sbyte SByteProp { get; set; }
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 }

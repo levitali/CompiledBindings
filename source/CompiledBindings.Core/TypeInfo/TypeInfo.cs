@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mono.Cecil;
+using Mono.Cecil.Rocks;
 
 #nullable enable
 
@@ -34,7 +35,7 @@ public class TypeInfo
 		_isNullable = isNullable;
 	}
 
-	public TypeInfo(TypeReference type)
+	private TypeInfo(TypeReference type)
 	{
 		Type = type;
 		_nullableContext = GetNullableContext(type);
@@ -222,6 +223,13 @@ public class TypeInfo
 				}
 			}
 		}
+	}
+
+	public TypeInfo MakeGenericInstanceType(params TypeInfo[] arguments)
+	{
+		var typeRef = Type.MakeGenericInstanceType(arguments.Select(a => a.Type).ToArray());
+		var typeInfo = new TypeInfo(typeRef, null, _nullabileFlags, _nullableContext);
+		return typeInfo;
 	}
 
 	public override string ToString()

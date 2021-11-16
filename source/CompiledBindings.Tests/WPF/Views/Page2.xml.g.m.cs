@@ -15,6 +15,7 @@ namespace WPFTest.Views
 
 			_generatedCodeInitialized = true;
 
+			button2.Click += (p1, p2) => this.OnClick2();
 
 			Bindings_.Initialize(this);
 		}
@@ -32,6 +33,7 @@ namespace WPFTest.Views
 		class Page2_Bindings_
 		{
 			Page2 _targetRoot;
+			global::System.Windows.RoutedEventHandler _eventHandler2;
 			CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page2 dataRoot)
@@ -45,6 +47,9 @@ namespace WPFTest.Views
 				_generatedCodeDisposed = new CancellationTokenSource();
 
 				Update();
+
+				_eventHandler2 = dataRoot.OnClick1;
+				_targetRoot.button1.Click += _eventHandler2;
 			}
 
 			public void Cleanup()
@@ -52,6 +57,8 @@ namespace WPFTest.Views
 				if (_targetRoot != null)
 				{
 					_generatedCodeDisposed.Cancel();
+					_targetRoot.button1.Click -= _eventHandler2;
+					_eventHandler2 = null;
 					_targetRoot = null;
 				}
 			}

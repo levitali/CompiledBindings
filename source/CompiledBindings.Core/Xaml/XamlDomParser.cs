@@ -500,7 +500,9 @@ public class XamlDomParser
 			if (objProp.TargetEvent != null)
 			{
 				var expr = value.BindValue?.Expression ?? value.StaticValue;
-				if (expr != null && (expr is not MemberExpression me || me.Member is not MethodInfo))
+				if (expr != null && 
+					(expr is not MemberExpression me || me.Member is not MethodInfo) &&
+					(expr is not (CallExpression or InvokeExpression)))
 				{
 					throw new GeneratorException($"Expression type must be a method.", xamlNode);
 				}
