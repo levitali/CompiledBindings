@@ -27,7 +27,7 @@ public class ExpressionTests
 		Expression result;
 		IList<XamlNamespace> dummyNamespaces;
 		int dummyPos;
-		
+
 		expression = "(ListProp.Count - NullIntProp).ToString() ?? '-'";
 		expectedCode = "(dataRoot.ListProp?.Count - dataRoot.NullIntProp)?.ToString() ?? \"-\"";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out dummyNamespaces, out dummyPos);
@@ -52,7 +52,7 @@ public class ExpressionTests
 		expectedCode = "dataRoot.FuncProp()";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.AreEqual(result.ToString(), expectedCode);
-		
+
 		expression = "FuncProp2('test').GuidProp";
 		expectedCode = "dataRoot.FuncProp2?.Invoke(\"test\")?.GuidProp";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
@@ -60,6 +60,11 @@ public class ExpressionTests
 
 		expression = "local:Class1.Method1(typeof(local:Class2))";
 		expectedCode = "CompiledBindings.Tests.Class1.Method1(typeof(global::CompiledBindings.Tests.Class2))";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
+		Assert.AreEqual(result.ToString(), expectedCode);
+
+		expression = "NullDateTimeProp.ToString('g')";
+		expectedCode = "dataRoot.NullDateTimeProp?.ToString(\"g\")";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.AreEqual(result.ToString(), expectedCode);
 	}

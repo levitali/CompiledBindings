@@ -14,5 +14,9 @@ partial class Page1
 	public string? Title { get; set; }
 
 	private CollectionView list;
+
+	public void Save()
+	{
+	}
 }
 

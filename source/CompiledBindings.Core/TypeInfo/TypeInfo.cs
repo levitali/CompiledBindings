@@ -59,7 +59,7 @@ public class TypeInfo
 
 	public TypeReference Type { get; }
 
-	public bool IsNullable => _isNullable != false && Type.IsNullable();
+	public bool IsNullable => Type.IsValueNullable() || (_isNullable != false && !Type.IsValueType);
 
 	public IList<PropertyInfo> Properties
 	{

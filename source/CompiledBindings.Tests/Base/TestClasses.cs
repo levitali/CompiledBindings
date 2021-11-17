@@ -18,7 +18,9 @@ public class Class1
 
 	public bool? NullBoolProp { get; set; }
 
-	public Func<int> FuncProp { get; set; }
+	public DateTime? NullDateTimeProp { get; set; }
+
+	public Func<int> FuncProp { get; set; } = null!;
 
 	public Func<string, ItemViewModel?>? FuncProp2 { get; set; }
 

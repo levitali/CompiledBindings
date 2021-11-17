@@ -35,6 +35,7 @@ namespace XFTest.Views
 			var value1 = XFTest.Strings.Instance;
 			Title = value1.Title;
 			label4.Text = value1.Header1;
+			button1.Clicked += (p1, p2) => this.Save();
 
 			Bindings_.Initialize(this);
 			this.BindingContextChanged += this_BindingContextChanged;
@@ -397,7 +398,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "NullableIntProp")
 					{
-						targetRoot.label7.Text = (typedSender.NullableIntProp).ToString();
+						targetRoot.label7.Text = (typedSender.NullableIntProp ?? 0).ToString();
 						if (!notifyAll)
 						{
 							return;

@@ -376,17 +376,17 @@ public class ExpressionParser
 		{
 			if (i >= parameters.Count)
 			{
-				ParameterDefinition pd;
-				if (i == 0 || !(pd = parameters[parameters.Count - 1].Definition).CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+				ParameterInfo pi;
+				if (i == 0 || !(pi = parameters[parameters.Count - 1]).Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
 				{
 					throw new InvalidProgramException();
 				}
-				if (!pd.ParameterType.IsArray)
+				if (!pi.ParameterType.Type.IsArray)
 				{
 					throw new InvalidProgramException();
 				}
 
-				bool isNullable = pd.ParameterType.GetElementType().IsNullable();
+				bool isNullable = pi.ParameterType.GetElementType()!.IsNullable;
 				for (; i < args.Length; i++)
 				{
 					if (isNullable && args[i].IsNullable)
@@ -396,7 +396,7 @@ public class ExpressionParser
 				}
 				break;
 			}
-			else if (!parameters[i].ParameterType.Type.IsNullable() && args[i].IsNullable)
+			else if (!parameters[i].ParameterType.IsNullable && args[i].IsNullable)
 			{
 				args[i] = new CoalesceExpression(args[i], Expression.DefaultExpression);
 			}
@@ -701,7 +701,7 @@ public class ExpressionParser
 				if (method2 != null)
 				{
 					member = method2;
-					memberType = TypeInfo.GetTypeThrow(typeof(Delegate));
+					memberType = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Delegate)), false);
 				}
 				else
 				{

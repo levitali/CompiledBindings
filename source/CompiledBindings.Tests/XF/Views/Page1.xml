@@ -61,7 +61,8 @@
         </CollectionView>
         <Button
             x:DataType="{x:Null}"
-            IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}" />
+            IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}"
+            Clicked="{x:Set Save}"/>
     </StackLayout>
 
 </Page>
