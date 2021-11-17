@@ -442,7 +442,7 @@ public class NewExpression : Expression
 
 public class TypeExpression : Expression
 {
-	public TypeExpression(TypeInfo type) : base(type) //TODO actually the ExpressionType is TypeInfo.GetType("System.Type")
+	public TypeExpression(TypeInfo type) : base(type) //TODO actually the ExpressionType is TypeInfo.GetTypeThrow("System.Type")
 	{
 	}
 

@@ -19,8 +19,8 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public HashSet<string>? UsedNames { get; private set; }
 
-	public SimpleXamlDomParser(XNamespace xmlns, XNamespace xNs, Func<string, IEnumerable<string>> getClrNsFromXmlNs)
-		: base(xmlns, xNs, getClrNsFromXmlNs)
+	public SimpleXamlDomParser(XNamespace xmlns, XNamespace xNs, Func<string, IEnumerable<string>> getClrNsFromXmlNs, TypeInfo converterType)
+		: base(xmlns, xNs, getClrNsFromXmlNs, converterType)
 	{
 		DataTemplate = DefaultNamespace + "DataTemplate";
 	}

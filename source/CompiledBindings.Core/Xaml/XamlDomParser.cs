@@ -12,15 +12,15 @@ public class XamlDomParser
 	private readonly XName xSet;
 	private readonly XName xNull;
 	private readonly XName xType;
-	private readonly XName xFieldModifier;
 
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
-	public XamlDomParser(XNamespace defaultNamespace, XNamespace xNamespace, Func<string, IEnumerable<string>> getClrNsFromXmlNs)
+	public XamlDomParser(XNamespace defaultNamespace, XNamespace xNamespace, Func<string, IEnumerable<string>> getClrNsFromXmlNs, TypeInfo converterType)
 	{
 		DefaultNamespace = defaultNamespace;
 		_getClrNsFromXmlNs = getClrNsFromXmlNs;
+		ConverterType = converterType;
 
 		this.xNamespace = xNamespace;
 		xClass = xNamespace + "Class";
@@ -30,7 +30,6 @@ public class XamlDomParser
 		xSet = xNamespace + "Set";
 		xNull = xNamespace + "Null";
 		xType = xNamespace + "Type";
-		xFieldModifier = xNamespace + "FieldModifier";
 		xDataType = xNamespace + "DataType";
 	}
 
@@ -39,17 +38,13 @@ public class XamlDomParser
 	public XName xClass { get; }
 	public XName xName { get; }
 	public XName xDataType { get; }
+	public TypeInfo ConverterType { get; }
+
+	public IList<XamlNamespace>? KnownNamespaces { get; set; }
 
 	public string File { get; set; }
 	public TypeInfo TargetType { get; set; }
 	public TypeInfo DataType { get; set; }
-	public TypeInfo ConverterType { get; set; }
-	public IList<XamlNamespace>? KnownNamespaces { get; set; }
-	public HashSet<string> KnownContentTypes { get; set; }
-	public Dictionary<string, string> KnownContentProperties { get; set; }
-	public Dictionary<XName, string> KnownTypeMappings { get; set; }
-	public Dictionary<string, (XName className, string propertyName)> KnownAttachedProperties { get; set; }
-	public Dictionary<string, ICSharpTypeConverter> TypeConverters { get; set; }
 
 	public TypeInfo GetRootType(XElement root)
 	{
@@ -69,35 +64,6 @@ public class XamlDomParser
 	public TypeInfo FindType(XElement xelement)
 	{
 		return FindType(xelement.Name, xelement);
-	}
-
-	public string? FindFullTypeName(XName className, XObject xobject)
-	{
-		if (KnownTypeMappings != null && KnownTypeMappings.TryGetValue(className, out var typeName))
-		{
-			return typeName;
-		}
-		var clrNs = XamlNamespace.GetClrNamespace(className.NamespaceName);
-		if (clrNs != null)
-		{
-			return clrNs + "." + className.LocalName;
-		}
-		foreach (string clrNr2 in _getClrNsFromXmlNs(className.NamespaceName))
-		{
-			string clrTypeName = clrNr2;
-			if (!clrTypeName.EndsWith("/"))
-			{
-				clrTypeName += '.';
-			}
-
-			clrTypeName += className.LocalName;
-			var type = TypeInfo.GetType(clrTypeName);
-			if (type != null)
-			{
-				return type.Type.GetCSharpFullName();
-			}
-		}
-		return null;
 	}
 
 	public XName? GetTypeNameFromAttribute(string value, XAttribute attr)
@@ -155,36 +121,6 @@ public class XamlDomParser
 		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode);
 	}
 
-	public string GetCSharpValue(string value, XamlNode xamlNode, TypeInfo type)
-	{
-		if (type.Type.FullName == "System.Type")
-		{
-			var xmlTypeName = XamlParser.GetTypeName(value, xamlNode.Element, KnownNamespaces);
-			var clrFullTypeName = FindFullTypeName(xmlTypeName, xamlNode.Element);
-			value = $"typeof({clrFullTypeName})";
-		}
-		else
-		{
-			if (TypeConverters != null && TypeConverters.TryGetValue(type.Type.FullName, out var converter))
-			{
-				value = converter.Convert(value);
-			}
-			else if (type.Type.FullName == "System.String")
-			{
-				value = '\"' + value + '\"';
-			}
-			else if (type.Type.FullName == "System.Char")
-			{
-				value = '\'' + value + '\'';
-			}
-			else if (type.Type.ResolveEx()?.IsEnum == true)
-			{
-				value = type.Type.FullName + "." + value;
-			}
-		}
-		return value;
-	}
-
 	public static string GenerateName(XElement element, HashSet<string> usedNames)
 	{
 		string id;
@@ -204,100 +140,8 @@ public class XamlDomParser
 		return id;
 	}
 
-	public XamlObject ParseXamlNode(XamlObject? parent, XamlNode xamlNode, bool rootNode, bool parseChildren = true)
-	{
-		try
-		{
-			var type = rootNode ? TargetType : FindType((XElement)xamlNode.Element);
-
-			var xamlObj = new XamlObject(xamlNode, type)
-			{
-				Parent = parent
-			};
-
-			// Parse name
-			var nameProp = xamlNode.Properties.FirstOrDefault(p => p.Name == xName || p.Name == NameAttr);
-			if (nameProp != null)
-			{
-				xamlObj.Name = nameProp.Value;
-				xamlObj.NameExplicitlySet = true;
-				xamlObj.GenerateMember = true;
-			}
-
-			if (KnownContentTypes?.Contains(type.Type.FullName) == true)
-			{
-				if (xamlNode.Value == null)
-				{
-					throw new GeneratorException("Value cannot be null.", xamlNode);
-				}
-				xamlObj.CreateCSharpValue = GetCSharpValue(xamlNode.Value, xamlNode, type);
-			}
-			else
-			{
-				var properties = new List<XamlNode>();
-				properties.AddRange(xamlNode.Properties);
-
-				foreach (var prop in properties)
-				{
-					if (prop.Name == xFieldModifier)
-					{
-						xamlObj.FieldModifier = prop.Value;
-					}
-					else if (prop.Name.Namespace == xNamespace)
-					{
-						// Ignore here
-					}
-					else
-					{
-						xamlObj.Properties.Add(GetObjectProperty(xamlObj, prop));
-					}
-				}
-
-				if (parseChildren && xamlNode.Children.Count > 0)
-				{
-					string? contentProperty = null;
-					bool found = false;
-					if (KnownContentProperties != null)
-					{
-						var type2 = type;
-						do
-						{
-							found = KnownContentProperties.TryGetValue(type2.Type.FullName, out contentProperty);
-							if (found)
-							{
-								break;
-							}
-
-							type2 = type2.BaseType;
-						}
-						while (type2 != null);
-					}
-					if (!found)
-					{
-						throw new GeneratorException("Child element not expected.", xamlNode);
-					}
-
-					xamlObj.Properties.Add(GetObjectProperty(xamlObj, contentProperty!, xamlNode));
-				}
-			}
-			return xamlObj;
-		}
-		catch (ParseException ex)
-		{
-			throw new GeneratorException(ex.Message, xamlNode, ex.Position);
-		}
-		catch (Exception ex) when (ex is not GeneratorException)
-		{
-			throw new GeneratorException(ex.Message, xamlNode);
-		}
-	}
-
 	private TypeInfo FindType(XName className, XObject xobject)
 	{
-		if (KnownTypeMappings != null && KnownTypeMappings.TryGetValue(className, out var typeName))
-		{
-			return TypeInfo.GetTypeThrow(typeName);
-		}
 		var clrNs = XamlNamespace.GetClrNamespace(className.NamespaceName);
 		if (clrNs != null)
 		{
@@ -334,19 +178,12 @@ public class XamlDomParser
 			XName? attachedClassName = null;
 			string? attachedPropertyName = null;
 
-			if (KnownAttachedProperties != null && KnownAttachedProperties.TryGetValue(memberName, out var propertyName2) == true)
+			int index = memberName.IndexOf('.');
+			if (index != -1)
 			{
-				(attachedClassName, attachedPropertyName) = propertyName2;
-			}
-			else
-			{
-				int index = memberName.IndexOf('.');
-				if (index != -1)
-				{
-					string typeName = memberName.Substring(0, index);
-					attachedClassName = XamlParser.GetTypeName(typeName, xamlNode.Element, KnownNamespaces);
-					attachedPropertyName = memberName.Substring(index + 1);
-				}
+				string typeName = memberName.Substring(0, index);
+				attachedClassName = XamlParser.GetTypeName(typeName, xamlNode.Element, KnownNamespaces);
+				attachedPropertyName = memberName.Substring(index + 1);
 			}
 
 			if (attachedClassName != null)
@@ -448,10 +285,10 @@ public class XamlDomParser
 				try
 				{
 					var defaultBindModeAttr =
-								EnumerableExtensions.SelectSequence(objProp.XamlNode.Element, e => e.Parent, objProp.XamlNode.Element is XElement)
-								.Cast<XElement>()
-								.Select(e => e.Attribute(xDefaultBindMode))
-								.FirstOrDefault(a => a != null);
+						EnumerableExtensions.SelectSequence(objProp.XamlNode.Element, e => e.Parent, objProp.XamlNode.Element is XElement)
+						.Cast<XElement>()
+						.Select(e => e.Attribute(xDefaultBindMode))
+						.FirstOrDefault(a => a != null);
 					var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
 					value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, ConverterType, ref _localVarIndex);
 					if (value.BindValue.SourceExpression != null)
@@ -468,23 +305,6 @@ public class XamlDomParser
 				{
 					throw new ParseException(ex.Message, ex.Position + "x:Bind".Length, ex.Length);
 				}
-			}
-			else if (objProp.TargetEvent != null)
-			{
-				value.CSharpValue = xamlNode.Value;
-			}
-			else if (xamlNode.Children.Count > 1 ||
-				(propType.Type.FullName != "System.String" && TypeInfo.GetTypeThrow(typeof(IEnumerable)).IsAssignableFrom(propType)))
-			{
-				value.CollectionValue = xamlNode.Children.Select(n => ParseXamlNode(obj, n, false)).ToList();
-			}
-			else if (xamlNode.Children.Count == 0 && !string.IsNullOrEmpty(xamlNode.Value))
-			{
-				value.CSharpValue = GetCSharpValue(xamlNode.Value!, xamlNode, propType);
-			}
-			else if (xamlNode.Children.Count == 0 && propType.Type.FullName == "System.String")
-			{
-				value.CSharpValue = "\"\"";
 			}
 			else
 			{
@@ -569,9 +389,4 @@ public class XamlDomParser
 											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))
 			.FirstOrDefault(m => m.Parameters[m.Parameters.Count == 1 ? 0 : 1].ParameterType.IsAssignableFrom(targetType));
 	}
-}
-
-public interface ICSharpTypeConverter
-{
-	string Convert(string value);
 }

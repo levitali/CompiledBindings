@@ -128,7 +128,7 @@ public class TypeInfo
 		.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 		.ToList();
 
-	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO!! nullablility in base type from this one
+	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO nullablility in base type from this one
 
 	public TypeInfo? GetElementType()
 	{

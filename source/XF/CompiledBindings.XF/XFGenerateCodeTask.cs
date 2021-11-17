@@ -209,18 +209,17 @@ public class XFXamlDomParser : SimpleXamlDomParser
 						XmlNamespace: (string)at.ConstructorArguments[0].Value,
 						ClrNamespace: (string)at.ConstructorArguments[1].Value))
 					.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
-					// For old XF versions
-					if (_nsMappings.Count == 0)
+				// For old XF versions
+				if (_nsMappings.Count == 0)
 				{
 					_nsMappings = new[] { (XmlNamespace: "http://xamarin.com/schemas/2014/forms", ClrNamespace: "Xamarin.Forms") }
-						.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
+					.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
 				}
 			}
-
 			return _nsMappings[xmlNs];
-		})
+		},
+		TypeInfo.GetTypeThrow("Xamarin.Forms.IValueConverter"))
 	{
-		ConverterType = TypeInfo.GetTypeThrow("Xamarin.Forms.IValueConverter");
 	}
 
 	public override bool IsMemExtension(XAttribute a)

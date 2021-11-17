@@ -15,12 +15,12 @@
 
   <files>
     <file src="..\Targets\CompiledBindings.WPF.targets" target="build" />
-    <file src="..\..\..\..\bin\WPF\CompiledBindings.WPF.dll" target="build" />
-    <file src="..\..\..\..\bin\WPF\CompiledBindings.Core.dll" target="build" />
-    <file src="..\..\..\..\bin\WPF\Mono.Cecil.dll" target="build" />
-    <file src="..\..\..\..\bin\WPF\Mono.Cecil.Mdb.dll" target="build" />
-    <file src="..\..\..\..\bin\WPF\Mono.Cecil.Pdb.dll" target="build" />
-    <file src="..\..\..\..\bin\WPF\Mono.Cecil.Rocks.dll" target="build" />
+    <file src="..\..\..\..\bin\net472\CompiledBindings.WPF.dll" target="build" />
+    <file src="..\..\..\..\bin\net472\CompiledBindings.Core.dll" target="build" />
+    <file src="..\..\..\..\bin\net472\Mono.Cecil.dll" target="build" />
+    <file src="..\..\..\..\bin\net472\Mono.Cecil.Mdb.dll" target="build" />
+    <file src="..\..\..\..\bin\net472\Mono.Cecil.Pdb.dll" target="build" />
+    <file src="..\..\..\..\bin\net472\Mono.Cecil.Rocks.dll" target="build" />
 
     <file src="..\..\..\..\bin\net35\CompiledBindings.dll" target="lib\net35\" />
     <file src="..\..\..\..\bin\net40\CompiledBindings.dll" target="lib\net40\" />

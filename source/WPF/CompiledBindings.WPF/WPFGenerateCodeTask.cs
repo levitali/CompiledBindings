@@ -367,10 +367,10 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 					}
 
 					return _nsMappings[xmlNs];
-				})
+				},
+				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"))
 	{
 		DependencyObjectType = TypeInfo.GetTypeThrow("System.Windows.DependencyObject");
-		ConverterType = TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter");
 	}
 
 	public override bool IsMemExtension(XAttribute a)

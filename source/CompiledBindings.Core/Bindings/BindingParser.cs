@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo rootType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, TypeInfo converterType, ref int localVarIndex)
+	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, TypeInfo converterType, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value;
@@ -43,7 +43,7 @@ public static class BindingParser
 			dataType = type == null ? null : new TypeInfo(type, false);
 			dataTypeSet = true;
 
-			sourceType = dataType ?? rootType;
+			sourceType = dataType ?? targetType;
 		}
 
 		int pos1 = 0;
@@ -105,7 +105,7 @@ public static class BindingParser
 					resources.Add((resourceName, resourceType));
 
 					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, converterType.Type), converterType);
-					expr = new ParameterExpression(rootType, "targetRoot");
+					expr = new ParameterExpression(targetType, "targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(converterType, false));
 
 					int pos2 = str.IndexOf(',');
@@ -211,7 +211,7 @@ public static class BindingParser
 			}
 			else
 			{
-				throw new ParseException($"Property {name} is not valid for x:Bind"); //TODO!! position
+				throw new ParseException($"Property {name} is not valid for x:Bind"); //TODO! position
 			}
 		}
 
@@ -301,7 +301,7 @@ public static class BindingParser
 		};
 	}
 
-	public static BindingsData CreateBindingsData(IList<Bind> binds, TypeInfo? targetRootType, TypeInfo dataRootType, TypeInfo? dependencyObjectType = null)
+	public static BindingsData CreateBindingsData(IList<Bind> binds, TypeInfo? targetType, TypeInfo dataType, TypeInfo? dependencyObjectType = null)
 	{
 		for (int i = 0; i < binds.Count; i++)
 		{
@@ -317,13 +317,13 @@ public static class BindingParser
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
 			.GroupBy(e => e.expr.Expression.ToString())
-			.Select(g => new NotifyPropertyChangedData()
+			.Select(g => new NotifyPropertyChangedData
 			{
 				SourceExpression = g.First().expr.Expression,
 				Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
 				{
 					var expr = g2.First().expr;
-					return new NotifyPropertyChangedProperty()
+					return new NotifyPropertyChangedProperty
 					{
 						Property = (PropertyInfo)expr.Member,
 						Expression = expr,
@@ -382,11 +382,13 @@ public static class BindingParser
 			foreach (var prop in propChangeData.Properties)
 			{
 				var expr = new MemberExpression(typedSender, prop.Property, prop.Property.PropertyType);
-				var setExpressions = prop.Bindings.Select(b =>
-				{
-					var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
-					return (PropertySetExpressionBase)new PropertySetExpression(b.Property, expression);
-				}).ToList();
+				var setExpressions = prop.Bindings
+					.Select(b =>
+					{
+						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
+						return (PropertySetExpressionBase)new PropertySetExpression(b.Property, expression);
+					})
+					.ToList();
 
 				foreach (var prop2 in prop.DependentNotifyProperties)
 				{
@@ -445,8 +447,8 @@ public static class BindingParser
 
 		return new BindingsData
 		{
-			DataRootType = dataRootType,
-			TargetRootType = targetRootType,
+			DataType = dataType,
+			TargetType = targetType,
 			Bindings = binds,
 			NotifyPropertyChangedList = notifyPropertyChangedList,
 			TwoWayEvents = twoWayEventHandlers,
@@ -458,8 +460,8 @@ public static class BindingParser
 public class BindingsData
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public TypeInfo? TargetRootType { get; init; }
-	public TypeInfo DataRootType { get; init; }
+	public TypeInfo? TargetType { get; init; }
+	public TypeInfo DataType { get; init; }
 	public IList<Bind> Bindings { get; init; }
 	public List<NotifyPropertyChangedData> NotifyPropertyChangedList { get; init; }
 	public List<TwoWayEventData> TwoWayEvents { get; init; }

@@ -357,7 +357,7 @@ public class ExpressionParser
 			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
 		}
 		var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
-		//TODO!! check if the arguments and the method match (parameters count, assignable)
+		//TODO! check if the arguments and the method match (parameters count, assignable)
 		if (method.Parameters.Count < args.Length)
 		{
 			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
@@ -479,8 +479,8 @@ public class ExpressionParser
 
 		var typeExpr = ParseTypeExpression(prefix, errorPos);
 		var args = ParseArgumentList();
-		//TODO!! CorrectCharParameters
-		//TODO!! CorrectNotNullableParameters
+		//TODO! CorrectCharParameters
+		//TODO! CorrectNotNullableParameters
 		return new NewExpression(typeExpr, args);
 	}
 
@@ -828,7 +828,7 @@ public class ExpressionParser
 		}
 		else
 		{
-			//TODO!! at least check number of parameters
+			//TODO! at least check number of parameters
 			var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
 			if (prop == null)
 			{

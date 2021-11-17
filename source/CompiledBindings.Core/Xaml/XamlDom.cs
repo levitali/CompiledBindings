@@ -24,11 +24,6 @@ public class XamlObject
 
 	public bool GenerateMember { get; set; }
 	public string? FieldModifier { get; set; }
-
-	public IEnumerable<Bind> EnumerateBinds()
-	{
-		return Properties.Select(p => p.Value.BindValue).Where(b => b != null)!;
-	}
 }
 
 public class XamlObjectProperty

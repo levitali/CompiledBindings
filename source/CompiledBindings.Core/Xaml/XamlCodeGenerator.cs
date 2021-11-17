@@ -138,7 +138,7 @@ $@"{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
 {a}			{{");
 
 			string varName;
-			if (expression is not ParameterExpression) //TODO!!
+			if (expression is not ParameterExpression)
 			{
 				varName = "value" + localVarIndex++;
 				output.AppendLine(
@@ -202,7 +202,7 @@ $@"{a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
 		}
 	}
 
-	public void GenerateUpdateMethodBody(StringBuilder output, UpdateMethod updateMethod, string? targetRootVariable = null, string? bindingsAccess = null, string? align = null)
+	public void GenerateUpdateMethodBody(StringBuilder output, UpdateMethod updateMethod, string? targetRootVariable = null, string? bindingsAccess = null, string? a = null)
 	{
 		int localVarIndex = updateMethod.LocalVariables.Count + 1;
 		int localFuncIndex = 0;
@@ -211,19 +211,19 @@ $@"{a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
 		{
 			foreach (var prop in updateMethod.SetProperties)
 			{
-				GenerateSetValue(output, prop, null, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, align);
+				GenerateSetValue(output, prop, null, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, a);
 			}
 		}
 
 		foreach (var variable in updateMethod.LocalVariables)
 		{
 			output.AppendLine(
-$@"{align}			var {variable.Name} = {variable.Expression};");
+$@"{a}			var {variable.Name} = {variable.Expression};");
 		}
 
 		foreach (var prop in updateMethod.SetExpressions)
 		{
-			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, align);
+			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, a);
 		}
 	}
 }

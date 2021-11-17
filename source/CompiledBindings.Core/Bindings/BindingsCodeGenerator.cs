@@ -10,7 +10,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 
 	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
 	{
-		bool isDiffDataRoot = targetClassName != bindingsData.DataRootType.Type.Name || targetNamespace != bindingsData.DataRootType.Type.Namespace;
+		bool isDiffDataRoot = targetClassName != bindingsData.DataType.Type.Name || targetNamespace != bindingsData.DataType.Type.Namespace;
 		var rootGroup = bindingsData.NotifyPropertyChangedList.SingleOrDefault(g => g.SourceExpression is ParameterExpression pe && pe.Name == "dataRoot");
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
@@ -55,7 +55,7 @@ $@"			{targetClassName} _targetRoot;");
 		if (isDiffDataRoot)
 		{
 			output.AppendLine(
-$@"			global::{ bindingsData.DataRootType.Type.GetCSharpFullName()} _dataRoot;");
+$@"			global::{ bindingsData.DataType.Type.GetCSharpFullName()} _dataRoot;");
 		}
 
 		if (bindingsData.NotifyPropertyChangedList.Count > 0)
@@ -98,13 +98,13 @@ $@"			CancellationTokenSource _generatedCodeDisposed;");
 		{
 			output.AppendLine(
 $@"
-			public void Initialize({targetClassName} targetRoot, global::{bindingsData.DataRootType.Type.GetCSharpFullName()} dataRoot)
+			public void Initialize({targetClassName} targetRoot, global::{bindingsData.DataType.Type.GetCSharpFullName()} dataRoot)
 			{{
 				if (_targetRoot != null)
 					throw new System.InvalidOperationException();
 				if (targetRoot == null)
 					throw new System.ArgumentNullException(nameof(targetRoot));");
-			if (bindingsData.DataRootType.Type.IsNullable())
+			if (bindingsData.DataType.Type.IsNullable())
 			{
 				output.AppendLine(
 $@"				if (dataRoot == null)
@@ -259,7 +259,7 @@ $@"					{targetExpr} -= _eventHandler{binding.Index};
 $@"					_bindingsTrackings.Cleanup();");
 		}
 
-		if (isDiffDataRoot && bindingsData.DataRootType.Type.IsNullable())
+		if (isDiffDataRoot && bindingsData.DataType.Type.IsNullable())
 		{
 			output.AppendLine(
 $@"					_dataRoot = null;");
@@ -291,7 +291,7 @@ $@"
 			output.AppendLine(
 $@"				var bindings = this;");
 		}
-		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "targetRoot", align: "\t");
+		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "targetRoot", a: "\t");
 
 		output.AppendLine();
 
@@ -499,7 +499,7 @@ $@"					var bindings = TryGetBindings();
 						output.AppendLine(
 $@"					if (notifyAll || e.PropertyName == ""{prop.Property.Definition.Name}"")
 					{{");
-						GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", align: "\t\t\t");
+						GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", a: "\t\t\t");
 						foreach (var dependentGroup in prop.DependentNotifyProperties)
 						{
 							output.AppendLine(
@@ -536,7 +536,7 @@ $@"					var bindings = TryGetBindings();
 					var dataRoot = bindings.{(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
 					var typedSender = (global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()})sender;");
 
-						GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", align: "\t\t");
+						GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", a: "\t\t");
 						foreach (var dependentGroup in prop.DependentNotifyProperties)
 						{
 							output.AppendLine(
