@@ -7,7 +7,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Mono.Cecil;
 
 #nullable enable
 
@@ -368,9 +367,9 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 
 					return _nsMappings[xmlNs];
 				},
-				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"))
+				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
+				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"))
 	{
-		DependencyObjectType = TypeInfo.GetTypeThrow("System.Windows.DependencyObject");
 	}
 
 	public override bool IsMemExtension(XAttribute a)

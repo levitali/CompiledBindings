@@ -14,15 +14,20 @@ public class SimpleXamlDomParser : XamlDomParser
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
 
 	public readonly XName DataTemplate;
-
-	public TypeInfo? DependencyObjectType;
+	public readonly TypeInfo? DependencyObjectType;
 
 	public HashSet<string>? UsedNames { get; private set; }
 
-	public SimpleXamlDomParser(XNamespace xmlns, XNamespace xNs, Func<string, IEnumerable<string>> getClrNsFromXmlNs, TypeInfo converterType)
+	public SimpleXamlDomParser(
+		XNamespace xmlns,
+		XNamespace xNs,
+		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
+		TypeInfo converterType,
+		TypeInfo? dependencyObjectType = null)
 		: base(xmlns, xNs, getClrNsFromXmlNs, converterType)
 	{
 		DataTemplate = DefaultNamespace + "DataTemplate";
+		DependencyObjectType = dependencyObjectType;
 	}
 
 	public SimpleXamlDom Parse(string file, XDocument xamlDoc)
