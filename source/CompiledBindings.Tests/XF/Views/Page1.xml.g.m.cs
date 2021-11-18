@@ -37,7 +37,7 @@ namespace XFTest.Views
 			label4.Text = value1.Header1;
 			button1.Clicked += (p1, p2) => this.Save();
 
-			Bindings_.Initialize(this);
+			Bindings.Initialize(this);
 			this.BindingContextChanged += this_BindingContextChanged;
 			if (this.BindingContext is global::XFTest.ViewModels.Page1ViewModel dataRoot1)
 			{
@@ -47,9 +47,9 @@ namespace XFTest.Views
 
 		~Page1()
 		{
-			if (Bindings_ != null)
+			if (Bindings != null)
 			{
-				Bindings_.Cleanup();
+				Bindings.Cleanup();
 			}
 			if (Bindings_this != null)
 			{

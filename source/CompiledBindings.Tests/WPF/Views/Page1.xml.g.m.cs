@@ -42,7 +42,7 @@ namespace WPFTest.Views
 			}
 			header1.Text = value1.Header1;
 
-			Bindings_.Initialize(this);
+			Bindings.Initialize(this);
 			this.DataContextChanged += this_DataContextChanged;
 			if (this.DataContext is global::WPFTest.ViewModels.Page1ViewModel dataRoot1)
 			{
@@ -53,9 +53,9 @@ namespace WPFTest.Views
 		~Page1()
 		{
 			_generatedCodeDisposed.Cancel();
-			if (Bindings_ != null)
+			if (Bindings != null)
 			{
-				Bindings_.Cleanup();
+				Bindings.Cleanup();
 			}
 			if (Bindings_this != null)
 			{

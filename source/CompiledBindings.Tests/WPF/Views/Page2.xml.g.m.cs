@@ -17,14 +17,14 @@ namespace WPFTest.Views
 
 			button2.Click += (p1, p2) => this.OnClick2();
 
-			Bindings_.Initialize(this);
+			Bindings.Initialize(this);
 		}
 
 		~Page2()
 		{
-			if (Bindings_ != null)
+			if (Bindings != null)
 			{
-				Bindings_.Cleanup();
+				Bindings.Cleanup();
 			}
 		}
 

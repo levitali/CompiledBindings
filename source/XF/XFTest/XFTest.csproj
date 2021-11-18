@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -21,10 +21,10 @@
     <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
   </ItemGroup>
 
-  <UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\XF\CompiledBindings.XF.dll" />
-  <UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\XF\CompiledBindings.XF.dll" />
-  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\XF\CompiledBindings.Core.dll" />
-  <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\XF\CompiledBindings.Core.dll" />
+  <UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.XF.dll" />
+  <UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.XF.dll" />
+  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
+  <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
 
   <Target Name="XFBeforeBuild" BeforeTargets="BeforeBuild">
     <PropertyGroup>
@@ -42,7 +42,8 @@
     <CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
       <Output TaskParameter="Include" ItemName="XamlFiles" />
     </CreateItem>
-    <XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" AttachDebugger="true">
+    <XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)"
+                        AttachDebugger="false">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
     </XFGenerateCodeTask>
     <ItemGroup>
@@ -53,16 +54,18 @@
   </Target>
 
   <Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-    <XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="true" />
+    <XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)"
+                               AttachDebugger="false" />
   </Target>
 
   <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-    <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="true" />
+    <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)"
+                         AttachDebugger="false" />
   </Target>
 
   <Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 
-    <UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)" AttachDebugger="true">
+    <UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)" AttachDebugger="false">
       <Output TaskParameter="UpdatedReferenceCopyLocalFiles" ItemName="UpdatedReferenceCopyLocalFiles" />
     </UpdateReferenceCopyLocalTask>
 

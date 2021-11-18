@@ -200,11 +200,11 @@ $@"			_generatedCodeDisposed.Cancel();");
 
 			foreach (var bs in parseResult.BindingScopes)
 			{
-				var viewName = bs.ViewName ?? (bs.DataType != null ? rootElement : null);
+				var viewName = bs.DataType == null ? null : "_" + (bs.ViewName ?? "this");
 				output.AppendLine(
-$@"			if (Bindings_{viewName} != null)
+$@"			if (Bindings{viewName} != null)
 			{{
-				Bindings_{viewName}.Cleanup();
+				Bindings{viewName}.Cleanup();
 			}}");
 			}
 
@@ -274,11 +274,11 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 		for (int i = 0; i < parseResult.BindingScopes.Count; i++)
 		{
 			var bs = parseResult.BindingScopes[i];
-			var viewName = bs.ViewName ?? (bs.DataType != null ? rootElement : null);
+			var viewName = bs.ViewName ?? rootElement;
 			if (bs.DataType == null)
 			{
 				output.AppendLine(
-$@"			Bindings_{viewName}.Initialize(this);");
+$@"			Bindings.Initialize(this);");
 			}
 			else
 			{

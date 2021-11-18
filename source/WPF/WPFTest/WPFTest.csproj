@@ -30,9 +30,9 @@
     <Resource Include="Images\download.png" />
   </ItemGroup>
 
-  <UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="..\..\..\bin\WPF\CompiledBindings.WPF.dll" />
-  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\WPF\CompiledBindings.Core.dll" />
-  <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\WPF\CompiledBindings.Core.dll" />
+  <UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.WPF.dll" />
+  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
+  <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
   
   <PropertyGroup>
     <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
