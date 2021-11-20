@@ -8,6 +8,68 @@ At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it 
 
 {x:Bind} Markup Extension have an expression as its first parameter, or the expression is specified by the Path parameter, following by other parameters like Mode, BindBack, Converter, ConverterParameter.
 
+### x:Bind usage
+
+Note, that in some examples bellow the TextBlock (WPF) control is used, in others Label (Xamarin Forms).
+
+**Property paths**
+ ```xaml
+<TextBlock Text="{x:Bind Title}"/>
+<TextBlock Text="{x:Bind Movie.Year}"/>
+ ```
+ 
+**Function calls**
+ ```xaml
+<TextBlock Text="{x:Bind Movie.Description.Trim()}"/>
+<TextBlock Text="{x:Bind local:MainPage.GenerateSongTitle(Title, Description)}"/>
+ ```
+ 
+The first example above is the call of instance method Trim(). The second is the call of static method GenerateSongTitle of MainPage class, wich takes two parameters (multi-binding).
+ 
+ The expression of the {x:Bind} can also have the following operators:
+ - **binary operators** (in round brackets alternatives, which are better for XML): +, -, \*, /, = (eq), != (ne), < (lt), > (gt), <= (le), >= (ge) 
+  ```xaml
+<Label IsVisible="{x:Bind Movie.Year gt 2000}"/>
+ ```
+ 
+  - **unary operators**: -, +, ! (not)
+ ```xaml
+<Label IsVisible="{x:Bind not IsChanged}"/>
+ ```
+  - **logical operators**: && (and), || (or)
+ ```xaml
+<Label IsVisible="{x:Bind NoTitle and IsChanged}"/>
+ ```
+ - **coalesce operator**
+ ```xaml
+<TextBlock Visibility="{x:Bind IsChange ? Collapsed : Visible}"/>
+ ```
+Note, that the Collapsed and Visible values here are inferred from Visibility property.
+
+ - **null check operator**
+ ```xaml
+<Label IsVisible="{x:Bind Movie.Title ?? 'no title'}"/>
+ ```
+ 
+ - **cast operator**. The class, to which cast is made, must be fully specified with namespace (the namespace must be declared)
+ ```xaml
+<CollectionView x:Name="itemsList"/>
+<Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
+ ```
+ 
+  - **new operator**. The class must be fully specified with namespace
+ ```xaml
+<Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
+ ```
+ 
+You can use following **constants** in the expression:
+- numbers with or wihout decimal seperator (point). For example 2.3
+- true, false
+- null
+- this
+- strings. For example 'some string'
+- characters. The same as strings, for example 'a'. Which type is actually used is mostly inferred during compilation. In case of ambiquity, the cast operator must be used.
+
 ### Data source
 
 If not specified, the data source of {x:Bind} is the root control/page/window itself. In Xamarin Forms you can specify the data source type with x:DataType attribute.
@@ -29,85 +91,36 @@ Because x:DataType attribute is not available for WPF, you can do the following.
 
 Note, that if the data source is specified, the {x:Bind} extensions are only applied if the DataContext (or BindingContext in XF) of the root or corresponding controls is set to an object of the specified type.
 
-If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
+If the {x:Bind} Markup Extension is used in a DataTemplate and you don't set the IsItemsSource property to true to the binding, setting the ItemsSource of a collection control (see below), you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
 
-### Declaring CLR-Namespaces namespaces with "using" and "global using"
+#### New in Version 1.0.6
 
-For CLR-Namespaces you can use the "using" syntax. For example
- ```xaml
-  xmlns:local="using:CompiledBindingsDemo"
-  ```
+**DataType** property
 
-You can also declare the CLR-Namespaces globally with "global using" syntax. For {x:Bind} markup extensions in other XAML files you do not have to declare the namespace. Note, this works only for {x:Bind}. If a namespace is used for other purposes, it must be decleared locally.
+You can set the DataType only for a one x:Bind, by setting the corresponding DataType property.
 
- ```xaml
-  xmlns:local="global using:CompiledBindingsDemo"
-  ```
-
-### x:Bind usage
-
-Note, that in some examples bellow the TextBlock (WPF) control is used, in others Label (Xamarin Forms).
-
-Property paths
- ```xaml
-<TextBlock Text="{x:Bind Title}"/>
-<TextBlock Text="{x:Bind Movie.Year}"/>
- ```
- 
-Function calls
- ```xaml
-<TextBlock Text="{x:Bind Movie.Description.Trim()}"/>
-<TextBlock Text="{x:Bind local:MainPage.GenerateSongTitle(Title, Description)}"/>
- ```
- 
-The first example above is the call of instance method Trim(). The second is the call of static method GenerateSongTitle of MainPage class, wich takes two parameters (multi-binding).
- 
- The expression of the {x:Bind} can also have the following operators:
- - binary operators (in round brackets alternatives, which are better for XML): +, -, \*, /, = (eq), != (ne), < (lt), > (gt), <= (le), >= (ge) 
-  ```xaml
-<Label IsVisible="{x:Bind Movie.Year gt 2000}"/>
- ```
- 
-  - unary operators: -, +, ! (not)
- ```xaml
-<Label IsVisible="{x:Bind not IsChanged}"/>
- ```
-  - logical operators: && (and), || (or)
- ```xaml
-<Label IsVisible="{x:Bind NoTitle and IsChanged}"/>
- ```
- - coalesce operator
- ```xaml
-<TextBlock Visibility="{x:Bind IsChange ? Collapsed : Visible}"/>
- ```
-Note, that the Collapsed and Visible values here are inferred from Visibility property.
-
- - null check operator
- ```xaml
-<Label IsVisible="{x:Bind Movie.Title ?? 'no title'}"/>
- ```
- 
- - cast operator. The class, to which cast is made, must be fully specified with namespace (the namespace must be declared)
  ```xaml
 <CollectionView x:Name="itemsList"/>
-<Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
+<Label Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title, DataType={x:Null}}"/>
  ```
  
-  - new operator. The class must be fully specified with namespace
- ```xaml
-<Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
- ```
- 
-You can use following constants in the expression:
-- numbers with or wihout decimal seperator (point). For example 2.3
-- true, false
-- null
-- this
-- strings. For example 'some string'
-- characters. The same as strings, for example 'a'. Which type is actually used is mostly inferred during compilation. In case of ambiquity, the cast operator must be used.
+ **IsItemsSource** property
 
+If you use {x:Bind} to set the ItemsSource property of a collection control (ListBox, ListView, CollectionView etc), you can set the IsItemsSource property to *true*, so that the data type of a elements is automatically detected. Than you don't have to specify it for the ItemTemplate.
+
+ ```xaml
+<CollectionView ItemsSource="{x:Bind Movies, IsItemsSource=true}">
+    <CollectionView.ItemTemplate>
+        <DataTemplate>
+	        <Label Text="{x:Bind Title}"/>
+	    </DataTemplate>
+    </CollectionView.ItemTemplate>
+</CollectionView>
+ ```
+ 
+ Note, that it works only if the DataTemplate is specifed a XAML child to the collection control.
 
 ### x:Bind other parameters
 
@@ -229,3 +242,17 @@ You can overcome this problem by using m: Namespace to set the Text property:
 ```xaml
 <TextBlock m:Text="{x:Bind system:String.Format('{0:0.###} {1}', Quantity, Unit)}"
 ```
+
+### Declaring CLR-Namespaces namespaces with "using" and "global using"
+
+For CLR-Namespaces you can use the "using" syntax. For example
+ ```xaml
+  xmlns:local="using:CompiledBindingsDemo"
+  ```
+
+You can also declare the CLR-Namespaces globally with "global using" syntax. For {x:Bind} markup extensions in other XAML files you do not have to declare the namespace. Note, this works only for {x:Bind}. If a namespace is used for other purposes, it must be decleared locally.
+
+ ```xaml
+  xmlns:local="global using:CompiledBindingsDemo"
+  ```
+
