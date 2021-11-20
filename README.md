@@ -26,15 +26,25 @@ Because x:DataType attribute is not available for WPF, you can do the following.
   xmlns:local="clr-namespace:CompiledBindingsDemo"
   mx:DataType="local:MainViewModel"
   ```
-For CLR-Namespaces you can also use the "using" syntax. For example
- ```xaml
-  xmlns:local="using:CompiledBindingsDemo"
-  ```
+
 Note, that if the data source is specified, the {x:Bind} extensions are only applied if the DataContext (or BindingContext in XF) of the root or corresponding controls is set to an object of the specified type.
 
 If the {x:Bind} Markup Extension is used in a DataTemplate, you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
+
+### Declaring CLR-Namespaces namespaces with "using" and "global using"
+
+For CLR-Namespaces you can use the "using" syntax. For example
+ ```xaml
+  xmlns:local="using:CompiledBindingsDemo"
+  ```
+
+You can also declare the CLR-Namespaces globally with "global using" syntax. For {x:Bind} markup extensions in other XAML files you do not have to declare the namespace. Note, this works only for {x:Bind}. If a namespace is used for other purposes, it must be decleared locally.
+
+ ```xaml
+  xmlns:local="global using:CompiledBindingsDemo"
+  ```
 
 ### x:Bind usage
 
@@ -85,6 +95,11 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 <Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
  ```
  
+  - new operator. The class must be fully specified with namespace
+ ```xaml
+<Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
+ ```
+ 
 You can use following constants in the expression:
 - numbers with or wihout decimal seperator (point). For example 2.3
 - true, false
@@ -97,13 +112,69 @@ You can use following constants in the expression:
 ### x:Bind other parameters
 
 - **Mode** Specifies the binding mode, as one of these strings: "OneTime", "OneWay", "TwoWay" or "OneWayToSource". The default is "OneWay" 
-- **Converter** Specifies the converter. The value must be a StaticResource expression.
-- **ConverterParameter** Specifies the converter parameter. Note, that here you can use any expression like in the first expression parameter.
+- **Converter** Specifies the converter.
+- **ConverterParameter** Specifies the converter parameter.
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
+- **FallbackValue** Specifies a value to display when the source or path cannot be resolved.
+- **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
+
+The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {x:Static} markup extension.
 
 ### Observing changes
 
 If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
+
+### Binding to asynchronous (returning Task&lt;T&gt;) properties and functions.
+
+If a property's or a function's returning type is Task&lt;T&gt;, its value is taking with await.
+
+For example, you have a function LoadImageAsync in your ViewModel, which asynchronously downloads an image. You can set the image like this:
+
+ ```xaml
+<Image Source="{x:Bind LoadImageAsync()}" />
+ ```
+ 
+While waiting for the value to arrive, the {x:Bind} reports the *FallbackValue*, if one is available, or the default value of the binding target property. For example:
+
+```xaml
+<Page.Resources>
+    <BitmapImage x:Key="defaultImage" UriSource="/Images/download.png" />
+</Page.Resources>
+
+<Image Source="{x:Bind LoadImageAsync(), FallbackValue={StaticResource defaultImage}}" />
+ ```
+
+If an asynchronous function throws an exception, the exception is ignored. The value of the target property is not changed.
+
+### Binding to tuples.
+
+Sometimes it is needed to calculate values for many UI properties using the same logic. For example, foreground and background of a TextBlock must be set according to some state or other logic. You can define one property (function), which returns both foreground and background.
+
+``` c#
+public (Brush foreground, Brush background) Colors
+{
+	get
+	{
+		switch (this.State)
+		{
+			case EntityState.Saved:
+				return (Brushes.Beige, Brushes.Green);
+			case EntityState.NotEdited:
+				return (Brushes.White, Brushes.Black);
+					
+		       ...
+		}
+	}
+}
+```
+
+Than you can use it:
+
+``` xaml
+<TextBlock Foreground="{x:Bind Colors.foreground}" Background="{x:Bind Colors.background}"/>
+```
+
+Note, that the Color property is not called twice. Its value is taken only once, saved as local variable in the generated C# code, and than the values are set to the Control's properties.
 
 ## x:Set Markup Extension
 
