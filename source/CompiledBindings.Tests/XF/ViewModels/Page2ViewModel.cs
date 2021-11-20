@@ -20,7 +20,7 @@ public class Page2ViewModel : INotifyPropertyChanged
 
 	public string CalculateString() => "";
 
-	public (string fontFamily, string glyph) GetIcon() => ("", "");
+	public (string fontFamily, string? glyph) GetIcon() => ("", "");
 
 	public Func<string, ItemViewModel>? FuncProp { get; set; }
 

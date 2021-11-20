@@ -35,7 +35,7 @@ public class TypeInfo
 		_nullableContext = GetNullableContext(type);
 		_nullabileFlags = GetNullableFlags(type);
 		var b = _nullabileFlags?[0] ?? _nullableContext;
-		_isNullable = b == null ? null : b == 2;
+		_isNullable = b is null or 0 ? null : b == 2;
 	}
 
 	private TypeInfo(TypeReference type, bool? isNullable, byte[]? nullabileFlags, byte? nullableContext)
@@ -51,7 +51,7 @@ public class TypeInfo
 		else
 		{
 			var b = _nullabileFlags?[0] ?? _nullableContext;
-			_isNullable = b == null ? null : b == 2;
+			_isNullable = b is null or 0 ? null : b == 2;
 		}
 	}
 
@@ -295,7 +295,7 @@ public class TypeInfo
 		if (isNullable == null)
 		{
 			var b = (nullableFlags?[0] ?? nullableContext);
-			isNullable = b == null ? null : b == 2;
+			isNullable = b is null or 0 ? null : b == 2;
 		}
 
 		return new TypeInfo(type, isNullable, nullableFlags, nullableContext);
@@ -329,7 +329,7 @@ public class TypeInfo
 	private bool? GetIsNullableSumElement(int index)
 	{
 		var b = _nullabileFlags?.Skip(index).FirstOrDefault() ?? _nullableContext;
-		return b == null ? null : b == 2;
+		return b is null or 0 ? null : b == 2;
 	}
 }
 
