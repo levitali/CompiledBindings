@@ -414,10 +414,10 @@ public static class BindingParser
 			.Where(b => (b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && b.UpdateSourceTrigger != UpdateSourceTrigger.Explicit)
 			.GroupBy(b => (b.Property.Object, b.TargetChangedEvent))
 			.Select((g, i) => new TwoWayEventData
-			(
-				Bindings: g.ToList(),
-				Index: i
-			))
+			{
+				Bindings = g.ToList(),
+				Index = i
+			})
 			.ToList();
 
 		var props1 = binds
@@ -493,11 +493,13 @@ public class NotifyPropertyChangedProperty
 	public List<NotifyPropertyChangedData> DependentNotifyProperties { get; } = new List<NotifyPropertyChangedData>();
 };
 
-public record TwoWayEventData
-(
-	List<Bind> Bindings,
-	int Index
-);
+public class TwoWayEventData
+{
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	public List<Bind> Bindings { get; init; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	public int Index { get; init; }
+};
 
 public class Bind
 {

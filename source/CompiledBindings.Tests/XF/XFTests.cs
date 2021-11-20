@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-
 namespace CompiledBindings.Tests.XF;
 
 [TestClass]
@@ -22,7 +21,6 @@ public class XFTests
 	{
 		TestPage("Page2");
 	}
-
 
 	private void TestPage(string pageName)
 	{
