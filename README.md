@@ -189,6 +189,30 @@ Than you can use it:
 
 Note, that the Color property is not called twice. Its value is taken only once, saved as local variable in the generated C# code, and than the values are set to the Control's properties.
 
+### Binding to events as target.
+
+You can binding to a controls event and have a function at the end of expression, which will be called when the event is triggered. If you want to receive the event parameters, the signature of the function must be the same as the event handler. The function in the expression must be used without parameters.
+
+``` xaml
+<TextBox Drop="{x:Bind _viewModel.OnDrop}"/>
+```
+``` c#
+public void OnDrop(object sender, System.Windows.DragEventArgs e)
+{
+}
+```
+
+You can use also a function with any signature, passing the parameters in XAML.
+
+``` xaml
+<Button Click="{x:Bind _viewModel.Save(true)}"/>
+```
+``` c#
+public void Save(bool parameter)
+{
+}
+```
+
 ## x:Set Markup Extension
 
 This library also provides {x:Set} Markup Extension. It has an expression parameter, similar like {x:Bind}, and no other parameters. The data source of {x:Set} is always the root page/control/window itself. The expression is evaluated and set only once at the end of constructors of the page/control/window. If an expression is a static property of some type, than it is similar to {x:Static} Markup Extension.
@@ -218,10 +242,10 @@ The extension method for example above can look like this:
  ```c#
 public static void SetFocused(this VisualElement visualElement, bool focused)
 {
-		if (focused)
-		{
-				visualElement.Focus();
-		}
+    if (focused)
+    {
+        visualElement.Focus();
+    }
 }
 ``` 
 
