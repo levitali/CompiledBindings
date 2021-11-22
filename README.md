@@ -120,7 +120,7 @@ If you use {x:Bind} to set the ItemsSource property of a collection control (Lis
 </CollectionView>
  ```
  
- Note, that it works only if the DataTemplate is specifed a XAML child to the collection control.
+ Note, that it works only if the DataTemplate is specifed as a XAML child to the collection control.
 
 ### x:Bind other parameters
 
