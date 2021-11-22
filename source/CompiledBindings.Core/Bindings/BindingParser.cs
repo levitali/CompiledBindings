@@ -7,7 +7,7 @@ public static class BindingParser
 	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, TypeInfo converterType, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
-		var str = xBind.Value;
+		var str = xBind.Value?.TrimEnd();
 		if (string.IsNullOrWhiteSpace(str))
 		{
 			throw new ParseException("Missing expression.");
@@ -46,7 +46,7 @@ public static class BindingParser
 			sourceType = dataType ?? targetType;
 		}
 
-		int pos1 = 0;
+		int currentPos = 0, pos1 = 0;
 		while (true)
 		{
 			if (pos1 == str!.Length)
@@ -54,14 +54,17 @@ public static class BindingParser
 				break;
 			}
 
-			str = str.Substring(pos1).Trim();
-			if (str.Length == 0)
+			var str2 = str.Substring(pos1).TrimStart();
+			if (str2.Length == 0)
 			{
 				break;
 			}
 
+			currentPos += str.Length - str2.Length;
+			str = str2;
+
 			bool parseExpression = false;
-			match = Regex.Match(str, @"^\s*(\w+)\s*=\s*(.+)\s*$");
+			match = Regex.Match(str, @"^(\w+)\s*=\s*(.+)\s*$");
 			if (!match.Success)
 			{
 				if (expression == null)
@@ -120,7 +123,15 @@ public static class BindingParser
 				}
 				else
 				{
-					expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out var includeNamespaces, out pos1);
+					IList<XamlNamespace> includeNamespaces;
+					try
+					{
+						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces, out pos1);
+					}
+					catch (ParseException ex)
+					{
+						throw new ParseException(ex.Message, currentPos + ex.Position, ex.Length);
+					}
 					includeNamespaces.ForEach(ns => prop.IncludeNamespaces.Add(ns.ClrNamespace!));
 				}
 				if (name == "Path")
@@ -179,7 +190,7 @@ public static class BindingParser
 						{
 							msg += " Use 'eq' instead of '=' to compare 'Mode' in expression.";
 						}
-						throw new ParseException(msg, pos1);
+						throw new ParseException(msg, currentPos + match.Groups[2].Index);
 					}
 				}
 				else if (name == "DataType")
@@ -190,7 +201,7 @@ public static class BindingParser
 				{
 					if (!bool.TryParse(value, out isItemsSource))
 					{
-						throw new ParseException($"Invalid boolean value: {value}", pos1);
+						throw new ParseException($"Invalid boolean value: {value}", currentPos + match.Groups[2].Index);
 					}
 				}
 				else
@@ -204,14 +215,14 @@ public static class BindingParser
 						targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == value);
 						if (targetChangedEvent == null)
 						{
-							throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.");
+							throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
 						}
 					}
 				}
 			}
 			else
 			{
-				throw new ParseException($"Property {name} is not valid for x:Bind"); //TODO! position
+				throw new ParseException($"Property {name} is not valid for x:Bind", currentPos);
 			}
 		}
 

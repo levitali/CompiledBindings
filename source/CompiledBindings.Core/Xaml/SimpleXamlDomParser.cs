@@ -32,7 +32,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public SimpleXamlDom Parse(string file, XDocument xamlDoc)
 	{
-		File = file;
+		CurrentFile = file;
 
 		UsedNames = new HashSet<string>(xamlDoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
 
@@ -81,7 +81,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				}
 			}
 
-			rootResult.StaticUpdate = ExpressionUtils.CreateUpdateMethod(rootResult.XamlObjects);
+			rootResult.UpdateMethod = ExpressionUtils.CreateUpdateMethod(rootResult.XamlObjects);
 
 			DataType = savedDataType;
 
@@ -153,7 +153,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				if (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate && xelement != xamlDoc.Root))
 				{
 					var type = xelement == xamlDoc.Root ? result.TargetType : FindType(xelement);
-					obj = new XamlObject(new XamlNode(file, xelement, xelement.Name), type)
+					obj = new XamlObject(new XamlNode(xelement, xelement.Name), type)
 					{
 						Name = viewName,
 						NameExplicitlySet = nameExplicitlySet
@@ -166,7 +166,7 @@ public class SimpleXamlDomParser : XamlDomParser
 						{
 							try
 							{
-								var xamlNode = XamlParser.ParseAttribute(file, attr, KnownNamespaces);
+								var xamlNode = XamlParser.ParseAttribute(attr, KnownNamespaces);
 								var prop = GetObjectProperty(obj, xamlNode);
 								obj.Properties.Add(prop);
 
@@ -248,7 +248,7 @@ public class SimpleXamlDomParser : XamlDomParser
 							var dataTemplate = new SimpleXamlDom(child);
 							int index = result.DataTemplates.Count;
 							ProcessRoot(dataTemplate, child, elementType);
-							if (dataTemplate.BindingScopes.Count > 0 || !dataTemplate.StaticUpdate!.IsEmpty)
+							if (dataTemplate.BindingScopes.Count > 0 || !dataTemplate.UpdateMethod!.IsEmpty)
 							{
 								result.DataTemplates.Insert(index, dataTemplate);
 							}
@@ -270,7 +270,10 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public virtual bool IsMemExtension(XAttribute a)
 	{
-		return a.Name.Namespace == mNamespace || a.Value.StartsWith("{x:Set ");
+		return a.Name.Namespace == mNamespace ||
+			   a.Value.StartsWith("[x:Bind ") ||
+			   a.Value.StartsWith("{x:Set ") ||
+			   a.Value.StartsWith("[x:Set ");
 	}
 }
 
@@ -289,14 +292,14 @@ public class SimpleXamlDom
 	public List<XamlObject>? XamlObjects;
 	public bool HasDestructor;
 
-	public UpdateMethod StaticUpdate;
+	public UpdateMethod UpdateMethod;
 
 	public List<SimpleXamlDom> DataTemplates = new List<SimpleXamlDom>();
 
 	public bool GenerateInitializeMethod =>
 		BindingScopes.Count > 0 ||
-		StaticUpdate.SetExpressions.Count > 0 ||
-		StaticUpdate.SetProperties?.Count > 0;
+		UpdateMethod.SetExpressions.Count > 0 ||
+		UpdateMethod.SetProperties?.Count > 0;
 
 	public bool GenerateCode =>
 		GenerateInitializeMethod ||

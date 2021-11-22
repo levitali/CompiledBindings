@@ -4,21 +4,21 @@ namespace CompiledBindings;
 
 public class XamlParser
 {
-	public static XamlNode ParseElement(string file, XElement element, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode ParseElement(XElement element, IList<XamlNamespace>? knownNamespaces)
 	{
-		return ParseElement(file, element, element.Name.LocalName, knownNamespaces);
+		return ParseElement(element, element.Name.LocalName, knownNamespaces);
 	}
 
-	private static XamlNode ParseElement(string file, XElement element, string name, IList<XamlNamespace>? knownNamespaces)
+	private static XamlNode ParseElement(XElement element, string name, IList<XamlNamespace>? knownNamespaces)
 	{
-		var node = new XamlNode(file, element, element.Name.Namespace + name)
+		var node = new XamlNode(element, element.Name.Namespace + name)
 		{
 			Value = element.Value
 		};
 
 		foreach (var attribute in element.Attributes().Where(a => a.Name != "xmlns" && a.Name.Namespace != XNamespace.Xmlns))
 		{
-			node.Properties.Add(ParseAttribute(file, attribute, knownNamespaces));
+			node.Properties.Add(ParseAttribute(attribute, knownNamespaces));
 		}
 
 		string propertyStartPart = node.Name.LocalName + ".";
@@ -26,20 +26,20 @@ public class XamlParser
 		{
 			if (child.Name.LocalName.StartsWith(propertyStartPart))
 			{
-				node.Properties.Add(ParseElement(file, child, child.Name.LocalName.Substring(propertyStartPart.Length), knownNamespaces));
+				node.Properties.Add(ParseElement(child, child.Name.LocalName.Substring(propertyStartPart.Length), knownNamespaces));
 			}
 			else
 			{
-				node.Children.Add(ParseElement(file, child, child.Name.LocalName, knownNamespaces));
+				node.Children.Add(ParseElement(child, child.Name.LocalName, knownNamespaces));
 			}
 		}
 
 		return node;
 	}
 
-	public static XamlNode ParseAttribute(string file, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode ParseAttribute(XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		var node = new XamlNode(file, attribute, attribute.Name);
+		var node = new XamlNode(attribute, attribute.Name);
 
 		string str = attribute.Value.Trim();
 		bool squareBracket = false;
@@ -50,7 +50,7 @@ public class XamlParser
 			{
 				throw new ParseException($"Expected {expecedBracket}", str.Length);
 			}
-			node.Children.Add(ParseMarkupExtension(attribute, file, knownNamespaces));
+			node.Children.Add(ParseMarkupExtension(attribute, knownNamespaces));
 		}
 		else
 		{
@@ -60,14 +60,15 @@ public class XamlParser
 		return node;
 	}
 
-	private static XamlNode ParseMarkupExtension(XAttribute attribute, string file, IList<XamlNamespace>? knownNamespaces)
+	private static XamlNode ParseMarkupExtension(XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		return ParseMarkupExtension(attribute.Value.Trim(), attribute, file, knownNamespaces);
+		return ParseMarkupExtension(attribute.Value.Trim(), attribute, knownNamespaces);
 	}
 
-	public static XamlNode ParseMarkupExtension(string str, XAttribute attribute, string file, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode ParseMarkupExtension(string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
 		string? value;
+		int valueOffset;
 
 		// Get the name
 		int pos = str.IndexOf(' ', 1);
@@ -75,16 +76,19 @@ public class XamlParser
 		{
 			pos = str.Length - 1;
 			value = null;
+			valueOffset = 0;
 		}
 		else
 		{
-			value = str.Substring(pos + 1, str.Length - pos - 2).Trim();
+			value = str.Substring(pos + 1, str.Length - pos - 2).TrimStart();
+			valueOffset = str.Length - value.Length - 1;
+			value = value.TrimEnd();
 		}
 
 		string name = str.Substring(1, pos - 1);
 		var nodeName = GetTypeName(name, attribute.Parent, knownNamespaces);
 
-		return new XamlNode(file, attribute, nodeName) { Value = value };
+		return new XamlNode(attribute, nodeName) { Value = value, ValueOffset = valueOffset };
 	}
 
 	public static XName GetTypeName(string value, XObject xobject, IList<XamlNamespace>? knownNamespaces)
@@ -142,14 +146,11 @@ public class XamlNode
 	private List<XamlNode>? _properties;
 	private List<XamlNode>? _children;
 
-	public XamlNode(string file, XObject element, XName name)
+	public XamlNode(XObject element, XName name)
 	{
-		File = file;
 		Element = element;
 		Name = name;
 	}
-
-	public string File { get; }
 	public XObject Element { get; }
 	public XName Name { get; }
 
@@ -162,6 +163,8 @@ public class XamlNode
 	}
 
 	public string? Value { get; set; }
+
+	public int ValueOffset { get; set; }
 
 	public void Remove()
 	{
