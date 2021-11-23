@@ -99,7 +99,6 @@ namespace WPFTest.Views
 				}
 #line default
 #line hidden
-
 			}
 		}
 	}

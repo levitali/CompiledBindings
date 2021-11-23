@@ -48,7 +48,7 @@
                         ProjectPath="$(MSBuildProjectDirectory)"
                         IntermediateOutputPath="$(IntermediateOutputPath)"
                         LangVersion="$(LangVersion)"
-                        AttachDebugger="true">
+                        AttachDebugger="false">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
     </XFGenerateCodeTask>
     <ItemGroup>

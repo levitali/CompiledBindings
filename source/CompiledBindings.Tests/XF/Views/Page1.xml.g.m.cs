@@ -313,7 +313,6 @@ namespace XFTest.Views
 				targetRoot.list.ItemsSource = dataRoot.ListProp;
 #line default
 #line hidden
-
 			}
 
 			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
@@ -783,7 +782,6 @@ namespace XFTest.Views
 				targetRoot.label3.Text = dataRoot.BooleanProp.ToString();
 #line default
 #line hidden
-
 			}
 
 			class Page1_DataTemplate1_BindingsTrackings_rootElement
@@ -935,7 +933,6 @@ namespace XFTest.Views
 				targetRoot.label9.Text = dataRoot.DecimalProp.ToString();
 #line default
 #line hidden
-
 			}
 
 			class Page1_DataTemplate2_BindingsTrackings_rootElement
