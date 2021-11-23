@@ -68,6 +68,7 @@ public class XamlParser
 	public static XamlNode ParseMarkupExtension(string str, XAttribute attribute, string file, IList<XamlNamespace>? knownNamespaces)
 	{
 		string? value;
+		int valueOffset;
 
 		// Get the name
 		int pos = str.IndexOf(' ', 1);
@@ -75,16 +76,19 @@ public class XamlParser
 		{
 			pos = str.Length - 1;
 			value = null;
+			valueOffset = 0;
 		}
 		else
 		{
-			value = str.Substring(pos + 1, str.Length - pos - 2).Trim();
+			value = str.Substring(pos + 1, str.Length - pos - 2).TrimStart();
+			valueOffset = str.Length - value.Length - 1;
+			value = value.TrimEnd();
 		}
 
 		string name = str.Substring(1, pos - 1);
 		var nodeName = GetTypeName(name, attribute.Parent, knownNamespaces);
 
-		return new XamlNode(file, attribute, nodeName) { Value = value };
+		return new XamlNode(file, attribute, nodeName) { Value = value, ValueOffset = valueOffset };
 	}
 
 	public static XName GetTypeName(string value, XObject xobject, IList<XamlNamespace>? knownNamespaces)
@@ -162,6 +166,7 @@ public class XamlNode
 	}
 
 	public string? Value { get; set; }
+	public int ValueOffset { get; set; }
 
 	public void Remove()
 	{

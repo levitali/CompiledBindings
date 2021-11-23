@@ -15,7 +15,10 @@ namespace WPFTest.Views
 
 			_generatedCodeInitialized = true;
 
+#line 0 "Page2.xml"
 			button2.Click += (p1, p2) => this.OnClick2();
+#line default
+#line hidden
 
 			Bindings.Initialize(this);
 		}
@@ -48,8 +51,11 @@ namespace WPFTest.Views
 
 				Update();
 
+#line 0 "Page2.xml"
 				_eventHandler2 = dataRoot.OnClick1;
 				_targetRoot.button1.Click += _eventHandler2;
+#line default
+#line hidden
 			}
 
 			public void Cleanup()
@@ -73,12 +79,14 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
 				var bindings = this;
+#line 0 "Page2.xml"
 				targetRoot.textBlock1.Text = dataRoot.Prop1;
 				Set0(bindings._generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
 				{
 					try
 					{
+#line 0 "Page2.xml"
 						var value = await dataRoot.Prop2;
 						if (!cancellationToken.IsCancellationRequested)
 						{
@@ -89,6 +97,8 @@ namespace WPFTest.Views
 					{
 					}
 				}
+#line default
+#line hidden
 
 			}
 		}

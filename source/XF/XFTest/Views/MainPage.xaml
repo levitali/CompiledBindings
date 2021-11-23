@@ -26,7 +26,7 @@
         <Label Text="{x:Set local:Strings.Instance.Header1}" />
         <Label
             IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
-            Text="{x:Bind DecimalProp.ToString('0.###')}"
+            Text="{x:Bind DecimalProp.ToString('0.###', 3)}"
             TextColor="{x:Set Color.Aqua}" />
         <CollectionView
             ItemTemplate="{StaticResource test1Template}"

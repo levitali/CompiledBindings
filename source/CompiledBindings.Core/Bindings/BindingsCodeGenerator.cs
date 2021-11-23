@@ -156,6 +156,9 @@ $@"
 			{
 				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", null, ref dummyLocalVar, ref dummyLocalFunc, "\t");
 			}
+			output.AppendLine(
+$@"#line default
+#line hidden");
 		}
 
 		// Generate setting PropertyChanged event handler for data root
@@ -293,12 +296,15 @@ $@"				var bindings = this;");
 		}
 		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "targetRoot", a: "\t");
 
-		output.AppendLine();
-
-		foreach (var group in bindingsData.NotifyPropertyChangedList.Where(g => g != rootGroup))
+		var setPropHandlers = bindingsData.NotifyPropertyChangedList.Where(g => g != rootGroup).ToList();
+		if (setPropHandlers.Count > 0)
 		{
-			output.AppendLine(
+			output.AppendLine();
+			foreach (var group in setPropHandlers)
+			{
+				output.AppendLine(
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
+			}
 		}
 
 		// Close Update method

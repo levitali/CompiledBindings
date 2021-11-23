@@ -39,8 +39,12 @@ namespace XFTest.Views
 
 			someConverter = (global::Xamarin.Forms.IValueConverter)(this.Resources.ContainsKey("someConverter") == true ? this.Resources["someConverter"] : global::Xamarin.Forms.Application.Current.Resources["someConverter"]);
 
+#line 0 "Page2.xml"
 			label7.Text = Test.BarcodeKeys.HU + "," + Test.BarcodeKeys.Batch;
+#line 0 "Page2.xml"
 			button1.Clicked += this.OnClicked;
+#line default
+#line hidden
 
 			this.BindingContextChanged += this_BindingContextChanged;
 			if (this.BindingContext is global::XFTest.Views.Page2 dataRoot0)
@@ -109,14 +113,24 @@ namespace XFTest.Views
 				var value3 = dataRoot._viewModel?.GetIcon();
 				var value4 = dataRoot._viewModel?.Group?[0];
 				var value5 = value1?.GuidProp.ToString();
+#line 0 "Page2.xml"
 				targetRoot.label1.Text = value2?.GuidProp.ToString();
+#line 0 "Page2.xml"
 				targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel?.StringProp, typeof(global::System.String), dataRoot._viewModel?.DecimalProp + 1, null));
+#line 0 "Page2.xml"
 				targetRoot.label3.Text = dataRoot._viewModel?.CalculateString().TrimNumber();
+#line 0 "Page2.xml"
 				targetRoot.label4.Text = value5;
+#line 0 "Page2.xml"
 				targetRoot.label5.Text = value5;
+#line 0 "Page2.xml"
 				targetRoot.label6.Text = value4?.GuidProp.ToString();
+#line 0 "Page2.xml"
 				targetRoot.label8.FontFamily = value3.Item1;
+#line 0 "Page2.xml"
 				targetRoot.label8.Text = value3.Item2;
+#line default
+#line hidden
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value2);
@@ -217,7 +231,10 @@ namespace XFTest.Views
 					if (notifyAll || e.PropertyName == "CurrentItem")
 					{
 						var value1 = typedSender.CurrentItem;
+#line 0 "Page2.xml"
 						targetRoot.label1.Text = value1?.GuidProp.ToString();
+#line default
+#line hidden
 						SetPropertyChangedEventHandler1(value1);
 						if (!notifyAll)
 						{
@@ -226,7 +243,10 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "StringProp")
 					{
+#line 0 "Page2.xml"
 						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(typedSender.StringProp, typeof(global::System.String), dataRoot._viewModel?.DecimalProp + 1, null));
+#line default
+#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -234,7 +254,10 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "DecimalProp")
 					{
+#line 0 "Page2.xml"
 						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel?.StringProp, typeof(global::System.String), typedSender.DecimalProp + 1, null));
+#line default
+#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -244,8 +267,12 @@ namespace XFTest.Views
 					{
 						var value1 = typedSender.FuncProp?.Invoke("test");
 						var value2 = value1?.GuidProp.ToString();
+#line 0 "Page2.xml"
 						targetRoot.label4.Text = value2;
+#line 0 "Page2.xml"
 						targetRoot.label5.Text = value2;
+#line default
+#line hidden
 						SetPropertyChangedEventHandler2(value1);
 						if (!notifyAll)
 						{
@@ -255,7 +282,10 @@ namespace XFTest.Views
 					if (notifyAll || e.PropertyName == "Group")
 					{
 						var value1 = typedSender.Group?[0];
+#line 0 "Page2.xml"
 						targetRoot.label6.Text = value1?.GuidProp.ToString();
+#line default
+#line hidden
 						SetPropertyChangedEventHandler3(value1);
 						if (!notifyAll)
 						{
@@ -279,7 +309,10 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "GuidProp")
 					{
+#line 0 "Page2.xml"
 						targetRoot.label1.Text = typedSender.GuidProp.ToString();
+#line default
+#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -303,8 +336,12 @@ namespace XFTest.Views
 					if (notifyAll || e.PropertyName == "GuidProp")
 					{
 						var value1 = typedSender.GuidProp.ToString();
+#line 0 "Page2.xml"
 						targetRoot.label4.Text = value1;
+#line 0 "Page2.xml"
 						targetRoot.label5.Text = value1;
+#line default
+#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -327,7 +364,10 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "GuidProp")
 					{
+#line 0 "Page2.xml"
 						targetRoot.label6.Text = typedSender.GuidProp.ToString();
+#line default
+#line hidden
 						if (!notifyAll)
 						{
 							return;

@@ -1,0 +1,169 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.6.1": {
+      "CompiledBindings/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "compile": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win7-x86": {
+      "CompiledBindings/1.0.0": {
+        "type": "project",
+        "framework": ".NETFramework,Version=v4.0",
+        "compile": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        }
+      }
+    },
+    "net6.0-windows7.0": {
+      "CompiledBindings/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.0",
+        "compile": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WPF"
+        ]
+      }
+    },
+    "net6.0-windows7.0/win7-x86": {
+      "CompiledBindings/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.0",
+        "compile": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/CompiledBindings.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App.WPF"
+        ]
+      }
+    }
+  },
+  "libraries": {
+    "CompiledBindings/1.0.0": {
+      "type": "project",
+      "path": "../CompiledBindings/CompiledBindings.csproj",
+      "msbuildProject": "../CompiledBindings/CompiledBindings.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.6.1": [
+      "CompiledBindings >= 1.0.0"
+    ],
+    "net6.0-windows7.0": [
+      "CompiledBindings >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Vitali\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
+    "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\WPFTest\\WPFTest.csproj",
+      "projectName": "WPFTest",
+      "projectPath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\WPFTest\\WPFTest.csproj",
+      "packagesPath": "C:\\Users\\Vitali\\.nuget\\packages\\",
+      "outputPath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\WPFTest\\obj\\",
+      "projectStyle": "PackageReference",
+      "crossTargeting": true,
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+        "C:\\Program Files (x86)\\Microsoft\\Xamarin\\NuGet\\"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Vitali\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net461",
+        "net6.0-windows"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "W:\\nugets": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nuget.membrain-it.com/nuget/External": {},
+        "https://nuget.membrain-it.com/nuget/Membrain": {},
+        "https://nuget.membrain-it.com/nuget/Test": {}
+      },
+      "frameworks": {
+        "net6.0-windows7.0": {
+          "targetAlias": "net6.0-windows",
+          "projectReferences": {
+            "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings\\CompiledBindings.csproj": {
+              "projectPath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings\\CompiledBindings.csproj"
+            }
+          }
+        },
+        "net461": {
+          "targetAlias": "net461",
+          "projectReferences": {
+            "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings\\CompiledBindings.csproj": {
+              "projectPath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings\\CompiledBindings.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net6.0-windows7.0": {
+        "targetAlias": "net6.0-windows",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          },
+          "Microsoft.WindowsDesktop.App.WPF": {
+            "privateAssets": "none"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+      },
+      "net461": {
+        "targetAlias": "net461",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+      }
+    },
+    "runtimes": {
+      "win7-x86": {
+        "#import": []
+      }
+    }
+  }
+}

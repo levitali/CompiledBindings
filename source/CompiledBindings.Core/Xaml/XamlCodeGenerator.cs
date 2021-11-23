@@ -88,13 +88,15 @@ public class XamlCodeGenerator
 				if (property.Value.BindValue != null)
 				{
 					output.AppendLine(
-$@"{a}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
+$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+{a}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
 {a}			{setExpr} += {bindingsAccess}_eventHandler{property.Value.BindValue.Index};");
 				}
 				else
 				{
 					output.AppendLine(
-$@"{a}			{setExpr} += {value};");
+$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+{a}			{setExpr} += {value};");
 				}
 			}
 			else
@@ -142,7 +144,8 @@ $@"{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
 			{
 				varName = "value" + localVarIndex++;
 				output.AppendLine(
-$@"{a}				var {varName} = {value};");
+$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+{a}				var {varName} = {value};");
 			}
 			else
 			{
@@ -175,7 +178,8 @@ $@"{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
 				if (fallbackValue != null)
 				{
 					output.AppendLine(
-$@"{a}					var task = {value};
+$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+{a}					var task = {value};
 {a}					if (!task.IsCompleted)
 {a}					{{
 {a}						{setExpr}{(isMethodCall ? $"({fallbackValue})" : $" = {fallbackValue}")};
@@ -183,7 +187,8 @@ $@"{a}					var task = {value};
 					value = "task";
 				}
 				output.AppendLine(
-$@"{a}					var value = await {value};
+$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+{a}					var value = await {value};
 {a}					if (!cancellationToken.IsCancellationRequested)
 {a}					{{
 {a}						{setExpr}{(isMethodCall ? $"(value)" : $" = value")};
@@ -197,7 +202,8 @@ $@"{a}					var value = await {value};
 			else
 			{
 				output.AppendLine(
-$@"{a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
+$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+{a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
 			}
 		}
 	}
@@ -225,6 +231,9 @@ $@"{a}			var {variable.Name} = {variable.Expression};");
 		{
 			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, a);
 		}
+		output.AppendLine(
+$@"#line default
+#line hidden");
 	}
 }
 

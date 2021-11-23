@@ -13,6 +13,7 @@ public class XamlDomParser
 	private readonly XName xNull;
 	private readonly XName xType;
 
+	private string _projectPath;
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
@@ -42,7 +43,7 @@ public class XamlDomParser
 
 	public IList<XamlNamespace>? KnownNamespaces { get; set; }
 
-	public string File { get; set; }
+	public string CurrentFile { get; set; }
 	public TypeInfo TargetType { get; set; }
 	public TypeInfo DataType { get; set; }
 
@@ -57,7 +58,7 @@ public class XamlDomParser
 		}
 		catch (Exception ex)
 		{
-			throw new GeneratorException(ex.Message, File, xClassAttr, xClassAttr.Value.Length);
+			throw new GeneratorException(ex.Message, CurrentFile, xClassAttr, xClassAttr.Value.Length);
 		}
 	}
 
@@ -70,7 +71,7 @@ public class XamlDomParser
 	{
 		if (value.StartsWith("{"))
 		{
-			var xamlNode = XamlParser.ParseMarkupExtension(value, attr, File, KnownNamespaces);
+			var xamlNode = XamlParser.ParseMarkupExtension(value, attr, CurrentFile, KnownNamespaces);
 			if (xamlNode.Name == xNull)
 			{
 				return null;
@@ -81,12 +82,12 @@ public class XamlDomParser
 			}
 			else
 			{
-				throw new GeneratorException($"Unexpected markup extension {xamlNode.Name}", File, attr);
+				throw new GeneratorException($"Unexpected markup extension {xamlNode.Name}", CurrentFile, attr);
 			}
 		}
 		if (value == null)
 		{
-			throw new GeneratorException($"Missing type.", File, attr);
+			throw new GeneratorException($"Missing type.", CurrentFile, attr);
 		}
 		return XamlParser.GetTypeName(value, attr.Parent, KnownNamespaces);
 	}
@@ -162,7 +163,7 @@ public class XamlDomParser
 				return type;
 			}
 		}
-		throw new GeneratorException($"The type {className} was not found.", File, xobject);
+		throw new GeneratorException($"The type {className} was not found.", CurrentFile, xobject);
 	}
 
 	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode)
@@ -277,7 +278,7 @@ public class XamlDomParser
 				}
 				catch (ParseException ex)
 				{
-					throw new ParseException(ex.Message, ex.Position + "x:Set".Length, ex.Length);
+					HandleParseException(ex);
 				}
 			}
 			else if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xBind)
@@ -303,7 +304,7 @@ public class XamlDomParser
 				}
 				catch (ParseException ex)
 				{
-					throw new ParseException(ex.Message, ex.Position + "x:Bind".Length, ex.Length);
+					HandleParseException(ex);
 				}
 			}
 			else
@@ -325,10 +326,19 @@ public class XamlDomParser
 			objProp.Value = value;
 
 			return objProp;
+
+			void HandleParseException(ParseException ex)
+			{
+				var offset = value!.Property.MemberName.Length +
+						2 + // ="    Note, if there are spaces in between, they are not considered
+						xamlNode.Children[0].ValueOffset +
+						ex.Position;
+				throw new ParseException(ex.Message, offset, ex.Length);
+			}
 		}
 		catch (ParseException ex)
 		{
-			throw new GeneratorException(ex.Message, xamlNode, ex.Position);
+			throw new GeneratorException(ex.Message, xamlNode, ex.Position, ex.Length);
 		}
 		catch (Exception ex) when (ex is not GeneratorException)
 		{

@@ -37,7 +37,7 @@ public class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 		var output = new StringBuilder();
 
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		_asyncFunctions = parseResult.StaticUpdate.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
+		_asyncFunctions = parseResult.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
 
 		if (parseResult.TargetType!.Type.Namespace != null)
 		{
@@ -268,7 +268,7 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 
 		GenerateInitializeResources(output, parseResult, rootElement, isDataTemplate);
 
-		_bindingsCodeGenerator.GenerateUpdateMethodBody(output, parseResult.StaticUpdate);
+		_bindingsCodeGenerator.GenerateUpdateMethodBody(output, parseResult.UpdateMethod);
 		output.AppendLine();
 
 		for (int i = 0; i < parseResult.BindingScopes.Count; i++)

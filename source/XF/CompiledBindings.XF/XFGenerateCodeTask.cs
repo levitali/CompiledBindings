@@ -27,6 +27,9 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	public string LocalAssembly { get; set; }
 
 	[Required]
+	public string ProjectPath { get; set; }
+
+	[Required]
 	public string IntermediateOutputPath { get; set; }
 
 	[Required]
@@ -65,6 +68,13 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 			var globalNamespaces = XamlNamespace.GetGlobalNamespaces(xamlFiles.Select(e => e.xdoc));
 			xamlDomParser.KnownNamespaces = globalNamespaces;
 
+			var intermediateOutputPath = IntermediateOutputPath;
+			bool isIntermediateOutputPathRooted = Path.IsPathRooted(intermediateOutputPath);
+			if (!isIntermediateOutputPathRooted)
+			{
+				intermediateOutputPath = Path.Combine(ProjectPath, intermediateOutputPath);
+			}
+
 			foreach (var (xaml, file, xdoc) in xamlFiles)
 			{
 				if (_cancellationTokenSource.IsCancellationRequested)
@@ -77,7 +87,26 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 					var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
 					if (xclass != null)
 					{
-						var parseResult = xamlDomParser.Parse(file, xdoc);
+						var targetRelativePath = xaml.GetMetadata("Link");
+						if (string.IsNullOrEmpty(targetRelativePath))
+						{
+							targetRelativePath = xaml.ItemSpec;
+						}
+						
+						string targetPath;
+						if (!isIntermediateOutputPathRooted)
+						{
+							var realPath = Path.Combine(ProjectPath, Path.GetDirectoryName(targetRelativePath));
+							var intermediatePath = Path.Combine(intermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
+							var relativePath = PathUtils.GetRelativePath(intermediatePath, realPath);
+							targetPath = Path.Combine(relativePath, Path.GetFileName(targetRelativePath));
+						}
+						else
+						{
+							targetPath = targetRelativePath;
+						}
+
+						var parseResult = xamlDomParser.Parse(targetPath, xdoc);
 
 						if (parseResult.GenerateCode)
 						{
@@ -86,12 +115,6 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 							bool dataTemplates = parseResult.DataTemplates.Count > 0;
 							generateDataTemplateBindings |= dataTemplates;
-
-							var targetRelativePath = xaml.GetMetadata("Link");
-							if (string.IsNullOrEmpty(targetRelativePath))
-							{
-								targetRelativePath = xaml.ItemSpec;
-							}
 
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var dirInfo = new DirectoryInfo(targetDir);

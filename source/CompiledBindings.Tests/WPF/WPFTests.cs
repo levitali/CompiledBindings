@@ -40,7 +40,7 @@ public class WPFTests
 			var xdoc = XDocument.Load(xamlFile);
 
 			var xamlDomParser = new WpfXamlDomParser();
-			var parseResult = xamlDomParser.Parse(xamlFile, xdoc);
+			var parseResult = xamlDomParser.Parse(Path.GetFileName(xamlFile), xdoc);
 			parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 
 			var codeGenerator = new WpfCodeGenerator("latest");

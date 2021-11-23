@@ -18,12 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="CompiledBindings" Condition="'$(TargetFramework)'=='net6.0-windows'">
-      <HintPath>..\..\..\bin\netcoreapp3.0\CompiledBindings.dll</HintPath>
-    </Reference>
-    <Reference Include="CompiledBindings" Condition="'$(TargetFramework)'=='net461'">
-      <HintPath>..\..\..\bin\net40\CompiledBindings.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,8 +43,7 @@
     <PropertyGroup>
       <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
     </PropertyGroup>
-    <WPFGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)"
-                         AttachDebugger="false">
+    <WPFGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" AttachDebugger="false">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
       <Output ItemName="NewPages" TaskParameter="NewPages" />
