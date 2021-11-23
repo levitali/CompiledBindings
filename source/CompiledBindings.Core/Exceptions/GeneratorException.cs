@@ -25,20 +25,18 @@ public class GeneratorException : Exception
 		}
 	}
 
-	public GeneratorException(string message, string file, XObject xnode, int offset = 0, int length = 0) : base(message)
+	public GeneratorException(string message, string file, XObject xnode, int offset = 0) : base(message)
 	{
 		File = file;
 		if (xnode is IXmlLineInfo lineInfo)
 		{
-			LineNumber = EndLineNumber = lineInfo.LineNumber;
+			LineNumber = lineInfo.LineNumber;
 			ColumnNumber = lineInfo.LinePosition;
 		}
 		ColumnNumber += offset;
-		EndColumnNumber = ColumnNumber + length; 
 	}
 
-	public GeneratorException(string message, string file, XamlNode xamlNode, int offset = 0, int length = 0) 
-		: this(message, file, xamlNode.Element, offset, length)
+	public GeneratorException(string message, XamlNode xamlNode, int offset = 0) : this(message, xamlNode.File, xamlNode.Element, offset)
 	{
 	}
 

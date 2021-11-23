@@ -44,7 +44,7 @@
             <TextBox Text="{x:Bind OrderInput, Mode=TwoWay}" />
             <TextBlock Text="{x:Set local:Strings.Instance.Header1}" />
             <TextBlock
-                Text="[x:Bind DecimalProp]"
+                Text="{x:Bind DecimalProp}"
                 Visibility="{x:Bind BooleanProp, Converter={StaticResource booleanToVisibilityConverter}}" />
             <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='aaa'}" />
             <TextBlock Text="{x:Bind ModifyViewModel.Input2, FallbackValue='aaa'}" />

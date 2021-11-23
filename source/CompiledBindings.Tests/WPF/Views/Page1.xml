@@ -50,7 +50,7 @@
         <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='abc'}" />
         <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='aaa'}" />
         <TextBlock Text="{x:Bind TaskProp, FallbackValue='Loading...'}" />
-        <Image Source="[x:Bind LoadImageAsync()]" />
+        <Image Source="{x:Bind LoadImageAsync()}" />
         <Button
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />

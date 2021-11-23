@@ -35,7 +35,7 @@ public class ExpressionParser
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
-			throw new ParseException("Empty expression.");
+			throw new ParseException("Empty expression.", 0);
 		}
 
 		var parser = new ExpressionParser(new ParameterExpression(dataType, member), expression!, resultType, namespaces);
@@ -283,7 +283,7 @@ public class ExpressionParser
 		return expr;
 	}
 
-	private MethodInfo FindMethod(TypeInfo type, string methodName, Expression[] args, int errPos)
+	private MethodInfo FindMethod(TypeInfo type, string methodName, Expression[] args)
 	{
 		type = GetNullableUnderlyingType(type);
 
@@ -340,7 +340,7 @@ public class ExpressionParser
 		}
 		if (method == null)
 		{
-			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Type.FullName}'", errPos, methodName.Length);
+			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Type.FullName}'");
 		}
 		return method;
 	}
@@ -408,8 +408,7 @@ public class ExpressionParser
 		bool? isParamsChar = null;
 		for (int i = 0; i < args.Length; i++)
 		{
-			var arg = args[i];
-			if (arg is ConstantExpression ce && ce.Value is string)
+			if (args[i] is ConstantExpression ce && ce.Value is string)
 			{
 				if (isParamsChar == null && i == method.Parameters.Count)
 				{
@@ -434,10 +433,10 @@ public class ExpressionParser
 				}
 				if (isParamsChar == true || method.Parameters[i].ParameterType.Type.FullName == "System.Char")
 				{
-					string value = (string)((ConstantExpression)arg).Value!;
+					string value = (string)((ConstantExpression)args[i]).Value!;
 					if (value.Length != 1)
 					{
-						throw new ParseException($"Cannot convert {i + 1} argument '{value}' to char.", errorPos);
+						throw new ParseException($"Cannot convert '{value}' to char.", errorPos);
 					}
 
 					args[i] = new ConstantExpression(value[0]);
@@ -464,7 +463,7 @@ public class ExpressionParser
 			//	NextToken();
 			//	return _root;
 			default:
-				throw new ParseException("Expression expected", _token.pos);
+				throw new ParseException("Expression expected");
 		}
 	}
 
@@ -488,11 +487,10 @@ public class ExpressionParser
 	private Expression ParseTypeofExpression()
 	{
 		NextToken();
-		int errorPos = _token.pos;
 		var args = ParseArgumentList();
 		if (args.Length != 1 || args[0] is not TypeExpression typeExpression)
 		{
-			throw new ParseException($"Invalid type.", errorPos);
+			throw new ParseException($"Invalid type.");
 		}
 		return new TypeofExpression(typeExpression);
 	}
@@ -526,7 +524,7 @@ public class ExpressionParser
 		{
 			if (!ulong.TryParse(text, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out ulong value))
 			{
-				throw new ParseException($"Invalid integer literal '{text}'", _token.pos);
+				throw new ParseException($"Invalid integer literal '{text}'");
 			}
 
 			NextToken();
@@ -551,7 +549,7 @@ public class ExpressionParser
 		{
 			if (!long.TryParse(text, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long value))
 			{
-				throw new ParseException($"Invalid integer literal '{text}'", _token.pos);
+				throw new ParseException($"Invalid integer literal '{text}'");
 			}
 
 			NextToken();
@@ -593,7 +591,7 @@ public class ExpressionParser
 		}
 		if (value == null)
 		{
-			throw new ParseException($"Invalid real literal '{text}'", _token.pos);
+			throw new ParseException($"Invalid real literal '{text}'");
 		}
 
 		NextToken();
@@ -693,7 +691,7 @@ public class ExpressionParser
 
 					var args = ParseArgumentList(argumentTypes);
 
-					var method = FindMethod(type, id, args, errorPos);
+					var method = FindMethod(type, id, args);
 					CorrectCharParameters(method, args, errorPos);
 					CorrectNotNullableParameters(method, args);
 					return new CallExpression(instance, method, args);
@@ -784,12 +782,7 @@ public class ExpressionParser
 		{
 			throw new ParseException($"Namespace '{ns.Namespace.NamespaceName}' is not CLR-Namespace.", errorPos);
 		}
-		typeName = ns.ClrNamespace + '.' + typeName;
-		var expressionType = TypeInfo.GetType(typeName);
-		if (expressionType == null)
-		{
-			throw new ParseException($"Type not found: {typeName}", errorPos);
-		}
+		var expressionType = TypeInfo.GetTypeThrow(ns.ClrNamespace + '.' + typeName);
 		return new TypeExpression(expressionType);
 	}
 
@@ -906,7 +899,7 @@ public class ExpressionParser
 				}
 				else
 				{
-					throw new ParseException(Res.OperatorNotSupported, _textPos);
+					throw new ParseException(Res.OperatorNotSupported);
 				}
 				break;
 			case '(':
@@ -1132,7 +1125,7 @@ public class ExpressionParser
 	{
 		if (_token.id != t)
 		{
-			throw new ParseException(errorMessage, _token.pos, _token.text.Length);
+			throw new ParseException(errorMessage);
 		}
 	}
 

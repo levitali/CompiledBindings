@@ -11,7 +11,7 @@
     x:Class="XFTest.Views.Page1"
     x:DataType="viewModels:Page1ViewModel"
     Title="{x:Set local:Strings.Instance.Title}">
-
+  
     <Page.Resources>
         <DataTemplate
             x:Key="test1Template"
@@ -62,7 +62,7 @@
         <Button
             x:DataType="{x:Null}"
             IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}"
-            Clicked="[x:Set Save]" />
+            Clicked="{x:Set Save}"/>
     </StackLayout>
 
 </Page>
