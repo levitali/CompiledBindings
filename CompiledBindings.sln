@@ -1,21 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8539C80A-72C9-4199-9B58-4F6BFD0EF04B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompiledBindings.Core", "source\CompiledBindings.Core\CompiledBindings.Core.csproj", "{5C7E00FD-1C0D-45D1-B4E8-B18C729C2FD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings.Core", "source\CompiledBindings.Core\CompiledBindings.Core.csproj", "{5C7E00FD-1C0D-45D1-B4E8-B18C729C2FD8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WPF", "WPF", "{8D6AE562-B45D-457E-8A85-375C1E508ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompiledBindings.WPF", "source\WPF\CompiledBindings.WPF\CompiledBindings.WPF.csproj", "{2260C42C-97EF-496E-9614-4BEDFFEBCDF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings.WPF", "source\WPF\CompiledBindings.WPF\CompiledBindings.WPF.csproj", "{2260C42C-97EF-496E-9614-4BEDFFEBCDF6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings", "source\WPF\CompiledBindings\CompiledBindings.csproj", "{3E5DFC80-4F63-4939-ABDF-450055F2B19F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XF", "XF", "{1AC8082A-6C6E-4E67-835E-59FF41E31C67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompiledBindings.XF", "source\XF\CompiledBindings.XF\CompiledBindings.XF.csproj", "{DB845705-796A-414A-B3C3-849B15006F50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings.XF", "source\XF\CompiledBindings.XF\CompiledBindings.XF.csproj", "{DB845705-796A-414A-B3C3-849B15006F50}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings", "source\XF\CompiledBindings\CompiledBindings.csproj", "{7ABBC627-9225-4D4E-993D-AD44DDFF36F9}"
 EndProject

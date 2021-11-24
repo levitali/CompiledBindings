@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, TypeInfo converterType, ref int localVarIndex)
+	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value?.TrimEnd();
@@ -101,15 +101,15 @@ public static class BindingParser
 					var resourceName = match2.Groups[1].Value;
 					var resourceType = name switch
 					{
-						"Converter" => converterType,
+						"Converter" => xamlDomParser.ConverterType,
 						"FallbackValue" or "TargetNullValue" => prop.MemberType,
 						_ => TypeInfo.GetTypeThrow(typeof(object))
 					};
 					resources.Add((resourceName, resourceType));
 
-					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, converterType.Type), converterType);
+					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, xamlDomParser.ConverterType.Type), xamlDomParser.ConverterType);
 					expr = new ParameterExpression(targetType, "targetRoot");
-					expr = new MemberExpression(expr, resourceField, new TypeInfo(converterType, false));
+					expr = new MemberExpression(expr, resourceField, new TypeInfo(xamlDomParser.ConverterType, false));
 
 					int pos2 = str.IndexOf(',');
 					if (pos2 == -1)
@@ -264,7 +264,7 @@ public static class BindingParser
 
 		if (sourceExpression != null && converter != null)
 		{
-			var convertMethod = converterType.Methods.First(m => m.Definition.Name == "Convert");
+			var convertMethod = xamlDomParser.ConverterType.Methods.First(m => m.Definition.Name == "Convert");
 			sourceExpression = new CallExpression(converter, convertMethod, new Expression[]
 			{
 					sourceExpression,

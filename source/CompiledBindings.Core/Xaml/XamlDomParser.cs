@@ -291,7 +291,7 @@ public class XamlDomParser
 						.Select(e => e.Attribute(xDefaultBindMode))
 						.FirstOrDefault(a => a != null);
 					var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-					value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, ConverterType, ref _localVarIndex);
+					value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, ref _localVarIndex);
 					if (value.BindValue.SourceExpression != null)
 					{
 						if (value.BindValue.Converter == null)

@@ -8,9 +8,11 @@ namespace XFTest
 
 		public string? Category { get; set; }
 
-		public string? Title => "Test";
+		public string Title => "Test";
 
-		public string? Header1 => "Header1";
+		public string Header1 => "Header1";
+
+		public string Header2 => "Header2";
 
 	}
 }
