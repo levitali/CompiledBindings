@@ -23,6 +23,7 @@ namespace WPFTest.Views
 			TrueToVisibleConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["TrueToVisibleConverter"] ?? global::System.Windows.Application.Current.Resources["TrueToVisibleConverter"] ?? throw new global::System.Exception("Resource 'TrueToVisibleConverter' not found."));
 			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
 
+#line 0 "Page1.xml"
 			var value1 = WPFTest.Strings.Instance;
 #line 0 "Page1.xml"
 			Title = value1.Title;
@@ -314,9 +315,13 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				var bindings = this;
+#line 0 "Page1.xml"
 				var value1 = dataRoot.ModifyViewModel;
+#line 0 "Page1.xml"
 				var value2 = dataRoot.ArrayProp.Length > 0;
+#line 0 "Page1.xml"
 				var value3 = dataRoot.BooleanProp;
+#line 0 "Page1.xml"
 				var value4 = dataRoot.DecimalProp;
 #line 0 "Page1.xml"
 				targetRoot.header1.Visibility = (value3 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
@@ -405,6 +410,7 @@ namespace WPFTest.Views
 					_settingBinding4 = true;
 					try
 					{
+#line 0 "Page1.xml"
 						dataRoot.OrderInput = _targetRoot.textBox1.Text;
 					}
 					catch
@@ -415,6 +421,8 @@ namespace WPFTest.Views
 						_settingBinding4 = false;
 					}
 				}
+#line default
+#line hidden
 			}
 
 			private void OnTargetChanged1(object sender, global::System.EventArgs e)
@@ -426,6 +434,7 @@ namespace WPFTest.Views
 					_settingBinding5 = true;
 					try
 					{
+#line 0 "Page1.xml"
 						dataRoot.BoolInput = (global::System.Boolean)targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
 					}
 					catch
@@ -436,6 +445,8 @@ namespace WPFTest.Views
 						_settingBinding5 = false;
 					}
 				}
+#line default
+#line hidden
 			}
 
 			class Page1_BindingsTrackings_this
@@ -498,6 +509,7 @@ namespace WPFTest.Views
 
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
+#line 0 "Page1.xml"
 						var value1 = typedSender.BooleanProp;
 #line 0 "Page1.xml"
 						targetRoot.header1.Visibility = (value1 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
@@ -512,6 +524,7 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "DecimalProp")
 					{
+#line 0 "Page1.xml"
 						var value1 = typedSender.DecimalProp;
 #line 0 "Page1.xml"
 						targetRoot.textBlock5.Text = value1.ToString();
@@ -562,6 +575,7 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "ArrayProp")
 					{
+#line 0 "Page1.xml"
 						var value1 = typedSender.ArrayProp.Length > 0;
 						if (!bindings._settingBinding5)
 						{
@@ -594,6 +608,7 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "ModifyViewModel")
 					{
+#line 0 "Page1.xml"
 						var value1 = typedSender.ModifyViewModel;
 #line 0 "Page1.xml"
 						targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
@@ -764,7 +779,9 @@ namespace WPFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
+#line 0 "Page1.xml"
 				var value1 = dataRoot.BooleanProp;
+#line 0 "Page1.xml"
 				var value2 = dataRoot.Model;
 #line 0 "Page1.xml"
 				targetRoot.textBlock1.Text = value2.SByteProp.ToString();
@@ -838,6 +855,7 @@ namespace WPFTest.Views
 
 					if (notifyAll || e.PropertyName == "Model")
 					{
+#line 0 "Page1.xml"
 						var value1 = typedSender.Model;
 #line 0 "Page1.xml"
 						targetRoot.textBlock1.Text = value1.SByteProp.ToString();
@@ -851,6 +869,7 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
+#line 0 "Page1.xml"
 						var value1 = typedSender.BooleanProp;
 #line 0 "Page1.xml"
 						targetRoot.textBlock2.Text = value1.ToString();

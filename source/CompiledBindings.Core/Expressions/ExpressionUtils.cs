@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public static class ExpressionUtils
 {
-	public static List<LocalVariable> GroupExpressions(IReadOnlyList<PropertySetExpressionBase> setExpressions)
+	public static List<LocalVariable> GroupExpressions(IReadOnlyList<PropertySetExpression> setExpressions)
 	{
 		int localVarIndex = 1;
 		List<LocalVariable> localVars = new();
@@ -26,7 +26,7 @@ public static class ExpressionUtils
 				break;
 			}
 
-			var expression = group.First().expr;
+			var (pr, expression) = group.First();
 			var type = expression.Type;
 			if (!type.IsNullable && expression.IsNullable)
 			{
@@ -40,7 +40,7 @@ public static class ExpressionUtils
 				}
 			}
 
-			var localVar = new LocalVariable("value" + localVarIndex++, expression);
+			var localVar = new LocalVariable("value" + localVarIndex++, expression, pr.Property);
 			var localVarExpr = new ParameterExpression(type, localVar.Name);
 			foreach (var prop in group.Distinct(p => p.property))
 			{
@@ -101,36 +101,30 @@ public static class ExpressionUtils
 	}
 }
 
-public class PropertySetExpressionBase
+public class PropertySetExpression
 {
-	public PropertySetExpressionBase(Expression expression)
+	public PropertySetExpression(XamlObjectProperty property, Expression expression)
 	{
+		Property = property;
 		Expression = expression;
 	}
 
-	public Expression Expression { get; set; }
-}
-
-public class PropertySetExpression : PropertySetExpressionBase
-{
-	public PropertySetExpression(XamlObjectProperty property, Expression expression) : base(expression)
-	{
-		Property = property;
-	}
-
 	public XamlObjectProperty Property { get; }
+	public Expression Expression { get; set; }
 }
 
 public class LocalVariable
 {
-	public LocalVariable(string name, Expression expression)
+	public LocalVariable(string name, Expression expression, XamlObjectProperty firstProperty)
 	{
 		Name = name;
 		Expression = expression;
+		FirstProperty = firstProperty;
 	}
 
 	public string Name { get; }
 	public Expression Expression { get; }
+	public XamlObjectProperty FirstProperty { get; }
 }
 
 public class UpdateMethod

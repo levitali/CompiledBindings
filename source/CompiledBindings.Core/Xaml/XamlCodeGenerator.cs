@@ -224,7 +224,8 @@ $@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.Xaml
 		foreach (var variable in updateMethod.LocalVariables)
 		{
 			output.AppendLine(
-$@"{a}			var {variable.Name} = {variable.Expression};");
+$@"#line {((IXmlLineInfo)variable.FirstProperty.XamlNode.Element).LineNumber} ""{variable.FirstProperty.XamlNode.File}""
+{a}			var {variable.Name} = {variable.Expression};");
 		}
 
 		foreach (var prop in updateMethod.SetExpressions)

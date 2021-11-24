@@ -120,6 +120,7 @@
                          Pages="@(Page)"
                          ReferenceAssemblies="@(ReferencePath)"
                          LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
+                         ProjectPath="$(MSBuildProjectDirectory)"
                          IntermediateOutputPath="$(IntermediateOutputPath)"
                          LangVersion="$(LangVersion)">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />

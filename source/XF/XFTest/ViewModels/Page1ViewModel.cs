@@ -9,6 +9,8 @@ namespace XFTest.ViewModels
 {
 	public class Page1ViewModel : INotifyPropertyChanged
 	{
+		public ModifyPage1ViewModel ModifyViewModel { get; } = new ();
+
 		public decimal DecimalProp { get; set; }
 
 		public bool BooleanProp { get; set; }
@@ -23,6 +25,14 @@ namespace XFTest.ViewModels
 		public Func<Type, char, bool>? FuncProp { get; set; }	
 
 		public event PropertyChangedEventHandler? PropertyChanged;
+	}
+
+	public class ModifyPage1ViewModel : INotifyPropertyChanged
+	{
+		public event PropertyChangedEventHandler? PropertyChanged;
+
+		public string? Input1 { get; set; }	
+		public int? Input2 { get; set; }
 	}
 
 	public class EntityViewModel : INotifyPropertyChanged

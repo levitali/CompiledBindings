@@ -397,13 +397,13 @@ public static class BindingParser
 					.Select(b =>
 					{
 						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
-						return (PropertySetExpressionBase)new PropertySetExpression(b.Property, expression);
+						return new PropertySetExpression(b.Property, expression);
 					})
 					.ToList();
 
 				foreach (var prop2 in prop.DependentNotifyProperties)
 				{
-					setExpressions.Add(new PropertySetExpressionBase(prop2.SourceExpression.CloneReplace(prop.Expression, expr)));
+					setExpressions.Add(new PropertySetExpression(prop2.Properties[0].Bindings[0].Property, prop2.SourceExpression.CloneReplace(prop.Expression, expr)));
 				}
 
 				var localVars = ExpressionUtils.GroupExpressions(setExpressions);
@@ -435,13 +435,11 @@ public static class BindingParser
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!)).ToList();
 
-		var props2 = new List<PropertySetExpressionBase>();
-		foreach (var group in notifyPropertyChangedList)
-		{
-			props2.Add(new PropertySetExpressionBase(group.SourceExpression));
-		}
+		var props2 = notifyPropertyChangedList
+			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.SourceExpression))
+			.ToList();
 
-		List<PropertySetExpressionBase> props3 = props1.Cast<PropertySetExpressionBase>().Union(props2).ToList();
+		var props3 = props1.Union(props2).ToList();
 
 		var localVars2 = ExpressionUtils.GroupExpressions(props3);
 

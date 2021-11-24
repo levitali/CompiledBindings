@@ -330,7 +330,9 @@ $@"
 			}
 
 			output.AppendLine(
-$@"			}}");
+$@"#line default
+#line hidden
+			}}");
 		}
 
 		#endregion
@@ -385,7 +387,9 @@ $@"				}}");
 			}
 
 			output.AppendLine(
-$@"			}}");
+$@"#line default
+#line hidden
+			}}");
 		}
 
 		#endregion
@@ -694,7 +698,8 @@ $@"{a2}				try
 			if (isNullable)
 			{
 				output.AppendLine(
-$@"{a2}					var value = {me!.Expression};
+$@"#line {((IXmlLineInfo)bind.Property.XamlNode.Element).LineNumber} ""{bind.Property.XamlNode.File}""
+{a2}					var value = {me!.Expression};
 {a2}					if (value != null)
 {a2}					{{");
 				GenerateSetTarget($"value.{me.Member.Definition.Name}", a2 + '\t');
@@ -730,7 +735,8 @@ $@"{a}					{expression}({setExpr});");
 				else
 				{
 					output.AppendLine(
-$@"{a}					{expression} = {setExpr};");
+$@"#line {((IXmlLineInfo)bind.Property.XamlNode.Element).LineNumber} ""{bind.Property.XamlNode.File}""
+{a}					{expression} = {setExpr};");
 				}
 			}
 		}

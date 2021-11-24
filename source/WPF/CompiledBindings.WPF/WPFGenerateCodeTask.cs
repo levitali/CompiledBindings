@@ -27,6 +27,9 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 	public string LocalAssembly { get; set; }
 
 	[Required]
+	public string ProjectPath { get; set; }
+
+	[Required]
 	public string IntermediateOutputPath { get; set; }
 
 	public ITaskItem ApplicationDefinition { get; set; }
@@ -82,6 +85,13 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 			var globalNamespaces = XamlNamespace.GetGlobalNamespaces(xamlFiles.Select(e => e.xdoc));
 			xamlDomParser.KnownNamespaces = globalNamespaces;
 
+			var intermediateOutputPath = IntermediateOutputPath;
+			bool isIntermediateOutputPathRooted = Path.IsPathRooted(intermediateOutputPath);
+			if (!isIntermediateOutputPathRooted)
+			{
+				intermediateOutputPath = Path.Combine(ProjectPath, intermediateOutputPath);
+			}
+
 			foreach (var (xaml, file, xdoc) in xamlFiles)
 			{
 				var newXaml = xaml;
@@ -134,7 +144,19 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 					var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
 					if (xclass != null)
 					{
-						var parseResult = xamlDomParser.Parse(file, xdoc);
+						string targetPath;
+						if (!isIntermediateOutputPathRooted)
+						{
+							var realPath = Path.Combine(ProjectPath, Path.GetDirectoryName(targetRelativePath));
+							var intermediatePath = Path.Combine(intermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
+							var relativePath = PathUtils.GetRelativePath(intermediatePath, realPath);
+							targetPath = Path.Combine(relativePath, Path.GetFileName(targetRelativePath));
+						}
+						else
+						{
+							targetPath = targetRelativePath;
+						}
+						var parseResult = xamlDomParser.Parse(targetPath, xdoc);
 
 						if (parseResult.GenerateCode)
 						{

@@ -23,6 +23,8 @@
 
     <StackLayout>
 
+        <Entry Text="{x:Bind ModifyViewModel.Input1, Mode=OneWayToSource}" />
+
         <Label Text="{x:Set local:Strings.Instance.Header1}" />
         <Label
             IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"

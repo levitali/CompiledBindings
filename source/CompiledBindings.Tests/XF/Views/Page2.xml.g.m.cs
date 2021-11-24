@@ -108,10 +108,15 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
+#line 0 "Page2.xml"
 				var value1 = dataRoot._viewModel?.FuncProp?.Invoke("test");
+#line 0 "Page2.xml"
 				var value2 = dataRoot._viewModel?.CurrentItem;
+#line 0 "Page2.xml"
 				var value3 = dataRoot._viewModel?.GetIcon();
+#line 0 "Page2.xml"
 				var value4 = dataRoot._viewModel?.Group?[0];
+#line 0 "Page2.xml"
 				var value5 = value1?.GuidProp.ToString();
 #line 0 "Page2.xml"
 				targetRoot.label1.Text = value2?.GuidProp.ToString();
@@ -230,6 +235,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "CurrentItem")
 					{
+#line 0 "Page2.xml"
 						var value1 = typedSender.CurrentItem;
 #line 0 "Page2.xml"
 						targetRoot.label1.Text = value1?.GuidProp.ToString();
@@ -265,7 +271,9 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "FuncProp")
 					{
+#line 0 "Page2.xml"
 						var value1 = typedSender.FuncProp?.Invoke("test");
+#line 0 "Page2.xml"
 						var value2 = value1?.GuidProp.ToString();
 #line 0 "Page2.xml"
 						targetRoot.label4.Text = value2;
@@ -281,6 +289,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "Group")
 					{
+#line 0 "Page2.xml"
 						var value1 = typedSender.Group?[0];
 #line 0 "Page2.xml"
 						targetRoot.label6.Text = value1?.GuidProp.ToString();
@@ -335,6 +344,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "GuidProp")
 					{
+#line 0 "Page2.xml"
 						var value1 = typedSender.GuidProp.ToString();
 #line 0 "Page2.xml"
 						targetRoot.label4.Text = value1;
