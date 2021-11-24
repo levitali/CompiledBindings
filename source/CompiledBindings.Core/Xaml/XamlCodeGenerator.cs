@@ -4,12 +4,29 @@ namespace CompiledBindings;
 
 public class XamlCodeGenerator
 {
-	public XamlCodeGenerator(string langVersion)
+	public XamlCodeGenerator(string langVersion, string msbuildVersion)
 	{
-		LangNullables =
-			langVersion is "latest" or "preview" ||
-			(float.TryParse(langVersion, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var version) && version >= 8);
+		var msbuildVersionParts = msbuildVersion.Split('.');
+		if (!int.TryParse(msbuildVersionParts[0], out var buildVersionNum))
+		{
+			buildVersionNum = 0;
+		}
+		if (!float.TryParse(langVersion, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var langVersionNum))
+		{
+			if (langVersion is "latest" or "preview" && buildVersionNum >= 16)
+			{
+				langVersionNum = buildVersionNum == 16 ? 9.0f : 10.0f;
+			}
+			else
+			{
+				langVersionNum = 7.3f;
+			}
+		}
+		LangVersion = langVersionNum;
+		LangNullables =	LangVersion >= 8;
 	}
+
+	public float LangVersion { get; }
 
 	public bool LangNullables { get; }
 
@@ -88,14 +105,14 @@ public class XamlCodeGenerator
 				if (property.Value.BindValue != null)
 				{
 					output.AppendLine(
-$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+$@"{LineDirective(property.XamlNode)}
 {a}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
 {a}			{setExpr} += {bindingsAccess}_eventHandler{property.Value.BindValue.Index};");
 				}
 				else
 				{
 					output.AppendLine(
-$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+$@"{LineDirective(property.XamlNode)}
 {a}			{setExpr} += {value};");
 				}
 			}
@@ -144,7 +161,7 @@ $@"{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
 			{
 				varName = "value" + localVarIndex++;
 				output.AppendLine(
-$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+$@"{LineDirective(property.XamlNode)}
 {a}				var {varName} = {value};");
 			}
 			else
@@ -178,7 +195,7 @@ $@"{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
 				if (fallbackValue != null)
 				{
 					output.AppendLine(
-$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+$@"{LineDirective(property.XamlNode)}
 {a}					var task = {value};
 {a}					if (!task.IsCompleted)
 {a}					{{
@@ -187,7 +204,7 @@ $@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.Xaml
 					value = "task";
 				}
 				output.AppendLine(
-$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+$@"{LineDirective(property.XamlNode)}
 {a}					var value = await {value};
 {a}					if (!cancellationToken.IsCancellationRequested)
 {a}					{{
@@ -202,7 +219,7 @@ $@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.Xaml
 			else
 			{
 				output.AppendLine(
-$@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.XamlNode.File}""
+$@"{LineDirective(property.XamlNode)}
 {a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
 			}
 		}
@@ -224,7 +241,7 @@ $@"#line {((IXmlLineInfo)property.XamlNode.Element).LineNumber} ""{property.Xaml
 		foreach (var variable in updateMethod.LocalVariables)
 		{
 			output.AppendLine(
-$@"#line {((IXmlLineInfo)variable.FirstProperty.XamlNode.Element).LineNumber} ""{variable.FirstProperty.XamlNode.File}""
+$@"{LineDirective(variable.FirstProperty.XamlNode)}
 {a}			var {variable.Name} = {variable.Expression};");
 		}
 
@@ -235,6 +252,20 @@ $@"#line {((IXmlLineInfo)variable.FirstProperty.XamlNode.Element).LineNumber} ""
 		output.AppendLine(
 $@"#line default
 #line hidden");
+	}
+
+	public string LineDirective(XamlNode xamlNode)
+	{
+		var li = (IXmlLineInfo)xamlNode.Element;
+		var line = li.LineNumber;
+		if (LangVersion >= 10)
+		{
+			var column = li.LinePosition;
+			//TODO Somehow it doesn't work as expected.
+			//Experimentally was found out, that it works if the "column offset" is the line number
+			return $"#line ({line}, {column}) - ({line}, {column}) {line} \"{xamlNode.File}\"";
+		}
+		return $"#line {line} \"{xamlNode.File}\"";
 	}
 }
 

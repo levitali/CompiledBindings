@@ -30,9 +30,10 @@ public class SimpleXamlDomParser : XamlDomParser
 		DependencyObjectType = dependencyObjectType;
 	}
 
-	public SimpleXamlDom Parse(string file, XDocument xamlDoc)
+	public SimpleXamlDom Parse(string file, string lineFile, XDocument xamlDoc)
 	{
 		CurrentFile = file;
+		CurrentLineFile = lineFile;
 
 		UsedNames = new HashSet<string>(xamlDoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
 
@@ -46,7 +47,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 		ProcessRoot(result, xamlDoc.Root, null);
 
-		result.HasDestructor = result.TargetType.Type.ResolveEx()!.Methods.Any(m => m.Name == "Finalize" && m.IsVirtual && m.IsFamily && m.IsHideBySig);
+		result.HasDestructor = result.TargetType.Methods.Any(m => m.Definition.Name == "Finalize" && m.Definition.IsVirtual && m.Definition.IsFamily && m.Definition.IsHideBySig);
 
 		return result;
 
@@ -153,7 +154,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				if (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate && xelement != xamlDoc.Root))
 				{
 					var type = xelement == xamlDoc.Root ? result.TargetType : FindType(xelement);
-					obj = new XamlObject(new XamlNode(CurrentFile, xelement, xelement.Name), type)
+					obj = new XamlObject(new XamlNode(CurrentLineFile, xelement, xelement.Name), type)
 					{
 						Name = viewName,
 						NameExplicitlySet = nameExplicitlySet
@@ -166,7 +167,7 @@ public class SimpleXamlDomParser : XamlDomParser
 						{
 							try
 							{
-								var xamlNode = XamlParser.ParseAttribute(CurrentFile, attr, KnownNamespaces);
+								var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
 								var prop = GetObjectProperty(obj, xamlNode);
 								obj.Properties.Add(prop);
 

@@ -35,7 +35,7 @@ public class ExpressionParser
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
-			throw new ParseException("Empty expression.");
+			throw new ParseException(Res.EmptyExpression);
 		}
 
 		var parser = new ExpressionParser(new ParameterExpression(dataType, member), expression!, resultType, namespaces);
@@ -357,7 +357,6 @@ public class ExpressionParser
 			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
 		}
 		var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
-		//TODO! check if the arguments and the method match (parameters count, assignable)
 		if (method.Parameters.Count < args.Length)
 		{
 			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
@@ -464,7 +463,7 @@ public class ExpressionParser
 			//	NextToken();
 			//	return _root;
 			default:
-				throw new ParseException("Expression expected", _token.pos);
+				throw new ParseException(Res.ExpressionExpected, _token.pos);
 		}
 	}
 
@@ -480,8 +479,6 @@ public class ExpressionParser
 
 		var typeExpr = ParseTypeExpression(prefix, errorPos);
 		var args = ParseArgumentList();
-		//TODO! CorrectCharParameters
-		//TODO! CorrectNotNullableParameters
 		return new NewExpression(typeExpr, args);
 	}
 
@@ -492,7 +489,7 @@ public class ExpressionParser
 		var args = ParseArgumentList();
 		if (args.Length != 1 || args[0] is not TypeExpression typeExpression)
 		{
-			throw new ParseException($"Invalid type.", errorPos);
+			throw new ParseException(Res.InvalidType, errorPos);
 		}
 		return new TypeofExpression(typeExpression);
 	}
@@ -835,7 +832,6 @@ public class ExpressionParser
 		}
 		else
 		{
-			//TODO! at least check number of parameters
 			var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
 			if (prop == null)
 			{
@@ -1155,14 +1151,17 @@ public class ExpressionParser
 
 	private static class Res
 	{
-		public const string SyntaxError = "Syntax error";
-		public const string ColonExpected = "':' expected";
-		public const string OpenParenExpected = "'(' expected";
-		public const string CloseParenOrOperatorExpected = "')' or operator expected";
-		public const string CloseParenOrCommaExpected = "')' or ',' expected";
-		public const string CloseBracketOrCommaExpected = "']' or ',' expected";
-		public const string IdentifierExpected = "Identifier expected";
+		public const string EmptyExpression = "Empty expression.";
+		public const string ExpressionExpected = "Expression expected.";
+		public const string SyntaxError = "Syntax error.";
+		public const string ColonExpected = "':' expected.";
+		public const string OpenParenExpected = "'(' expected.";
+		public const string CloseParenOrOperatorExpected = "')' or operator expected.";
+		public const string CloseParenOrCommaExpected = "')' or ',' expected.";
+		public const string CloseBracketOrCommaExpected = "']' or ',' expected.";
+		public const string IdentifierExpected = "Identifier expected.";
 		public const string OperatorNotSupported = "Operator is not supported.";
+		public const string InvalidType = "Invalid type.";
 	}
 
 	private struct Token

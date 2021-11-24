@@ -128,7 +128,7 @@ public class TypeInfo
 		.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 		.ToList();
 
-	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO nullablility in base type from this one
+	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO nullablility in base type from this one?
 
 	public TypeInfo? GetElementType()
 	{
@@ -321,9 +321,9 @@ public class TypeInfo
 
 	private static byte? GetNullableContext(TypeReference type)
 	{
-		var attrs = type.ResolveEx()?.CustomAttributes;
-		var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-		return (byte?)attr?.ConstructorArguments[0].Value;
+		return (byte?)type.ResolveEx()?
+			.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute")?
+			.ConstructorArguments[0].Value;
 	}
 
 	private bool? GetIsNullableSumElement(int index)

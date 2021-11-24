@@ -21,6 +21,9 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	public string LangVersion { get; set; }
 
 	[Required]
+	public string MSBuildVersion { get; set; }
+
+	[Required]
 	public ITaskItem[] ReferenceAssemblies { get; set; }
 
 	[Required]
@@ -93,24 +96,24 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 							targetRelativePath = xaml.ItemSpec;
 						}
 						
-						string targetPath;
+						string lineFile;
 						if (!isIntermediateOutputPathRooted)
 						{
 							var realPath = Path.Combine(ProjectPath, Path.GetDirectoryName(targetRelativePath));
 							var intermediatePath = Path.Combine(intermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var relativePath = PathUtils.GetRelativePath(intermediatePath, realPath);
-							targetPath = Path.Combine(relativePath, Path.GetFileName(targetRelativePath));
+							lineFile = Path.Combine(relativePath, Path.GetFileName(targetRelativePath));
 						}
 						else
 						{
-							targetPath = targetRelativePath;
+							lineFile = targetRelativePath;
 						}
 
-						var parseResult = xamlDomParser.Parse(targetPath, xdoc);
+						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc);
 
 						if (parseResult.GenerateCode)
 						{
-							var codeGenerator = new XFCodeGenerator(LangVersion);
+							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 
 							bool dataTemplates = parseResult.DataTemplates.Count > 0;
@@ -253,15 +256,16 @@ public class XFXamlDomParser : SimpleXamlDomParser
 
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 {
-	public XFCodeGenerator(string langVersion)
-		: base(new BindingsCodeGenerator(langVersion),
+	public XFCodeGenerator(string langVersion, string msbuildVersion)
+		: base(new BindingsCodeGenerator(langVersion, msbuildVersion),
 			   "Binding",
 			   "System.EventArgs",
 			   "Xamarin.Forms.Element",
 			   "global::Xamarin.Forms.NameScopeExtensions.FindByName<global::{0}>({1}, \"{2}\")",
 			   true,
 			   true,
-			   langVersion)
+			   langVersion,
+			   msbuildVersion)
 	{
 	}
 

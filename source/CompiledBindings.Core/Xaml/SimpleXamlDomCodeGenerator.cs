@@ -20,8 +20,9 @@ public class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 									  string findByNameFormat,
 									  bool generateVariableDeclarations,
 									  bool generateVariableInitialization,
-									  string langVersion)
-		: base(langVersion)
+									  string langVersion,
+									  string msbuildVersion)
+		: base(langVersion, msbuildVersion)
 	{
 		_bindingsCodeGenerator = bindingsCodeGenerator;
 		_bindingContextStart = bindingContextStart;

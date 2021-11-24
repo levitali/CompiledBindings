@@ -50,7 +50,7 @@ public class XamlParser
 			{
 				throw new ParseException($"Expected {expecedBracket}", str.Length);
 			}
-			node.Children.Add(ParseMarkupExtension(attribute, file, knownNamespaces));
+			node.Children.Add(ParseMarkupExtension(file, attribute, knownNamespaces));
 		}
 		else
 		{
@@ -60,12 +60,12 @@ public class XamlParser
 		return node;
 	}
 
-	private static XamlNode ParseMarkupExtension(XAttribute attribute, string file, IList<XamlNamespace>? knownNamespaces)
+	private static XamlNode ParseMarkupExtension(string file, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		return ParseMarkupExtension(attribute.Value.Trim(), attribute, file, knownNamespaces);
+		return ParseMarkupExtension(file, attribute.Value.Trim(), attribute, knownNamespaces);
 	}
 
-	public static XamlNode ParseMarkupExtension(string str, XAttribute attribute, string file, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode ParseMarkupExtension(string file, string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
 		string? value;
 		int valueOffset;

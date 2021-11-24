@@ -37,13 +37,13 @@ public class WPFTests
 		try
 		{
 			var xamlFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml");
-			var xdoc = XDocument.Load(xamlFile);
+			var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
 
 			var xamlDomParser = new WpfXamlDomParser();
-			var parseResult = xamlDomParser.Parse(Path.GetFileName(xamlFile), xdoc);
+			var parseResult = xamlDomParser.Parse(xamlFile, Path.GetFileName(xamlFile), xdoc);
 			parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 
-			var codeGenerator = new WpfCodeGenerator("latest");
+			var codeGenerator = new WpfCodeGenerator("latest", "17.0.0");
 			var code = codeGenerator.GenerateCode(parseResult);
 
 			var csharpFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml.g.m.cs");

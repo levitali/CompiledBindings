@@ -21,6 +21,9 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 	public string LangVersion { get; set; }
 
 	[Required]
+	public string MSBuildVersion { get; set; }
+
+	[Required]
 	public ITaskItem[] ReferenceAssemblies { get; set; }
 
 	[Required]
@@ -144,25 +147,25 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 					var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
 					if (xclass != null)
 					{
-						string targetPath;
+						string lineFile;
 						if (!isIntermediateOutputPathRooted)
 						{
 							var realPath = Path.Combine(ProjectPath, Path.GetDirectoryName(targetRelativePath));
 							var intermediatePath = Path.Combine(intermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var relativePath = PathUtils.GetRelativePath(intermediatePath, realPath);
-							targetPath = Path.Combine(relativePath, Path.GetFileName(targetRelativePath));
+							lineFile = Path.Combine(relativePath, Path.GetFileName(targetRelativePath));
 						}
 						else
 						{
-							targetPath = targetRelativePath;
+							lineFile = targetRelativePath;
 						}
-						var parseResult = xamlDomParser.Parse(targetPath, xdoc);
+						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc);
 
 						if (parseResult.GenerateCode)
 						{
 							parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 
-							var codeGenerator = new WpfCodeGenerator(LangVersion);
+							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 
 							bool dataTemplates = parseResult.DataTemplates.Count > 0;
@@ -402,15 +405,16 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 
 public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 {
-	public WpfCodeGenerator(string langVersion)
-		: base(new WpfBindingsCodeGenerator(langVersion),
+	public WpfCodeGenerator(string langVersion, string msbuildVersion)
+		: base(new WpfBindingsCodeGenerator(langVersion, msbuildVersion),
 			   "Data",
 			   "System.Windows.DependencyPropertyChangedEventArgs",
 			   "System.Windows.FrameworkElement",
 			   "(global::{0}){1}.FindName(\"{2}\")",
 			   false,
 			   false,
-			   langVersion)
+			   langVersion,
+			   msbuildVersion)
 	{
 	}
 
@@ -444,7 +448,7 @@ $@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root
 
 public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 {
-	public WpfBindingsCodeGenerator(string langVersion) : base(langVersion)
+	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
 	{
 
 	}

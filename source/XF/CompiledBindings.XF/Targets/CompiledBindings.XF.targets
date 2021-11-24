@@ -82,7 +82,8 @@
                         LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
                         IntermediateOutputPath="$(IntermediateOutputPath)"
                         ProjectPath="$(MSBuildProjectDirectory)"
-                        LangVersion="$(LangVersion)">
+                        LangVersion="$(LangVersion)"
+                        MSBuildVersion="$(MSBuildVersion)">
       <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
     </XFGenerateCodeTask>

@@ -37,8 +37,8 @@ public class GeneratorException : Exception
 		EndColumnNumber = ColumnNumber + length; 
 	}
 
-	public GeneratorException(string message, XamlNode xamlNode, int offset = 0, int length = 0) 
-		: this(message, xamlNode.File, xamlNode.Element, offset, length)
+	public GeneratorException(string message, string file, XamlNode xamlNode, int offset = 0, int length = 0) 
+		: this(message, file, xamlNode.Element, offset, length)
 	{
 	}
 

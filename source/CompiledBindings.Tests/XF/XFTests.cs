@@ -34,12 +34,12 @@ public class XFTests
 		try
 		{
 			var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
-			var xdoc = XDocument.Load(xamlFile);
+			var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
 
 			var xamlDomParser = new XFXamlDomParser();
-			var parseResult = xamlDomParser.Parse(Path.GetFileName(xamlFile), xdoc);
+			var parseResult = xamlDomParser.Parse(xamlFile, Path.GetFileName(xamlFile), xdoc);
 
-			var codeGenerator = new XFCodeGenerator("latest");
+			var codeGenerator = new XFCodeGenerator("latest", "17.0.0");
 			var code = codeGenerator.GenerateCode(parseResult);
 
 			var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");

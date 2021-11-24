@@ -138,10 +138,11 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="WPF\Views\Page1.xml">
+    <Content Include="WPF\Views\Page1.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+      <Generator>MSBuild:Compile</Generator>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="WPF\Views\Page2.xml">

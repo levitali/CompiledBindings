@@ -32,13 +32,13 @@ namespace XFTest.Views
 			entry1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Entry>(this, "entry1");
 			button1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Button>(this, "button1");
 
-#line 0 "Page1.xml"
+#line (13, 5) - (13, 5) 13 "Page1.xml"
 			var value1 = XFTest.Strings.Instance;
-#line 0 "Page1.xml"
+#line (13, 5) - (13, 5) 13 "Page1.xml"
 			Title = value1.Title;
-#line 0 "Page1.xml"
+#line (39, 16) - (39, 16) 39 "Page1.xml"
 			label4.Text = value1.Header1;
-#line 0 "Page1.xml"
+#line (65, 13) - (65, 13) 65 "Page1.xml"
 			button1.Clicked += (p1, p2) => this.Save();
 #line default
 #line hidden
@@ -51,7 +51,7 @@ namespace XFTest.Views
 			}
 		}
 
-		~Page1()
+		private void DeinitializeAfterDestructor()
 		{
 			if (Bindings != null)
 			{
@@ -110,9 +110,9 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
-#line 0 "Page1.xml"
+#line (64, 13) - (64, 13) 64 "Page1.xml"
 				var value1 = (((global::XFTest.ViewModels.EntityViewModel)dataRoot.list.SelectedItem));
-#line 0 "Page1.xml"
+#line (64, 13) - (64, 13) 64 "Page1.xml"
 				targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
 #line hidden
@@ -181,7 +181,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
-#line 0 "Page1.xml"
+#line (64, 13) - (64, 13) 64 "Page1.xml"
 						targetRoot.button1.IsEnabled = typedSender.BooleanProp;
 #line default
 #line hidden
@@ -207,9 +207,9 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "SelectedItem")
 					{
-#line 0 "Page1.xml"
+#line (64, 13) - (64, 13) 64 "Page1.xml"
 						var value1 = (((global::XFTest.ViewModels.EntityViewModel)typedSender.SelectedItem));
-#line 0 "Page1.xml"
+#line (64, 13) - (64, 13) 64 "Page1.xml"
 						targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
 #line hidden
@@ -287,34 +287,34 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-#line 0 "Page1.xml"
+#line (42, 13) - (42, 13) 42 "Page1.xml"
 				var value1 = dataRoot.BooleanProp;
-#line 0 "Page1.xml"
+#line (41, 13) - (41, 13) 41 "Page1.xml"
 				var value2 = dataRoot.DecimalProp;
-#line 0 "Page1.xml"
+#line (41, 13) - (41, 13) 41 "Page1.xml"
 				targetRoot.label5.Text = value2.ToString();
-#line 0 "Page1.xml"
+#line (42, 13) - (42, 13) 42 "Page1.xml"
 				targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
-#line 0 "Page1.xml"
+#line (43, 16) - (43, 16) 43 "Page1.xml"
 				targetRoot.label6.Text = (value2 + 1).ToString();
-#line 0 "Page1.xml"
+#line (44, 16) - (44, 16) 44 "Page1.xml"
 				targetRoot.label7.Text = (dataRoot.NullableIntProp ?? 0).ToString();
-#line 0 "Page1.xml"
+#line (45, 16) - (45, 16) 45 "Page1.xml"
 				targetRoot.label8.Text = (!value1).ToString();
 				if (!_settingBinding6)
 				{
-#line 0 "Page1.xml"
+#line (48, 13) - (48, 13) 48 "Page1.xml"
 					var value3 = value1.ToString();
 					if (!object.Equals(targetRoot.entry1.Text, value3))
 					{
 						targetRoot.entry1.Text = value3;
 					}
 				}
-#line 0 "Page1.xml"
+#line (49, 13) - (49, 13) 49 "Page1.xml"
 				targetRoot.entry1.SetFocused(dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
-#line 0 "Page1.xml"
+#line (52, 13) - (52, 13) 52 "Page1.xml"
 				targetRoot.list.IsVisible = dataRoot.ArrayProp?.Length > 0;
-#line 0 "Page1.xml"
+#line (53, 13) - (53, 13) 53 "Page1.xml"
 				targetRoot.list.ItemsSource = dataRoot.ListProp;
 #line default
 #line hidden
@@ -329,7 +329,7 @@ namespace XFTest.Views
 					case "IsFocused":
 						try
 						{
-#line 0 "Page1.xml"
+#line (47, 13) - (47, 13) 47 "Page1.xml"
 							dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1] = _targetRoot.entry1.IsFocused;
 						}
 						catch
@@ -402,11 +402,11 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "DecimalProp")
 					{
-#line 0 "Page1.xml"
+#line (41, 13) - (41, 13) 41 "Page1.xml"
 						var value1 = typedSender.DecimalProp;
-#line 0 "Page1.xml"
+#line (41, 13) - (41, 13) 41 "Page1.xml"
 						targetRoot.label5.Text = value1.ToString();
-#line 0 "Page1.xml"
+#line (43, 16) - (43, 16) 43 "Page1.xml"
 						targetRoot.label6.Text = (value1 + 1).ToString();
 #line default
 #line hidden
@@ -417,15 +417,15 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
-#line 0 "Page1.xml"
+#line (42, 13) - (42, 13) 42 "Page1.xml"
 						var value1 = typedSender.BooleanProp;
-#line 0 "Page1.xml"
+#line (42, 13) - (42, 13) 42 "Page1.xml"
 						targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
-#line 0 "Page1.xml"
+#line (45, 16) - (45, 16) 45 "Page1.xml"
 						targetRoot.label8.Text = (!value1).ToString();
 						if (!bindings._settingBinding6)
 						{
-#line 0 "Page1.xml"
+#line (48, 13) - (48, 13) 48 "Page1.xml"
 							var value2 = value1.ToString();
 							if (!object.Equals(targetRoot.entry1.Text, value2))
 							{
@@ -441,7 +441,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "NullableIntProp")
 					{
-#line 0 "Page1.xml"
+#line (44, 16) - (44, 16) 44 "Page1.xml"
 						targetRoot.label7.Text = (typedSender.NullableIntProp ?? 0).ToString();
 #line default
 #line hidden
@@ -452,7 +452,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "FocusedField")
 					{
-#line 0 "Page1.xml"
+#line (49, 13) - (49, 13) 49 "Page1.xml"
 						targetRoot.entry1.SetFocused(typedSender.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line default
 #line hidden
@@ -463,7 +463,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "ArrayProp")
 					{
-#line 0 "Page1.xml"
+#line (52, 13) - (52, 13) 52 "Page1.xml"
 						targetRoot.list.IsVisible = typedSender.ArrayProp?.Length > 0;
 #line default
 #line hidden
@@ -474,7 +474,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "ListProp")
 					{
-#line 0 "Page1.xml"
+#line (53, 13) - (53, 13) 53 "Page1.xml"
 						targetRoot.list.ItemsSource = typedSender.ListProp;
 #line default
 #line hidden
@@ -577,11 +577,11 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-#line 0 "Page1.xml"
+#line (20, 24) - (20, 24) 20 "Page1.xml"
 				var value1 = dataRoot.Model;
-#line 0 "Page1.xml"
+#line (20, 24) - (20, 24) 20 "Page1.xml"
 				targetRoot.label1.Text = value1?.SByteProp.ToString();
-#line 0 "Page1.xml"
+#line (21, 24) - (21, 24) 21 "Page1.xml"
 				targetRoot.label2.Text = dataRoot.BooleanProp.ToString();
 #line default
 #line hidden
@@ -649,9 +649,9 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "Model")
 					{
-#line 0 "Page1.xml"
+#line (20, 24) - (20, 24) 20 "Page1.xml"
 						var value1 = typedSender.Model;
-#line 0 "Page1.xml"
+#line (20, 24) - (20, 24) 20 "Page1.xml"
 						targetRoot.label1.Text = value1?.SByteProp.ToString();
 #line default
 #line hidden
@@ -663,7 +663,7 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
-#line 0 "Page1.xml"
+#line (21, 24) - (21, 24) 21 "Page1.xml"
 						targetRoot.label2.Text = typedSender.BooleanProp.ToString();
 #line default
 #line hidden
@@ -689,7 +689,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "SByteProp")
 					{
-#line 0 "Page1.xml"
+#line (20, 24) - (20, 24) 20 "Page1.xml"
 						targetRoot.label1.Text = typedSender.SByteProp.ToString();
 #line default
 #line hidden
@@ -790,7 +790,7 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-#line 0 "Page1.xml"
+#line (30, 36) - (30, 36) 30 "Page1.xml"
 				targetRoot.label3.Text = dataRoot.BooleanProp.ToString();
 #line default
 #line hidden
@@ -840,7 +840,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
-#line 0 "Page1.xml"
+#line (30, 36) - (30, 36) 30 "Page1.xml"
 						targetRoot.label3.Text = typedSender.BooleanProp.ToString();
 #line default
 #line hidden
@@ -941,7 +941,7 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-#line 0 "Page1.xml"
+#line (57, 32) - (57, 32) 57 "Page1.xml"
 				targetRoot.label9.Text = dataRoot.DecimalProp.ToString();
 #line default
 #line hidden
@@ -991,7 +991,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "DecimalProp")
 					{
-#line 0 "Page1.xml"
+#line (57, 32) - (57, 32) 57 "Page1.xml"
 						targetRoot.label9.Text = typedSender.DecimalProp.ToString();
 #line default
 #line hidden

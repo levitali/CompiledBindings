@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public class BindingsCodeGenerator : XamlCodeGenerator
 {
-	public BindingsCodeGenerator(string langVersion) : base(langVersion)
+	public BindingsCodeGenerator(string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
 	{
 	}
 
@@ -698,7 +698,7 @@ $@"{a2}				try
 			if (isNullable)
 			{
 				output.AppendLine(
-$@"#line {((IXmlLineInfo)bind.Property.XamlNode.Element).LineNumber} ""{bind.Property.XamlNode.File}""
+$@"{LineDirective(bind.Property.XamlNode)}
 {a2}					var value = {me!.Expression};
 {a2}					if (value != null)
 {a2}					{{");
@@ -735,7 +735,7 @@ $@"{a}					{expression}({setExpr});");
 				else
 				{
 					output.AppendLine(
-$@"#line {((IXmlLineInfo)bind.Property.XamlNode.Element).LineNumber} ""{bind.Property.XamlNode.File}""
+$@"{LineDirective(bind.Property.XamlNode)}
 {a}					{expression} = {setExpr};");
 				}
 			}

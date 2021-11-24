@@ -13,7 +13,6 @@ public class XamlDomParser
 	private readonly XName xNull;
 	private readonly XName xType;
 
-	private string _projectPath;
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
@@ -44,6 +43,7 @@ public class XamlDomParser
 	public IList<XamlNamespace>? KnownNamespaces { get; set; }
 
 	public string CurrentFile { get; set; }
+	public string CurrentLineFile { get; set; }
 	public TypeInfo TargetType { get; set; }
 	public TypeInfo DataType { get; set; }
 
@@ -71,7 +71,7 @@ public class XamlDomParser
 	{
 		if (value.StartsWith("{"))
 		{
-			var xamlNode = XamlParser.ParseMarkupExtension(value, attr, CurrentFile, KnownNamespaces);
+			var xamlNode = XamlParser.ParseMarkupExtension(CurrentLineFile, value, attr, KnownNamespaces);
 			if (xamlNode.Name == xNull)
 			{
 				return null;
@@ -195,18 +195,18 @@ public class XamlDomParser
 				var setPropertyMethod = attachPropertyOwnerType.Methods.FirstOrDefault(m => m.Definition.Name == setMethodName);
 				if (setPropertyMethod == null)
 				{
-					throw new GeneratorException($"Invalid attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. Missing method {setMethodName}.", xamlNode);
+					throw new GeneratorException($"Invalid attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. Missing method {setMethodName}.", CurrentFile, xamlNode);
 				}
 
 				var parameters = setPropertyMethod.Parameters;
 				if (parameters.Count != 2)
 				{
-					throw new GeneratorException($"Invalid set method for attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. The {setMethodName} method must have two parameters.", xamlNode);
+					throw new GeneratorException($"Invalid set method for attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. The {setMethodName} method must have two parameters.", CurrentFile, xamlNode);
 				}
 
 				if (!parameters[0].ParameterType.IsAssignableFrom(obj.Type))
 				{
-					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Type.FullName}.", xamlNode);
+					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Type.FullName}.", CurrentFile, xamlNode);
 				}
 
 				objProp.MemberName = setMethodName;
@@ -250,12 +250,12 @@ public class XamlDomParser
 							}
 							if (method == null)
 							{
-								throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Type.FullName}.", xamlNode);
+								throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Type.FullName}.", CurrentFile, xamlNode);
 							}
 						}
 						else if (method.Parameters.Count != 1)
 						{
-							throw new GeneratorException($"Cannot bind to method {obj.Type.Type.FullName}.{memberName}. To use a method as target, the method must have one parameter.", xamlNode);
+							throw new GeneratorException($"Cannot bind to method {obj.Type.Type.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
 						}
 
 						objProp.TargetMethod = method;
@@ -309,7 +309,7 @@ public class XamlDomParser
 			}
 			else
 			{
-				throw new GeneratorException($"The value cannot be processed.", xamlNode);
+				throw new GeneratorException($"The value cannot be processed.", CurrentFile, xamlNode);
 			}
 
 			if (objProp.TargetEvent != null)
@@ -319,7 +319,7 @@ public class XamlDomParser
 					(expr is not MemberExpression me || me.Member is not MethodInfo) &&
 					(expr is not (CallExpression or InvokeExpression)))
 				{
-					throw new GeneratorException($"Expression type must be a method.", xamlNode);
+					throw new GeneratorException($"Expression type must be a method.", CurrentFile, xamlNode);
 				}
 			}
 
@@ -338,11 +338,11 @@ public class XamlDomParser
 		}
 		catch (ParseException ex)
 		{
-			throw new GeneratorException(ex.Message, xamlNode, ex.Position, ex.Length);
+			throw new GeneratorException(ex.Message, CurrentFile, xamlNode, ex.Position, ex.Length);
 		}
 		catch (Exception ex) when (ex is not GeneratorException)
 		{
-			throw new GeneratorException(ex.Message, xamlNode);
+			throw new GeneratorException(ex.Message, CurrentFile, xamlNode);
 		}
 	}
 
