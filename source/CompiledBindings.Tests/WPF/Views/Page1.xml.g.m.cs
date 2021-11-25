@@ -56,7 +56,7 @@ namespace WPFTest.Views
 			}
 		}
 
-		private void DeinitializeAfterDestructor()
+		~Page1()
 		{
 			_generatedCodeDisposed.Cancel();
 			if (Bindings != null)
@@ -118,7 +118,7 @@ namespace WPFTest.Views
 				var dataRoot = _targetRoot;
 #line (34, 13) - (34, 13) 34 "Page1.xml"
 				targetRoot.textBlock4.Text = dataRoot._viewModel.DecimalProp.ToString();
-#line (55, 13) - (55, 13) 55 "Page1.xml"
+#line (56, 13) - (56, 13) 56 "Page1.xml"
 				targetRoot.button1.IsEnabled = dataRoot.listView.SelectedItem != null;
 #line default
 #line hidden
@@ -215,7 +215,7 @@ namespace WPFTest.Views
 					var targetRoot = bindings._targetRoot;
 					var dataRoot = bindings._targetRoot;
 					var typedSender = (global::System.Windows.Controls.ListView)sender;
-#line (55, 13) - (55, 13) 55 "Page1.xml"
+#line (56, 13) - (56, 13) 56 "Page1.xml"
 					targetRoot.button1.IsEnabled = typedSender.SelectedItem != null;
 #line default
 #line hidden
@@ -245,7 +245,7 @@ namespace WPFTest.Views
 			Page1 _targetRoot;
 			global::WPFTest.ViewModels.Page1ViewModel _dataRoot;
 			Page1_BindingsTrackings_this _bindingsTrackings;
-			global::System.Windows.RoutedEventHandler _eventHandler12;
+			global::System.Windows.RoutedEventHandler _eventHandler13;
 			bool _settingBinding4;
 			bool _settingBinding5;
 			CancellationTokenSource _generatedCodeDisposed;
@@ -266,9 +266,9 @@ namespace WPFTest.Views
 
 				Update();
 
-#line (56, 13) - (56, 13) 56 "Page1.xml"
-				_eventHandler12 = (p1, p2) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
-				_targetRoot.button1.Click += _eventHandler12;
+#line (57, 13) - (57, 13) 57 "Page1.xml"
+				_eventHandler13 = (p1, p2) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
+				_targetRoot.button1.Click += _eventHandler13;
 #line default
 #line hidden
 
@@ -297,8 +297,8 @@ namespace WPFTest.Views
 						.FromProperty(
 							global::System.Windows.Controls.CheckBox.IsCheckedProperty, typeof(global::System.Windows.Controls.CheckBox))
 						.RemoveValueChanged(_targetRoot.checkBox1, OnTargetChanged1);
-					_targetRoot.button1.Click -= _eventHandler12;
-					_eventHandler12 = null;
+					_targetRoot.button1.Click -= _eventHandler13;
+					_eventHandler13 = null;
 					_bindingsTrackings.Cleanup();
 					_dataRoot = null;
 					_targetRoot = null;
@@ -354,7 +354,7 @@ namespace WPFTest.Views
 #line (49, 13) - (49, 13) 49 "Page1.xml"
 				targetRoot.listView.SetVisible(value2);
 #line (50, 20) - (50, 20) 50 "Page1.xml"
-				targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
+				targetRoot.textBlock7.Text = (value1 != null ? value1.Input1 : "abc");
 #line (51, 20) - (51, 20) 51 "Page1.xml"
 				targetRoot.textBlock8.Text = value1?.Input1 ?? "aaa";
 				Set0(bindings._generatedCodeDisposed.Token);
@@ -379,12 +379,14 @@ namespace WPFTest.Views
 					{
 					}
 				}
+#line (53, 20) - (53, 20) 53 "Page1.xml"
+				targetRoot.textBlock10.Text = dataRoot.Calculate(new WPFTest.ViewModels.ParamClass("text"));
 				Set1(bindings._generatedCodeDisposed.Token);
 				async void Set1(CancellationToken cancellationToken)
 				{
 					try
 					{
-#line (53, 16) - (53, 16) 53 "Page1.xml"
+#line (54, 16) - (54, 16) 54 "Page1.xml"
 						var value = await dataRoot.LoadImageAsync();
 						if (!cancellationToken.IsCancellationRequested)
 						{
@@ -611,7 +613,7 @@ namespace WPFTest.Views
 #line (50, 20) - (50, 20) 50 "Page1.xml"
 						var value1 = typedSender.ModifyViewModel;
 #line (50, 20) - (50, 20) 50 "Page1.xml"
-						targetRoot.textBlock7.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
+						targetRoot.textBlock7.Text = (value1 != null ? value1.Input1 : "abc");
 #line (51, 20) - (51, 20) 51 "Page1.xml"
 						targetRoot.textBlock8.Text = value1?.Input1 ?? "aaa";
 #line default

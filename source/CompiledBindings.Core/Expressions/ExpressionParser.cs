@@ -287,7 +287,6 @@ public class ExpressionParser
 	{
 		type = GetNullableUnderlyingType(type);
 
-		MethodInfo? method = null;
 		var methods = type.Methods
 			.Where(m => m.Definition.Name == methodName &&
 						(m.Parameters.Count >= args.Length ||
@@ -305,9 +304,20 @@ public class ExpressionParser
 				}
 			}
 		}
+
+		var method = FindMethod(methods, args, errPos);
+		if (method == null)
+		{
+			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Type.FullName}'", errPos, methodName.Length);
+		}
+		return method;
+	}
+
+	private MethodInfo? FindMethod(IList<MethodInfo> methods, Expression[] args, int errPos)
+	{		
 		if (methods.Count == 1)
 		{
-			method = methods[0];
+			return methods[0];
 			// Note! So far we do not check if parameters are assignable.
 			// If not, the generated code will not compile
 		}
@@ -319,8 +329,9 @@ public class ExpressionParser
 				var parameters = m.Parameters;
 				for (int i = 0; i < args.Length; i++)
 				{
-					if (!parameters[i].ParameterType.IsAssignableFrom(args[i].Type) &&
-						(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.Type.FullName != "System.Char"))
+					if (parameters.Count <= i ||
+						(!parameters[i].ParameterType.IsAssignableFrom(args[i].Type) &&
+							(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.Type.FullName != "System.Char")))
 					{
 						goto Label_NextMethod;
 					}
@@ -332,17 +343,12 @@ public class ExpressionParser
 						goto Label_NextMethod;
 					}
 				}
-				method = m;
-				break;
+				return m;
 
 			Label_NextMethod:;
 			}
 		}
-		if (method == null)
-		{
-			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Type.FullName}'", errPos, methodName.Length);
-		}
-		return method;
+		return null;
 	}
 
 	private Expression ParseInvoke(Expression expr)
@@ -479,6 +485,16 @@ public class ExpressionParser
 
 		var typeExpr = ParseTypeExpression(prefix, errorPos);
 		var args = ParseArgumentList();
+
+		var method = FindMethod(typeExpr.Type.Constructors, args, errorPos);
+		if (method == null)
+		{
+			throw new ParseException($"No applicable constructor exists in type '{typeExpr.Type.Type.FullName}'", errorPos);
+		}
+
+		CorrectCharParameters(method, args, errorPos);
+		CorrectNotNullableParameters(method, args);
+
 		return new NewExpression(typeExpr, args);
 	}
 
@@ -681,12 +697,8 @@ public class ExpressionParser
 				{
 					// Try to find the first member method with the name in order to take argument types.
 					// Afterwards the more suitable member or extension method will be found.
-					IList<TypeInfo>? argumentTypes = null;
 					var methodInfo = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
-					if (methodInfo != null)
-					{
-						argumentTypes = methodInfo.Parameters.Select(p => p.ParameterType).ToList();
-					}
+					var argumentTypes = methodInfo?.Parameters.Select(p => p.ParameterType).ToList();
 
 					var args = ParseArgumentList(argumentTypes);
 

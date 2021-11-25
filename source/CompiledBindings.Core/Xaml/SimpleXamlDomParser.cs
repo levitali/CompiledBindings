@@ -47,7 +47,9 @@ public class SimpleXamlDomParser : XamlDomParser
 
 		ProcessRoot(result, xamlDoc.Root, null);
 
-		result.HasDestructor = result.TargetType.Methods.Any(m => m.Definition.Name == "Finalize" && m.Definition.IsVirtual && m.Definition.IsFamily && m.Definition.IsHideBySig);
+		result.HasDestructor = result.TargetType.Methods.Any(m => 
+			m.Definition.DeclaringType == result.TargetType.Type &&
+			m.Definition.Name == "Finalize" && m.Definition.IsVirtual && m.Definition.IsFamily && m.Definition.IsHideBySig);
 
 		return result;
 

@@ -31,6 +31,8 @@ public class Page1ViewModel : INotifyPropertyChanged
 	public Task<string> TaskProp => Task.FromResult(string.Empty);
 
 	public Task<ImageSource> LoadImageAsync() => null!;
+
+	public string Calculate(ParamClass prm) => "";
 }
 
 public class Pag1ModifyViewModel : INotifyPropertyChanged
@@ -60,4 +62,19 @@ public class EntityModel : INotifyPropertyChanged
 	public sbyte SByteProp { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
+}
+
+public class ParamClass
+{
+	public ParamClass(string str, int i)
+	{
+	}
+
+	public ParamClass() : this("", 0)
+	{
+	}
+
+	public ParamClass(string str) : this(str, 0)
+	{
+	}
 }

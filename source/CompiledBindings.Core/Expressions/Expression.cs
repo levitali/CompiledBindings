@@ -188,11 +188,6 @@ public class MemberExpression : Expression, IAccessExpression
 		return expression is not (TypeExpression or NewExpression) &&
 			expression.Type.IsNullable && (expression is not ParameterExpression pe || pe.IsNullable);
 	}
-
-	public Expression CloneReplaceExpression(Expression expression)
-	{
-		return new MemberExpression(expression, Member, Type);
-	}
 }
 
 public class UnaryExpression : Expression
@@ -344,11 +339,6 @@ public class CallExpression : Expression, IAccessExpression
 		}
 		return clone;
 	}
-
-	public Expression CloneReplaceExpression(Expression expression)
-	{
-		return new CallExpression(expression, Method, Args);
-	}
 }
 
 public class InvokeExpression : Expression, IAccessExpression
@@ -394,11 +384,6 @@ public class InvokeExpression : Expression, IAccessExpression
 			clone.Args[i] = Args[i].CloneReplace(current, replace);
 		}
 		return clone;
-	}
-
-	public Expression CloneReplaceExpression(Expression expression)
-	{
-		return new InvokeExpression(expression, Args, Type);
 	}
 }
 
@@ -562,11 +547,6 @@ public class ElementAccessExpression : Expression, IAccessExpression
 		}
 		return clone;
 	}
-
-	public Expression CloneReplaceExpression(Expression expression)
-	{
-		return new ElementAccessExpression(Type, expression, Parameters);
-	}
 }
 
 public class ConditionalExpression : Expression
@@ -615,6 +595,7 @@ public class CoalesceExpression : Expression
 {
 	public CoalesceExpression(Expression left, Expression right) : base(right.Type)
 	{
+		Debug.Assert(left.IsNullable);
 		Left = left;
 		Right = right;
 	}
@@ -677,6 +658,8 @@ public class FallbackExpression : Expression
 
 	public FallbackExpression(Expression expression, Expression fallbackExpression, Expression notNullExpression, string localVarName, TypeInfo type) : base(type)
 	{
+		Debug.Assert(notNullExpression is IAccessExpression);
+
 		Expression = expression;
 		Fallback = fallbackExpression;
 		NotNull = notNullExpression;
@@ -696,8 +679,19 @@ public class FallbackExpression : Expression
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
-		var clone = (FallbackExpression)MemberwiseClone();
-		clone.Expression = Expression.CloneReplace(current, replace);
+		var expression = Expression.CloneReplace(current, replace);
+		if (expression is ParameterExpression pe)
+		{
+			return new ConditionalExpression(
+				new BinaryExpression(expression, Expression.NullExpression, "!="),
+				NotNull.CloneReplace(
+					((IAccessExpression)NotNull).Expression,
+					new ParameterExpression(new TypeInfo(pe.Type, false), pe.Name)),
+				Fallback);
+		}
+
+		var clone = (FallbackExpression)base.CloneReplaceCore(current, replace);
+		clone.Expression = expression;
 		clone.Fallback = Fallback.CloneReplace(current, replace);
 		clone.NotNull = NotNull.CloneReplace(current, replace);
 		return clone;
@@ -712,6 +706,4 @@ public class FallbackExpression : Expression
 public interface IAccessExpression
 {
 	Expression Expression { get; }
-
-	Expression CloneReplaceExpression(Expression expression);
 }

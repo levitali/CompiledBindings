@@ -285,11 +285,19 @@ public static class BindingParser
 
 		if (sourceExpression != null && fallbackValue != null)
 		{
-			var expr = sourceExpression.EnumerateTree().Reverse().OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+			var expr = sourceExpression
+				.EnumerateTree().Reverse().OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 			if (expr != null)
 			{
 				var localVarName = "v" + localVarIndex++;
-				sourceExpression = new FallbackExpression(expr.Expression, fallbackValue, expr.CloneReplaceExpression(new ParameterExpression(new TypeInfo(sourceExpression.Type, false), localVarName)), localVarName, sourceExpression.Type);
+				sourceExpression = new FallbackExpression(
+					expr.Expression,
+					fallbackValue,
+					((Expression)expr).CloneReplace(
+						expr.Expression,
+						new ParameterExpression(new TypeInfo(sourceExpression.Type, false), localVarName)),
+					localVarName,
+					sourceExpression.Type);
 			}
 		}
 

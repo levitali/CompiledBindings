@@ -72,7 +72,7 @@ public class BindExtension : MarkupExtension
 
 	public bool IsItemsSource { get; set; }
 
-	public override object ProvideValue(IServiceProvider serviceProvider)
+	public override object? ProvideValue(IServiceProvider serviceProvider)
 	{
 		var provideValueTarget = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));
 		var propertyType = (provideValueTarget.TargetProperty as DependencyProperty)?.PropertyType;

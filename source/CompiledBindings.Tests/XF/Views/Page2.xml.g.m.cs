@@ -53,7 +53,7 @@ namespace XFTest.Views
 			}
 		}
 
-		private void DeinitializeAfterDestructor()
+		~Page2()
 		{
 			if (Bindings_this != null)
 			{

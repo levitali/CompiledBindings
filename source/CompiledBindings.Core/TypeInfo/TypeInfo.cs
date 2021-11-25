@@ -10,6 +10,7 @@ public class TypeInfo
 	private IList<PropertyInfo>? _properties;
 	private IList<FieldInfo>? _fields;
 	private IList<MethodInfo>? _methods;
+	private IList<MethodInfo>? _constructors;
 	private IList<EventInfo>? _events;
 	private readonly bool? _isNullable;
 	private readonly byte? _nullableContext;
@@ -117,6 +118,14 @@ public class TypeInfo
 
 	public IList<MethodInfo> Methods => _methods ??=
 		Type.GetAllMethods()
+			.Select(m => new MethodInfo(
+				m,
+				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
+				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
+			.ToList();
+
+	public IList<MethodInfo> Constructors => _constructors ??=
+		Type.ResolveEx()!.GetConstructors()
 			.Select(m => new MethodInfo(
 				m,
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
