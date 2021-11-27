@@ -157,8 +157,7 @@ $@"
 				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", null, ref dummyLocalVar, ref dummyLocalFunc, "\t");
 			}
 			output.AppendLine(
-$@"#line default
-#line hidden");
+$@"#line default");
 		}
 
 		// Generate setting PropertyChanged event handler for data root
@@ -331,7 +330,6 @@ $@"
 
 			output.AppendLine(
 $@"#line default
-#line hidden
 			}}");
 		}
 
@@ -387,9 +385,7 @@ $@"				}}");
 			}
 
 			output.AppendLine(
-$@"#line default
-#line hidden
-			}}");
+$@"			}}");
 		}
 
 		#endregion
@@ -700,6 +696,7 @@ $@"{a2}				try
 				output.AppendLine(
 $@"{LineDirective(bind.Property.XamlNode)}
 {a2}					var value = {me!.Expression};
+#line default
 {a2}					if (value != null)
 {a2}					{{");
 				GenerateSetTarget($"value.{me.Member.Definition.Name}", a2 + '\t');
@@ -736,7 +733,8 @@ $@"{a}					{expression}({setExpr});");
 				{
 					output.AppendLine(
 $@"{LineDirective(bind.Property.XamlNode)}
-{a}					{expression} = {setExpr};");
+{a}					{expression} = {setExpr};
+#line default");
 				}
 			}
 		}

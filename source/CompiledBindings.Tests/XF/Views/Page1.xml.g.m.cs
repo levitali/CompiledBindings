@@ -41,7 +41,6 @@ namespace XFTest.Views
 #line (65, 13) - (65, 13) 65 "Page1.xml"
 			button1.Clicked += (p1, p2) => this.Save();
 #line default
-#line hidden
 
 			Bindings.Initialize(this);
 			this.BindingContextChanged += this_BindingContextChanged;
@@ -115,7 +114,6 @@ namespace XFTest.Views
 #line (64, 13) - (64, 13) 64 "Page1.xml"
 				targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
-#line hidden
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.list);
@@ -184,7 +182,6 @@ namespace XFTest.Views
 #line (64, 13) - (64, 13) 64 "Page1.xml"
 						targetRoot.button1.IsEnabled = typedSender.BooleanProp;
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -212,7 +209,6 @@ namespace XFTest.Views
 #line (64, 13) - (64, 13) 64 "Page1.xml"
 						targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
-#line hidden
 						SetPropertyChangedEventHandler0(value1);
 						if (!notifyAll)
 						{
@@ -301,10 +297,12 @@ namespace XFTest.Views
 				targetRoot.label7.Text = (dataRoot.NullableIntProp ?? 0).ToString();
 #line (45, 16) - (45, 16) 45 "Page1.xml"
 				targetRoot.label8.Text = (!value1).ToString();
+#line default
 				if (!_settingBinding6)
 				{
 #line (48, 13) - (48, 13) 48 "Page1.xml"
 					var value3 = value1.ToString();
+#line default
 					if (!object.Equals(targetRoot.entry1.Text, value3))
 					{
 						targetRoot.entry1.Text = value3;
@@ -317,7 +315,6 @@ namespace XFTest.Views
 #line (53, 13) - (53, 13) 53 "Page1.xml"
 				targetRoot.list.ItemsSource = dataRoot.ListProp;
 #line default
-#line hidden
 			}
 
 			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
@@ -331,6 +328,7 @@ namespace XFTest.Views
 						{
 #line (47, 13) - (47, 13) 47 "Page1.xml"
 							dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1] = _targetRoot.entry1.IsFocused;
+#line default
 						}
 						catch
 						{
@@ -354,8 +352,6 @@ namespace XFTest.Views
 						}
 						break;
 				}
-#line default
-#line hidden
 			}
 
 			class Page1_BindingsTrackings_this
@@ -409,7 +405,6 @@ namespace XFTest.Views
 #line (43, 16) - (43, 16) 43 "Page1.xml"
 						targetRoot.label6.Text = (value1 + 1).ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -423,17 +418,18 @@ namespace XFTest.Views
 						targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
 #line (45, 16) - (45, 16) 45 "Page1.xml"
 						targetRoot.label8.Text = (!value1).ToString();
+#line default
 						if (!bindings._settingBinding6)
 						{
 #line (48, 13) - (48, 13) 48 "Page1.xml"
 							var value2 = value1.ToString();
+#line default
 							if (!object.Equals(targetRoot.entry1.Text, value2))
 							{
 								targetRoot.entry1.Text = value2;
 							}
 						}
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -444,7 +440,6 @@ namespace XFTest.Views
 #line (44, 16) - (44, 16) 44 "Page1.xml"
 						targetRoot.label7.Text = (typedSender.NullableIntProp ?? 0).ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -455,7 +450,6 @@ namespace XFTest.Views
 #line (49, 13) - (49, 13) 49 "Page1.xml"
 						targetRoot.entry1.SetFocused(typedSender.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -466,7 +460,6 @@ namespace XFTest.Views
 #line (52, 13) - (52, 13) 52 "Page1.xml"
 						targetRoot.list.IsVisible = typedSender.ArrayProp?.Length > 0;
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -477,7 +470,6 @@ namespace XFTest.Views
 #line (53, 13) - (53, 13) 53 "Page1.xml"
 						targetRoot.list.ItemsSource = typedSender.ListProp;
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -514,7 +506,6 @@ namespace XFTest.Views
 			label2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label2");
 
 #line default
-#line hidden
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
 			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
@@ -584,7 +575,6 @@ namespace XFTest.Views
 #line (21, 24) - (21, 24) 21 "Page1.xml"
 				targetRoot.label2.Text = dataRoot.BooleanProp.ToString();
 #line default
-#line hidden
 
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
@@ -654,7 +644,6 @@ namespace XFTest.Views
 #line (20, 24) - (20, 24) 20 "Page1.xml"
 						targetRoot.label1.Text = value1?.SByteProp.ToString();
 #line default
-#line hidden
 						SetPropertyChangedEventHandler1(value1);
 						if (!notifyAll)
 						{
@@ -666,7 +655,6 @@ namespace XFTest.Views
 #line (21, 24) - (21, 24) 21 "Page1.xml"
 						targetRoot.label2.Text = typedSender.BooleanProp.ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -692,7 +680,6 @@ namespace XFTest.Views
 #line (20, 24) - (20, 24) 20 "Page1.xml"
 						targetRoot.label1.Text = typedSender.SByteProp.ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -727,7 +714,6 @@ namespace XFTest.Views
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label3");
 
 #line default
-#line hidden
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
 			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
@@ -793,7 +779,6 @@ namespace XFTest.Views
 #line (30, 36) - (30, 36) 30 "Page1.xml"
 				targetRoot.label3.Text = dataRoot.BooleanProp.ToString();
 #line default
-#line hidden
 			}
 
 			class Page1_DataTemplate1_BindingsTrackings_rootElement
@@ -843,7 +828,6 @@ namespace XFTest.Views
 #line (30, 36) - (30, 36) 30 "Page1.xml"
 						targetRoot.label3.Text = typedSender.BooleanProp.ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -878,7 +862,6 @@ namespace XFTest.Views
 			label9 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label9");
 
 #line default
-#line hidden
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
 			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
@@ -944,7 +927,6 @@ namespace XFTest.Views
 #line (57, 32) - (57, 32) 57 "Page1.xml"
 				targetRoot.label9.Text = dataRoot.DecimalProp.ToString();
 #line default
-#line hidden
 			}
 
 			class Page1_DataTemplate2_BindingsTrackings_rootElement
@@ -994,7 +976,6 @@ namespace XFTest.Views
 #line (57, 32) - (57, 32) 57 "Page1.xml"
 						targetRoot.label9.Text = typedSender.DecimalProp.ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;

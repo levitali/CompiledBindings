@@ -107,6 +107,7 @@ public class XamlCodeGenerator
 					output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
 {a}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
+#line default
 {a}			{setExpr} += {bindingsAccess}_eventHandler{property.Value.BindValue.Index};");
 				}
 				else
@@ -119,7 +120,8 @@ $@"{LineDirective(property.XamlNode)}
 			else
 			{
 				output.AppendLine(
-$@"{a}			{setExpr} += {value};");
+$@"{LineDirective(property.XamlNode)}
+{a}			{setExpr} += {value};");
 			}
 		}
 		else if (property.TargetMethod != null)
@@ -129,7 +131,8 @@ $@"{a}			{setExpr} += {value};");
 				if (property.TargetMethod.Definition.IsStatic)
 				{
 					output.AppendLine(
-$@"{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
+$@"{LineDirective(property.XamlNode)}
+{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
 				}
 				else
 				{
@@ -139,7 +142,8 @@ $@"{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullNa
 						attachRoot += '.';
 					}
 					output.AppendLine(
-$@"{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
+$@"{LineDirective(property.XamlNode)}
+{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
 				}
 			}
 			else
@@ -153,7 +157,8 @@ $@"{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Defin
 		else if (property.Value.BindValue?.Mode == BindingMode.TwoWay)
 		{
 			output.AppendLine(
-$@"{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
+$@"#line default
+{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
 {a}			{{");
 
 			string varName;
@@ -162,7 +167,8 @@ $@"{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
 				varName = "value" + localVarIndex++;
 				output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
-{a}				var {varName} = {value};");
+{a}				var {varName} = {value};
+#line default");
 			}
 			else
 			{
@@ -186,7 +192,8 @@ $@"{a}				if (!object.Equals({setExpr}, {varName}))
 			{
 				var bindings = property.Value.BindValue != null ? "bindings." : null;
 				output.AppendLine(
-$@"{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
+$@"#line default
+{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
 {a}			async void Set{localFuncIndex++}(CancellationToken cancellationToken)
 {a}			{{
 {a}				try
@@ -197,15 +204,19 @@ $@"{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
 					output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
 {a}					var task = {value};
+#line default
 {a}					if (!task.IsCompleted)
 {a}					{{
+{LineDirective(property.XamlNode)}
 {a}						{setExpr}{(isMethodCall ? $"({fallbackValue})" : $" = {fallbackValue}")};
+#line default
 {a}					}}");
 					value = "task";
 				}
 				output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
 {a}					var value = await {value};
+#line default
 {a}					if (!cancellationToken.IsCancellationRequested)
 {a}					{{
 {a}						{setExpr}{(isMethodCall ? $"(value)" : $" = value")};
@@ -250,8 +261,7 @@ $@"{LineDirective(variable.FirstProperty.XamlNode)}
 			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, a);
 		}
 		output.AppendLine(
-$@"#line default
-#line hidden");
+$@"#line default");
 	}
 
 	public string LineDirective(XamlNode xamlNode)

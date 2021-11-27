@@ -44,7 +44,6 @@ namespace XFTest.Views
 #line (32, 17) - (32, 17) 32 "Page2.xml"
 			button1.Clicked += this.OnClicked;
 #line default
-#line hidden
 
 			this.BindingContextChanged += this_BindingContextChanged;
 			if (this.BindingContext is global::XFTest.Views.Page2 dataRoot0)
@@ -135,7 +134,6 @@ namespace XFTest.Views
 #line (30, 13) - (30, 13) 30 "Page2.xml"
 				targetRoot.label8.Text = value3.Item2;
 #line default
-#line hidden
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value2);
@@ -240,7 +238,6 @@ namespace XFTest.Views
 #line (21, 16) - (21, 16) 21 "Page2.xml"
 						targetRoot.label1.Text = value1?.GuidProp.ToString();
 #line default
-#line hidden
 						SetPropertyChangedEventHandler1(value1);
 						if (!notifyAll)
 						{
@@ -252,7 +249,6 @@ namespace XFTest.Views
 #line (22, 16) - (22, 16) 22 "Page2.xml"
 						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(typedSender.StringProp, typeof(global::System.String), dataRoot._viewModel?.DecimalProp + 1, null));
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -263,7 +259,6 @@ namespace XFTest.Views
 #line (22, 16) - (22, 16) 22 "Page2.xml"
 						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel?.StringProp, typeof(global::System.String), typedSender.DecimalProp + 1, null));
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -280,7 +275,6 @@ namespace XFTest.Views
 #line (25, 16) - (25, 16) 25 "Page2.xml"
 						targetRoot.label5.Text = value2;
 #line default
-#line hidden
 						SetPropertyChangedEventHandler2(value1);
 						if (!notifyAll)
 						{
@@ -294,7 +288,6 @@ namespace XFTest.Views
 #line (26, 16) - (26, 16) 26 "Page2.xml"
 						targetRoot.label6.Text = value1?.GuidProp.ToString();
 #line default
-#line hidden
 						SetPropertyChangedEventHandler3(value1);
 						if (!notifyAll)
 						{
@@ -321,7 +314,6 @@ namespace XFTest.Views
 #line (21, 16) - (21, 16) 21 "Page2.xml"
 						targetRoot.label1.Text = typedSender.GuidProp.ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -351,7 +343,6 @@ namespace XFTest.Views
 #line (25, 16) - (25, 16) 25 "Page2.xml"
 						targetRoot.label5.Text = value1;
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
@@ -377,7 +368,6 @@ namespace XFTest.Views
 #line (26, 16) - (26, 16) 26 "Page2.xml"
 						targetRoot.label6.Text = typedSender.GuidProp.ToString();
 #line default
-#line hidden
 						if (!notifyAll)
 						{
 							return;
