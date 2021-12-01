@@ -64,7 +64,7 @@ public static class BindingParser
 			str = str2;
 
 			bool parseExpression = false;
-			match = Regex.Match(str, @"^(\w+)\s*=\s*(.+)\s*$");
+			match = Regex.Match(str, @"^(\w+)\s*(?<!=)=(?!=)\s*(.+)\s*$");
 			if (!match.Success)
 			{
 				if (expression == null)
@@ -484,6 +484,17 @@ public class BindingsData
 	public List<TwoWayEventData> TwoWayEvents { get; init; }
 	public UpdateMethod UpdateMethod { get; init; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+	public void Validate(string file)
+	{
+		foreach (var binding in TwoWayEvents.SelectMany(b => b.Bindings))
+		{
+			if (!binding.IsDPChangeEvent && binding.TargetChangedEvent == null)
+			{
+				throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceTrigger property.", file, binding.Property.XamlNode);
+			}
+		}
+	}
 };
 
 public class NotifyPropertyChangedData

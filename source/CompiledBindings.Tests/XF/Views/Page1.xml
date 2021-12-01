@@ -43,14 +43,17 @@
         <Label Text="{x:Bind DecimalProp + 1}" />
         <Label Text="{x:Bind NullableIntProp ?? 0}" />
         <Label Text="{x:Bind !BooleanProp}" />
+        <Label Text="{x:Bind ListProp[0].DecimalProp}" />
         <Entry
             IsFocused="{x:Bind FocusedField[Field1], Mode=OneWayToSource}"
             Text="{x:Bind BooleanProp, BindBack=SetValue}"
             m:SetFocused="{x:Bind FocusedField[Field1]}" />
+        <ui:PickerEx SelectedItem="{x:Bind StringProp, Mode=TwoWay}"/>
         <CollectionView
             x:Name="list"
             IsVisible="{x:Bind ArrayProp.Length > 0}"
             ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
+            
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid>

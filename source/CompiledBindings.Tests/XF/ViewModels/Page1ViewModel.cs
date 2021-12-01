@@ -17,9 +17,9 @@ public class Page1ViewModel : INotifyPropertyChanged
 	public TestEnum EnumProp { get; set; }
 
 	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
-		{
-			new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
-		};
+	{
+		new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
+	};
 
 	public int[]? ArrayProp { get; set; }
 
@@ -30,6 +30,8 @@ public class Page1ViewModel : INotifyPropertyChanged
 	}
 
 	public FocusState<Field> FocusedField { get; private set; } = new FocusState<Field>();
+
+	public string? StringProp { get; set; }
 
 	public enum Field
 	{

@@ -159,11 +159,13 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						{
 							lineFile = targetRelativePath;
 						}
+						
 						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc);
 
 						if (parseResult.GenerateCode)
 						{
 							parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
+							parseResult.Validate(file);
 
 							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);

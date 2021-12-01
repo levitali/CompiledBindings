@@ -38,6 +38,7 @@ public class XFTests
 
 			var xamlDomParser = new XFXamlDomParser();
 			var parseResult = xamlDomParser.Parse(xamlFile, Path.GetFileName(xamlFile), xdoc);
+			parseResult.Validate(xamlFile);
 
 			var codeGenerator = new XFCodeGenerator("latest", "17.0.0");
 			var code = codeGenerator.GenerateCode(parseResult);

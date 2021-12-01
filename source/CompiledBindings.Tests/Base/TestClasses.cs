@@ -57,3 +57,17 @@ public class BindingsTargetClass
 {
 }
 
+#nullable disable
+
+public class NullableDisabledBaseClass
+{
+	public object SelectedItem { get; set; }
+}
+
+#nullable enable
+
+public class NullableEnabledDerivedClass : NullableDisabledBaseClass
+{
+	public string Dummy { get; set; } = "";
+}
+

@@ -299,7 +299,7 @@ public class TypeInfo
 			}
 		}
 
-		nullableContext ??= _nullableContext;
+		//nullableContext ??= _nullableContext;
 
 		if (isNullable == null)
 		{

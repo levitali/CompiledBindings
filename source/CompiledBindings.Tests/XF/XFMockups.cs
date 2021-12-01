@@ -6,7 +6,7 @@ using Xamarin.Forms;
 
 [assembly: XmlnsDefinition("http://xamarin.com/schemas/2014/forms", "Xamarin.Forms")]
 
-#nullable enable
+#nullable disable
 
 namespace Xamarin.Forms
 {
@@ -15,32 +15,32 @@ namespace Xamarin.Forms
 		public bool IsVisible { get; set; }
 		public bool IsEnabled { get; set; }
 
-		public event EventHandler? Focused;
-		public event PropertyChangedEventHandler? PropertyChanged;
+		public event EventHandler Focused;
+		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
 	public class Page : VisualElement
 	{
-		public string? Title { get; set; }
+		public string Title { get; set; }
 	}
 
 	public class Label : VisualElement
 	{
-		public string? Text { get; set; }
-		public string FontFamily { get; set; } = "";
+		public string Text { get; set; }
+		public string FontFamily { get; set; }
 		public Color TextColor { get; set; }
 	}
 
 	public class Entry : VisualElement
 	{
-		public string? Text { get; set; }
+		public string Text { get; set; }
 
 		public bool IsFocused { get; }
 	}
 
 	public class Button : VisualElement
 	{
-		public event EventHandler? Clicked;
+		public event EventHandler Clicked;
 	}
 
 	public class StackLayout : VisualElement
@@ -49,9 +49,14 @@ namespace Xamarin.Forms
 
 	public class CollectionView : VisualElement
 	{
-		public IEnumerable? ItemsSource { get; set; }
-		public DataTemplate? ItemTemplate { get; set; }
-		public object? SelectedItem { get; set; }
+		public IEnumerable ItemsSource { get; set; }
+		public DataTemplate ItemTemplate { get; set; }
+		public object SelectedItem { get; set; }
+	}
+
+	public class Picker : VisualElement
+	{
+		public object SelectedItem { get; set; }
 	}
 
 	public sealed class XmlnsDefinitionAttribute : Attribute
@@ -64,7 +69,7 @@ namespace Xamarin.Forms
 
 		public string XmlNamespace { get; }
 		public string ClrNamespace { get; }
-		public string? AssemblyName { get; set; }
+		public string AssemblyName { get; set; }
 	}
 
 	public class DataTemplate
@@ -84,6 +89,8 @@ namespace Xamarin.Forms
 	}
 }
 
+#nullable enable
+
 namespace UI
 {
 	public static class Extensions
@@ -91,5 +98,10 @@ namespace UI
 		public static void SetFocused(this VisualElement control, bool isFocused)
 		{
 		}
+	}
+
+	public class PickerEx : Picker
+	{
+		public string Dummy { get; set; } = "";
 	}
 }

@@ -41,6 +41,10 @@ public class TypeInfoTests
 		Assert.IsTrue(getIcon.ReturnType.Fields.Count == 2);
 		Assert.IsFalse(getIcon.ReturnType.Fields[0].FieldType.IsNullable);
 		Assert.IsTrue(getIcon.ReturnType.Fields[1].FieldType.IsNullable);
+
+		var nullableDerived = TypeInfo.GetTypeThrow(typeof(NullableEnabledDerivedClass));
+		prop = nullableDerived.Properties.Single(p => p.Definition.Name == nameof(NullableDisabledBaseClass.SelectedItem));
+		Assert.IsTrue(prop.PropertyType.IsNullable);
 	}
 }
 

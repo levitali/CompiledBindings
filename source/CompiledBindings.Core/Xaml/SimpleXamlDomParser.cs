@@ -345,6 +345,11 @@ public class SimpleXamlDom
 			}
 		}
 	}
+
+	public void Validate(string file)
+	{
+		BindingScopes.ForEach(bs => bs.BindingsData?.Validate(file));
+	}
 }
 
 public class BindingScope

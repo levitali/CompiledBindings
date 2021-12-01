@@ -98,40 +98,6 @@ $@"	}}");
 		return output.ToString();
 	}
 
-	public string GenerateVariableDeclarationCode(SimpleXamlDom parseResult)
-	{
-		var output = new StringBuilder();
-
-		if (parseResult.TargetType!.Type.Namespace != null)
-		{
-			output.AppendLine(
-$@"namespace {parseResult.TargetType.Type.Namespace}
-{{");
-		}
-
-		output.AppendLine(
-$@"	partial class {parseResult.TargetType.Type.Name}
-	{{");
-		foreach (var obj in parseResult.XamlObjects.Where(o => !o.NameExplicitlySet))
-		{
-			output.AppendLine(
-$@"		global::{obj.Type.Type.GetCSharpFullName()} {obj.Name};");
-		}
-
-		GenerateResourceDeclarations(output, parseResult);
-
-		output.AppendLine(
-$@"	}}");
-
-		if (parseResult.TargetType.Type.Namespace != null)
-		{
-			output.AppendLine(
-"}");
-		}
-
-		return output.ToString();
-	}
-
 	private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult)
 	{
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
