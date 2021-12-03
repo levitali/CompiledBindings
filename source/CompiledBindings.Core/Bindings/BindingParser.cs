@@ -108,7 +108,7 @@ public static class BindingParser
 					resources.Add((resourceName, resourceType));
 
 					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, xamlDomParser.ConverterType.Type), xamlDomParser.ConverterType);
-					expr = new ParameterExpression(targetType, "targetRoot");
+					expr = new VariableExpression(targetType, "targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(xamlDomParser.ConverterType, false));
 
 					int pos2 = str.IndexOf(',');
@@ -295,7 +295,7 @@ public static class BindingParser
 					fallbackValue,
 					((Expression)expr).CloneReplace(
 						expr.Expression,
-						new ParameterExpression(new TypeInfo(sourceExpression.Type, false), localVarName)),
+						new VariableExpression(new TypeInfo(sourceExpression.Type, false), localVarName)),
 					localVarName,
 					sourceExpression.Type);
 			}
@@ -397,7 +397,7 @@ public static class BindingParser
 
 		foreach (var propChangeData in notifyPropertyChangedList)
 		{
-			var typedSender = new ParameterExpression(new TypeInfo(propChangeData.SourceExpression.Type, false), "typedSender");
+			var typedSender = new VariableExpression(new TypeInfo(propChangeData.SourceExpression.Type, false), "typedSender");
 			foreach (var prop in propChangeData.Properties)
 			{
 				var expr = new MemberExpression(typedSender, prop.Property, prop.Property.PropertyType);

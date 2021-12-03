@@ -10,7 +10,7 @@ public class ExpressionParser
 		{ "false", new ConstantExpression(false) },
 		{ "null", Expression.NullExpression },
 	};
-	private readonly ParameterExpression _root;
+	private readonly VariableExpression _root;
 	private readonly IList<XamlNamespace> _namespaces;
 	private readonly List<XamlNamespace> _includeNamespaces = new List<XamlNamespace>();
 	private readonly string _text;
@@ -20,7 +20,7 @@ public class ExpressionParser
 	private Token _token;
 	private TypeInfo? _expectedType;
 
-	private ExpressionParser(ParameterExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
+	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
 	{
 		_root = root;
 		_namespaces = namespaces;
@@ -38,7 +38,7 @@ public class ExpressionParser
 			throw new ParseException(Res.EmptyExpression);
 		}
 
-		var parser = new ExpressionParser(new ParameterExpression(dataType, member), expression!, resultType, namespaces);
+		var parser = new ExpressionParser(new VariableExpression(dataType, member), expression!, resultType, namespaces);
 
 		var res = parser.ParseExpression();
 		if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))

@@ -123,9 +123,9 @@ public class DefaultExpression : Expression
 	public override bool IsNullable => false; //TODO!!
 }
 
-public class ParameterExpression : Expression
+public class VariableExpression : Expression
 {
-	public ParameterExpression(TypeInfo type, string name) : base(type)
+	public VariableExpression(TypeInfo type, string name) : base(type)
 	{
 		Name = name;
 	}
@@ -186,7 +186,7 @@ public class MemberExpression : Expression, IAccessExpression
 	internal static bool CheckExpressionNullable(Expression expression)
 	{
 		return expression is not (TypeExpression or NewExpression) &&
-			expression.Type.IsNullable && (expression is not ParameterExpression pe || pe.IsNullable);
+			expression.Type.IsNullable && (expression is not VariableExpression pe || pe.IsNullable);
 	}
 }
 
@@ -680,13 +680,13 @@ public class FallbackExpression : Expression
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
 		var expression = Expression.CloneReplace(current, replace);
-		if (expression is ParameterExpression pe)
+		if (expression is VariableExpression ve)
 		{
 			return new ConditionalExpression(
 				new BinaryExpression(expression, Expression.NullExpression, "!="),
 				NotNull.CloneReplace(
 					((IAccessExpression)NotNull).Expression,
-					new ParameterExpression(new TypeInfo(pe.Type, false), pe.Name)),
+					new VariableExpression(new TypeInfo(ve.Type, false), ve.Name)),
 				Fallback);
 		}
 

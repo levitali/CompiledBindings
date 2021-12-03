@@ -28,7 +28,7 @@
     </Page.Resources>
 
     <StackPanel>
-        <Image Source="{x:Set LoadImageAsync()}" />
+		<Image Source="{x:Set LoadImageAsync()}" />
         <TextBlock
             mx:DataType="{x:Null}"
             m:Text="{x:Bind _viewModel.DecimalProp}" />
@@ -55,6 +55,8 @@
         <Button
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
-    </StackPanel>
+		<TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
+		<TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
+	</StackPanel>
 
 </Page>

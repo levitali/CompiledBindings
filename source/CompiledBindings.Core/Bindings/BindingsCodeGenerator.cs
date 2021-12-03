@@ -11,7 +11,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
 	{
 		bool isDiffDataRoot = targetClassName != bindingsData.DataType.Type.Name || targetNamespace != bindingsData.DataType.Type.Namespace;
-		var rootGroup = bindingsData.NotifyPropertyChangedList.SingleOrDefault(g => g.SourceExpression is ParameterExpression pe && pe.Name == "dataRoot");
+		var rootGroup = bindingsData.NotifyPropertyChangedList.SingleOrDefault(g => g.SourceExpression is VariableExpression pe && pe.Name == "dataRoot");
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
@@ -631,6 +631,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 		{
 			var expr = bind.BindBackExpression ?? bind.Expression!;
 			var me = expr as MemberExpression;
+			var ae = expr.EnumerateTree().Reverse().OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 
 			string memberExpr = "_targetRoot";
 			if (bind.Property.Object.Name != null)
@@ -691,8 +692,6 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 				}
 			}
 
-			bool isNullable = me?.Expression.IsNullable == true;
-
 			string? a2 = a;
 			if (bind.Mode == BindingMode.TwoWay)
 			{
@@ -705,21 +704,22 @@ $@"{a}				if (!_settingBinding{bind.Index})
 			output.AppendLine(
 $@"{a2}				try
 {a2}				{{");
-			if (isNullable)
+			if (ae != null)
 			{
+				var memberExpr2 = expr.CloneReplace(ae.Expression, new VariableExpression(new TypeInfo(ae.Expression.Type, false), "value"));
 				output.AppendLine(
 $@"{LineDirective(bind.Property.XamlNode)}
-{a2}					var value = {me!.Expression};
+{a2}					var value = {ae!.Expression};
 #line default
 {a2}					if (value != null)
 {a2}					{{");
-				GenerateSetTarget($"value.{me.Member.Definition.Name}", a2 + '\t'); //TODO!!! can not only be last member
+				GenerateSetSource(memberExpr2.ToString(), a2 + '\t');
 				output.AppendLine(
 $@"{a2}					}}");
 			}
 			else
 			{
-				GenerateSetTarget(expr.ToString(), a2);
+				GenerateSetSource(expr.ToString(), a2);
 			}
 			output.AppendLine(
 $@"{a2}				}}
@@ -736,12 +736,14 @@ $@"{a}					finally
 {a}				}}");
 			}
 
-			void GenerateSetTarget(string expression, string? a)
+			void GenerateSetSource(string expression, string? a)
 			{
 				if (me?.Member is MethodInfo)
 				{
 					output.AppendLine(
-$@"{a}					{expression}({setExpr});");
+$@"{LineDirective(bind.Property.XamlNode)}
+{a}					{expression}({setExpr});
+#line default");
 				}
 				else
 				{

@@ -17,7 +17,7 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public bool BooleanProp { get; }
 
-	public Pag1ModifyViewModel? ModifyViewModel { get; }
+	public Page1ModifyViewModel? ModifyViewModel { get; }
 
 	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
 	{
@@ -35,13 +35,22 @@ public class Page1ViewModel : INotifyPropertyChanged
 	public string Calculate(ParamClass prm) => "";
 }
 
-public class Pag1ModifyViewModel : INotifyPropertyChanged
+public class Page1ModifyViewModel : INotifyPropertyChanged
 {
 	public string? Input1 { get; set; }
+
+	public Page1ModifyTextViewModel ModifyTextViewModel { get; } = new Page1ModifyTextViewModel();
 
 	public void OnClick(bool parameter)
 	{
 	}
+
+	public event PropertyChangedEventHandler? PropertyChanged;
+}
+
+public class Page1ModifyTextViewModel : INotifyPropertyChanged
+{
+	public string? TextInput { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 }

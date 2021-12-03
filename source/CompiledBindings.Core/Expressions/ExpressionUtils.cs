@@ -13,7 +13,7 @@ public static class ExpressionUtils
 		{
 			var group = setExpressions
 				.SelectMany(p => p.Expression.EnumerateTree()
-					.Where(e => e is not (ConstantExpression or ParameterExpression or TypeExpression or DefaultExpression or NewExpression) &&
+					.Where(e => e is not (ConstantExpression or VariableExpression or TypeExpression or DefaultExpression or NewExpression) &&
 								(e is not MemberExpression me || (me.Member is not (MethodInfo or FieldInfo))))
 					.Select(e => (property: p, expr: e)))
 				.GroupBy(e => e.expr.ToString())
@@ -41,7 +41,7 @@ public static class ExpressionUtils
 			}
 
 			var localVar = new LocalVariable("value" + localVarIndex++, expression, pr.Property);
-			var localVarExpr = new ParameterExpression(type, localVar.Name);
+			var localVarExpr = new VariableExpression(type, localVar.Name);
 			foreach (var prop in group.Distinct(p => p.property))
 			{
 				prop.property.Expression = prop.property.Expression.CloneReplace(prop.expr, localVarExpr);

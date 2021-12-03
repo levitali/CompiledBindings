@@ -162,7 +162,7 @@ $@"#line default
 {a}			{{");
 
 			string varName;
-			if (expression is not ParameterExpression)
+			if (expression is not VariableExpression)
 			{
 				varName = "value" + localVarIndex++;
 				output.AppendLine(

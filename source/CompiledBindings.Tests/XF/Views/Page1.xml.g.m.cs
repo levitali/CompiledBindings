@@ -384,7 +384,9 @@ namespace XFTest.Views
 							_settingBinding7 = true;
 							try
 							{
+#line (49, 13) - (49, 13) 49 "Page1.xml"
 								dataRoot.SetValue(_targetRoot.entry1.Text);
+#line default
 							}
 							catch
 							{
