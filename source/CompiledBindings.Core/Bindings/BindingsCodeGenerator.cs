@@ -666,14 +666,28 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			}
 			else if (!sourceType.IsAssignableFrom(bind.Property.MemberType))
 			{
-				var typeName = $"global::{sourceType.Type.GetCSharpFullName()}";
-				if (bind.Property.MemberType.Type.FullName == "System.Object" && !sourceType.Type.IsValueType)
+				var type = sourceType.Type;
+				if (bind.Property.MemberType.Type.FullName == "System.Object")
 				{
-					setExpr = $"({typeName}){setExpr}";
+					setExpr = $"(global::{type.GetCSharpFullName()}){setExpr}";
 				}
 				else
 				{
-					setExpr = $"({typeName})System.Convert.ChangeType({setExpr}, typeof({typeName}), null)";
+					if (type.IsValueNullable())
+					{
+						type = type.GetGenericArguments()[0];
+					}
+
+					if (bind.Property.MemberType.Type.IsNullable())
+					{
+						var checkNull = bind.Property.MemberType.Type.FullName == "System.String" ? $"string.IsNullOrEmpty(t{bind.Index})" : $"t{bind.Index} == null";
+						var @default = bind.Property.MemberType.Type.IsNullable() ? "null" : "default";
+						setExpr = $"{setExpr} is var t{bind.Index} && {checkNull} ? {@default} : (global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType(t{bind.Index}, typeof(global::{type.GetCSharpFullName()}), null)";
+					}
+					else
+					{
+						setExpr = $"(global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType({setExpr}, typeof(global::{type.GetCSharpFullName()}), null)";
+					}
 				}
 			}
 
@@ -699,7 +713,7 @@ $@"{LineDirective(bind.Property.XamlNode)}
 #line default
 {a2}					if (value != null)
 {a2}					{{");
-				GenerateSetTarget($"value.{me.Member.Definition.Name}", a2 + '\t');
+				GenerateSetTarget($"value.{me.Member.Definition.Name}", a2 + '\t'); //TODO!!! can not only be last member
 				output.AppendLine(
 $@"{a2}					}}");
 			}

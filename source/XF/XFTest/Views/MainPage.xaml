@@ -24,6 +24,7 @@
     <StackLayout>
 
         <Entry Text="{x:Bind ModifyViewModel.Input1, Mode=OneWayToSource}" />
+        <Entry Text="{x:Bind ModifyViewModel.Input2, Mode=TwoWay}" />
 
         <Label Text="{x:Set local:Strings.Instance.Header1}" />
         <Label

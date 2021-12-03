@@ -48,6 +48,8 @@
             IsFocused="{x:Bind FocusedField[Field1], Mode=OneWayToSource}"
             Text="{x:Bind BooleanProp, BindBack=SetValue}"
             m:SetFocused="{x:Bind FocusedField[Field1]}" />
+		<Entry
+            Text="{x:Bind NullableIntProp, Mode=TwoWay}" />
         <ui:PickerEx SelectedItem="{x:Bind StringProp, Mode=TwoWay}"/>
         <CollectionView
             x:Name="list"

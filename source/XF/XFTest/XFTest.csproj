@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2125" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.0" />
   </ItemGroup>
 
@@ -42,14 +42,7 @@
     <CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
       <Output TaskParameter="Include" ItemName="XamlFiles" />
     </CreateItem>
-    <XFGenerateCodeTask XamlFiles="@(XamlFiles)"
-                        ReferenceAssemblies="@(ReferencePath)"
-                        LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
-                        ProjectPath="$(MSBuildProjectDirectory)"
-                        IntermediateOutputPath="$(IntermediateOutputPath)"
-                        LangVersion="$(LangVersion)"
-                        MSBuildVersion="$(MSBuildVersion)"
-                        AttachDebugger="false">
+    <XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" AttachDebugger="false">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
     </XFGenerateCodeTask>
     <ItemGroup>
@@ -60,14 +53,11 @@
   </Target>
 
   <Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-    <XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" 
-                               Assembly="$(IntermediateOutputPath)$(TargetFileName)"
-                               AttachDebugger="false" />
+    <XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="false" />
   </Target>
 
   <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-    <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)"
-                         AttachDebugger="false" />
+    <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="false" />
   </Target>
 
   <Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">

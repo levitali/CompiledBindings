@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using XFTest.ViewModels;
 
 namespace XFTest
 {
@@ -13,6 +14,8 @@ namespace XFTest
 		public MainPage()
 		{
 			InitializeComponent();
+
+			BindingContext = new Page1ViewModel();
 		}
 	}
 }
