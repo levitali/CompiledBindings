@@ -57,6 +57,7 @@
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
 		<TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
 		<TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
+		<CheckBox IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}" />
 	</StackPanel>
 
 </Page>

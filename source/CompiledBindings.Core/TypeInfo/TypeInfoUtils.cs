@@ -115,6 +115,11 @@ public static class TypeInfoUtils
 			return true;
 		}
 
+		if (baseType.IsValueNullable() && baseType.GetGenericArguments()[0].FullName == type.FullName)
+		{
+			return true;
+		}
+
 		string baseTypeFullName = baseType.FullName;
 		return (baseType.ResolveEx()?.IsInterface == true ? type.GetAllInterfaces() : EnumerableExtensions.SelectSequence(type, t => t.ResolveEx()?.BaseType, true))
 			.Any(t => t.FullName == baseTypeFullName);

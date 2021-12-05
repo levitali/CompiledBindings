@@ -667,27 +667,32 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			}
 			else if (!sourceType.IsAssignableFrom(bind.Property.MemberType))
 			{
-				var type = sourceType.Type;
-				if (bind.Property.MemberType.Type.FullName == "System.Object")
+				var sourceType2 = sourceType.Type;
+				var targetType = bind.Property.MemberType.Type;
+				if (targetType.FullName == "System.Object")
 				{
-					setExpr = $"(global::{type.GetCSharpFullName()}){setExpr}";
+					setExpr = $"(global::{sourceType2.GetCSharpFullName()}){setExpr}";
+				}
+				else if (targetType.IsValueNullable() && targetType.GetGenericArguments()[0].FullName == sourceType2.FullName)
+				{
+					setExpr = $"{setExpr} ?? default";
 				}
 				else
 				{
-					if (type.IsValueNullable())
+					if (sourceType2.IsValueNullable())
 					{
-						type = type.GetGenericArguments()[0];
+						sourceType2 = sourceType2.GetGenericArguments()[0];
 					}
 
 					if (bind.Property.MemberType.Type.IsNullable())
 					{
 						var checkNull = bind.Property.MemberType.Type.FullName == "System.String" ? $"string.IsNullOrEmpty(t{bind.Index})" : $"t{bind.Index} == null";
-						var @default = bind.Property.MemberType.Type.IsNullable() ? "null" : "default";
-						setExpr = $"{setExpr} is var t{bind.Index} && {checkNull} ? {@default} : (global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType(t{bind.Index}, typeof(global::{type.GetCSharpFullName()}), null)";
+						var @default = sourceType.Type.IsNullable() ? "null" : "default";
+						setExpr = $"{setExpr} is var t{bind.Index} && {checkNull} ? {@default} : (global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType(t{bind.Index}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
 					}
 					else
 					{
-						setExpr = $"(global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType({setExpr}, typeof(global::{type.GetCSharpFullName()}), null)";
+						setExpr = $"(global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType({setExpr}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
 					}
 				}
 			}

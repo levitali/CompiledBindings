@@ -45,9 +45,6 @@ public class TypeInfoTests
 		var nullableDerived = TypeInfo.GetTypeThrow(typeof(NullableEnabledDerivedClass));
 		prop = nullableDerived.Properties.Single(p => p.Definition.Name == nameof(NullableDisabledBaseClass.SelectedItem));
 		Assert.IsTrue(prop.PropertyType.IsNullable);
-
-		prop = class1TypeInfo.Properties.Single(p => p.Definition.Name == nameof(Class1.ListProp));
-		method = prop.PropertyType.Methods.Single(m => m.Definition == prop.Definition.GetMethod);
 	}
 }
 
