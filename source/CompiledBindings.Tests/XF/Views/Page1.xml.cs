@@ -13,7 +13,7 @@ partial class Page1
 {
 	public string? Title { get; set; }
 
-	private CollectionView list;
+	private CollectionView list = new CollectionView();
 
 	public void Save()
 	{

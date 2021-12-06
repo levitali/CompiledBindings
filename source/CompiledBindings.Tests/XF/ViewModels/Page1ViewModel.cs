@@ -3,6 +3,7 @@ using System.ComponentModel;
 using UI;
 
 #nullable enable
+#pragma warning disable 0067
 
 namespace XFTest.ViewModels;
 

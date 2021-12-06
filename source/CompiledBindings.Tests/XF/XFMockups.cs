@@ -7,6 +7,7 @@ using Xamarin.Forms;
 [assembly: XmlnsDefinition("http://xamarin.com/schemas/2014/forms", "Xamarin.Forms")]
 
 #nullable disable
+#pragma warning disable 0067
 
 namespace Xamarin.Forms
 {

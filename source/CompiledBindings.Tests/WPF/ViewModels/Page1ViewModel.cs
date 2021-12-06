@@ -6,6 +6,7 @@ using System.Windows.Media;
 namespace WPFTest.ViewModels;
 
 #nullable enable
+#pragma warning disable 0067
 
 public class Page1ViewModel : INotifyPropertyChanged
 {
@@ -24,7 +25,7 @@ public class Page1ViewModel : INotifyPropertyChanged
 		new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
 	};
 
-	public int[] ArrayProp { get; }
+	public int[] ArrayProp { get; } = new int[0];
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -59,7 +60,7 @@ public class Page1ModifyTextViewModel : INotifyPropertyChanged
 
 public class EntityViewModel : INotifyPropertyChanged
 {
-	public EntityModel Model { get; }
+	public EntityModel Model { get; } = new EntityModel();
 
 	public decimal DecimalProp { get; set; }
 

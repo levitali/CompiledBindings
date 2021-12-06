@@ -13,9 +13,9 @@ namespace WPFTest.Views;
 
 partial class Page1
 {
-	private Page1ViewModel _viewModel;
+	private Page1ViewModel _viewModel = new Page1ViewModel();
 
-	private ListView listView;
+	private ListView listView = new ListView();
 
 	public string? Title { get; set; }
 

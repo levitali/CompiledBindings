@@ -8,6 +8,10 @@
     <OutputPath>..\..\..\bin\</OutputPath>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>1701;1702;netsdk1138</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='net35'">
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationFramework" />
