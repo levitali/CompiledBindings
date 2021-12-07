@@ -30,24 +30,24 @@ public class SimpleXamlDomParser : XamlDomParser
 		DependencyObjectType = dependencyObjectType;
 	}
 
-	public SimpleXamlDom Parse(string file, string lineFile, XDocument xamlDoc)
+	public SimpleXamlDom Parse(string file, string lineFile, XDocument xdoc)
 	{
 		CurrentFile = file;
 		CurrentLineFile = lineFile;
 
-		UsedNames = new HashSet<string>(xamlDoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
+		UsedNames = new HashSet<string>(xdoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
 
-		TargetType = DataType = GetRootType(xamlDoc.Root);
-		var result = new SimpleXamlDom(xamlDoc.Root)
+		TargetType = DataType = GetRootType(xdoc.Root);
+		var result = new SimpleXamlDom(xdoc.Root)
 		{
 			TargetType = TargetType
 		};
 
 		var visualStatesGroupsName = DefaultNamespace + "VisualStateManager.VisualStateGroups";
 
-		ProcessRoot(result, xamlDoc.Root, null);
+		ProcessRoot(result, xdoc.Root, null);
 
-		result.HasDestructor = result.TargetType.Methods.Any(m => 
+		result.HasDestructor = result.TargetType.Methods.Any(m =>
 			m.Definition.DeclaringType == result.TargetType.Type &&
 			m.Definition.Name == "Finalize" && m.Definition.IsVirtual && m.Definition.IsFamily && m.Definition.IsHideBySig);
 
@@ -108,7 +108,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				if (xelement != xroot && (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate)))
 				{
 					viewName = xelement.Attribute(xName)?.Value ?? xelement.Attribute(NameAttr)?.Value;
-					if (viewName == null && xelement != xamlDoc.Root)
+					if (viewName == null && xelement != xdoc.Root)
 					{
 						viewName = XamlDomParser.GenerateName(xelement, UsedNames);
 					}
@@ -119,9 +119,9 @@ public class SimpleXamlDomParser : XamlDomParser
 				}
 
 				// Process x:DataType attribute
-				TypeInfo? dataType;
 				if (dataTypeAttr != null)
 				{
+					TypeInfo? dataType;
 					try
 					{
 						var type = FindTypeFromAttribute(dataTypeAttr);
@@ -153,9 +153,9 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				XamlObject? obj = null;
 
-				if (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate && xelement != xamlDoc.Root))
+				if (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate && xelement != xdoc.Root))
 				{
-					var type = xelement == xamlDoc.Root ? result.TargetType : FindType(xelement);
+					var type = xelement == xdoc.Root ? result.TargetType : FindType(xelement);
 					obj = new XamlObject(new XamlNode(CurrentLineFile, xelement, xelement.Name), type)
 					{
 						Name = viewName,
@@ -170,7 +170,7 @@ public class SimpleXamlDomParser : XamlDomParser
 							try
 							{
 								var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-								var prop = GetObjectProperty(obj, xamlNode);
+								var prop = GetObjectProperty(obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null);
 								obj.Properties.Add(prop);
 
 								var bind = prop.Value.BindValue;
@@ -203,12 +203,12 @@ public class SimpleXamlDomParser : XamlDomParser
 									{
 										if (elementType != null)
 										{
-											throw new ParseException("IsItemsSource is already set in some other x:Bind of this element.");
+											throw new ParseException(Res.IsItemsSourceAlreadySet);
 										}
 										elementType = bind.Expression!.Type.GetItemType();
 										if (elementType == null)
 										{
-											throw new ParseException("Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.");
+											throw new ParseException(Res.ElementTypeCannotBeInferred);
 										}
 									}
 								}
@@ -240,14 +240,6 @@ public class SimpleXamlDomParser : XamlDomParser
 					{
 						if (child.Descendants().SelectMany(e => e.Attributes()).Any(a => IsMemExtension(a)))
 						{
-							if (elementType == null && child.Attribute(xDataType) == null && child.Attribute(mxDataType) == null && child.Attribute(DataTypeAttr) == null &&
-								EnumerableExtensions.SelectTree(child, c => c.Attribute(xDataType) == null && child.Attribute(mxDataType) == null && child.Attribute(DataTypeAttr) == null ? c.Elements() : XElement.EmptySequence)
-									.SelectMany(e => e.Attributes())
-									.Any(a => IsMemExtension(a) && a.Value.StartsWith("{x:Bind ")))
-							{
-								throw new GeneratorException("DataType must be set for a DataTemplate.", file, child);
-							}
-
 							var dataTemplate = new SimpleXamlDom(child);
 							int index = result.DataTemplates.Count;
 							ProcessRoot(dataTemplate, child, elementType);
@@ -277,6 +269,12 @@ public class SimpleXamlDomParser : XamlDomParser
 			   a.Value.StartsWith("[x:Bind ") ||
 			   a.Value.StartsWith("{x:Set ") ||
 			   a.Value.StartsWith("[x:Set ");
+	}
+
+	private static class Res
+	{
+		public const string IsItemsSourceAlreadySet = "IsItemsSource is already set in some other x:Bind of this element.";
+		public const string ElementTypeCannotBeInferred = "Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.";
 	}
 }
 

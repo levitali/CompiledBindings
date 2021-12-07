@@ -4,13 +4,13 @@ namespace CompiledBindings;
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, ref int localVarIndex)
+	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, bool throwIfWithoutDataType, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value?.TrimEnd();
 		if (string.IsNullOrWhiteSpace(str))
 		{
-			throw new ParseException("Missing expression.");
+			throw new ParseException(Res.MissingExpression);
 		}
 
 		var namespaces = xamlDomParser.GetNamespaces(prop.XamlNode).ToList();
@@ -44,6 +44,10 @@ public static class BindingParser
 			dataTypeSet = true;
 
 			sourceType = dataType ?? targetType;
+		}
+		else if (throwIfWithoutDataType)
+		{
+			throw new ParseException(Res.xBindNoDataType);
 		}
 
 		int currentPos = 0, pos1 = 0;
@@ -471,6 +475,12 @@ public static class BindingParser
 			TwoWayEvents = twoWayEventHandlers,
 			UpdateMethod = updateMethod
 		};
+	}
+
+	private static class Res
+	{
+		public const string MissingExpression = "Missing expression.";
+		public const string xBindNoDataType = "DataType is unknown. It must be specified when using x:Bind in a DataTemplate.";
 	}
 }
 

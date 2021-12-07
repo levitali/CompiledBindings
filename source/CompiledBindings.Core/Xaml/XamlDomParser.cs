@@ -117,9 +117,9 @@ public class XamlDomParser
 		return namespaces;
 	}
 
-	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode)
+	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode, bool throwIfBindWithoutDataType)
 	{
-		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode);
+		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, throwIfBindWithoutDataType);
 	}
 
 	public static string GenerateName(XElement element, HashSet<string> usedNames)
@@ -166,7 +166,7 @@ public class XamlDomParser
 		throw new GeneratorException($"The type {className} was not found.", CurrentFile, xobject);
 	}
 
-	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode)
+	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode, bool throwIfBindWithoutDataType)
 	{
 		try
 		{
@@ -291,7 +291,7 @@ public class XamlDomParser
 						.Select(e => e.Attribute(xDefaultBindMode))
 						.FirstOrDefault(a => a != null);
 					var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-					value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, ref _localVarIndex);
+					value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, throwIfBindWithoutDataType, ref _localVarIndex);
 					if (value.BindValue.SourceExpression != null)
 					{
 						if (value.BindValue.Converter == null)
