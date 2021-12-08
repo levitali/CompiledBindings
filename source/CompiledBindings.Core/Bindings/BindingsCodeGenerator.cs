@@ -349,7 +349,7 @@ $@"#line default
 			else
 			{
 				output.AppendLine(
-$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].TargetChangedEvent!.Definition.GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.GetCSharpFullName()} p{i}"))})");
+$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].TargetChangedEvent!.GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Type.GetCSharpFullName()} p{i}"))})");
 			}
 
 			output.AppendLine(

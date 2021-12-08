@@ -80,7 +80,7 @@ public class XamlCodeGenerator
 		{
 			if (expression != null)
 			{
-				var types = property.TargetEvent.Definition.GetEventHandlerParameterTypes().ToList();
+				var types = property.TargetEvent.GetEventHandlerParameterTypes().ToList();
 
 				bool wrap;
 				if (expression is MemberExpression me && me.Member is MethodInfo sourceMethod)

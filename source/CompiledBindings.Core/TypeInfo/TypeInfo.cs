@@ -62,66 +62,26 @@ public class TypeInfo
 
 	public bool IsNullable => Type.IsValueNullable() || (_isNullable != false && !Type.IsValueType);
 
-	public IList<PropertyInfo> Properties
-	{
-		get
-		{
-			if (_properties == null)
+	public IList<PropertyInfo> Properties => _properties ??=
+		EnumerateTypeAndSubTypes()
+			.SelectMany(t => t.Properties).Select(p =>
 			{
-				HashSet<string> notNullabelProperties = new();
+				var knownNotNull = NotNullableProperties.TryGetValue(p.DeclaringType.FullName, out var props) && props.Contains(p.Name);
+				return new PropertyInfo(p, GetTypeSumElement(p.PropertyType, p.DeclaringType, knownNotNull ? false : null, p.CustomAttributes));
+			})
+			.ToList();
 
-				var type = Type;
-				if (Type.IsArray)
-				{
-					type = GetTypeThrow(typeof(Array)).Type;
-				}
-				else
-				{
-					var type2 = type;
-					do
-					{
-						if (NotNullableProperties.TryGetValue(type2.FullName, out var properties))
-						{
-							notNullabelProperties.UnionWith(properties);
-						}
-						type2 = type2.GetBaseType();
-					}
-					while (type2 != null);
-				}
-
-				_properties = type.GetAllProperties().Select(p =>
-				{
-					var knownNotNull = notNullabelProperties?.Contains(p.Name) == true;
-					return new PropertyInfo(p, GetTypeSumElement(p.PropertyType, p.DeclaringType, knownNotNull ? false : null, p.CustomAttributes));
-				}).ToList();
-			}
-			return _properties;
-		}
-	}
-
-	public IList<FieldInfo> Fields
-	{
-		get
-		{
-			if (_fields == null)
-			{
-				var type = Type;
-				if (Type.IsArray)
-				{
-					type = GetTypeThrow(typeof(Array)).Type;
-				}
-				_fields = type.GetAllFields().Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes))).ToList();
-			}
-			return _fields;
-		}
-	}
+	public IList<FieldInfo> Fields => _fields ??=
+		EnumerateTypeAndSubTypes()
+			.SelectMany(t => t.Fields.Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes))))
+			.ToList();
 
 	public IList<MethodInfo> Methods => _methods ??=
-		Type.GetAllMethods()
-			.Select(m => new MethodInfo(
+		EnumerateTypeAndSubTypes()
+			.SelectMany(t => t.Methods.Where(m => !m.IsConstructor).Select(m => new MethodInfo(
 				m,
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
-				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
+				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes))))
 			.ToList();
 
 	public IList<MethodInfo> Constructors => _constructors ??=
@@ -133,9 +93,9 @@ public class TypeInfo
 			.ToList();
 
 	public IList<EventInfo> Events => _events ??=
-		TypeInfoUtils.GetAllEvents(Type)
-		.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
-		.ToList();
+		EnumerateTypeAndSubTypes()
+			.SelectMany(t => t.Events.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes))))
+			.ToList();
 
 	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO nullablility in base type from this one?
 
@@ -146,7 +106,7 @@ public class TypeInfo
 		{
 			return null;
 		}
-		return new TypeInfo(elementType, GetIsNullableSumElement(1), GetNullableFlags(elementType), GetNullableContext(elementType) ?? _nullableContext);
+		return new TypeInfo(elementType, GetIsNullableSubElement(1), GetNullableFlags(elementType), GetNullableContext(elementType) ?? _nullableContext);
 	}
 
 	public IList<TypeInfo>? GetGenericArguments()
@@ -158,7 +118,7 @@ public class TypeInfo
 		}
 
 		return genericArguments
-			.Select((ga, i) => new TypeInfo(ga, GetIsNullableSumElement(i + 1), GetNullableFlags(ga), GetNullableContext(ga) ?? _nullableContext))
+			.Select((ga, i) => new TypeInfo(ga, GetIsNullableSubElement(i + 1), GetNullableFlags(ga), GetNullableContext(ga) ?? _nullableContext))
 			.ToList();
 	}
 
@@ -174,7 +134,7 @@ public class TypeInfo
 			if (enumerableType != null)
 			{
 				var itemType = enumerableType.GetGenericArguments()[0];
-				return new TypeInfo(itemType, GetIsNullableSumElement(1), GetNullableFlags(itemType), GetNullableContext(itemType) ?? _nullableContext);
+				return new TypeInfo(itemType, GetIsNullableSubElement(1), GetNullableFlags(itemType), GetNullableContext(itemType) ?? _nullableContext);
 			}
 		}
 		return null;
@@ -261,7 +221,7 @@ public class TypeInfo
 						type = type2.GetGenericArguments()[i];
 						if (isNullable == null)
 						{
-							isNullable = GetIsNullableSumElement(i + 1);
+							isNullable = GetIsNullableSubElement(i + 1);
 						}
 						goto Lable_Break1;
 					}
@@ -299,8 +259,6 @@ public class TypeInfo
 			}
 		}
 
-		//nullableContext ??= _nullableContext;
-
 		if (isNullable == null)
 		{
 			var b = (nullableFlags?[0] ?? nullableContext);
@@ -308,6 +266,33 @@ public class TypeInfo
 		}
 
 		return new TypeInfo(type, isNullable, nullableFlags, nullableContext);
+	}
+
+	private IEnumerable<TypeDefinition> EnumerateTypeAndSubTypes()
+	{
+		var type = Type;
+		if (type.IsArray)
+		{
+			return EnumerableExtensions.AsEnumerable(GetTypeThrow(typeof(Array)).Type.ResolveEx()!);
+		}
+
+		if (type.IsGenericInstance)
+		{
+			type = type.GetElementType();
+		}
+
+		var typeDefinition = type.ResolveEx();
+		if (typeDefinition == null)
+		{
+			return Enumerable.Empty<TypeDefinition>();
+		}
+
+		if (typeDefinition.IsInterface)
+		{
+			return EnumerableExtensions.SelectTree(typeDefinition, t => t.Interfaces.Select(i => i.InterfaceType.ResolveEx()).Where(t => t != null).Select(t => t!), true);
+		}
+
+		return EnumerableExtensions.SelectSequence(typeDefinition, t => t.BaseType.ResolveEx(), true).Where(t => t != null).Select(t => t!);
 	}
 
 	private static byte[]? GetNullableFlags(TypeReference type)
@@ -335,7 +320,7 @@ public class TypeInfo
 			.ConstructorArguments[0].Value;
 	}
 
-	private bool? GetIsNullableSumElement(int index)
+	private bool? GetIsNullableSubElement(int index)
 	{
 		var b = _nullabileFlags?.Skip(index).FirstOrDefault() ?? _nullableContext;
 		return b is null or 0 ? null : b == 2;
@@ -410,6 +395,16 @@ public class EventInfo : IMemberInfo
 
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => EventType;
+
+	public IEnumerable<TypeInfo> GetEventHandlerParameterTypes()
+	{
+		var invokeMethod = EventType.Methods.FirstOrDefault(m => m.Definition.Name == "Invoke");
+		if (invokeMethod == null)
+		{
+			return Enumerable.Empty<TypeInfo>();
+		}
+		return invokeMethod.Parameters.Select(p => p.ParameterType);
+	}
 }
 
 public class ParameterInfo

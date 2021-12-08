@@ -47,7 +47,7 @@ public static class BindingParser
 		}
 		else if (throwIfWithoutDataType)
 		{
-			throw new ParseException(Res.xBindNoDataType);
+			throw new ParseException(Res.NoDataType);
 		}
 
 		int currentPos = 0, pos1 = 0;
@@ -480,7 +480,7 @@ public static class BindingParser
 	private static class Res
 	{
 		public const string MissingExpression = "Missing expression.";
-		public const string xBindNoDataType = "DataType is unknown. It must be specified when using x:Bind in a DataTemplate.";
+		public const string NoDataType = "DataType is unknown. It must be specified when using x:Bind in a DataTemplate.";
 	}
 }
 

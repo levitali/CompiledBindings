@@ -325,16 +325,16 @@ public class SimpleXamlDom
 				prop.Value.BindValue.TargetChangedEvent == null)
 			{
 				var dpName = prop.TargetProperty!.Definition.Name + "Property";
-				IMemberDefinition dp = prop.Object.Type.Type.GetAllFields().FirstOrDefault(f =>
-					f.Name == dpName &&
-					f.IsStatic &&
-					f.FieldType.FullName == dependencyPropertyType);
+				IMemberInfo dp = prop.Object.Type.Fields.FirstOrDefault(f =>
+					f.Definition.Name == dpName &&
+					f.Definition.IsStatic &&
+					f.FieldType.Type.FullName == dependencyPropertyType);
 				if (dp == null)
 				{
-					dp = prop.Object.Type.Type.GetAllProperties().FirstOrDefault(p =>
-						p.Name == dpName &&
-						p.IsStatic() &&
-						p.PropertyType.FullName == dependencyPropertyType);
+					dp = prop.Object.Type.Properties.FirstOrDefault(p =>
+						p.Definition.Name == dpName &&
+						p.Definition.IsStatic() &&
+						p.PropertyType.Type.FullName == dependencyPropertyType);
 				}
 				if (dp != null)
 				{
