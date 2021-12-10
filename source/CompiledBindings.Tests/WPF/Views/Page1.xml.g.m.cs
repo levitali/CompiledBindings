@@ -558,12 +558,12 @@ namespace WPFTest.Views
 					try
 					{
 #line (59, 12) - (59, 12) 59 "Page1.xml"
-						var value = dataRoot.ModifyViewModel;
+						var value = dataRoot.ModifyViewModel?.ModifyTextViewModel;
 #line default
 						if (value != null)
 						{
 #line (59, 12) - (59, 12) 59 "Page1.xml"
-							value.ModifyTextViewModel.TextInput = _targetRoot.textBox3.Text;
+							value.TextInput = _targetRoot.textBox3.Text;
 #line default
 						}
 					}

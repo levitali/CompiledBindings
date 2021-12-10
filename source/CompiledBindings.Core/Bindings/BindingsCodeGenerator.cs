@@ -631,7 +631,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 		{
 			var expr = bind.BindBackExpression ?? bind.Expression!;
 			var me = expr as MemberExpression;
-			var ae = expr.EnumerateTree().Reverse().OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+			var ae = expr.EnumerateTree().OrderByDescending(e => e.ToString()).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 
 			string memberExpr = "_targetRoot";
 			if (bind.Property.Object.Name != null)
