@@ -234,7 +234,7 @@ public class XamlNamespace
 			.SelectMany(xdoc => xdoc.Descendants().Attributes())
 			.Where(a => a.Name.Namespace == XNamespace.Xmlns)
 			.Select(a => (a, m: _usingRegex.Match(a.Value)))
-			.Where(e => e.m.Success)
+			.Where(e => e.m.Success && !string.IsNullOrEmpty(e.m.Groups[1].Value))
 			.Select(e => new XamlNamespace(e.a.Name.LocalName, e.a.Value.Trim()))
 			.Distinct(n => n.Prefix)
 			.ToList();
