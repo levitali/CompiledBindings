@@ -1,14 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <OutputPath>..\..\..\bin\</OutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Product>CompiledBindings</Product>
+		<Company>levitali</Company>
+		<Version>1.0.7</Version>
+		<LangVersion>latest</LangVersion>
+		<OutputPath>..\..\..\bin\</OutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Mono.Cecil" Version="0.11.4" />
-    <PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Mono.Cecil" Version="0.11.4" />
+		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2244" />
+	</ItemGroup>
 
 </Project>
