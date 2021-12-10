@@ -283,72 +283,71 @@ public class ExpressionParser
 		return expr;
 	}
 
-	private MethodInfo FindMethod(TypeInfo type, string methodName, Expression[] args, int errPos)
+	private bool CheckMethodApplicable(MethodInfo method, Expression[] args, bool isExtension)
+	{
+		var parameters = method.Parameters;
+		int prmIndex = isExtension ? 1 : 0;
+
+		if (parameters.Count == prmIndex && args.Length > 0)
+		{
+			return false;
+		}
+
+		for (int i = 0; i < args.Length; i++, prmIndex++)
+		{
+			TypeInfo prmType = null!;
+			if (parameters.Count > prmIndex)
+			{
+				prmType = parameters[prmIndex].ParameterType;
+			}
+			else if (!CheckLastParameterArray())
+			{
+				return false;
+			}
+			if (!CheckAssignable() && (!CheckLastParameterArray() || !CheckAssignable()))
+			{
+				return false;
+			}
+
+			bool CheckLastParameterArray()
+			{
+				var lastPrm = parameters[parameters.Count - 1];
+				if (!lastPrm.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+				{
+					return false;
+				}
+				prmType = lastPrm.ParameterType.GetElementType()!;
+				return true;
+			}
+
+			bool CheckAssignable()
+			{
+				return prmType.IsAssignableFrom(args[i].Type) ||
+					(args[i] is ConstantExpression ce && ce.Value is string && prmType.Type.FullName == "System.Char");
+			}
+		}
+		if (prmIndex < parameters.Count)
+		{
+			if (!parameters[prmIndex].Definition.IsOptional)
+			{
+				return false;
+			}
+			// Other parameters must also be optional
+		}
+		return true;
+	}
+
+	private IEnumerable<(MethodInfo method, XamlNamespace? ns)> EnumerateMethods(TypeInfo type, string methodName)
 	{
 		type = GetNullableUnderlyingType(type);
 
-		var methods = type.Methods
-			.Where(m => m.Definition.Name == methodName &&
-						(m.Parameters.Count >= args.Length ||
-						 (m.Parameters.Count > 0 && m.Parameters[m.Parameters.Count - 1].Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))))
-			.ToList();
-		if (methods.Count == 0)
-		{
-			foreach (var ns in _namespaces)
-			{
-				methods = TypeInfo.FindExtensionMethods(ns.ClrNamespace!, methodName).ToList();
-				if (methods.Count > 0)
-				{
-					_includeNamespaces.Add(ns);
-					break;
-				}
-			}
-		}
-
-		var method = FindMethod(methods, args, errPos);
-		if (method == null)
-		{
-			throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Type.FullName}'", errPos, methodName.Length);
-		}
-		return method;
-	}
-
-	private MethodInfo? FindMethod(IList<MethodInfo> methods, Expression[] args, int errPos)
-	{		
-		if (methods.Count == 1)
-		{
-			return methods[0];
-			// Note! So far we do not check if parameters are assignable.
-			// If not, the generated code will not compile
-		}
-		else if (methods.Count > 1)
-		{
-			// If there are many methods, it is need to find the right one.
-			foreach (var m in methods)
-			{
-				var parameters = m.Parameters;
-				for (int i = 0; i < args.Length; i++)
-				{
-					if (parameters.Count <= i ||
-						(!parameters[i].ParameterType.IsAssignableFrom(args[i].Type) &&
-							(args[i] is not ConstantExpression ce || ce.Value is not string || parameters[i].ParameterType.Type.FullName != "System.Char")))
-					{
-						goto Label_NextMethod;
-					}
-				}
-				if (m.Parameters.Count > args.Length)
-				{
-					if (!m.Parameters[args.Length].Definition.IsOptional)
-					{
-						goto Label_NextMethod;
-					}
-				}
-				return m;
-
-			Label_NextMethod:;
-			}
-		}
-		return null;
+		return type.Methods
+			.Where(m => m.Definition.Name == methodName)
+			.Select(m => (m, (XamlNamespace?)null))
+			.Concat(
+				_namespaces.SelectMany(ns =>
+					TypeInfo.FindExtensionMethods(ns.ClrNamespace!, methodName)
+					.Select(m => (m, (XamlNamespace?)ns))));
 	}
 
 	private Expression ParseInvoke(Expression expr)
@@ -368,7 +367,7 @@ public class ExpressionParser
 			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
 		}
 
-		CorrectCharParameters(method, args, errorPos);
+		CorrectCharParameters(method, args, false, errorPos);
 		CorrectNotNullableParameters(method, args);
 
 		return new InvokeExpression(expr, args, method.ReturnType);
@@ -408,36 +407,37 @@ public class ExpressionParser
 		}
 	}
 
-	private static void CorrectCharParameters(MethodInfo method, Expression[] args, int errorPos)
+	private static void CorrectCharParameters(MethodInfo method, Expression[] args, bool isExtension, int errorPos)
 	{
 		bool? isParamsChar = null;
-		for (int i = 0; i < args.Length; i++)
+		for (int i = 0, prmIndex = isExtension ? 1 : 0; i < args.Length; i++, prmIndex++)
 		{
 			var arg = args[i];
 			if (arg is ConstantExpression ce && ce.Value is string)
 			{
-				if (isParamsChar == null && i == method.Parameters.Count)
+				if (isParamsChar == null && prmIndex == method.Parameters.Count)
 				{
 					throw new InvalidProgramException();
 				}
 
-				if (i == method.Parameters.Count - 1)
+				if (prmIndex == method.Parameters.Count - 1)
 				{
-					if (method.Parameters[i].Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
+					var prm = method.Parameters[prmIndex];
+					if (prm.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
 					{
-						if (!method.Parameters[i].ParameterType.Type.IsArray)
+						if (!prm.ParameterType.Type.IsArray)
 						{
 							throw new InvalidProgramException();
 						}
 
-						isParamsChar = method.Parameters[i].ParameterType.Type.GetElementType().FullName == "System.Char";
+						isParamsChar = prm.ParameterType.Type.GetElementType().FullName == "System.Char";
 						if (isParamsChar == false)
 						{
 							return;
 						}
 					}
 				}
-				if (isParamsChar == true || method.Parameters[i].ParameterType.Type.FullName == "System.Char")
+				if (isParamsChar == true || method.Parameters[prmIndex].ParameterType.Type.FullName == "System.Char")
 				{
 					string value = (string)((ConstantExpression)arg).Value!;
 					if (value.Length != 1)
@@ -486,13 +486,13 @@ public class ExpressionParser
 		var typeExpr = ParseTypeExpression(prefix, errorPos);
 		var args = ParseArgumentList();
 
-		var method = FindMethod(typeExpr.Type.Constructors, args, errorPos);
+		var method = typeExpr.Type.Constructors.FirstOrDefault(c => CheckMethodApplicable(c, args, false));
 		if (method == null)
 		{
 			throw new ParseException($"No applicable constructor exists in type '{typeExpr.Type.Type.FullName}'", errorPos);
 		}
 
-		CorrectCharParameters(method, args, errorPos);
+		CorrectCharParameters(method, args, false, errorPos);
 		CorrectNotNullableParameters(method, args);
 
 		return new NewExpression(typeExpr, args);
@@ -695,17 +695,41 @@ public class ExpressionParser
 			{
 				if (_token.id == TokenId.OpenParen)
 				{
-					// Try to find the first member method with the name in order to take argument types.
-					// Afterwards the more suitable member or extension method will be found.
-					var methodInfo = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
-					var argumentTypes = methodInfo?.Parameters.Select(p => p.ParameterType).ToList();
+					var enumerator = EnumerateMethods(type, id).GetEnumerator();
 
+					MethodInfo method;
+					XamlNamespace? ns;
+
+					// Get the first method with the name in order to take argument types.
+					// Afterwards the more suitable member or extension method will be found.
+					GetNextMethod();
+
+					var argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
 					var args = ParseArgumentList(argumentTypes);
 
-					var method = FindMethod(type, id, args, errorPos);
-					CorrectCharParameters(method, args, errorPos);
+					while (!CheckMethodApplicable(method, args, ns != null))
+					{
+						GetNextMethod();
+					}
+
+					if (ns != null)
+					{
+						_includeNamespaces.Add(ns);
+					}
+
+					CorrectCharParameters(method, args, ns != null, errorPos);
 					CorrectNotNullableParameters(method, args);
+					
 					return new CallExpression(instance, method, args);
+
+					void GetNextMethod()
+					{
+						if (!enumerator.MoveNext())
+						{
+							throw new ParseException($"No applicable method '{id}' exists in type '{type.Type.FullName}'", errorPos, id.Length);
+						}
+						(method, ns) = enumerator.Current;
+					}
 				}
 
 				var method2 = type.Methods.FirstOrDefault(m => m.Definition.Name == id);

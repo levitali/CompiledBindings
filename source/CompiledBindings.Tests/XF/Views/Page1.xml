@@ -60,6 +60,7 @@
                 <DataTemplate>
                     <Grid>
                         <Label Text="{x:Bind DecimalProp}" />
+						<Label Text="{x:Bind StringProp.TrimStart('0')}" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

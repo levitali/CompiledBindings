@@ -44,7 +44,7 @@ namespace XFTest.Views
 			Title = value1.Title;
 #line (39, 16) - (39, 16) 39 "Page1.xml"
 			label4.Text = value1.Header1;
-#line (70, 13) - (70, 13) 70 "Page1.xml"
+#line (71, 13) - (71, 13) 71 "Page1.xml"
 			button1.Clicked += (p1, p2) => this.Save();
 #line default
 
@@ -115,9 +115,9 @@ namespace XFTest.Views
 
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
-#line (69, 13) - (69, 13) 69 "Page1.xml"
+#line (70, 13) - (70, 13) 70 "Page1.xml"
 				var value1 = (((global::XFTest.ViewModels.EntityViewModel)dataRoot.list.SelectedItem));
-#line (69, 13) - (69, 13) 69 "Page1.xml"
+#line (70, 13) - (70, 13) 70 "Page1.xml"
 				targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
 
@@ -185,7 +185,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
-#line (69, 13) - (69, 13) 69 "Page1.xml"
+#line (70, 13) - (70, 13) 70 "Page1.xml"
 						targetRoot.button1.IsEnabled = typedSender.BooleanProp;
 #line default
 						if (!notifyAll)
@@ -210,9 +210,9 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "SelectedItem")
 					{
-#line (69, 13) - (69, 13) 69 "Page1.xml"
+#line (70, 13) - (70, 13) 70 "Page1.xml"
 						var value1 = (((global::XFTest.ViewModels.EntityViewModel)typedSender.SelectedItem));
-#line (69, 13) - (69, 13) 69 "Page1.xml"
+#line (70, 13) - (70, 13) 70 "Page1.xml"
 						targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
 						SetPropertyChangedEventHandler0(value1);
@@ -1038,10 +1038,12 @@ namespace XFTest.Views
 	class Page1_DataTemplate2 : global::CompiledBindings.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Label label10;
+		private global::Xamarin.Forms.Label label11;
 
 		public void Initialize(global::Xamarin.Forms.Element rootElement)
 		{
 			label10 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label10");
+			label11 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label11");
 
 #line default
 
@@ -1108,6 +1110,8 @@ namespace XFTest.Views
 				var dataRoot = _dataRoot;
 #line (62, 32) - (62, 32) 62 "Page1.xml"
 				targetRoot.label10.Text = dataRoot?.DecimalProp.ToString();
+#line (63, 14) - (63, 14) 63 "Page1.xml"
+				targetRoot.label11.Text = dataRoot?.StringProp?.TrimStart('0');
 #line default
 			}
 
@@ -1157,6 +1161,16 @@ namespace XFTest.Views
 					{
 #line (62, 32) - (62, 32) 62 "Page1.xml"
 						targetRoot.label10.Text = typedSender.DecimalProp.ToString();
+#line default
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+					if (notifyAll || e.PropertyName == "StringProp")
+					{
+#line (63, 14) - (63, 14) 63 "Page1.xml"
+						targetRoot.label11.Text = typedSender.StringProp?.TrimStart('0');
 #line default
 						if (!notifyAll)
 						{

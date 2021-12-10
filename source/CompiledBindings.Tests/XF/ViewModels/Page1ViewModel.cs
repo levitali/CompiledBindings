@@ -45,6 +45,8 @@ public class EntityViewModel : INotifyPropertyChanged
 {
 	public EntityModel? Model { get; }
 
+	public string? StringProp { get; set; }
+
 	public decimal DecimalProp { get; set; }
 
 	public bool BooleanProp { get; set; }
