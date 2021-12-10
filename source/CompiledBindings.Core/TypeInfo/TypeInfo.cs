@@ -173,13 +173,17 @@ public class TypeInfo
 		_typeCache.Clear();
 	}
 
-	public static IEnumerable<MethodInfo> FindExtensionMethods(string ns, string name)
+	public static IEnumerable<MethodInfo> FindExtensionMethods(string ns, string name, TypeInfo type)
 	{
 		foreach (var refTyp in TypeInfoUtils.AllTypes.Values.Where(t => t.Namespace == ns))
 		{
 			if (refTyp.IsSealed && refTyp.IsAbstract)
 			{
-				foreach (var method in refTyp.Methods.Where(m => m.Name == name && m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute")))
+				foreach (var method in refTyp.Methods.Where(m => 
+					m.Name == name && 
+					m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute") &&
+					m.Parameters.Count > 0 &&
+					m.Parameters[0].ParameterType.IsAssignableFrom(type.Type)))
 				{
 					var typeInfo = GetTypeThrow(refTyp.FullName);
 					yield return typeInfo.Methods.First(m => m.Definition == method);

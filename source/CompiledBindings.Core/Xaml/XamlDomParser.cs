@@ -237,7 +237,7 @@ public class XamlDomParser
 							foreach (var ns in GetNamespaces(xamlNode))
 							{
 								var clrNs = ns.ClrNamespace!;
-								method = TypeInfo.FindExtensionMethods(clrNs, memberName)
+								method = TypeInfo.FindExtensionMethods(clrNs, memberName, typeInfo)
 										.FirstOrDefault(m => m.Parameters.Count == 2 && m.Parameters[0].ParameterType.IsAssignableFrom(obj.Type));
 								if (method != null)
 								{
@@ -395,7 +395,7 @@ public class XamlDomParser
 	{
 		return type.Methods
 			.Where(m => m.Definition.Name == methodName && m.Parameters.Count == 1)
-			.Union(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName)
+			.Union(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName, type)
 											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))
 			.FirstOrDefault(m => m.Parameters[m.Parameters.Count == 1 ? 0 : 1].ParameterType.IsAssignableFrom(targetType));
 	}

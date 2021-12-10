@@ -326,6 +326,7 @@ public class ExpressionParser
 					(args[i] is ConstantExpression ce && ce.Value is string && prmType.Type.FullName == "System.Char");
 			}
 		}
+		
 		if (prmIndex < parameters.Count)
 		{
 			if (!parameters[prmIndex].Definition.IsOptional)
@@ -334,6 +335,7 @@ public class ExpressionParser
 			}
 			// Other parameters must also be optional
 		}
+		
 		return true;
 	}
 
@@ -346,7 +348,7 @@ public class ExpressionParser
 			.Select(m => (m, (XamlNamespace?)null))
 			.Concat(
 				_namespaces.SelectMany(ns =>
-					TypeInfo.FindExtensionMethods(ns.ClrNamespace!, methodName)
+					TypeInfo.FindExtensionMethods(ns.ClrNamespace!, methodName, type)
 					.Select(m => (m, (XamlNamespace?)ns))));
 	}
 
