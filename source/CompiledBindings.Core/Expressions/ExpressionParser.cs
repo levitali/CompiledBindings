@@ -356,14 +356,16 @@ public class ExpressionParser
 	{
 		int errorPos = _token.pos;
 
-		var args = ParseArgumentList();
-
 		var delegateType = TypeInfo.GetTypeThrow(typeof(MulticastDelegate));
 		if (!delegateType.IsAssignableFrom(expr.Type))
 		{
 			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
 		}
+		
 		var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
+		var argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
+		
+		var args = ParseArgumentList(argumentTypes);
 		if (method.Parameters.Count < args.Length)
 		{
 			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
