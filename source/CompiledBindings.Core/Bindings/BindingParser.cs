@@ -242,7 +242,7 @@ public static class BindingParser
 			}
 		}
 
-		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && expression is not (MemberExpression or CallExpression or ElementAccessExpression))
+		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && (bindBackExpression ?? expression) is not (MemberExpression or CallExpression or ElementAccessExpression))
 		{
 			throw new ParseException("The expression must be settable for TwoWay or OneWayToSource bindings.");
 		}
