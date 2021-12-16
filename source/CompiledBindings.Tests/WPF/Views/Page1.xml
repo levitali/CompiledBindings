@@ -21,14 +21,16 @@
             DataType="viewModels:EntityViewModel">
             <Grid>
                 <TextBlock Text="{x:Bind Model.SByteProp}" />
-                <TextBlock Text="{x:Bind BooleanProp}" />
+                <TextBlock
+                    Text="{x:Bind BooleanProp}"
+                    Visibility="{x:Bind views:XamlUtils.TrueToVisible(BooleanProp)}" />
                 <TextBlock IsEnabled="{x:Bind BooleanProp, Converter={StaticResource InverseBooleanConverter}}" />
             </Grid>
         </DataTemplate>
     </Page.Resources>
 
     <StackPanel>
-		<Image Source="{x:Set LoadImageAsync()}" />
+        <Image Source="{x:Set LoadImageAsync()}" />
         <TextBlock
             mx:DataType="{x:Null}"
             m:Text="{x:Bind _viewModel.DecimalProp}" />
@@ -55,9 +57,9 @@
         <Button
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
-		<TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
-		<TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
-		<CheckBox IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}" />
-	</StackPanel>
+        <TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
+        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
+        <CheckBox IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}" />
+    </StackPanel>
 
 </Page>

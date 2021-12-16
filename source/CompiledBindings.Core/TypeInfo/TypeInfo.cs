@@ -6,7 +6,6 @@ public class TypeInfo
 {
 	private static readonly Dictionary<string, TypeInfo> _typeCache = new Dictionary<string, TypeInfo>(StringComparer.OrdinalIgnoreCase);
 
-	private TypeInfo? _baseType;
 	private IList<PropertyInfo>? _properties;
 	private IList<FieldInfo>? _fields;
 	private IList<MethodInfo>? _methods;
@@ -19,7 +18,6 @@ public class TypeInfo
 	public TypeInfo(TypeInfo typeInfo, bool isNullable)
 	{
 		Type = typeInfo.Type;
-		_baseType = typeInfo._baseType;
 		_properties = typeInfo._properties;
 		_fields = typeInfo._fields;
 		_methods = typeInfo._methods;
@@ -96,8 +94,6 @@ public class TypeInfo
 		EnumerateTypeAndSubTypes()
 			.SelectMany(t => t.Events.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes))))
 			.ToList();
-
-	public TypeInfo? BaseType => _baseType ??= Type.ResolveEx()?.BaseType is var bt && bt != null ? new TypeInfo(bt) : null; //TODO nullablility in base type from this one?
 
 	public TypeInfo? GetElementType()
 	{

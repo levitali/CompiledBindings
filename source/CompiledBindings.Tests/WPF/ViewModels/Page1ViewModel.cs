@@ -22,7 +22,7 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
 	{
-		new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
+		new EntityViewModel { DecimalProp = 1, BooleanProp = true },
 	};
 
 	public int[] ArrayProp { get; } = new int[0];

@@ -29,7 +29,7 @@ public static class BindingParser
 		EventInfo? targetChangedEvent = null;
 		List<(string name, TypeInfo type)> resources = new();
 
-		// TODO! how to match optional comma and not include it in the group?
+		// TODO: how to match optional comma and not include it in the group?
 		var match = Regex.Match(str, @"^.*DataType\s*(?<!=)=(?!=)(.+)");
 		if (match.Success)
 		{
@@ -271,10 +271,10 @@ public static class BindingParser
 			var convertMethod = xamlDomParser.ConverterType.Methods.First(m => m.Definition.Name == "Convert");
 			sourceExpression = new CallExpression(converter, convertMethod, new Expression[]
 			{
-					sourceExpression,
-					new TypeofExpression(new TypeExpression(prop.MemberType)),
-					converterParameter ?? Expression.NullExpression,
-					Expression.NullExpression
+				sourceExpression,
+				new TypeofExpression(new TypeExpression(prop.MemberType)),
+				converterParameter ?? Expression.NullExpression,
+				Expression.NullExpression
 			});
 			if (prop.MemberType.Type.FullName != "System.Object")
 			{

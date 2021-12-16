@@ -39,3 +39,9 @@ public class InverseBooleanConverter : IValueConverter
 		throw new NotImplementedException();
 	}
 }
+
+public static class XamlUtils
+{
+	public static Visibility TrueToVisible(bool? value, bool hide = false) => default;
+}
+

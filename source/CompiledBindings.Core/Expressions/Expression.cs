@@ -95,7 +95,7 @@ public class ConstantExpression : Expression
 		return Enumerable.Empty<Expression>();
 	}
 
-	public override bool IsNullable => false; //TODO!!
+	public override bool IsNullable => false;
 }
 
 public class DefaultExpression : Expression
@@ -120,7 +120,7 @@ public class DefaultExpression : Expression
 		return Enumerable.Empty<Expression>();
 	}
 
-	public override bool IsNullable => false; //TODO!!
+	public override bool IsNullable => false;
 }
 
 public class VariableExpression : Expression
@@ -427,7 +427,7 @@ public class NewExpression : Expression
 
 public class TypeExpression : Expression
 {
-	public TypeExpression(TypeInfo type) : base(type) //TODO actually the ExpressionType is TypeInfo.GetTypeThrow("System.Type")
+	public TypeExpression(TypeInfo type) : base(type)
 	{
 	}
 
