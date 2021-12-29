@@ -451,7 +451,7 @@ public static class BindingParser
 			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.SourceExpression))
 			.ToList();
 
-		var props3 = props1.Union(props2).ToList();
+		var props3 = props1.Concat(props2).ToList();
 
 		var localVars2 = ExpressionUtils.GroupExpressions(props3);
 

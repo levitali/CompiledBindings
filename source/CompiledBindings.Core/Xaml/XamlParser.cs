@@ -4,39 +4,6 @@ namespace CompiledBindings;
 
 public class XamlParser
 {
-	public static XamlNode ParseElement(string file, XElement element, IList<XamlNamespace>? knownNamespaces)
-	{
-		return ParseElement(file, element, element.Name.LocalName, knownNamespaces);
-	}
-
-	private static XamlNode ParseElement(string file, XElement element, string name, IList<XamlNamespace>? knownNamespaces)
-	{
-		var node = new XamlNode(file, element, element.Name.Namespace + name)
-		{
-			Value = element.Value
-		};
-
-		foreach (var attribute in element.Attributes().Where(a => a.Name != "xmlns" && a.Name.Namespace != XNamespace.Xmlns))
-		{
-			node.Properties.Add(ParseAttribute(file, attribute, knownNamespaces));
-		}
-
-		string propertyStartPart = node.Name.LocalName + ".";
-		foreach (var child in element.Elements())
-		{
-			if (child.Name.LocalName.StartsWith(propertyStartPart))
-			{
-				node.Properties.Add(ParseElement(file, child, child.Name.LocalName.Substring(propertyStartPart.Length), knownNamespaces));
-			}
-			else
-			{
-				node.Children.Add(ParseElement(file, child, child.Name.LocalName, knownNamespaces));
-			}
-		}
-
-		return node;
-	}
-
 	public static XamlNode ParseAttribute(string file, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
 		var node = new XamlNode(file, attribute, attribute.Name);
@@ -159,11 +126,7 @@ public class XamlNode
 
 	public List<XamlNode> Properties => _properties ??= new List<XamlNode>();
 
-	public List<XamlNode> Children
-	{
-		get => _children ??= new List<XamlNode>();
-		set => _children = value;
-	}
+	public List<XamlNode> Children => _children ??= new List<XamlNode>();
 
 	public string? Value { get; set; }
 	public int ValueOffset { get; set; }

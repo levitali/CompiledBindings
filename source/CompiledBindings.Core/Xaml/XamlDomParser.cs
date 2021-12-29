@@ -395,7 +395,7 @@ public class XamlDomParser
 	{
 		return type.Methods
 			.Where(m => m.Definition.Name == methodName && m.Parameters.Count == 1)
-			.Union(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName, type)
+			.Concat(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName, type)
 											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))
 			.FirstOrDefault(m => m.Parameters[m.Parameters.Count == 1 ? 0 : 1].ParameterType.IsAssignableFrom(targetType));
 	}

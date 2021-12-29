@@ -223,14 +223,14 @@ public class TypeInfo
 						{
 							isNullable = GetIsNullableSubElement(i + 1);
 						}
-						goto Lable_Break1;
+						goto Label_Break1;
 					}
 				}
 				type2 = td.BaseType;
 			}
 			while (type2 != null);
 		}
-	Lable_Break1:
+	Label_Break1:
 
 		byte[]? nullableFlags = null;
 		var attributes = attributesHierarchy.First();

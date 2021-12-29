@@ -27,12 +27,12 @@ public class WPFTests
 		int substr = "file:///".Length;
 		TypeInfoUtils.LoadReferences(new string[]
 		{
-				typeof(object).Assembly.CodeBase.Substring(substr),
-				typeof(INotifyPropertyChanged).Assembly.CodeBase.Substring(substr),
-				typeof(System.Windows.Controls.Control).Assembly.CodeBase.Substring(substr),
-				typeof(System.Windows.UIElement).Assembly.CodeBase.Substring(substr),
-				typeof(System.Windows.DependencyObject).Assembly.CodeBase.Substring(substr),
-				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
+			typeof(object).Assembly.CodeBase.Substring(substr),
+			typeof(INotifyPropertyChanged).Assembly.CodeBase.Substring(substr),
+			typeof(System.Windows.Controls.Control).Assembly.CodeBase.Substring(substr),
+			typeof(System.Windows.UIElement).Assembly.CodeBase.Substring(substr),
+			typeof(System.Windows.DependencyObject).Assembly.CodeBase.Substring(substr),
+			Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
 		});
 		try
 		{

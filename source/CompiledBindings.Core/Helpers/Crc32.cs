@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-#nullable enable
+﻿#nullable enable
 
 namespace CompiledBindings;
 

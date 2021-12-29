@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 
 #nullable enable
 
@@ -9,7 +8,7 @@ namespace XFTest.ViewModels
 {
 	public class Page1ViewModel : INotifyPropertyChanged
 	{
-		public ModifyPage1ViewModel ModifyViewModel { get; } = new ();
+		public ModifyPage1ViewModel ModifyViewModel { get; } = new();
 
 		public decimal DecimalProp { get; set; }
 
@@ -22,7 +21,7 @@ namespace XFTest.ViewModels
 
 		public int[] ArrayProp { get; set; } = new[] { 1, 2, 3 };
 
-		public Func<Type, char, bool>? FuncProp { get; set; }	
+		public Func<Type, char, bool>? FuncProp { get; set; }
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 	}
@@ -31,7 +30,7 @@ namespace XFTest.ViewModels
 	{
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		public string? Input1 { get; set; }	
+		public string? Input1 { get; set; }
 		public int? Input2 { get; set; }
 	}
 
