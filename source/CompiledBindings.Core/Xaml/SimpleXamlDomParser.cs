@@ -4,10 +4,8 @@ namespace CompiledBindings;
 
 public class SimpleXamlDomParser : XamlDomParser
 {
-	public static readonly XNamespace mcNamespace = "http://schemas.openxmlformats.org/markup-compatibility/2006";
 	public static readonly XNamespace mNamespace = "http://compiledbindings.com/";
 	public static readonly XNamespace mxNamespace = "http://compiledbindings.com/x";
-	public static readonly XName mcIgnorable = mcNamespace + "Ignorable";
 	public static readonly XName mxDataType = mxNamespace + "DataType";
 
 	public static readonly XName NameAttr = XNamespace.None + "Name"; // WPF Name attribute

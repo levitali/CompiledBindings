@@ -1,0 +1,89 @@
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:PreformanceCompareApp"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mx="http://compiledbindings.com/x"
+    xmlns:vm="clr-namespace:PreformanceCompareApp.ViewModels"
+    mc:Ignorable="d mx"
+    x:Class="PreformanceCompareApp.BindingWindow"    
+    Width="800"
+    Height="450"
+    Title="Binding Performance">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Margin="0,0,0,12"
+            Text="{Binding Avarage}" />
+
+        <ListBox
+            Grid.Row="1"
+            ItemsSource="{Binding TransferOrders}"
+            VirtualizingStackPanel.VirtualizationMode="Recycling">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="vm:TransferOrderViewModel">
+                    <StackPanel Orientation="Horizontal">
+
+                        <StackPanel Margin="8">
+                            <TextBlock
+                                Style="{StaticResource HeaderStyle}"
+                                Text="Material" />
+                            <TextBlock
+                                Style="{StaticResource ValueStyle}"
+                                Text="{Binding Material}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="8">
+                            <TextBlock
+                                Style="{StaticResource HeaderStyle}"
+                                Text="Material text" />
+                            <TextBlock
+                                Style="{StaticResource ValueStyle}"
+                                Text="{Binding MaterialText}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="8">
+                            <TextBlock
+                                Style="{StaticResource HeaderStyle}"
+                                Text="From" />
+                            <TextBlock
+                                Style="{StaticResource ValueStyle}"
+                                Text="{Binding From}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="8">
+                            <TextBlock
+                                Style="{StaticResource HeaderStyle}"
+                                Text="To" />
+                            <TextBlock
+                                Style="{StaticResource ValueStyle}"
+                                Text="{Binding To}" />
+                        </StackPanel>
+
+                        <StackPanel Margin="8">
+                            <TextBlock
+                                Style="{StaticResource HeaderStyle}"
+                                Text="Quantity" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock
+                                    Style="{StaticResource ValueStyle}"
+                                    Text="{Binding Quantity}" />
+                                <TextBlock
+                                    Margin="4,0,0,0"
+                                    Style="{StaticResource ValueStyle}"
+                                    Text="{Binding QuantityUnit}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
