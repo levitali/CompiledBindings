@@ -36,11 +36,11 @@ public class XFTests
 			var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
 			var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
 
-			var xamlDomParser = new XFXamlDomParser();
+			var xamlDomParser = new XFXamlDomParser(new PlatformConstants());
 			var parseResult = xamlDomParser.Parse(xamlFile, Path.GetFileName(xamlFile), xdoc);
 			parseResult.Validate(xamlFile);
 
-			var codeGenerator = new XFCodeGenerator("latest", "17.0.0");
+			var codeGenerator = new XFCodeGenerator("latest", "17.0.0", new PlatformConstants());
 			var code = codeGenerator.GenerateCode(parseResult);
 
 			var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");
