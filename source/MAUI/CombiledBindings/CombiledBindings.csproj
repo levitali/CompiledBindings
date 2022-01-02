@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Product>CompiledBindings</Product>
+        <Company>levitali</Company>
+        <Version>1.0.8</Version>
+        <LangVersion>latest</LangVersion>
+        <OutputPath>..\..\..\bin\</OutputPath>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UseMaui>true</UseMaui>
+    </PropertyGroup>
+
+</Project>

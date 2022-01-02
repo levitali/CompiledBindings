@@ -16,6 +16,8 @@
 /source/WPF/CompiledBindings.WPF/obj
 /source/XF/CompiledBindings/obj
 /source/XF/CompiledBindings.XF/obj
+/source/MAUI/CompiledBindings/obj
+/source/MAUI/CompiledBindings.MAUI/obj
 /source/CompiledBindings.Tests/bin
 /source/CompiledBindings.Tests/obj
 /source/WPF/WPFTest/bin
@@ -25,3 +27,8 @@
 /source/XF/XFTest/obj
 /source/XF/XFTest.UWP/bin
 /source/XF/XFTest.UWP/obj
+/source/MAUI/MauiTest/.vs
+/source/MAUI/MauiTest/bin
+/source/MAUI/MauiTest/obj
+/source/MAUI/CombiledBindings/obj
+/source/PerformanceCompareApp/obj

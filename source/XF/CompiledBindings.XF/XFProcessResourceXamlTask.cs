@@ -18,6 +18,18 @@ namespace CompiledBindings;
 
 public class XFProcessResourceXamlTask : Task
 {
+	private PlatformConstants _platformConstants;
+
+	public XFProcessResourceXamlTask() : this(new PlatformConstants())
+	{
+
+	}
+
+	public XFProcessResourceXamlTask(PlatformConstants platformConstants)
+	{
+		_platformConstants = platformConstants;
+	}
+
 	[Required]
 	public ITaskItem[] ReferenceAssemblies { get; set; }
 
@@ -43,7 +55,7 @@ public class XFProcessResourceXamlTask : Task
 				AssemblyResolver = new TypeInfoUtils.AssemblyResolver(),
 			};
 
-			var xamlDomParser = new XFXamlDomParser();
+			var xamlDomParser = new XFXamlDomParser(_platformConstants);
 
 			var assembly = AssemblyDefinition.ReadAssembly(Assembly, prm);
 			try

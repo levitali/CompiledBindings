@@ -16,6 +16,16 @@ namespace CompiledBindings;
 public class XFGenerateCodeTask : Task, ICancelableTask
 {
 	private CancellationTokenSource? _cancellationTokenSource;
+	private PlatformConstants _platformConstants;
+
+	public XFGenerateCodeTask() : this(new PlatformConstants())
+	{
+	}
+
+	public XFGenerateCodeTask(PlatformConstants platformConstants)
+	{
+		_platformConstants = platformConstants;
+	}
 
 	[Required]
 	public string LangVersion { get; set; }
@@ -57,7 +67,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
-			var xamlDomParser = new XFXamlDomParser();
+			var xamlDomParser = new XFXamlDomParser(_platformConstants);
 
 			var generatedCodeFiles = new List<TaskItem>();
 			bool generateDataTemplateBindings = false;
@@ -95,7 +105,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 						{
 							targetRelativePath = xaml.ItemSpec;
 						}
-						
+
 						string lineFile;
 						if (!isIntermediateOutputPathRooted)
 						{
@@ -113,7 +123,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 						if (parseResult.GenerateCode)
 						{
-							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion);
+							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion, _platformConstants);
 							string code = codeGenerator.GenerateCode(parseResult);
 
 							bool dataTemplates = parseResult.DataTemplates.Count > 0;
@@ -167,49 +177,49 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	private string GenerateDataTemplateBindingsClass()
 	{
 		return
-@"namespace CompiledBindings
-{
-	using Xamarin.Forms;
+$@"namespace CompiledBindings
+{{
+	using {_platformConstants.BaseClrNamespace};
 
 	public class DataTemplateBindings
-	{
+	{{
 		public static readonly BindableProperty BindingsProperty =
 			BindableProperty.CreateAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), null, propertyChanged: BindingsChanged);
 
 		public static IGeneratedDataTemplate GetBindings(BindableObject @object)
-		{
+		{{
 			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
-		}
+		}}
 
 		public static void SetBindings(BindableObject @object, IGeneratedDataTemplate value)
-		{
+		{{
 			@object.SetValue(BindingsProperty, value);
-		}
+		}}
 
 		public static readonly BindableProperty RootProperty =
 			BindableProperty.CreateAttached(""Root"", typeof(VisualElement), typeof(DataTemplateBindings), null);
 
 		public static VisualElement GetRoot(BindableObject @object)
-		{
+		{{
 			return (VisualElement)@object.GetValue(RootProperty);
-		}
+		}}
 
 		public static void SetRoot(BindableObject @object, VisualElement value)
-		{
+		{{
 			@object.SetValue(RootProperty, value);
-		}
+		}}
 
 		static void BindingsChanged(BindableObject bindable, object oldValue, object newValue)
-		{
+		{{
 			((IGeneratedDataTemplate)newValue).Initialize((Element)bindable);
-		}
-	}
+		}}
+	}}
 
 	public interface IGeneratedDataTemplate
-	{
-		void Initialize(global::Xamarin.Forms.Element rootElement);
-	}
-}";
+	{{
+		void Initialize(Element rootElement);
+	}}
+}}";
 	}
 
 	void ICancelableTask.Cancel()
@@ -222,15 +232,16 @@ public class XFXamlDomParser : SimpleXamlDomParser
 {
 	private static ILookup<string, string>? _nsMappings;
 
-	public XFXamlDomParser() : base(
-		"http://xamarin.com/schemas/2014/forms",
+	public XFXamlDomParser(PlatformConstants platformConstants) : base(
+		platformConstants.DefaultNamespace,
 		"http://schemas.microsoft.com/winfx/2009/xaml",
 		getClrNsFromXmlNs: xmlNs =>
 		{
 			if (_nsMappings == null)
 			{
+				string attrName = $"{platformConstants.BaseClrNamespace}.XmlnsDefinitionAttribute";
 				_nsMappings = TypeInfoUtils.Assemblies
-					.SelectMany(ass => ass.CustomAttributes.Where(at => at.AttributeType.FullName == "Xamarin.Forms.XmlnsDefinitionAttribute"))
+					.SelectMany(ass => ass.CustomAttributes.Where(at => at.AttributeType.FullName == attrName))
 					.Select(at => (
 						XmlNamespace: (string)at.ConstructorArguments[0].Value,
 						ClrNamespace: (string)at.ConstructorArguments[1].Value))
@@ -244,7 +255,7 @@ public class XFXamlDomParser : SimpleXamlDomParser
 			}
 			return _nsMappings[xmlNs];
 		},
-		TypeInfo.GetTypeThrow("Xamarin.Forms.IValueConverter"))
+		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.IValueConverter"))
 	{
 	}
 
@@ -256,17 +267,20 @@ public class XFXamlDomParser : SimpleXamlDomParser
 
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 {
-	public XFCodeGenerator(string langVersion, string msbuildVersion)
+	PlatformConstants _platformConstants;
+
+	public XFCodeGenerator(string langVersion, string msbuildVersion, PlatformConstants platformConstants)
 		: base(new BindingsCodeGenerator(langVersion, msbuildVersion),
 			   "Binding",
 			   "System.EventArgs",
-			   "Xamarin.Forms.Element",
-			   "global::Xamarin.Forms.NameScopeExtensions.FindByName<global::{0}>({1}, \"{2}\")",
+			   $"{platformConstants.BaseClrNamespace}.Element",
+			   "global::" + platformConstants.BaseClrNamespace + ".NameScopeExtensions.FindByName<global::{0}>({1}, \"{2}\")",
 			   true,
 			   true,
 			   langVersion,
 			   msbuildVersion)
 	{
+		_platformConstants = platformConstants;
 	}
 
 	protected override void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
@@ -291,11 +305,17 @@ $@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElem
 			foreach (var resource in resources)
 			{
 				output.AppendLine(
-$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root1}.Resources.ContainsKey(""{resource.name}"") == true ? {root2}.Resources[""{resource.name}""] : global::Xamarin.Forms.Application.Current.Resources[""{resource.name}""]);");
+$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root1}.Resources.ContainsKey(""{resource.name}"") == true ? {root2}.Resources[""{resource.name}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resource.name}""]);");
 			}
 
 			output.AppendLine();
 		}
 	}
+}
+
+public class PlatformConstants
+{
+	public virtual string BaseClrNamespace => "Xamarin.Forms";
+	public virtual string DefaultNamespace => "http://xamarin.com/schemas/2014/forms";
 }
 
