@@ -9,7 +9,7 @@
         <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
     </PropertyGroup>
 
-    <Target Name="GenerateCode" AfterTargets="CoreCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+    <Target Name="GenerateCode" BeforeTargets="CoreCompile" Condition="'$(DesignTimeBuild)' != 'True'">
         <MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />
         <Csc Condition=" '$(LocalAssemblyGenerated)' == 'false' "
              AdditionalLibPaths="$(AdditionalLibPaths)"
