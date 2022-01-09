@@ -196,10 +196,6 @@ namespace WPFTest.Views
 #line (36, 13) - (36, 13) 36 "Page1.xml"
 						targetRoot.textBlock4.Text = typedSender.DecimalProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -859,10 +855,6 @@ namespace WPFTest.Views
 							}
 						}
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -935,10 +927,6 @@ namespace WPFTest.Views
 							}
 						}
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -969,10 +957,6 @@ namespace WPFTest.Views
 							}
 						}
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -1172,10 +1156,6 @@ namespace WPFTest.Views
 #line (27, 28) - (27, 28) 27 "Page1.xml"
 						targetRoot.textBlock3.IsEnabled = ((global::System.Boolean)targetRoot.InverseBooleanConverter.Convert(value1, typeof(global::System.Boolean), null, null));
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -1197,10 +1177,6 @@ namespace WPFTest.Views
 #line (23, 28) - (23, 28) 23 "Page1.xml"
 						targetRoot.textBlock1.Text = typedSender.SByteProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
