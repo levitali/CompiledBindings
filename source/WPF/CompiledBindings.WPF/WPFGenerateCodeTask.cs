@@ -405,6 +405,7 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 					return _nsMappings[xmlNs];
 				},
 				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
+				TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
 				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"))
 	{
 	}

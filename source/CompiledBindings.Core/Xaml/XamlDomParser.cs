@@ -16,11 +16,17 @@ public class XamlDomParser
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
-	public XamlDomParser(XNamespace defaultNamespace, XNamespace xNamespace, Func<string, IEnumerable<string>> getClrNsFromXmlNs, TypeInfo converterType)
+	public XamlDomParser(
+		XNamespace defaultNamespace,
+		XNamespace xNamespace,
+		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
+		TypeInfo converterType,
+		TypeInfo bindingType)
 	{
 		DefaultNamespace = defaultNamespace;
 		_getClrNsFromXmlNs = getClrNsFromXmlNs;
 		ConverterType = converterType;
+		BindingType = bindingType;
 
 		this.xNamespace = xNamespace;
 		xClass = xNamespace + "Class";
@@ -39,6 +45,7 @@ public class XamlDomParser
 	public XName xName { get; }
 	public XName xDataType { get; }
 	public TypeInfo ConverterType { get; }
+	public TypeInfo BindingType { get; }
 
 	public IList<XamlNamespace>? KnownNamespaces { get; set; }
 
@@ -270,6 +277,7 @@ public class XamlDomParser
 			{
 				try
 				{
+					CheckPropertyTypeNotBinding();
 					var staticNode = xamlNode.Children[0];
 					value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
 					includeNamespaces.ForEach(ns => objProp.IncludeNamespaces.Add(ns.ClrNamespace!));
@@ -285,6 +293,7 @@ public class XamlDomParser
 			{
 				try
 				{
+					CheckPropertyTypeNotBinding();
 					var defaultBindModeAttr =
 						EnumerableExtensions.SelectSequence(objProp.XamlNode.Element, e => e.Parent, objProp.XamlNode.Element is XElement)
 						.Cast<XElement>()
@@ -326,6 +335,14 @@ public class XamlDomParser
 			objProp.Value = value;
 
 			return objProp;
+
+			void CheckPropertyTypeNotBinding()
+			{
+				if (BindingType.IsAssignableFrom(propType))
+				{
+					throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
+				}
+			}
 
 			void HandleParseException(ParseException ex)
 			{

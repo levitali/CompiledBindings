@@ -263,7 +263,8 @@ public class XFXamlDomParser : SimpleXamlDomParser
 			}
 			return _nsMappings[xmlNs];
 		},
-		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.IValueConverter"))
+		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.IValueConverter"),
+		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.BindingBase"))
 	{
 	}
 

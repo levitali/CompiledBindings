@@ -22,8 +22,9 @@ public class SimpleXamlDomParser : XamlDomParser
 		XNamespace xNs,
 		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
 		TypeInfo converterType,
+		TypeInfo bindingType,
 		TypeInfo? dependencyObjectType = null)
-		: base(xmlns, xNs, getClrNsFromXmlNs, converterType)
+		: base(xmlns, xNs, getClrNsFromXmlNs, converterType, bindingType)
 	{
 		DataTemplate = DefaultNamespace + "DataTemplate";
 		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
