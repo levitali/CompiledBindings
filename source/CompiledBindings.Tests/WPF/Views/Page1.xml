@@ -27,6 +27,12 @@
                 <TextBlock IsEnabled="{x:Bind BooleanProp, Converter={StaticResource InverseBooleanConverter}}" />
             </Grid>
         </DataTemplate>
+
+        <HierarchicalDataTemplate
+            x:Key="test2Template"
+            DataType="viewModels:EntityViewModel" ItemsSource="{Binding Children}">
+            <TextBlock Text="{x:Bind Title}" />
+        </HierarchicalDataTemplate>
     </Page.Resources>
 
     <StackPanel>

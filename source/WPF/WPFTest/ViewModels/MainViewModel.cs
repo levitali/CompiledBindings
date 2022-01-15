@@ -59,6 +59,10 @@ public class Pag1ModifyViewModel
 
 public class EntityViewModel : INotifyPropertyChanged
 {
+	public string Title { get; set; }
+
+	public IList<EntityViewModel>? Children { get; set; }
+
 	public EntityModel Model { get; } = new EntityModel();
 
 	public decimal DecimalProp { get; set; }

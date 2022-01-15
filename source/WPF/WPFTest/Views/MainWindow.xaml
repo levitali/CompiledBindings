@@ -34,6 +34,12 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
+
+        <HierarchicalDataTemplate
+            x:Key="test2Template"
+            DataType="viewModels:EntityViewModel" ItemsSource="{Binding Children}">
+            <TextBlock Text="{x:Bind Title}" />
+        </HierarchicalDataTemplate>
     </Window.Resources>
 
     <ScrollViewer>

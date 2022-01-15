@@ -12,6 +12,7 @@ public class SimpleXamlDomParser : XamlDomParser
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
 
 	public readonly XName DataTemplate;
+	public readonly XName HierarchicalDataTemplate; // WPF HierarchicalDataTemplate
 	public readonly TypeInfo? DependencyObjectType;
 
 	public HashSet<string>? UsedNames { get; private set; }
@@ -25,6 +26,7 @@ public class SimpleXamlDomParser : XamlDomParser
 		: base(xmlns, xNs, getClrNsFromXmlNs, converterType)
 	{
 		DataTemplate = DefaultNamespace + "DataTemplate";
+		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
 		DependencyObjectType = dependencyObjectType;
 	}
 
@@ -103,7 +105,9 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				string? viewName = null;
 				bool nameExplicitlySet = false;
-				if (xelement != xroot && (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate)))
+				if (xelement != xroot && 
+					(attrs.Count > 0 || 
+					 (dataTypeAttr != null && xelement.Name != DataTemplate && xelement.Name != HierarchicalDataTemplate)))
 				{
 					viewName = xelement.Attribute(xName)?.Value ?? xelement.Attribute(NameAttr)?.Value;
 					if (viewName == null && xelement != xdoc.Root)
@@ -151,7 +155,8 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				XamlObject? obj = null;
 
-				if (attrs.Count > 0 || (dataTypeAttr != null && xelement.Name != DataTemplate && xelement != xdoc.Root))
+				if (attrs.Count > 0 || 
+				    (dataTypeAttr != null && xelement.Name != DataTemplate && xelement.Name != HierarchicalDataTemplate && xelement != xdoc.Root))
 				{
 					var type = xelement == xdoc.Root ? result.TargetType : FindType(xelement);
 					obj = new XamlObject(new XamlNode(CurrentLineFile, xelement, xelement.Name), type)
@@ -234,7 +239,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				foreach (var child in xelement.Elements())
 				{
-					if (child.Name == DataTemplate)
+					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
 					{
 						if (child.Descendants().SelectMany(e => e.Attributes()).Any(a => IsMemExtension(a)))
 						{

@@ -7,6 +7,7 @@ namespace WPFTest.ViewModels;
 
 #nullable enable
 #pragma warning disable 0067
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 public class Page1ViewModel : INotifyPropertyChanged
 {
@@ -60,6 +61,8 @@ public class Page1ModifyTextViewModel : INotifyPropertyChanged
 
 public class EntityViewModel : INotifyPropertyChanged
 {
+	public string Title { get; set; }
+
 	public EntityModel Model { get; } = new EntityModel();
 
 	public decimal DecimalProp { get; set; }
@@ -72,6 +75,8 @@ public class EntityViewModel : INotifyPropertyChanged
 public class EntityModel : INotifyPropertyChanged
 {
 	public sbyte SByteProp { get; set; }
+
+	public IList<EntityViewModel>? Children { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 }
