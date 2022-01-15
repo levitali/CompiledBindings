@@ -53,7 +53,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 		void ProcessRoot(SimpleXamlDom rootResult, XElement xroot, TypeInfo? dataType)
 		{
-			var rootBindingScope = new BindingScope() { DataType = dataType };
+			var rootBindingScope = new BindingScope { DataType = dataType };
 			rootResult.BindingScopes.Add(rootBindingScope);
 			rootResult.XamlObjects = new List<XamlObject>();
 
@@ -218,7 +218,7 @@ public class SimpleXamlDomParser : XamlDomParser
 							}
 							catch (ParseException ex)
 							{
-								var lineInfo = new LineInfo() { File = file };
+								var lineInfo = new LineInfo { File = file };
 								lineInfo.ColumnNumber = attr.Name.LocalName.Length + 1 + ex.Position;
 								if (attr is IXmlLineInfo li)
 								{
@@ -347,12 +347,3 @@ public class SimpleXamlDom
 		BindingScopes.ForEach(bs => bs.BindingsData?.Validate(file));
 	}
 }
-
-public class BindingScope
-{
-	public string? ViewName;
-	public TypeInfo? DataType;
-	public List<Bind> Bindings = new List<Bind>();
-	public BindingsData? BindingsData;
-}
-

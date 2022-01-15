@@ -80,12 +80,12 @@
             <Output TaskParameter="Include" ItemName="XamlFiles" />
         </CreateItem>
         <MauiGenerateCodeTask XamlFiles="@(XamlFiles)"
-                          ReferenceAssemblies="@(ReferencePath)"
-                          LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
-                          IntermediateOutputPath="$(IntermediateOutputPath)"
-                          ProjectPath="$(MSBuildProjectDirectory)"
-                          LangVersion="$(LangVersion)"
-                          MSBuildVersion="$(MSBuildVersion)">
+							  ReferenceAssemblies="@(ReferencePath)"
+							  LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
+							  IntermediateOutputPath="$(IntermediateOutputPath)"
+							  ProjectPath="$(MSBuildProjectDirectory)"
+							  LangVersion="$(LangVersion)"
+							  MSBuildVersion="$(MSBuildVersion)">
             <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
             <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
         </MauiGenerateCodeTask>
@@ -98,7 +98,7 @@
 
     <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
         <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
-                         TargetAssembly="@(IntermediateAssembly)" />
+                             TargetAssembly="@(IntermediateAssembly)" />
     </Target>
 
     <Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">

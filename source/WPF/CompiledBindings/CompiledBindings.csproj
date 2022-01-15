@@ -1,27 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFrameworks>netcoreapp3.0;net35;net40</TargetFrameworks>
-		<Product>CompiledBindings</Product>
-		<Company>levitali</Company>
-		<Version>1.0.8</Version>
-		<UseWPF>true</UseWPF>
-		<LangVersion>latest</LangVersion>
-		<OutputPath>..\..\..\bin\</OutputPath>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<NoWarn>1701;1702;netsdk1138</NoWarn>
-	</PropertyGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)'=='net35'">
-		<Reference Include="WindowsBase" />
-		<Reference Include="PresentationFramework" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(TargetFramework)'=='net40'">
-		<Reference Include="System.Xaml" />
-		<Reference Include="WindowsBase" />
-	</ItemGroup>
+    <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.0;net35;net40</TargetFrameworks>
+        <Product>CompiledBindings</Product>
+        <Company>levitali</Company>
+        <Version>1.0.9</Version>
+        <UseWPF>true</UseWPF>
+        <LangVersion>latest</LangVersion>
+        <OutputPath>..\..\..\bin\</OutputPath>
+        <NoWarn>1701;1702;netsdk1138</NoWarn>
+    </PropertyGroup>
 
 </Project>

@@ -512,12 +512,16 @@ $@"					if (notifyAll || e.PropertyName == ""{prop.Property.Definition.Name}"")
 $@"						SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
 						}
 
-						output.AppendLine(
+						if (i < notifyGroup.Properties.Count - 1)
+						{
+							output.AppendLine(
 $@"						if (!notifyAll)
 						{{
 							return;
-						}}
-					}}");
+						}}");
+						}
+						output.AppendLine(
+$@"					}}");
 					}
 					output.AppendLine(
 $@"				}}");

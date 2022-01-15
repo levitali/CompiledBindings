@@ -211,13 +211,21 @@ $@"namespace CompiledBindings
 
 		static void BindingsChanged(BindableObject bindable, object oldValue, object newValue)
 		{{
-			((IGeneratedDataTemplate)newValue).Initialize((Element)bindable);
+			if (oldValue != null)
+			{{
+				((IGeneratedDataTemplate)oldValue).Cleanup((Element)bindable);
+			}}
+			if (newValue != null)
+			{{
+				((IGeneratedDataTemplate)newValue).Initialize((Element)bindable);
+			}}			
 		}}
 	}}
 
 	public interface IGeneratedDataTemplate
 	{{
 		void Initialize(Element rootElement);
+		void Cleanup(Element rootElement);
 	}}
 }}";
 	}

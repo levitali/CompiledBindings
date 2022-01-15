@@ -23,6 +23,6 @@ public class FocusState<T>
 
 	public static implicit operator FocusState<T>(T? value)
 	{
-		return new FocusState<T>() { State = value };
+		return new FocusState<T> { State = value };
 	}
 }

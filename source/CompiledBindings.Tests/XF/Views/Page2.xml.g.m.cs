@@ -289,10 +289,6 @@ namespace XFTest.Views
 						targetRoot.label6.Text = value1?.GuidProp.ToString();
 #line default
 						SetPropertyChangedEventHandler3(value1);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -314,10 +310,6 @@ namespace XFTest.Views
 #line (21, 16) - (21, 16) 21 "Page2.xml"
 						targetRoot.label1.Text = typedSender.GuidProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -343,10 +335,6 @@ namespace XFTest.Views
 #line (25, 16) - (25, 16) 25 "Page2.xml"
 						targetRoot.label5.Text = value1;
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -368,10 +356,6 @@ namespace XFTest.Views
 #line (26, 16) - (26, 16) 26 "Page2.xml"
 						targetRoot.label6.Text = typedSender.GuidProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 

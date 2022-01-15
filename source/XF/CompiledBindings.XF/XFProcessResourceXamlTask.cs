@@ -104,7 +104,7 @@ public class XFProcessResourceXamlTask : Task
 								string ln;
 								while ((ln = stringReader.ReadLine()) != null)
 								{
-									lines.Add(new TextLine() { Text = ln });
+									lines.Add(new TextLine { Text = ln });
 								}
 
 								if (mAttrs.Count > 0)
@@ -282,7 +282,7 @@ public class XFProcessResourceXamlTask : Task
 
 				if (assemblyModified)
 				{
-					assembly.Write(new WriterParameters() { WriteSymbols = true });
+					assembly.Write(new WriterParameters { WriteSymbols = true });
 				}
 			}
 			finally

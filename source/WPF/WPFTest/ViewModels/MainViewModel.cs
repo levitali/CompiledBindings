@@ -23,9 +23,9 @@ public class MainViewModel : INotifyPropertyChanged
 	public Task<string> TaskProp => Task.FromResult(string.Empty);
 
 	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
-		{
-			new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
-		};
+	{
+		new EntityViewModel { DecimalProp = 1, BooleanProp = true },
+	};
 
 	public int[] ArrayProp { get; set; } = new int[0];
 

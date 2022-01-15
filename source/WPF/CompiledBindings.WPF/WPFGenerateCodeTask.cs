@@ -109,6 +109,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				var sourceCodeTargetPath = Path.Combine(targetDir, Path.GetFileNameWithoutExtension(targetRelativePath) + ".g.m.cs");
 				var xamlFile = Path.Combine(IntermediateOutputPath, targetRelativePath);
 
+				/*
 				if (File.Exists(sourceCodeTargetPath))
 				{
 					using (var stream = File.OpenRead(sourceCodeTargetPath))
@@ -141,6 +142,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						}
 					}
 				}
+				*/
 
 				try
 				{
@@ -342,7 +344,14 @@ $@"namespace CompiledBindings
 
 		static void BindingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{{
-			((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
+			if (e.OldValue != null)
+			{{
+				((IGeneratedDataTemplate)e.OldValue).Cleanup((FrameworkElement)d);
+			}}
+			if (e.NewValue != null)
+			{{
+				((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
+			}}
 		}}
 
 		public static readonly DependencyProperty RootProperty =
@@ -362,6 +371,7 @@ $@"namespace CompiledBindings
 	public interface IGeneratedDataTemplate
 	{{
 		void Initialize(FrameworkElement rootElement);
+		void Cleanup(FrameworkElement rootElement);
 	}}
 }}";
 	}

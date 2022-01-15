@@ -188,10 +188,6 @@ namespace XFTest.Views
 #line (70, 13) - (70, 13) 70 "Page1.xml"
 						targetRoot.button1.IsEnabled = typedSender.BooleanProp;
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -216,10 +212,6 @@ namespace XFTest.Views
 						targetRoot.button1.IsEnabled = value1?.BooleanProp ?? default;
 #line default
 						SetPropertyChangedEventHandler0(value1);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -627,10 +619,6 @@ namespace XFTest.Views
 #line (56, 13) - (56, 13) 56 "Page1.xml"
 						targetRoot.list.IsVisible = typedSender.ArrayProp?.Length > 0;
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -652,10 +640,6 @@ namespace XFTest.Views
 #line (46, 16) - (46, 16) 46 "Page1.xml"
 						targetRoot.label9.Text = typedSender.DecimalProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -694,6 +678,12 @@ namespace XFTest.Views
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
+		}
+
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
 		}
 
 		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
@@ -837,10 +827,6 @@ namespace XFTest.Views
 #line (21, 24) - (21, 24) 21 "Page1.xml"
 						targetRoot.label2.Text = typedSender.BooleanProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -862,10 +848,6 @@ namespace XFTest.Views
 #line (20, 24) - (20, 24) 20 "Page1.xml"
 						targetRoot.label1.Text = typedSender.SByteProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -902,6 +884,12 @@ namespace XFTest.Views
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
+		}
+
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
 		}
 
 		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
@@ -1010,10 +998,6 @@ namespace XFTest.Views
 #line (30, 36) - (30, 36) 30 "Page1.xml"
 						targetRoot.label3.Text = typedSender.BooleanProp.ToString();
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
@@ -1052,6 +1036,12 @@ namespace XFTest.Views
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
+		}
+
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
 		}
 
 		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
@@ -1172,10 +1162,6 @@ namespace XFTest.Views
 #line (63, 14) - (63, 14) 63 "Page1.xml"
 						targetRoot.label11.Text = typedSender.StringProp?.TrimStart('0');
 #line default
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
 				}
 
