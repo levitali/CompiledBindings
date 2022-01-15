@@ -1,6 +1,6 @@
 # CompiledBindings
 
-This library provides {x:Bind} Markup Extension for WPF and Xamarin Forms. You can read about {x:Bind} Markup Extension for UWP [here](https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/x-bind-markup-extension). The whole functionality of {x:Bind} for UWP and also many other features are supported.
+This library provides {x:Bind} Markup Extension for WPF, MAUI and Xamarin Forms. You can read about {x:Bind} Markup Extension for UWP [here](https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/x-bind-markup-extension). The whole functionality of {x:Bind} for UWP and also many other features are supported.
 
 At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it in Visual Basis projects.
 
@@ -279,47 +279,3 @@ You can also declare the CLR-Namespaces globally with "global using" syntax. For
  ```xaml
   xmlns:local="global using:CompiledBindingsDemo"
   ```
-
-## Performance
-
-## Performance in Xamarin Forms app
-
-I compared list scrolling performance of a Xamarin Forms app. I first created UI with hard-coded texts, to ensure the UI visual tree is quick enough. Than I put bindings to it:
-- Not compiled Bindings
-- Xamarin compiled Bindings
-- My compiled Bindings.
-
-The result are:
-- Not compiled bindings perform noticeably bad
-- Xamarin compiled bindings perform better, but not as well as without bindings
-- Scrolling ist the best. No difference to scrolling with hard-coded texts.
-
-I tested on an industrial Android handheld. Here are the videos:
-
-- Not compiled (reflection) Bindings
-https://user-images.githubusercontent.com/884112/145461225-e0c9952a-32a9-4409-ab43-d02cd725754c.mp4
-
-
-- Xamarin compiled Bindings
-https://user-images.githubusercontent.com/884112/145461241-0b0eba2b-2960-43dc-9f10-2d2435d557c0.mp4
-
-- This compiled Bindings
-https://user-images.githubusercontent.com/884112/145461306-c6af2cb9-9437-4606-9133-56f33d614f69.mp4
-
-## Performance in WPF app
-
-To achieve visual difference between WPF and my bindings was for me not possible. All the WPF projects I have at the time perform visually good on modern computers also with classing bindings.
-
-In order to compare the performance, I created a demo project (you find it in source code). In the app a list of entities is displayed. The performance is measured by measuring how much time in average (the last 1000 measures) it was needed between taking the first and the last properties of an entity. Then by scrolling back and forth the list, it is possible to get the average time.
-
-The results are (in ticks):
-
-Classing Bindings:
-
-![Binding](https://user-images.githubusercontent.com/884112/147760454-4e99e845-3e2d-4b17-9b1e-4d0785c2860c.png)
-
-x:Bind:
-
-![xBind](https://user-images.githubusercontent.com/884112/147760483-c24b2ff0-43fe-4956-a8f0-2b3105cd4df2.png)
-
-As you can see, x:Bind is about 10 times faster
