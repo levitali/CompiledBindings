@@ -109,6 +109,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				var sourceCodeTargetPath = Path.Combine(targetDir, Path.GetFileNameWithoutExtension(targetRelativePath) + ".g.m.cs");
 				var xamlFile = Path.Combine(IntermediateOutputPath, targetRelativePath);
 
+				/*
 				if (File.Exists(sourceCodeTargetPath))
 				{
 					using (var stream = File.OpenRead(sourceCodeTargetPath))
@@ -141,6 +142,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						}
 					}
 				}
+				*/
 
 				try
 				{
