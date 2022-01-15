@@ -342,7 +342,14 @@ $@"namespace CompiledBindings
 
 		static void BindingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{{
-			((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
+			if (e.OldValue != null)
+			{{
+				((IGeneratedDataTemplate)e.OldValue).Cleanup((FrameworkElement)d);
+			}}
+			if (e.NewValue != null)
+			{{
+				((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
+			}}
 		}}
 
 		public static readonly DependencyProperty RootProperty =
@@ -362,6 +369,7 @@ $@"namespace CompiledBindings
 	public interface IGeneratedDataTemplate
 	{{
 		void Initialize(FrameworkElement rootElement);
+		void Cleanup(FrameworkElement rootElement);
 	}}
 }}";
 	}

@@ -1003,6 +1003,12 @@ namespace WPFTest.Views
 			}
 		}
 
+		public void Cleanup(global::System.Windows.FrameworkElement rootElement)
+		{
+			rootElement.DataContextChanged -= rootElement_DataContextChanged;
+			Bindings_rootElement.Cleanup();
+		}
+
 		private void rootElement_DataContextChanged(object sender, global::System.Windows.DependencyPropertyChangedEventArgs e)
 		{
 			Bindings_rootElement.Cleanup();

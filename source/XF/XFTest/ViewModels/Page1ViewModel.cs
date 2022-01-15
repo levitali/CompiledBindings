@@ -16,7 +16,7 @@ namespace XFTest.ViewModels
 
 		public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
 		{
-			new EntityViewModel() { DecimalProp = 1, BooleanProp = true },
+			new EntityViewModel { DecimalProp = 1, BooleanProp = true },
 		};
 
 		public int[] ArrayProp { get; set; } = new[] { 1, 2, 3 };

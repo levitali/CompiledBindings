@@ -75,16 +75,16 @@ public static class EnumerableExtensions
 		return SelectSequence(first, nextSelector, t => t == null, includeFirst);
 	}
 
-	public static IEnumerable<T> SelectSequence<T>(T source, Func<T, T?> parentSelector, Func<T, bool> endDetector, bool includeThis)
+	public static IEnumerable<T> SelectSequence<T>(T first, Func<T, T?> nextSelector, Func<T, bool> endDetector, bool includeFirst)
 	{
-		if (includeThis)
+		if (includeFirst)
 		{
-			yield return source;
+			yield return first;
 		}
-		var parent = parentSelector(source);
-		if (parent != null && !endDetector(parent))
+		var next = nextSelector(first);
+		if (next != null && !endDetector(next))
 		{
-			foreach (T parent2 in SelectSequence(parent, parentSelector, endDetector, true))
+			foreach (T parent2 in SelectSequence(next, nextSelector, endDetector, true))
 			{
 				yield return parent2;
 			}

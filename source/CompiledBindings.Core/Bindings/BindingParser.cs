@@ -113,7 +113,7 @@ public static class BindingParser
 
 					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, xamlDomParser.ConverterType.Type), xamlDomParser.ConverterType);
 					expr = new VariableExpression(targetType, "targetRoot");
-					expr = new MemberExpression(expr, resourceField, new TypeInfo(xamlDomParser.ConverterType, false));
+					expr = new MemberExpression(expr, resourceField, new TypeInfo(resourceType, false));
 
 					int pos2 = str.IndexOf(',');
 					if (pos2 == -1)

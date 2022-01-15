@@ -60,3 +60,11 @@ public class XamlObjectValue
 	public Bind? BindValue { get; set; }
 	public string? CSharpValue { get; set; }
 }
+
+public class BindingScope
+{
+	public string? ViewName;
+	public TypeInfo? DataType;
+	public List<Bind> Bindings = new List<Bind>();
+	public BindingsData? BindingsData;
+}

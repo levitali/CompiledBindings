@@ -680,6 +680,12 @@ namespace XFTest.Views
 			}
 		}
 
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
+		}
+
 		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_rootElement.Cleanup();
@@ -880,6 +886,12 @@ namespace XFTest.Views
 			}
 		}
 
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
+		}
+
 		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_rootElement.Cleanup();
@@ -1024,6 +1036,12 @@ namespace XFTest.Views
 			{
 				Bindings_rootElement.Initialize(this, dataRoot0);
 			}
+		}
+
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
 		}
 
 		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)

@@ -289,6 +289,7 @@ $@"
 		GenerateVariablesDeclarations(output, parseResult, false);
 		GenerateResourceDeclarations(output, parseResult);
 
+		// Initialize method
 		output.AppendLine(
 $@"
 		public void Initialize(global::{_bindableObject} rootElement)
@@ -298,6 +299,32 @@ $@"
 
 		output.AppendLine(
 $@"		}}");
+
+		// Cleanup method
+		output.AppendLine();
+		output.AppendLine(
+$@"		public void Cleanup(global::{_bindableObject} rootElement)
+		{{");
+
+		foreach (var bs in parseResult.BindingScopes)
+		{
+			if (bs.DataType == null)
+			{
+				output.AppendLine(
+$@"			Bindings.Cleanup();");
+			}
+			else
+			{
+				var viewName = bs.ViewName ?? "rootElement";
+				output.AppendLine(
+$@"			{viewName}.{_bindingContextStart}ContextChanged -= {viewName}_{_bindingContextStart}ContextChanged;
+			Bindings_{viewName}.Cleanup();");
+			}
+		}
+
+		output.AppendLine(
+$@"		}}");
+
 
 		GenerateBindingContextChangedHandlers(output, parseResult);
 
