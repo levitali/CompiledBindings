@@ -88,6 +88,10 @@ namespace Xamarin.Forms
 		public static Color Red { get; } = new Color();
 		public static Color Green { get; } = new Color();
 	}
+
+	public class BindingBase
+	{ 
+	}
 }
 
 #nullable enable
