@@ -94,7 +94,13 @@ public class SimpleXamlDomParser : XamlDomParser
 				var savedCurrentBindingScope = currentBindingScope;
 				var savedDataType = DataType;
 
+				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
+
 				var attrs = xelement.Attributes().Where(a => IsMemExtension(a)).ToList();
+				if (attrs.Count > 0 && isDataTemplateElement)
+				{
+					throw new GeneratorException("x:Bind or x:Set extensions cannot be used to set properties of a DataTemplate.", CurrentFile, attrs[0]);
+				}
 
 				var dataTypeAttr = xelement.Attribute(xDataType) ?? xelement.Attribute(mxDataType) ?? xelement.Attribute(DataTypeAttr);
 				if (dataTypeAttr != null &&
@@ -106,9 +112,9 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				string? viewName = null;
 				bool nameExplicitlySet = false;
-				if (xelement != xroot && 
-					(attrs.Count > 0 || 
-					 (dataTypeAttr != null && xelement.Name != DataTemplate && xelement.Name != HierarchicalDataTemplate)))
+				if (xelement != xroot &&
+					(attrs.Count > 0 ||
+					 (dataTypeAttr != null && !isDataTemplateElement)))
 				{
 					viewName = xelement.Attribute(xName)?.Value ?? xelement.Attribute(NameAttr)?.Value;
 					if (viewName == null && xelement != xdoc.Root)
@@ -156,8 +162,8 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				XamlObject? obj = null;
 
-				if (attrs.Count > 0 || 
-				    (dataTypeAttr != null && xelement.Name != DataTemplate && xelement.Name != HierarchicalDataTemplate && xelement != xdoc.Root))
+				if (attrs.Count > 0 ||
+					(dataTypeAttr != null && !isDataTemplateElement && xelement != xdoc.Root))
 				{
 					var type = xelement == xdoc.Root ? result.TargetType : FindType(xelement);
 					obj = new XamlObject(new XamlNode(CurrentLineFile, xelement, xelement.Name), type)
