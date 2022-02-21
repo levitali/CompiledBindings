@@ -256,6 +256,9 @@ Just like binding to methods, you can use m: Namespace to bind to properties. Th
 For example, in WPF if using single quotes in the expression, you receive the following error:
 
 ```xaml
+xmlns:system="using:System"
+```
+```xaml
 <TextBlock Text="{x:Bind system:String.Format('{0:0.###} {1}', Quantity, Unit)}" />
 ```
 ```text  
