@@ -242,7 +242,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				foreach (var child in xelement.Elements())
 				{
-					var a = child.Descendants().SelectMany(e => e.Attributes()).FirstOrDefault(a => IsMemExtension(a));
+					var a = child.DescendantsAndSelf().SelectMany(e => e.Attributes()).FirstOrDefault(a => IsMemExtension(a));
 					if (a != null)
 					{
 						if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
