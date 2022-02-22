@@ -6,7 +6,7 @@
         <AssemblyName>CompiledBindings.MAUI</AssemblyName>
         <Product>CompiledBindings</Product>
         <Company>levitali</Company>
-        <Version>1.0.8</Version>
+        <Version>1.0.9</Version>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>

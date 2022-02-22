@@ -272,6 +272,22 @@ public class XFXamlDomParser : SimpleXamlDomParser
 	{
 		return base.IsMemExtension(a) || a.Value.StartsWith("{x:Bind ");
 	}
+
+	public override (bool isSupported, string? controlName) IsElementSupported(XName elementName)
+	{
+		var b = base.IsElementSupported(elementName);
+		if (!b.isSupported)
+		{
+			return b;
+		}
+
+		if (elementName == Style)
+		{
+			return (false, "a Style");
+		}
+
+		return (true, null);
+	}
 }
 
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator

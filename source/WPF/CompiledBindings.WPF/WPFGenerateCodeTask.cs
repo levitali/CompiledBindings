@@ -161,7 +161,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						{
 							lineFile = targetRelativePath;
 						}
-						
+
 						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc);
 
 						if (parseResult.GenerateCode)
@@ -384,11 +384,10 @@ $@"namespace CompiledBindings
 
 public class WpfXamlDomParser : SimpleXamlDomParser
 {
-	private static readonly XNamespace _xmlns = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
 	private static ILookup<string, string>? _nsMappings = null;
 
 	public WpfXamlDomParser()
-		: base(_xmlns,
+		: base("http://schemas.microsoft.com/winfx/2006/xaml/presentation",
 			   "http://schemas.microsoft.com/winfx/2006/xaml",
 				getClrNsFromXmlNs: xmlNs =>
 				{
@@ -413,6 +412,22 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 	public override bool IsMemExtension(XAttribute a)
 	{
 		return base.IsMemExtension(a) || a.Value.StartsWith("{x:Bind ");
+	}
+
+	public override (bool isSupported, string? controlName) IsElementSupported(XName elementName)
+	{
+		var b = base.IsElementSupported(elementName);
+		if (!b.isSupported)
+		{
+			return b;
+		}
+
+		if (elementName == Style)
+		{
+			return (false, "a Style");
+		}
+
+		return (true, null);
 	}
 }
 

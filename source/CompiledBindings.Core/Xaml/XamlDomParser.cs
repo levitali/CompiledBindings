@@ -7,11 +7,15 @@ public class XamlDomParser
 {
 	private static readonly XName NameAttr = XNamespace.None + "Name";
 
-	private readonly XName xBind;
-	private readonly XName xDefaultBindMode;
-	private readonly XName xSet;
-	private readonly XName xNull;
-	private readonly XName xType;
+	public readonly XName DataTemplate;
+	public readonly XName Style;
+	public readonly XName VisualStatesGroups;
+
+	public readonly XName xBind;
+	public readonly XName xDefaultBindMode;
+	public readonly XName xSet;
+	public readonly XName xNull;
+	public readonly XName xType;
 
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
@@ -27,6 +31,10 @@ public class XamlDomParser
 		_getClrNsFromXmlNs = getClrNsFromXmlNs;
 		ConverterType = converterType;
 		BindingType = bindingType;
+
+		Style = DefaultNamespace + "Style";
+		DataTemplate = DefaultNamespace + "DataTemplate";
+		VisualStatesGroups = DefaultNamespace + "VisualStateManager.VisualStateGroups";
 
 		this.xNamespace = xNamespace;
 		xClass = xNamespace + "Class";

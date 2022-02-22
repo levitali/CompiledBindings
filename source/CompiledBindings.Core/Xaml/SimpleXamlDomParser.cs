@@ -11,8 +11,7 @@ public class SimpleXamlDomParser : XamlDomParser
 	public static readonly XName NameAttr = XNamespace.None + "Name"; // WPF Name attribute
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
 
-	public readonly XName DataTemplate;
-	public readonly XName HierarchicalDataTemplate; // WPF HierarchicalDataTemplate
+	public readonly XName HierarchicalDataTemplate; // WPF
 	public readonly TypeInfo? DependencyObjectType;
 
 	public HashSet<string>? UsedNames { get; private set; }
@@ -26,7 +25,6 @@ public class SimpleXamlDomParser : XamlDomParser
 		TypeInfo? dependencyObjectType = null)
 		: base(xmlns, xNs, getClrNsFromXmlNs, converterType, bindingType)
 	{
-		DataTemplate = DefaultNamespace + "DataTemplate";
 		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
 		DependencyObjectType = dependencyObjectType;
 	}
@@ -43,8 +41,6 @@ public class SimpleXamlDomParser : XamlDomParser
 		{
 			TargetType = TargetType
 		};
-
-		var visualStatesGroupsName = DefaultNamespace + "VisualStateManager.VisualStateGroups";
 
 		ProcessRoot(result, xdoc.Root, null);
 
@@ -246,9 +242,10 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				foreach (var child in xelement.Elements())
 				{
-					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
+					var a = child.Descendants().SelectMany(e => e.Attributes()).FirstOrDefault(a => IsMemExtension(a));
+					if (a != null)
 					{
-						if (child.Descendants().SelectMany(e => e.Attributes()).Any(a => IsMemExtension(a)))
+						if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
 						{
 							var dataTemplate = new SimpleXamlDom(child);
 							int index = result.DataTemplates.Count;
@@ -258,10 +255,15 @@ public class SimpleXamlDomParser : XamlDomParser
 								result.DataTemplates.Insert(index, dataTemplate);
 							}
 						}
-					}
-					else if (child.Name != visualStatesGroupsName)
-					{
-						ProcessElement(child, currentBindingScope, elementType);
+						else
+						{
+							var (isSupported, controlName) = IsElementSupported(child.Name);
+							if (!isSupported)
+							{
+								throw new GeneratorException($"x:Bind and x:Set extensions are not supported in {controlName}.", CurrentFile, a);
+							}
+							ProcessElement(child, currentBindingScope, elementType);
+						}
 					}
 				}
 
@@ -279,6 +281,15 @@ public class SimpleXamlDomParser : XamlDomParser
 			   a.Value.StartsWith("[x:Bind ") ||
 			   a.Value.StartsWith("{x:Set ") ||
 			   a.Value.StartsWith("[x:Set ");
+	}
+
+	public virtual (bool isSupported, string? controlName) IsElementSupported(XName elementName)
+	{
+        if (elementName == VisualStatesGroups)
+        {
+            return (false, "VisualStateManager");
+        }
+        return (true, null);
 	}
 
 	private static class Res

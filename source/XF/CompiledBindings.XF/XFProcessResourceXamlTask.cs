@@ -22,7 +22,6 @@ public class XFProcessResourceXamlTask : Task
 
 	public XFProcessResourceXamlTask() : this(new PlatformConstants())
 	{
-
 	}
 
 	public XFProcessResourceXamlTask(PlatformConstants platformConstants)
