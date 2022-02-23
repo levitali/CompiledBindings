@@ -62,7 +62,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				DataType = dataType;
 			}
 
-			var obj = ProcessElement(xroot, rootBindingScope, null);
+			var obj = ProcessElement(xroot, rootBindingScope, null, true, null);
 			if (obj != null)
 			{
 				obj.IsRoot = true;
@@ -85,7 +85,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 			DataType = savedDataType;
 
-			XamlObject? ProcessElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType)
+			XamlObject? ProcessElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType, bool isSupportedParent, string? parentDescription)
 			{
 				var savedCurrentBindingScope = currentBindingScope;
 				var savedDataType = DataType;
@@ -93,9 +93,16 @@ public class SimpleXamlDomParser : XamlDomParser
 				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
 
 				var attrs = xelement.Attributes().Where(a => IsMemExtension(a)).ToList();
-				if (attrs.Count > 0 && isDataTemplateElement)
+				if (attrs.Count > 0)
 				{
-					throw new GeneratorException("x:Bind or x:Set extensions cannot be used to set properties of a DataTemplate.", CurrentFile, attrs[0]);
+					if (isDataTemplateElement)
+					{
+						throw new GeneratorException("x:Bind or x:Set extensions cannot be used to set properties of a DataTemplate.", CurrentFile, attrs[0]);
+					}
+					if (!isSupportedParent)
+					{
+						throw new GeneratorException($"x:Bind and x:Set extensions are not supported in {parentDescription}.", CurrentFile, attrs[0]);
+					}
 				}
 
 				var dataTypeAttr = xelement.Attribute(xDataType) ?? xelement.Attribute(mxDataType) ?? xelement.Attribute(DataTypeAttr);
@@ -242,28 +249,20 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				foreach (var child in xelement.Elements())
 				{
-					var a = child.DescendantsAndSelf().SelectMany(e => e.Attributes()).FirstOrDefault(a => IsMemExtension(a));
-					if (a != null)
+					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
 					{
-						if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
+						var dataTemplate = new SimpleXamlDom(child);
+						int index = result.DataTemplates.Count;
+						ProcessRoot(dataTemplate, child, elementType);
+						if (dataTemplate.BindingScopes.Count > 0 || !dataTemplate.UpdateMethod!.IsEmpty)
 						{
-							var dataTemplate = new SimpleXamlDom(child);
-							int index = result.DataTemplates.Count;
-							ProcessRoot(dataTemplate, child, elementType);
-							if (dataTemplate.BindingScopes.Count > 0 || !dataTemplate.UpdateMethod!.IsEmpty)
-							{
-								result.DataTemplates.Insert(index, dataTemplate);
-							}
+							result.DataTemplates.Insert(index, dataTemplate);
 						}
-						else
-						{
-							var (isSupported, controlName) = IsElementSupported(child.Name);
-							if (!isSupported)
-							{
-								throw new GeneratorException($"x:Bind and x:Set extensions are not supported in {controlName}.", CurrentFile, a);
-							}
-							ProcessElement(child, currentBindingScope, elementType);
-						}
+					}
+					else
+					{
+						var (isSupported, controlName) = IsElementSupported(child.Name);
+						ProcessElement(child, currentBindingScope, elementType, isSupported && isSupportedParent, controlName ?? parentDescription);
 					}
 				}
 
@@ -285,11 +284,11 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public virtual (bool isSupported, string? controlName) IsElementSupported(XName elementName)
 	{
-        if (elementName == VisualStatesGroups)
-        {
-            return (false, "VisualStateManager");
-        }
-        return (true, null);
+		if (elementName == VisualStatesGroups)
+		{
+			return (false, "VisualStateManager");
+		}
+		return (true, null);
 	}
 
 	private static class Res
