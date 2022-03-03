@@ -706,8 +706,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			{
 				output.AppendLine(
 $@"{a}				if (!_settingBinding{bind.Index})
-{a}				{{
-{a}					_settingBinding{bind.Index} = true;");
+{a}				{{");
 				a2 = a + '\t';
 			}
 			output.AppendLine(
@@ -738,11 +737,7 @@ $@"{a2}				}}
 			if (bind.Mode == BindingMode.TwoWay)
 			{
 				output.AppendLine(
-$@"{a}					finally
-{a}					{{
-{a}						_settingBinding{bind.Index} = false;
-{a}					}}
-{a}				}}");
+$@"{a}				}}");
 			}
 
 			void GenerateSetSource(string expression, string? a)

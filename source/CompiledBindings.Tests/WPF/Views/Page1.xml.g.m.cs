@@ -356,26 +356,34 @@ namespace WPFTest.Views
 				targetRoot.textBlock6.Visibility = ((global::System.Windows.Visibility)targetRoot.TrueToVisibleConverter.Convert(value3, typeof(global::System.Windows.Visibility), null, null));
 #line (50, 20) - (50, 20) 50 "Page1.xml"
 				targetRoot.textBlock7.Text = (value4 + 1).ToString();
-#line default
-				if (!_settingBinding4)
-				{
 #line (51, 18) - (51, 18) 51 "Page1.xml"
-					var value7 = dataRoot.OrderInput;
+				var value7 = dataRoot.OrderInput;
 #line default
-					if (!object.Equals(targetRoot.textBox1.Text, value7))
+				if (!object.Equals(targetRoot.textBox1.Text, value7))
+				{
+					_settingBinding4 = true;
+					try
 					{
 						targetRoot.textBox1.Text = value7;
 					}
+					finally
+					{
+						_settingBinding4 = false;
+					}
 				}
-#line default
-				if (!_settingBinding5)
-				{
 #line (52, 19) - (52, 19) 52 "Page1.xml"
-					var value8 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value2, null));
+				var value8 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value2, null));
 #line default
-					if (!object.Equals(targetRoot.checkBox1.IsChecked, value8))
+				if (!object.Equals(targetRoot.checkBox1.IsChecked, value8))
+				{
+					_settingBinding5 = true;
+					try
 					{
 						targetRoot.checkBox1.IsChecked = value8;
+					}
+					finally
+					{
+						_settingBinding5 = false;
 					}
 				}
 #line (56, 13) - (56, 13) 56 "Page1.xml"
@@ -433,34 +441,46 @@ namespace WPFTest.Views
 					{
 					}
 				}
-#line default
-				if (!_settingBinding14)
+				if (!object.Equals(targetRoot.textBox2.Text, value5))
 				{
-					if (!object.Equals(targetRoot.textBox2.Text, value5))
+					_settingBinding14 = true;
+					try
 					{
 						targetRoot.textBox2.Text = value5;
 					}
+					finally
+					{
+						_settingBinding14 = false;
+					}
 				}
-#line default
-				if (!_settingBinding15)
-				{
 #line (67, 18) - (67, 18) 67 "Page1.xml"
-					var value9 = value6?.TextInput;
+				var value9 = value6?.TextInput;
 #line default
-					if (!object.Equals(targetRoot.textBox3.Text, value9))
+				if (!object.Equals(targetRoot.textBox3.Text, value9))
+				{
+					_settingBinding15 = true;
+					try
 					{
 						targetRoot.textBox3.Text = value9;
 					}
+					finally
+					{
+						_settingBinding15 = false;
+					}
 				}
-#line default
-				if (!_settingBinding16)
-				{
 #line (68, 19) - (68, 19) 68 "Page1.xml"
-					var value10 = value1?.BoolInput;
+				var value10 = value1?.BoolInput;
 #line default
-					if (!object.Equals(targetRoot.checkBox2.IsChecked, value10))
+				if (!object.Equals(targetRoot.checkBox2.IsChecked, value10))
+				{
+					_settingBinding16 = true;
+					try
 					{
 						targetRoot.checkBox2.IsChecked = value10;
+					}
+					finally
+					{
+						_settingBinding16 = false;
 					}
 				}
 #line default
@@ -475,7 +495,6 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				if (!_settingBinding4)
 				{
-					_settingBinding4 = true;
 					try
 					{
 #line (51, 18) - (51, 18) 51 "Page1.xml"
@@ -484,10 +503,6 @@ namespace WPFTest.Views
 					}
 					catch
 					{
-					}
-					finally
-					{
-						_settingBinding4 = false;
 					}
 				}
 			}
@@ -498,7 +513,6 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				if (!_settingBinding5)
 				{
-					_settingBinding5 = true;
 					try
 					{
 #line (52, 19) - (52, 19) 52 "Page1.xml"
@@ -507,10 +521,6 @@ namespace WPFTest.Views
 					}
 					catch
 					{
-					}
-					finally
-					{
-						_settingBinding5 = false;
 					}
 				}
 			}
@@ -521,7 +531,6 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				if (!_settingBinding14)
 				{
-					_settingBinding14 = true;
 					try
 					{
 #line (66, 18) - (66, 18) 66 "Page1.xml"
@@ -537,10 +546,6 @@ namespace WPFTest.Views
 					catch
 					{
 					}
-					finally
-					{
-						_settingBinding14 = false;
-					}
 				}
 			}
 
@@ -550,7 +555,6 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				if (!_settingBinding15)
 				{
-					_settingBinding15 = true;
 					try
 					{
 #line (67, 18) - (67, 18) 67 "Page1.xml"
@@ -566,10 +570,6 @@ namespace WPFTest.Views
 					catch
 					{
 					}
-					finally
-					{
-						_settingBinding15 = false;
-					}
 				}
 			}
 
@@ -579,7 +579,6 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				if (!_settingBinding16)
 				{
-					_settingBinding16 = true;
 					try
 					{
 #line (68, 19) - (68, 19) 68 "Page1.xml"
@@ -594,10 +593,6 @@ namespace WPFTest.Views
 					}
 					catch
 					{
-					}
-					finally
-					{
-						_settingBinding16 = false;
 					}
 				}
 			}
@@ -706,15 +701,19 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "OrderInput")
 					{
-#line default
-						if (!bindings._settingBinding4)
-						{
 #line (51, 18) - (51, 18) 51 "Page1.xml"
-							var value1 = typedSender.OrderInput;
+						var value1 = typedSender.OrderInput;
 #line default
-							if (!object.Equals(targetRoot.textBox1.Text, value1))
+						if (!object.Equals(targetRoot.textBox1.Text, value1))
+						{
+							bindings._settingBinding4 = true;
+							try
 							{
 								targetRoot.textBox1.Text = value1;
+							}
+							finally
+							{
+								bindings._settingBinding4 = false;
 							}
 						}
 #line default
@@ -725,15 +724,19 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "BoolInput")
 					{
-#line default
-						if (!bindings._settingBinding5)
-						{
 #line (52, 19) - (52, 19) 52 "Page1.xml"
-							var value1 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(typedSender.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
+						var value1 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(typedSender.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
 #line default
-							if (!object.Equals(targetRoot.checkBox1.IsChecked, value1))
+						if (!object.Equals(targetRoot.checkBox1.IsChecked, value1))
+						{
+							bindings._settingBinding5 = true;
+							try
 							{
 								targetRoot.checkBox1.IsChecked = value1;
+							}
+							finally
+							{
+								bindings._settingBinding5 = false;
 							}
 						}
 #line default
@@ -746,15 +749,19 @@ namespace WPFTest.Views
 					{
 #line (52, 19) - (52, 19) 52 "Page1.xml"
 						var value1 = typedSender.ArrayProp.Length > 0;
-#line default
-						if (!bindings._settingBinding5)
-						{
 #line (52, 19) - (52, 19) 52 "Page1.xml"
-							var value2 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
+						var value2 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
 #line default
-							if (!object.Equals(targetRoot.checkBox1.IsChecked, value2))
+						if (!object.Equals(targetRoot.checkBox1.IsChecked, value2))
+						{
+							bindings._settingBinding5 = true;
+							try
 							{
 								targetRoot.checkBox1.IsChecked = value2;
+							}
+							finally
+							{
+								bindings._settingBinding5 = false;
 							}
 						}
 #line (57, 13) - (57, 13) 57 "Page1.xml"
@@ -787,34 +794,46 @@ namespace WPFTest.Views
 						targetRoot.textBlock8.Text = (value1 != null ? value1.Input1 : "abc");
 #line (59, 20) - (59, 20) 59 "Page1.xml"
 						targetRoot.textBlock9.Text = value2 ?? "aaa";
-#line default
-						if (!bindings._settingBinding14)
+						if (!object.Equals(targetRoot.textBox2.Text, value2))
 						{
-							if (!object.Equals(targetRoot.textBox2.Text, value2))
+							bindings._settingBinding14 = true;
+							try
 							{
 								targetRoot.textBox2.Text = value2;
 							}
+							finally
+							{
+								bindings._settingBinding14 = false;
+							}
 						}
-#line default
-						if (!bindings._settingBinding15)
-						{
 #line (67, 18) - (67, 18) 67 "Page1.xml"
-							var value4 = value3?.TextInput;
+						var value4 = value3?.TextInput;
 #line default
-							if (!object.Equals(targetRoot.textBox3.Text, value4))
+						if (!object.Equals(targetRoot.textBox3.Text, value4))
+						{
+							bindings._settingBinding15 = true;
+							try
 							{
 								targetRoot.textBox3.Text = value4;
 							}
+							finally
+							{
+								bindings._settingBinding15 = false;
+							}
 						}
-#line default
-						if (!bindings._settingBinding16)
-						{
 #line (68, 19) - (68, 19) 68 "Page1.xml"
-							var value5 = value1?.BoolInput;
+						var value5 = value1?.BoolInput;
 #line default
-							if (!object.Equals(targetRoot.checkBox2.IsChecked, value5))
+						if (!object.Equals(targetRoot.checkBox2.IsChecked, value5))
+						{
+							bindings._settingBinding16 = true;
+							try
 							{
 								targetRoot.checkBox2.IsChecked = value5;
+							}
+							finally
+							{
+								bindings._settingBinding16 = false;
 							}
 						}
 #line default
@@ -877,12 +896,16 @@ namespace WPFTest.Views
 						var value1 = typedSender.Input1;
 #line (59, 20) - (59, 20) 59 "Page1.xml"
 						targetRoot.textBlock9.Text = value1 ?? "aaa";
-#line default
-						if (!bindings._settingBinding14)
+						if (!object.Equals(targetRoot.textBox2.Text, value1))
 						{
-							if (!object.Equals(targetRoot.textBox2.Text, value1))
+							bindings._settingBinding14 = true;
+							try
 							{
 								targetRoot.textBox2.Text = value1;
+							}
+							finally
+							{
+								bindings._settingBinding14 = false;
 							}
 						}
 #line default
@@ -895,15 +918,19 @@ namespace WPFTest.Views
 					{
 #line (67, 18) - (67, 18) 67 "Page1.xml"
 						var value1 = typedSender.ModifyTextViewModel;
-#line default
-						if (!bindings._settingBinding15)
-						{
 #line (67, 18) - (67, 18) 67 "Page1.xml"
-							var value2 = value1.TextInput;
+						var value2 = value1.TextInput;
 #line default
-							if (!object.Equals(targetRoot.textBox3.Text, value2))
+						if (!object.Equals(targetRoot.textBox3.Text, value2))
+						{
+							bindings._settingBinding15 = true;
+							try
 							{
 								targetRoot.textBox3.Text = value2;
+							}
+							finally
+							{
+								bindings._settingBinding15 = false;
 							}
 						}
 #line default
@@ -915,15 +942,19 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "BoolInput")
 					{
-#line default
-						if (!bindings._settingBinding16)
-						{
 #line (68, 19) - (68, 19) 68 "Page1.xml"
-							var value1 = typedSender.BoolInput;
+						var value1 = typedSender.BoolInput;
 #line default
-							if (!object.Equals(targetRoot.checkBox2.IsChecked, value1))
+						if (!object.Equals(targetRoot.checkBox2.IsChecked, value1))
+						{
+							bindings._settingBinding16 = true;
+							try
 							{
 								targetRoot.checkBox2.IsChecked = value1;
+							}
+							finally
+							{
+								bindings._settingBinding16 = false;
 							}
 						}
 #line default
@@ -945,15 +976,19 @@ namespace WPFTest.Views
 
 					if (notifyAll || e.PropertyName == "TextInput")
 					{
-#line default
-						if (!bindings._settingBinding15)
-						{
 #line (67, 18) - (67, 18) 67 "Page1.xml"
-							var value1 = typedSender.TextInput;
+						var value1 = typedSender.TextInput;
 #line default
-							if (!object.Equals(targetRoot.textBox3.Text, value1))
+						if (!object.Equals(targetRoot.textBox3.Text, value1))
+						{
+							bindings._settingBinding15 = true;
+							try
 							{
 								targetRoot.textBox3.Text = value1;
+							}
+							finally
+							{
+								bindings._settingBinding15 = false;
 							}
 						}
 #line default

@@ -309,39 +309,51 @@ namespace XFTest.Views
 				targetRoot.label8.Text = (!value1).ToString();
 #line (46, 16) - (46, 16) 46 "Page1.xml"
 				targetRoot.label9.Text = value5?.DecimalProp.ToString();
-#line default
-				if (!_settingBinding7)
-				{
 #line (49, 13) - (49, 13) 49 "Page1.xml"
-					var value6 = value1.ToString();
+				var value6 = value1.ToString();
 #line default
-					if (!object.Equals(targetRoot.entry1.Text, value6))
+				if (!object.Equals(targetRoot.entry1.Text, value6))
+				{
+					_settingBinding7 = true;
+					try
 					{
 						targetRoot.entry1.Text = value6;
+					}
+					finally
+					{
+						_settingBinding7 = false;
 					}
 				}
 #line (50, 13) - (50, 13) 50 "Page1.xml"
 				targetRoot.entry1.SetFocused(dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
-#line default
-				if (!_settingBinding9)
-				{
 #line (52, 13) - (52, 13) 52 "Page1.xml"
-					var value7 = value4?.ToString();
+				var value7 = value4?.ToString();
 #line default
-					if (!object.Equals(targetRoot.entry2.Text, value7))
+				if (!object.Equals(targetRoot.entry2.Text, value7))
+				{
+					_settingBinding9 = true;
+					try
 					{
 						targetRoot.entry2.Text = value7;
 					}
+					finally
+					{
+						_settingBinding9 = false;
+					}
 				}
-#line default
-				if (!_settingBinding10)
-				{
 #line (53, 22) - (53, 22) 53 "Page1.xml"
-					var value8 = dataRoot.StringProp;
+				var value8 = dataRoot.StringProp;
 #line default
-					if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value8))
+				if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value8))
+				{
+					_settingBinding10 = true;
+					try
 					{
 						targetRoot.pickerEx1.SelectedItem = value8;
+					}
+					finally
+					{
+						_settingBinding10 = false;
 					}
 				}
 #line (56, 13) - (56, 13) 56 "Page1.xml"
@@ -373,7 +385,6 @@ namespace XFTest.Views
 					case "Text":
 						if (!_settingBinding7)
 						{
-							_settingBinding7 = true;
 							try
 							{
 #line (49, 13) - (49, 13) 49 "Page1.xml"
@@ -382,10 +393,6 @@ namespace XFTest.Views
 							}
 							catch
 							{
-							}
-							finally
-							{
-								_settingBinding7 = false;
 							}
 						}
 						break;
@@ -401,7 +408,6 @@ namespace XFTest.Views
 					case "Text":
 						if (!_settingBinding9)
 						{
-							_settingBinding9 = true;
 							try
 							{
 #line (52, 13) - (52, 13) 52 "Page1.xml"
@@ -410,10 +416,6 @@ namespace XFTest.Views
 							}
 							catch
 							{
-							}
-							finally
-							{
-								_settingBinding9 = false;
 							}
 						}
 						break;
@@ -429,7 +431,6 @@ namespace XFTest.Views
 					case "SelectedItem":
 						if (!_settingBinding10)
 						{
-							_settingBinding10 = true;
 							try
 							{
 #line (53, 22) - (53, 22) 53 "Page1.xml"
@@ -438,10 +439,6 @@ namespace XFTest.Views
 							}
 							catch
 							{
-							}
-							finally
-							{
-								_settingBinding10 = false;
 							}
 						}
 						break;
@@ -528,15 +525,19 @@ namespace XFTest.Views
 						targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
 #line (45, 16) - (45, 16) 45 "Page1.xml"
 						targetRoot.label8.Text = (!value1).ToString();
-#line default
-						if (!bindings._settingBinding7)
-						{
 #line (49, 13) - (49, 13) 49 "Page1.xml"
-							var value2 = value1.ToString();
+						var value2 = value1.ToString();
 #line default
-							if (!object.Equals(targetRoot.entry1.Text, value2))
+						if (!object.Equals(targetRoot.entry1.Text, value2))
+						{
+							bindings._settingBinding7 = true;
+							try
 							{
 								targetRoot.entry1.Text = value2;
+							}
+							finally
+							{
+								bindings._settingBinding7 = false;
 							}
 						}
 #line default
@@ -551,15 +552,19 @@ namespace XFTest.Views
 						var value1 = typedSender.NullableIntProp;
 #line (44, 16) - (44, 16) 44 "Page1.xml"
 						targetRoot.label7.Text = (value1 ?? 0).ToString();
-#line default
-						if (!bindings._settingBinding9)
-						{
 #line (52, 13) - (52, 13) 52 "Page1.xml"
-							var value2 = value1?.ToString();
+						var value2 = value1?.ToString();
 #line default
-							if (!object.Equals(targetRoot.entry2.Text, value2))
+						if (!object.Equals(targetRoot.entry2.Text, value2))
+						{
+							bindings._settingBinding9 = true;
+							try
 							{
 								targetRoot.entry2.Text = value2;
+							}
+							finally
+							{
+								bindings._settingBinding9 = false;
 							}
 						}
 #line default
@@ -597,15 +602,19 @@ namespace XFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "StringProp")
 					{
-#line default
-						if (!bindings._settingBinding10)
-						{
 #line (53, 22) - (53, 22) 53 "Page1.xml"
-							var value1 = typedSender.StringProp;
+						var value1 = typedSender.StringProp;
 #line default
-							if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value1))
+						if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value1))
+						{
+							bindings._settingBinding10 = true;
+							try
 							{
 								targetRoot.pickerEx1.SelectedItem = value1;
+							}
+							finally
+							{
+								bindings._settingBinding10 = false;
 							}
 						}
 #line default

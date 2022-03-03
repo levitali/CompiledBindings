@@ -156,18 +156,13 @@ $@"{LineDirective(property.XamlNode)}
 		// setting the text causes moving cursor at first (or last, dependent on platform) position.
 		else if (property.Value.BindValue?.Mode == BindingMode.TwoWay)
 		{
-			output.AppendLine(
-$@"#line default
-{a}			if (!{bindingsAccess}_settingBinding{property.Value.BindValue.Index})
-{a}			{{");
-
 			string varName;
 			if (expression is not VariableExpression)
 			{
 				varName = "value" + localVarIndex++;
 				output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
-{a}				var {varName} = {value};
+{a}			var {varName} = {value};
 #line default");
 			}
 			else
@@ -175,9 +170,16 @@ $@"{LineDirective(property.XamlNode)}
 				varName = value;
 			}
 			output.AppendLine(
-$@"{a}				if (!object.Equals({setExpr}, {varName}))
+$@"{a}			if (!object.Equals({setExpr}, {varName}))
+{a}			{{
+{a}				{bindingsAccess}_settingBinding{property.Value.BindValue.Index} = true;
+{a}				try
 {a}				{{
 {a}					{setExpr} = {varName};
+{a}				}}
+{a}				finally
+{a}				{{
+{a}					{bindingsAccess}_settingBinding{property.Value.BindValue.Index} = false;
 {a}				}}
 {a}			}}");
 		}
