@@ -195,6 +195,14 @@ public static class TypeInfoUtils
 		return baseType;
 	}
 
+	public static IEnumerable<FieldDefinition> GetFields(this TypeReference type) => GetMembers(type, t => t.Fields);
+
+	public static IEnumerable<PropertyDefinition> GetProperties(this TypeReference type) => GetMembers(type, t => t.Properties);
+
+	public static IEnumerable<MethodDefinition> GetMethods(this TypeReference type) => GetMembers(type, t => t.Methods);
+
+	public static IEnumerable<EventDefinition> GetEvents(this TypeReference type) => GetMembers(type, t => t.Events);
+
 	public static IEnumerable<TypeReference> GetAllInterfaces(this TypeReference type)
 	{
 		var definition = type.ResolveEx();
@@ -242,6 +250,21 @@ public static class TypeInfoUtils
 		}
 		return type.Name;
 	}
+
+	private static IEnumerable<T> GetMembers<T>(this TypeReference type, Func<TypeDefinition, IEnumerable<T>> selector)
+	{
+		var typeDefinition = type.ResolveEx();
+		if (typeDefinition == null && type.IsGenericInstance)
+		{
+			typeDefinition = type.GetElementType().ResolveEx();
+		}
+		if (typeDefinition == null)
+		{
+			return Enumerable.Empty<T>();
+		}
+		return selector(typeDefinition);
+	}
+
 
 	private static TypeReference ReplaceGenericParameters(TypeReference type, TypeDefinition typeDefinition, TypeReference interfaceType)
 	{

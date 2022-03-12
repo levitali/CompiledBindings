@@ -326,7 +326,7 @@ public class ExpressionParser
 					(args[i] is ConstantExpression ce && ce.Value is string && prmType.Type.FullName == "System.Char");
 			}
 		}
-		
+
 		if (prmIndex < parameters.Count)
 		{
 			if (!parameters[prmIndex].Definition.IsOptional)
@@ -335,7 +335,7 @@ public class ExpressionParser
 			}
 			// Other parameters must also be optional
 		}
-		
+
 		return true;
 	}
 
@@ -361,10 +361,10 @@ public class ExpressionParser
 		{
 			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
 		}
-		
+
 		var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
 		var argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
-		
+
 		var args = ParseArgumentList(argumentTypes);
 		if (method.Parameters.Count < args.Length)
 		{
@@ -723,7 +723,7 @@ public class ExpressionParser
 
 					CorrectCharParameters(method, args, ns != null, errorPos);
 					CorrectNotNullableParameters(method, args);
-					
+
 					return new CallExpression(instance, method, args);
 
 					void GetNextMethod()

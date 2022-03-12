@@ -23,7 +23,7 @@ public class XamlCodeGenerator
 			}
 		}
 		LangVersion = langVersionNum;
-		LangNullables =	LangVersion >= 8;
+		LangNullables = LangVersion >= 8;
 	}
 
 	public float LangVersion { get; }

@@ -62,7 +62,8 @@ public class TypeInfo
 
 	public IList<PropertyInfo> Properties => _properties ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.Properties).Select(p =>
+			.SelectMany(t => t.GetProperties())
+			.Select(p =>
 			{
 				var knownNotNull = NotNullableProperties.TryGetValue(p.DeclaringType.FullName, out var props) && props.Contains(p.Name);
 				return new PropertyInfo(p, GetTypeSumElement(p.PropertyType, p.DeclaringType, knownNotNull ? false : null, p.CustomAttributes));
@@ -71,12 +72,12 @@ public class TypeInfo
 
 	public IList<FieldInfo> Fields => _fields ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.Fields.Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes))))
+			.SelectMany(t => t.GetFields().Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes))))
 			.ToList();
 
 	public IList<MethodInfo> Methods => _methods ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.Methods.Where(m => !m.IsConstructor).Select(m => new MethodInfo(
+			.SelectMany(t => t.GetMethods().Where(m => !m.IsConstructor).Select(m => new MethodInfo(
 				m,
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
 				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes))))
@@ -92,7 +93,7 @@ public class TypeInfo
 
 	public IList<EventInfo> Events => _events ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.Events.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes))))
+			.SelectMany(t => t.GetEvents().Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes))))
 			.ToList();
 
 	public TypeInfo? GetElementType()
@@ -175,8 +176,8 @@ public class TypeInfo
 		{
 			if (refTyp.IsSealed && refTyp.IsAbstract)
 			{
-				foreach (var method in refTyp.Methods.Where(m => 
-					m.Name == name && 
+				foreach (var method in refTyp.Methods.Where(m =>
+					m.Name == name &&
 					m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute") &&
 					m.Parameters.Count > 0 &&
 					m.Parameters[0].ParameterType.IsAssignableFrom(type.Type)))
@@ -268,12 +269,12 @@ public class TypeInfo
 		return new TypeInfo(type, isNullable, nullableFlags, nullableContext);
 	}
 
-	private IEnumerable<TypeDefinition> EnumerateTypeAndSubTypes()
+	private IEnumerable<TypeReference> EnumerateTypeAndSubTypes()
 	{
 		var type = Type;
 		if (type.IsArray)
 		{
-			return EnumerableExtensions.AsEnumerable(GetTypeThrow(typeof(Array)).Type.ResolveEx()!);
+			return EnumerableExtensions.AsEnumerable(GetTypeThrow(typeof(Array)).Type);
 		}
 
 		if (type.IsGenericInstance)
@@ -281,18 +282,12 @@ public class TypeInfo
 			type = type.GetElementType();
 		}
 
-		var typeDefinition = type.ResolveEx();
-		if (typeDefinition == null)
+		if (type.IsInterface())
 		{
-			return Enumerable.Empty<TypeDefinition>();
+			return type.GetAllInterfaces();
 		}
 
-		if (typeDefinition.IsInterface)
-		{
-			return EnumerableExtensions.SelectTree(typeDefinition, t => t.Interfaces.Select(i => i.InterfaceType.ResolveEx()).Where(t => t != null).Select(t => t!), true);
-		}
-
-		return EnumerableExtensions.SelectSequence(typeDefinition, t => t.BaseType.ResolveEx(), true).Where(t => t != null).Select(t => t!);
+		return EnumerableExtensions.SelectSequence(type, t => t.GetBaseType(), true).Where(t => t != null).Select(t => t!);
 	}
 
 	private static byte[]? GetNullableFlags(TypeReference type)
