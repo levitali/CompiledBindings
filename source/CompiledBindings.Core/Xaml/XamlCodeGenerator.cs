@@ -272,10 +272,18 @@ $@"#line default");
 		var line = li.LineNumber;
 		if (LangVersion >= 10)
 		{
-			var column = li.LinePosition;
+			var column1 = li.LinePosition;
+			var column2 = li.LinePosition;
+			if (xamlNode.Element is XAttribute attribute)
+			{
+				column2 +=
+					(attribute.Parent.GetPrefixOfNamespace(attribute.Name.Namespace)?.Length + 1 ?? 0) +
+					attribute.Name.LocalName.Length + 
+					attribute.Value.Length + 2;
+			}
 			//TODO Somehow it doesn't work as expected.
 			//Experimentally was found out, that it works if the "column offset" is the line number
-			return $"#line ({line}, {column}) - ({line}, {column}) {line} \"{xamlNode.File}\"";
+			return $"#line ({line}, {column1}) - ({line}, {column2}) {line} \"{xamlNode.File}\"";
 		}
 		return $"#line {line} \"{xamlNode.File}\"";
 	}
