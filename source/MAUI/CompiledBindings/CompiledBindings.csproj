@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Product>CompiledBindings</Product>
         <Company>levitali</Company>
-        <Version>1.0.8</Version>
+        <Version>1.0.10</Version>
         <LangVersion>latest</LangVersion>
         <OutputPath>..\..\..\bin\</OutputPath>
         <ImplicitUsings>enable</ImplicitUsings>
