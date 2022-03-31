@@ -147,6 +147,7 @@ public class XamlNode
 public class XamlNamespace
 {
 	private static readonly Regex _usingRegex = new Regex(@"^\s*(?:(global\s+))?using\s*:(.+)$");
+	private static readonly Regex _clrNamespaceRegex = new Regex(@"^clr-namespace:(.+?)(?:;.+)?$");
 
 	public XamlNamespace(string prefix, XNamespace ns)
 	{
@@ -166,16 +167,9 @@ public class XamlNamespace
 		{
 			return match.Groups[match.Groups.Count - 1].Value.Trim();
 		}
-		else if (nsName.StartsWith("clr-namespace:"))
+		else if ((match = _clrNamespaceRegex.Match(nsName)).Success)
 		{
-			const int l = 14; // length of "clr-namespace:"
-			int ind = nsName.IndexOf(';', l);
-			if (ind == -1)
-			{
-				ind = nsName.Length;
-			}
-
-			return nsName.Substring(l, ind - l);
+			return match.Groups[1].Value.Trim();
 		}
 		return null;
 	}
