@@ -77,7 +77,7 @@ public static class BindingParser
 				}
 				else
 				{
-					throw new ParseException($"Syntax error.");
+					throw new ParseException(Res.SyntaxError);
 				}
 			}
 
@@ -86,7 +86,7 @@ public static class BindingParser
 			{
 				if (expression != null)
 				{
-					throw new ParseException($"Syntax error.");
+					throw new ParseException(Res.SyntaxError);
 				}
 				name = "Path";
 			}
@@ -361,9 +361,9 @@ public static class BindingParser
 		bool CheckPropertyNotifiable(MemberExpression expr)
 		{
 			return expr.Member is PropertyInfo pi &&
-				   !pi.Definition.IsStatic() &&
+			       !pi.Definition.IsStatic() &&
 				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
-				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
+				      (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
 				   !pi.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute" && (bool)a.ConstructorArguments[0].Value == true);
 		}
 
@@ -479,6 +479,7 @@ public static class BindingParser
 
 	private static class Res
 	{
+		public const string SyntaxError = "Syntax error.";
 		public const string MissingExpression = "Missing expression.";
 		public const string NoDataType = "DataType is unknown. It must be specified when using x:Bind in a DataTemplate.";
 	}

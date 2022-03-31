@@ -2,53 +2,50 @@
 using System.ComponentModel;
 using System.Linq;
 
-namespace PreformanceCompareApp.ViewModels
+namespace PreformanceCompareApp.ViewModels;
+
+public class StatisticsViewModel : INotifyPropertyChanged
 {
+	private double _Avarage;
+	private int _index;
+	private readonly long[] _ticks = new long[1000];
+	private bool _useAllTicks = false;
 
-	public class StatisticsViewModel : INotifyPropertyChanged
+	public StatisticsViewModel(IList<TransferOrder> transferOrders)
 	{
-		private double _Avarage;
-		private int _index;
-		private readonly long[] _ticks = new long[1000];
-		private bool _useAllTicks = false;
+		TransferOrders = transferOrders.Select(t => new TransferOrderViewModel(this, t)).ToList();
+	}
 
-		public StatisticsViewModel(IList<TransferOrder> transferOrders)
+	public event PropertyChangedEventHandler? PropertyChanged;
+
+	public IList<TransferOrderViewModel> TransferOrders { get; }
+
+	public double Avarage
+	{
+		get => _Avarage;
+		set
 		{
-			TransferOrders = transferOrders.Select(t => new TransferOrderViewModel(this, t)).ToList();
+			_Avarage = value;
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Avarage)));
+		}
+	}
+
+	public void UpdateStatistics(long ticks)
+	{
+		_ticks[_index] = ticks;
+		_index++;
+		if (_index >= _ticks.Length)
+		{
+			_index = 0;
+			_useAllTicks = true;
 		}
 
-		public event PropertyChangedEventHandler? PropertyChanged;
-
-		public IList<TransferOrderViewModel> TransferOrders { get; }
-
-		public double Avarage
+		IEnumerable<long> t = _ticks;
+		if (!_useAllTicks)
 		{
-			get => _Avarage;
-			set
-			{
-				_Avarage = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Avarage)));
-			}
+			t = t.Take(_index);
 		}
 
-		public void UpdateStatistics(long ticks)
-		{
-			_ticks[_index] = ticks;
-			_index++;
-			if (_index >= _ticks.Length)
-			{
-				_index = 0;
-				_useAllTicks = true;
-			}
-
-			IEnumerable<long> t = _ticks;
-			if (!_useAllTicks)
-			{
-				t = t.Take(_index);
-			}
-
-			Avarage = t.Average();
-		}
-
+		Avarage = t.Average();
 	}
 }

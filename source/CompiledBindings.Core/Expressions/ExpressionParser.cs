@@ -18,7 +18,7 @@ public class ExpressionParser
 	private readonly int _textLen;
 	private char _ch;
 	private Token _token;
-	private TypeInfo? _expectedType;
+	private TypeInfo _expectedType;
 
 	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
 	{
@@ -462,7 +462,8 @@ public class ExpressionParser
 			case TokenId.Identifier:
 				return ParseIdentifier();
 			case TokenId.StringLiteral:
-				return ParseStringLiteral();
+			case TokenId.InterpolatedStringLiteral:
+				return ParseStringLiteral(_token.id == TokenId.InterpolatedStringLiteral);
 			case TokenId.IntegerLiteral:
 				return ParseIntegerLiteral();
 			case TokenId.RealLiteral:
@@ -514,11 +515,10 @@ public class ExpressionParser
 		return new TypeofExpression(typeExpression);
 	}
 
-	private Expression ParseStringLiteral()
+	private Expression ParseStringLiteral(bool isInterpolated)
 	{
-		ValidateToken(TokenId.StringLiteral);
 		char quote = _token.text[0];
-		string s = _token.text.Substring(1, _token.text.Length - 2);
+		string s = isInterpolated ? _token.text.Substring(2, _token.text.Length - 3) : _token.text.Substring(1, _token.text.Length - 2);
 		int start = 0;
 		while (true)
 		{
@@ -532,6 +532,34 @@ public class ExpressionParser
 			start = i + 1;
 		}
 		NextToken();
+
+		if (isInterpolated)
+		{
+			List<Expression> expressions = new();
+			List<string> formatParts = new();
+			var str = s;
+			var regex = new Regex(@".*?{(.+?)}.*");
+			while (true)
+			{
+				var match = regex.Match(str);
+				if (!match.Success)
+				{
+					break;
+				}
+
+				var g = match.Groups[1];
+
+				var parser = new ExpressionParser(_root, g.Value, _expectedType, _namespaces);
+				var expression = Parse(_root.Type, _root.Name, g.Value, _expectedType, false, _namespaces, out var includeNamespaces, out var dummy);
+				_includeNamespaces.AddRange(includeNamespaces.Except(_includeNamespaces, n => n.ClrNamespace));
+				expressions.Add(expression);
+
+				formatParts.Add(str.Substring(0, g.Index - 1));
+				str = str.Substring(g.Index + g.Length + 1);
+			}
+			return new InterpolatedStringExpression(formatParts, str, expressions);
+		}
+
 		return CreateLiteral(s, s);
 	}
 
@@ -846,7 +874,7 @@ public class ExpressionParser
 		var argList = new List<Expression>();
 		for (int i = 0; ; i++)
 		{
-			_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : null;
+			_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : savedExpectedType;
 			argList.Add(ParseExpression());
 			if (_token.id != TokenId.Comma)
 			{
@@ -1054,24 +1082,37 @@ public class ExpressionParser
 					t = TokenId.Bar;
 				}
 				break;
+			case '$':
+				NextChar();
+				if (_ch is not ('"' or '\''))
+				{
+					throw new ParseException("A string literal expected", _textPos);
+				}
+				ParseString();
+				t = TokenId.InterpolatedStringLiteral;
+				break;
 			case '"':
 			case '\'':
-				char quote = _ch;
-				do
+				ParseString();
+				void ParseString()
 				{
-					NextChar();
-					while (_textPos < _textLen && _ch != quote)
+					char quote = _ch;
+					do
 					{
 						NextChar();
-					}
+						while (_textPos < _textLen && _ch != quote)
+						{
+							NextChar();
+						}
 
-					if (_textPos == _textLen)
-					{
-						throw new ParseException("Unterminated string literal", _textPos);
-					}
+						if (_textPos == _textLen)
+						{
+							throw new ParseException("Unterminated string literal", _textPos);
+						}
 
-					NextChar();
-				} while (_ch == quote);
+						NextChar();
+					} while (_ch == quote);
+				}
 				t = TokenId.StringLiteral;
 				break;
 			default:
@@ -1245,7 +1286,8 @@ public class ExpressionParser
 		LessGreater,
 		DoubleEqual,
 		GreaterThanEqual,
-		DoubleBar
+		DoubleBar,
+		InterpolatedStringLiteral
 	}
 }
 
