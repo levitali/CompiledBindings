@@ -15,7 +15,7 @@ namespace WPFTest.Views
 
 			_generatedCodeInitialized = true;
 
-#line (17, 17) - (17, 40) 17 "Page2.xml"
+#line (17, 17) - (17, 17) 17 "Page2.xml"
 			button2.Click += (p1, p2) => this.OnClick2();
 #line default
 
@@ -50,7 +50,7 @@ namespace WPFTest.Views
 
 				Update();
 
-#line (16, 17) - (16, 41) 16 "Page2.xml"
+#line (16, 17) - (16, 17) 16 "Page2.xml"
 				_eventHandler2 = dataRoot.OnClick1;
 #line default
 				_targetRoot.button1.Click += _eventHandler2;
@@ -78,7 +78,7 @@ namespace WPFTest.Views
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
 				var bindings = this;
-#line (14, 20) - (14, 40) 14 "Page2.xml"
+#line (14, 20) - (14, 20) 14 "Page2.xml"
 				targetRoot.textBlock1.Text = dataRoot.Prop1;
 #line default
 				Set0(bindings._generatedCodeDisposed.Token);
@@ -86,7 +86,7 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (15, 20) - (15, 40) 15 "Page2.xml"
+#line (15, 20) - (15, 20) 15 "Page2.xml"
 						var value = await dataRoot.Prop2;
 #line default
 						if (!cancellationToken.IsCancellationRequested)

@@ -31,7 +31,6 @@
             IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
             Text="{x:Bind DecimalProp.ToString('0.###')}"
             TextColor="{x:Set Color.Aqua}" />
-        <Label Text="{x:Bind $'{BooleanProp} and {DecimalProp}'}" />
         <CollectionView
             ItemTemplate="{StaticResource test1Template}"
             ItemsSource="{x:Bind ListProp}" />

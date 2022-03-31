@@ -142,11 +142,6 @@ public static class EnumerableExtensions
 	{
 		return first.Union(second, new ComparisonEqualityComparer<T, TKey>(keySelector));
 	}
-
-	public static IEnumerable<T> Except<T, TKey>(this IEnumerable<T> first, IEnumerable<T> second, Func<T, TKey> keySelector)
-	{
-		return first.Except(second, new ComparisonEqualityComparer<T, TKey>(keySelector));
-	}
 }
 
 public class ComparisonEqualityComparer<T, TKey> : IEqualityComparer<T>
