@@ -568,7 +568,7 @@ public class ExpressionParser
 		}
 
 		format += _text.Substring(_textPos, endPos - _textPos);
-		_textPos = endPos + 1;
+		_textPos = endPos;
 
 		NextChar();
 		NextToken();
