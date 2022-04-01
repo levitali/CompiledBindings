@@ -18,6 +18,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Entry entry2;
 		private global::UI.PickerEx pickerEx1;
 		private global::Xamarin.Forms.Button button1;
+		private global::Xamarin.Forms.Label label12;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -37,6 +38,7 @@ namespace XFTest.Views
 			entry2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Entry>(this, "entry2");
 			pickerEx1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::UI.PickerEx>(this, "pickerEx1");
 			button1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Button>(this, "button1");
+			label12 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label12");
 
 #line (13, 5) - (13, 48) 13 "Page1.xml"
 			var value1 = XFTest.Strings.Instance;
@@ -289,35 +291,37 @@ namespace XFTest.Views
 				var dataRoot = _dataRoot;
 #line (42, 13) - (42, 58) 42 "Page1.xml"
 				var value1 = dataRoot.BooleanProp;
-#line (46, 16) - (46, 54) 46 "Page1.xml"
-				var value2 = dataRoot.ListProp;
 #line (41, 13) - (41, 39) 41 "Page1.xml"
-				var value3 = dataRoot.DecimalProp;
+				var value2 = dataRoot.DecimalProp;
+#line (46, 16) - (46, 54) 46 "Page1.xml"
+				var value3 = dataRoot.ListProp;
 #line (44, 16) - (44, 51) 44 "Page1.xml"
 				var value4 = dataRoot.NullableIntProp;
+#line (53, 22) - (53, 68) 53 "Page1.xml"
+				var value5 = dataRoot.StringProp;
 #line (46, 16) - (46, 54) 46 "Page1.xml"
-				var value5 = value2[0];
+				var value6 = value3[0];
 #line (41, 13) - (41, 39) 41 "Page1.xml"
-				targetRoot.label5.Text = value3.ToString();
+				targetRoot.label5.Text = value2.ToString();
 #line (42, 13) - (42, 58) 42 "Page1.xml"
 				targetRoot.label5.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
 #line (43, 16) - (43, 46) 43 "Page1.xml"
-				targetRoot.label6.Text = (value3 + 1).ToString();
+				targetRoot.label6.Text = (value2 + 1).ToString();
 #line (44, 16) - (44, 51) 44 "Page1.xml"
 				targetRoot.label7.Text = (value4 ?? 0).ToString();
 #line (45, 16) - (45, 43) 45 "Page1.xml"
 				targetRoot.label8.Text = (!value1).ToString();
 #line (46, 16) - (46, 54) 46 "Page1.xml"
-				targetRoot.label9.Text = value5?.DecimalProp.ToString();
+				targetRoot.label9.Text = value6?.DecimalProp.ToString();
 #line (49, 13) - (49, 58) 49 "Page1.xml"
-				var value6 = value1.ToString();
+				var value7 = value1.ToString();
 #line default
-				if (!object.Equals(targetRoot.entry1.Text, value6))
+				if (!object.Equals(targetRoot.entry1.Text, value7))
 				{
 					_settingBinding7 = true;
 					try
 					{
-						targetRoot.entry1.Text = value6;
+						targetRoot.entry1.Text = value7;
 					}
 					finally
 					{
@@ -327,29 +331,26 @@ namespace XFTest.Views
 #line (50, 13) - (50, 56) 50 "Page1.xml"
 				targetRoot.entry1.SetFocused(dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line (52, 13) - (52, 56) 52 "Page1.xml"
-				var value7 = value4?.ToString();
+				var value8 = value4?.ToString();
 #line default
-				if (!object.Equals(targetRoot.entry2.Text, value7))
+				if (!object.Equals(targetRoot.entry2.Text, value8))
 				{
 					_settingBinding9 = true;
 					try
 					{
-						targetRoot.entry2.Text = value7;
+						targetRoot.entry2.Text = value8;
 					}
 					finally
 					{
 						_settingBinding9 = false;
 					}
 				}
-#line (53, 22) - (53, 68) 53 "Page1.xml"
-				var value8 = dataRoot.StringProp;
-#line default
-				if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value8))
+				if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value5))
 				{
 					_settingBinding10 = true;
 					try
 					{
-						targetRoot.pickerEx1.SelectedItem = value8;
+						targetRoot.pickerEx1.SelectedItem = value5;
 					}
 					finally
 					{
@@ -359,10 +360,12 @@ namespace XFTest.Views
 #line (56, 13) - (56, 53) 56 "Page1.xml"
 				targetRoot.list.IsVisible = dataRoot.ArrayProp?.Length > 0;
 #line (57, 13) - (57, 63) 57 "Page1.xml"
-				targetRoot.list.ItemsSource = value2;
+				targetRoot.list.ItemsSource = value3;
+#line (72, 16) - (72, 141) 72 "Page1.xml"
+				targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", value2, value1, value5?.TrimStart('0'));
 #line default
 
-				_bindingsTrackings.SetPropertyChangedEventHandler1(value5);
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value6);
 			}
 
 			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
@@ -511,6 +514,8 @@ namespace XFTest.Views
 						targetRoot.label5.Text = value1.ToString();
 #line (43, 16) - (43, 46) 43 "Page1.xml"
 						targetRoot.label6.Text = (value1 + 1).ToString();
+#line (72, 16) - (72, 141) 72 "Page1.xml"
+						targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", value1, dataRoot.BooleanProp, dataRoot.StringProp?.TrimStart('0'));
 #line default
 						if (!notifyAll)
 						{
@@ -540,6 +545,8 @@ namespace XFTest.Views
 								bindings._settingBinding7 = false;
 							}
 						}
+#line (72, 16) - (72, 141) 72 "Page1.xml"
+						targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", dataRoot.DecimalProp, value1, dataRoot.StringProp?.TrimStart('0'));
 #line default
 						if (!notifyAll)
 						{
@@ -604,7 +611,6 @@ namespace XFTest.Views
 					{
 #line (53, 22) - (53, 68) 53 "Page1.xml"
 						var value1 = typedSender.StringProp;
-#line default
 						if (!object.Equals(targetRoot.pickerEx1.SelectedItem, value1))
 						{
 							bindings._settingBinding10 = true;
@@ -617,6 +623,8 @@ namespace XFTest.Views
 								bindings._settingBinding10 = false;
 							}
 						}
+#line (72, 16) - (72, 141) 72 "Page1.xml"
+						targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", dataRoot.DecimalProp, dataRoot.BooleanProp, value1?.TrimStart('0'));
 #line default
 						if (!notifyAll)
 						{

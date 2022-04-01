@@ -69,6 +69,7 @@
             x:DataType="{x:Null}"
             IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}"
             Clicked="[x:Set Save]" />
+        <Label Text="{x:Bind $'Decimal value: {DecimalProp:0.###}, Boolean value: {BooleanProp}, String value: {StringProp.TrimStart('0')}'}" />
     </StackLayout>
 
 </Page>

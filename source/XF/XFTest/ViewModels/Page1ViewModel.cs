@@ -10,7 +10,7 @@ namespace XFTest.ViewModels
 	{
 		public ModifyPage1ViewModel ModifyViewModel { get; } = new();
 
-		public decimal DecimalProp { get; set; }
+		public decimal DecimalProp { get; set; } = 1.230M;
 
 		public bool BooleanProp { get; set; }
 
@@ -20,6 +20,8 @@ namespace XFTest.ViewModels
 		};
 
 		public int[] ArrayProp { get; set; } = new[] { 1, 2, 3 };
+
+		public string StringProp => "0000123";
 
 		public Func<Type, char, bool>? FuncProp { get; set; }
 

@@ -19,6 +19,7 @@ public class ExpressionParser
 	private char _ch;
 	private Token _token;
 	private TypeInfo? _expectedType;
+	private char _endChar;
 
 	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
 	{
@@ -461,6 +462,8 @@ public class ExpressionParser
 		{
 			case TokenId.Identifier:
 				return ParseIdentifier();
+			case TokenId.InterpolatedString:
+				return ParseInterpolatedString();
 			case TokenId.StringLiteral:
 				return ParseStringLiteral();
 			case TokenId.IntegerLiteral:
@@ -512,6 +515,65 @@ public class ExpressionParser
 			throw new ParseException(Res.InvalidType, errorPos);
 		}
 		return new TypeofExpression(typeExpression);
+	}
+
+	private Expression ParseInterpolatedString()
+	{
+		var errorPos = _token.pos;
+		var quote = _text[_textPos];
+		_textPos++;
+
+		int endPos;
+		var format = "";
+		var expressions = new List<Expression>();
+
+		for (int i = 0; ; i++)
+		{
+			endPos = _text.IndexOf(quote, _textPos);
+			if (endPos == -1)
+			{
+				throw new ParseException(Res.UnterminatedStringLiteral, errorPos);
+			}
+
+			var pos  = _text.IndexOf('{', _textPos);
+			if (endPos < pos || pos == -1)
+			{
+				break;
+			}
+			
+			format += _text.Substring(_textPos, pos - _textPos + 1) + i.ToString();
+
+			_textPos = pos;
+			NextChar();
+			NextToken();
+
+			_endChar = '}';
+			var expression = ParseExpression();
+			expressions.Add(expression);
+			_endChar = '\0';
+
+			if (_token.id == TokenId.Colon)
+			{
+				pos = _text.IndexOf('}', _textPos);
+				if (pos == -1)
+				{
+					throw new ParseException(Res.CloseBracketExpected, _textPos);
+				}
+				format += ":";
+			}
+			else if (_token.id != TokenId.End || _ch != '}')
+			{
+				throw new ParseException(Res.CloseBracketExpected, _textPos);
+			}
+		}
+
+		format += _text.Substring(_textPos, endPos - _textPos);
+		_textPos = endPos + 1;
+
+		NextChar();
+		NextToken();
+
+		return new InterpolatedStringExpression(format, expressions);
 	}
 
 	private Expression ParseStringLiteral()
@@ -1067,12 +1129,20 @@ public class ExpressionParser
 
 					if (_textPos == _textLen)
 					{
-						throw new ParseException("Unterminated string literal", _textPos);
+						throw new ParseException(Res.UnterminatedStringLiteral, _textPos);
 					}
 
 					NextChar();
 				} while (_ch == quote);
 				t = TokenId.StringLiteral;
+				break;
+			case '$':
+				NextChar();
+				if (_ch is not ('\'' or '"'))
+				{
+					throw new ParseException("A string literal is expected.", _textPos);
+				}
+				t = TokenId.InterpolatedString;
 				break;
 			default:
 				if (char.IsLetter(_ch) || _ch == '_')
@@ -1123,7 +1193,7 @@ public class ExpressionParser
 
 					break;
 				}
-				if (_textPos == _textLen)
+				if (_textPos == _textLen || _ch == _endChar)
 				{
 					t = TokenId.End;
 					break;
@@ -1202,6 +1272,8 @@ public class ExpressionParser
 		public const string IdentifierExpected = "Identifier expected.";
 		public const string OperatorNotSupported = "Operator is not supported.";
 		public const string InvalidType = "Invalid type.";
+		public const string UnterminatedStringLiteral = "Unterminated string literal";
+		public const string CloseBracketExpected = "Exprected }";
 	}
 
 	private struct Token
@@ -1245,7 +1317,8 @@ public class ExpressionParser
 		LessGreater,
 		DoubleEqual,
 		GreaterThanEqual,
-		DoubleBar
+		DoubleBar,
+		InterpolatedString,
 	}
 }
 
