@@ -362,7 +362,7 @@ namespace XFTest.Views
 #line (57, 13) - (57, 63) 57 "Page1.xml"
 				targetRoot.list.ItemsSource = value3;
 #line (72, 16) - (72, 141) 72 "Page1.xml"
-				targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", value2, value1, value5?.TrimStart('0'));
+				targetRoot.label12.Text = $"Decimal value: {value2:0.###}, Boolean value: {value1}, String value: {value5?.TrimStart('0')}";
 #line default
 
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value6);
@@ -515,7 +515,7 @@ namespace XFTest.Views
 #line (43, 16) - (43, 46) 43 "Page1.xml"
 						targetRoot.label6.Text = (value1 + 1).ToString();
 #line (72, 16) - (72, 141) 72 "Page1.xml"
-						targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", value1, dataRoot.BooleanProp, dataRoot.StringProp?.TrimStart('0'));
+						targetRoot.label12.Text = $"Decimal value: {value1:0.###}, Boolean value: {dataRoot.BooleanProp}, String value: {dataRoot.StringProp?.TrimStart('0')}";
 #line default
 						if (!notifyAll)
 						{
@@ -546,7 +546,7 @@ namespace XFTest.Views
 							}
 						}
 #line (72, 16) - (72, 141) 72 "Page1.xml"
-						targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", dataRoot.DecimalProp, value1, dataRoot.StringProp?.TrimStart('0'));
+						targetRoot.label12.Text = $"Decimal value: {dataRoot.DecimalProp:0.###}, Boolean value: {value1}, String value: {dataRoot.StringProp?.TrimStart('0')}";
 #line default
 						if (!notifyAll)
 						{
@@ -624,7 +624,7 @@ namespace XFTest.Views
 							}
 						}
 #line (72, 16) - (72, 141) 72 "Page1.xml"
-						targetRoot.label12.Text = string.Format("Decimal value: {0:0.###}, Boolean value: {1}, String value: {2}", dataRoot.DecimalProp, dataRoot.BooleanProp, value1?.TrimStart('0'));
+						targetRoot.label12.Text = $"Decimal value: {dataRoot.DecimalProp:0.###}, Boolean value: {dataRoot.BooleanProp}, String value: {value1?.TrimStart('0')}";
 #line default
 						if (!notifyAll)
 						{

@@ -733,7 +733,7 @@ public class InterpolatedStringExpression : Expression
 
     protected override string ToStringCore()
     {
-        return $"string.Format(\"{_format}\", { string.Join(", ", _expressions.Select(e => e.ToString())) })";
+        return string.Format(_format, _expressions.Cast<object>().ToArray());
     }
 }
 

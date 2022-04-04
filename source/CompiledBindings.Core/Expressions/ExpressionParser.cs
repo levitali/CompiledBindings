@@ -19,7 +19,7 @@ public class ExpressionParser
 	private char _ch;
 	private Token _token;
 	private TypeInfo? _expectedType;
-	private char _endChar;
+	private bool _parsingInterpolatedString;
 
 	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
 	{
@@ -519,61 +519,99 @@ public class ExpressionParser
 
 	private Expression ParseInterpolatedString()
 	{
-		var errorPos = _token.pos;
+		var errorPos = _textPos;
 		var quote = _text[_textPos];
-		_textPos++;
 
 		int endPos;
-		var format = "";
 		var expressions = new List<Expression>();
+		// Start the format string
+		var format = "$\"";
 
 		for (int i = 0; ; i++)
 		{
+			// Find the end quote symbol
+			_textPos++;
 			endPos = _text.IndexOf(quote, _textPos);
 			if (endPos == -1)
 			{
 				throw new ParseException(Res.UnterminatedStringLiteral, errorPos);
 			}
 
+			// Find the start of interpolated expression
 			var pos  = _text.IndexOf('{', _textPos);
 			if (endPos < pos || pos == -1)
 			{
 				break;
 			}
-			
-			format += _text.Substring(_textPos, pos - _textPos + 1) + i.ToString();
 
+			// Add the text before the interpolated expression to the format
+			format += _text.Substring(_textPos, pos - _textPos);
+			// Add double { for generating single one in the C# code
+			format += "{{";
+			// Add placeholder for setting generated C# expression
+			format += "{" + i.ToString() + "}";
+
+			// Prepare parsing the interpolated expression
 			_textPos = pos;
 			NextChar();
 			NextToken();
 
-			_endChar = '}';
+			// Parse the expression
+			_parsingInterpolatedString = true;
 			var expression = ParseExpression();
 			expressions.Add(expression);
-			_endChar = '\0';
+			_parsingInterpolatedString = false;
 
+			// If the current token is colon, there is a format part
 			if (_token.id == TokenId.Colon)
 			{
+				// Find the closing }
 				pos = _text.IndexOf('}', _textPos);
 				if (pos == -1)
 				{
 					throw new ParseException(Res.CloseBracketExpected, _textPos);
 				}
-				format += ":";
+				// Ensure that there is no openning { before
+				var pos2 = _text.IndexOf('{', _textPos);
+				if (pos2 != -1 && pos2 < pos)
+				{
+					throw new ParseException(Res.CloseBracketExpected, pos2);
+				}
+				// Add the format part
+				format += ":" + _text.Substring(_textPos, pos - _textPos);
+				_textPos = pos;
 			}
 			else if (_token.id != TokenId.End || _ch != '}')
 			{
-				throw new ParseException(Res.CloseBracketExpected, _textPos);
+				throw new ParseException(Res.CloseBracketExpected, _token.pos);
 			}
+			// Add closing } for generated C# code
+			format += "}}";
 		}
 
+		// Add possible text after the last interpolated expression
 		format += _text.Substring(_textPos, endPos - _textPos);
-		_textPos = endPos;
+		// Close the format string
+		format += "\"";
 
+		// Prepare parsing next expression
+		_textPos = endPos;
 		NextChar();
 		NextToken();
 
-		return new InterpolatedStringExpression(format, expressions);
+		// The resulting format can still be invalid.
+		// Check it now by trying to generated C# code.
+		// Checking now will give the correct error position.
+		var result = new InterpolatedStringExpression(format, expressions);
+		try
+		{
+			var test = result.ToString();
+		}
+		catch (FormatException)
+		{
+			throw new ParseException(Res.IncorrectInterpolatedString, errorPos);
+		}
+		return result;
 	}
 
 	private Expression ParseStringLiteral()
@@ -1129,7 +1167,14 @@ public class ExpressionParser
 
 					if (_textPos == _textLen)
 					{
-						throw new ParseException(Res.UnterminatedStringLiteral, _textPos);
+						if (_parsingInterpolatedString)
+						{
+							throw new ParseException(Res.CloseBracketExpected, tokenPos);
+						}
+						else
+						{
+							throw new ParseException(Res.UnterminatedStringLiteral, _textPos);
+						}
 					}
 
 					NextChar();
@@ -1193,7 +1238,7 @@ public class ExpressionParser
 
 					break;
 				}
-				if (_textPos == _textLen || _ch == _endChar)
+				if (_textPos == _textLen || (_parsingInterpolatedString && _ch == '}'))
 				{
 					t = TokenId.End;
 					break;
@@ -1272,8 +1317,9 @@ public class ExpressionParser
 		public const string IdentifierExpected = "Identifier expected.";
 		public const string OperatorNotSupported = "Operator is not supported.";
 		public const string InvalidType = "Invalid type.";
-		public const string UnterminatedStringLiteral = "Unterminated string literal";
+		public const string UnterminatedStringLiteral = "Unterminated string literal.";
 		public const string CloseBracketExpected = "Exprected }";
+		public const string IncorrectInterpolatedString = "Incorrect interpolated string.";
 	}
 
 	private struct Token
