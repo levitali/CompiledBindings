@@ -62,6 +62,12 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 <Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
  ```
  
+   - **interpolated string**. The interpolated string must start with $ symbol following a string literal in quotes. The string may contain interpolated expressions in {} brackets, with optional format part. The string is resolved when the binding applies, or one of the values of any expression is changed.
+
+ ```xaml
+<Label Text="{x:Bind $'Decimal value: {DecimalProp:0.###}, Boolean value: {BooleanProp}, String value: {StringProp.TrimStart('0')}'}" />
+ ```
+ 
 You can use following **constants** in the expression:
 - numbers with or wihout decimal seperator (point). For example 2.3
 - true, false
