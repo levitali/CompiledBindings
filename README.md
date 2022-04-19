@@ -101,8 +101,6 @@ If the {x:Bind} Markup Extension is used in a DataTemplate and you don't set the
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
 
-#### New in Version 1.0.6
-
 **DataType** property
 
 You can set the DataType only for a one x:Bind, by setting the corresponding DataType property.
