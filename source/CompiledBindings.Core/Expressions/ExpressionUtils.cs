@@ -16,7 +16,7 @@ public static class ExpressionUtils
 					.Where(e => e is not (ConstantExpression or VariableExpression or TypeExpression or DefaultExpression or NewExpression) &&
 								(e is not MemberExpression me || (me.Member is not (MethodInfo or FieldInfo))))
 					.Select(e => (property: p, expr: e)))
-				.GroupBy(e => e.expr.ToString())
+				.GroupBy(e => e.expr.CSharpCode)
 				.Where(g => g.Take(2).Count() > 1)
 				.OrderByDescending(g => g.Select(p => p.property).Distinct().Count())
 				.ThenBy(g => g.First().expr, ExpressionComparer.Instance)
@@ -79,8 +79,8 @@ public static class ExpressionUtils
 
 		public int Compare(Expression x, Expression y)
 		{
-			var sx = x.ToString();
-			var sy = y.ToString();
+			var sx = x.CSharpCode;
+			var sy = y.CSharpCode;
 			if (sx == sy)
 			{
 				return 0;

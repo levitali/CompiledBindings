@@ -58,7 +58,7 @@ public class XamlCodeGenerator
 		string value;
 		if (property.Value.BindValue != null || property.Value.StaticValue != null)
 		{
-			value = expression!.ToString();
+			value = expression!.CSharpCode;
 		}
 		else if (property.Value.CSharpValue != null)
 		{
@@ -89,7 +89,7 @@ public class XamlCodeGenerator
 					if (wrap)
 					{
 						expression = new CallExpression(me.Expression, sourceMethod, new Expression[0]);
-						value = expression.ToString();
+						value = expression.CSharpCode;
 					}
 				}
 				else

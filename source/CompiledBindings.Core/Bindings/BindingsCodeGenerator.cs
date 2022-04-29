@@ -635,7 +635,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 		{
 			var expr = bind.BindBackExpression ?? bind.Expression!;
 			var me = expr as MemberExpression;
-			var ae = expr.EnumerateTree().OrderByDescending(e => e.ToString()).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+			var ae = expr.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 
 			string memberExpr = "_targetRoot";
 			if (bind.Property.Object.Name != null)
@@ -658,7 +658,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			{
 				string sourceTypeFullName = sourceType.Type.GetCSharpFullName();
 				string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
-				string parameter = bind.ConverterParameter?.ToString() ?? "null";
+				string parameter = bind.ConverterParameter?.CSharpCode ?? "null";
 				setExpr = GenerateConvertBackCall(bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
 			}
 			else if (sourceType.Type.FullName == "System.String" && bind.Property.MemberType.Type.FullName != "System.String")
@@ -721,13 +721,13 @@ $@"{LineDirective(bind.Property.XamlNode)}
 #line default
 {a2}					if (value != null)
 {a2}					{{");
-				GenerateSetSource(memberExpr2.ToString(), a2 + '\t');
+				GenerateSetSource(memberExpr2.CSharpCode, a2 + '\t');
 				output.AppendLine(
 $@"{a2}					}}");
 			}
 			else
 			{
-				GenerateSetSource(expr.ToString(), a2);
+				GenerateSetSource(expr.CSharpCode, a2);
 			}
 			output.AppendLine(
 $@"{a2}				}}

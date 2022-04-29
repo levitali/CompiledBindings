@@ -290,7 +290,7 @@ public static class BindingParser
 		if (sourceExpression != null && fallbackValue != null)
 		{
 			var expr = sourceExpression
-				.EnumerateTree().OrderByDescending(e => e.ToString()).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+				.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 			if (expr != null)
 			{
 				var localVarName = "v" + localVarIndex++;
@@ -339,7 +339,7 @@ public static class BindingParser
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
-			.GroupBy(e => e.expr.Expression.ToString())
+			.GroupBy(e => e.expr.Expression.CSharpCode)
 			.Select(g => new NotifyPropertyChangedData
 			{
 				SourceExpression = g.First().expr.Expression,
@@ -355,7 +355,7 @@ public static class BindingParser
 				})
 				.ToList(),
 			})
-			.OrderBy(g => g.SourceExpression.ToString())
+			.OrderBy(g => g.SourceExpression.CSharpCode)
 			.ToList();
 
 		bool CheckPropertyNotifiable(MemberExpression expr)
@@ -376,9 +376,9 @@ public static class BindingParser
 		{
 			foreach (var prop in notifPropData.Properties)
 			{
-				var expr = prop.Expression.ToString();
+				var expr = prop.Expression.CSharpCode;
 				foreach (var notifPropData2 in notifyPropertyChangedList
-					.Where(g => g != notifPropData && GetSourceExpr(g.SourceExpression).ToString().StartsWith(expr)))
+					.Where(g => g != notifPropData && GetSourceExpr(g.SourceExpression).CSharpCode.StartsWith(expr)))
 				{
 					var notifPropData2Clone = notifPropData2.Clone();
 					prop.DependentNotifyProperties.Add(notifPropData2Clone);

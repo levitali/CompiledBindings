@@ -549,7 +549,7 @@ public class ExpressionParser
 			// Add double { for generating single one in the C# code
 			format += "{{";
 			// Add placeholder for setting generated C# expression
-			format += "{" + i.ToString() + "}";
+			format += "{" + i + "}";
 
 			// Prepare parsing the interpolated expression
 			_textPos = pos;
@@ -605,7 +605,7 @@ public class ExpressionParser
 		var result = new InterpolatedStringExpression(format, expressions);
 		try
 		{
-			var test = result.ToString();
+			var test = result.CSharpCode;
 		}
 		catch (FormatException)
 		{
