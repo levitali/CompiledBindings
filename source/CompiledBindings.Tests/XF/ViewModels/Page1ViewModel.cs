@@ -54,6 +54,11 @@ public class EntityViewModel : INotifyPropertyChanged
 	public event PropertyChangedEventHandler? PropertyChanged;
 }
 
+public class ExtEntityViewModel : EntityViewModel
+{
+	public string? ExtraProp { get; }
+}
+
 public class EntityModel : INotifyPropertyChanged
 {
 	public sbyte SByteProp { get; set; }

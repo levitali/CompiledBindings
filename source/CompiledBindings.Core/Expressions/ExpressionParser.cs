@@ -56,25 +56,38 @@ public class ExpressionParser
 	// ?:, ?? operator
 	private Expression ParseExpression()
 	{
-		int errorPos = _token.pos;
 		var expr = ParseLogicalOr();
 
 		if (_token.id == TokenId.Question)
 		{
-			NextToken();
-			var expr1 = ParseExpression();
-			ValidateToken(TokenId.Colon, Res.ColonExpected);
-			NextToken();
-			var expr2 = ParseExpression();
-			expr = new ConditionalExpression(expr, expr1, expr2);
+			return ParseConditionalExpression(expr);
 		}
 		else if (_token.id == TokenId.DoubleQuestion)
 		{
-			NextToken();
-			var right = ParseExpression();
-			expr = new CoalesceExpression(expr, right);
+			return ParseCoalesceExpression(expr);
+		}
+		else if (TokenIdentifierIs("as"))
+		{
+			return ParseAsExpression(expr);
 		}
 		return expr;
+	}
+
+	private Expression ParseCoalesceExpression(Expression expression)
+	{
+		NextToken();
+		var right = ParseExpression();
+		return new CoalesceExpression(expression, right);
+	}
+
+	private Expression ParseConditionalExpression(Expression expression)
+	{
+		NextToken();
+		var expr1 = ParseExpression();
+		ValidateToken(TokenId.Colon, Res.ColonExpected);
+		NextToken();
+		var expr2 = ParseExpression();
+		return new ConditionalExpression(expression, expr1, expr2);
 	}
 
 	// ||, or operator
@@ -86,7 +99,6 @@ public class ExpressionParser
 			var savedExpectedType = _expectedType;
 			_expectedType = GetNullableUnderlyingType(left.Type);
 			ValidateNotMethodAccess(left);
-			//var op = _token;
 			NextToken();
 			var right = ParseLogicalAnd();
 			ValidateNotMethodAccess(right);
@@ -105,7 +117,6 @@ public class ExpressionParser
 			var savedExpectedType = _expectedType;
 			_expectedType = GetNullableUnderlyingType(left.Type);
 			ValidateNotMethodAccess(left);
-			//var op = _token;
 			NextToken();
 			var right = ParseComparison();
 			ValidateNotMethodAccess(right);
@@ -472,9 +483,6 @@ public class ExpressionParser
 				return ParseRealLiteral();
 			case TokenId.OpenParen:
 				return ParseParenExpression();
-			//case TokenId.Dot:// Dot at the beginning of expression means root; used actually only when the whole expression is a dot
-			//	NextToken();
-			//	return _root;
 			default:
 				throw new ParseException(Res.ExpressionExpected, _token.pos);
 		}
@@ -730,7 +738,11 @@ public class ExpressionParser
 		var e = ParseExpression();
 		ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
 		NextToken();
-		if (e is TypeExpression te)
+		if (e is AsExpression)
+		{
+			return e;
+		}
+		else if (e is TypeExpression te)
 		{
 			var expr = ParsePrimary();
 			return new CastExpression(expr, te.Type);
@@ -758,13 +770,27 @@ public class ExpressionParser
 		{
 			return ParseNewExpression();
 		}
-
 		if (_token.text == "typeof")
 		{
 			return ParseTypeofExpression();
 		}
 
 		return ParseMemberAccess(_root);
+	}
+
+	private Expression ParseAsExpression(Expression expression)
+	{
+		NextToken();
+
+		int errorPos = _token.pos;
+		string prefix = GetIdentifier();
+
+		NextToken();
+		ValidateToken(TokenId.Colon, Res.ColonExpected);
+
+		var typeExpr = ParseTypeExpression(prefix, errorPos);
+
+		return new AsExpression(expression, typeExpr);
 	}
 
 	private Expression ParseMemberAccess(Expression instance)

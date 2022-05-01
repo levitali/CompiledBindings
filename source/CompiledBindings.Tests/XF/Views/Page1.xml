@@ -28,6 +28,7 @@
                     <DataTemplate x:DataType="viewModels:EntityViewModel">
                         <Grid>
                             <Label Text="{x:Bind BooleanProp}" />
+							<Label Text="{x:Bind (this as viewModels:ExtEntityViewModel).ExtraProp}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -42,7 +43,7 @@
             TextColor="{x:Bind BooleanProp ? Green : Red}" />
         <Label Text="{x:Bind DecimalProp + 1}" />
         <Label Text="{x:Bind NullableIntProp ?? 0}" />
-        <Label Text="{x:Bind !BooleanProp}" />
+        <Label Text="{x:Bind not BooleanProp}" />
         <Label Text="{x:Bind ListProp[0].DecimalProp}" />
         <Entry
             IsFocused="{x:Bind FocusedField[Field1], Mode=OneWayToSource}"

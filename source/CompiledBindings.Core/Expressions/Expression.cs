@@ -728,6 +728,38 @@ public class InterpolatedStringExpression : Expression
 	}
 }
 
+public class AsExpression : Expression
+{
+	public AsExpression(Expression expression, TypeExpression type) : base(type.Type)
+	{
+		Expression = expression;
+		AsType = type;
+	}
+
+	public Expression Expression { get; private set; }
+
+	public TypeExpression AsType { get; }
+
+	protected override string GetCSharpCode()
+	{
+		return $"({Expression} as global::{AsType})";
+	}
+
+	public override IEnumerable<Expression> Enumerate()
+	{
+		yield return Expression;
+	}
+
+	protected override Expression CloneReplaceCore(Expression current, Expression replace)
+	{
+		var clone = (AsExpression)base.CloneReplaceCore(current, replace);
+		clone.Expression = Expression.CloneReplace(current, replace);
+		return clone;
+	}
+
+	public override bool IsNullable => true;
+}
+
 public interface IAccessExpression
 {
 	Expression Expression { get; }
