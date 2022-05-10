@@ -59,12 +59,6 @@ public class XamlObjectProperty
 
 public class XamlObjectValue
 {
-	public XamlObjectValue(XamlObjectProperty property)
-	{
-		Property = property;
-	}
-	public XamlObjectProperty Property { get; }
-
 	public XamlObject? ObjectValue { get; set; }
 	public List<XamlObject>? CollectionValue { get; set; }
 	public Expression? StaticValue { get; set; }

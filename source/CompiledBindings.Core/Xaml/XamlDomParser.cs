@@ -275,88 +275,8 @@ public class XamlDomParser
 				}
 			}
 
-			var value = new XamlObjectValue(objProp);
-
-			var propType = objProp.MemberType;
-			if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xSet)
-			{
-				try
-				{
-					CheckPropertyTypeNotBinding();
-					var staticNode = xamlNode.Children[0];
-					value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
-					includeNamespaces.ForEach(ns => xamlDom.AddNamespace(ns.ClrNamespace!));
-					value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
-					CorrectMethod(objProp, value.StaticValue.Type);
-				}
-				catch (ParseException ex)
-				{
-					HandleParseException(ex);
-				}
-			}
-			else if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xBind)
-			{
-				try
-				{
-					CheckPropertyTypeNotBinding();
-					var defaultBindModeAttr =
-						EnumerableExtensions.SelectSequence(objProp.XamlNode.Element, e => e.Parent, objProp.XamlNode.Element is XElement)
-						.Cast<XElement>()
-						.Select(e => e.Attribute(xDefaultBindMode))
-						.FirstOrDefault(a => a != null);
-					var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-					value.BindValue = BindingParser.Parse(xamlDom, objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, throwIfBindWithoutDataType, ref _localVarIndex);
-					if (value.BindValue.SourceExpression != null)
-					{
-						if (value.BindValue.Converter == null)
-						{
-							value.BindValue.SourceExpression = CorrectSourceExpression(value.BindValue.SourceExpression, objProp);
-						}
-						CorrectMethod(objProp, value.BindValue.SourceExpression.Type);
-					}
-					obj.GenerateMember = true;
-				}
-				catch (ParseException ex)
-				{
-					HandleParseException(ex);
-				}
-			}
-			else
-			{
-				throw new GeneratorException($"The value cannot be processed.", CurrentFile, xamlNode);
-			}
-
-			if (objProp.TargetEvent != null)
-			{
-				var expr = value.BindValue?.Expression ?? value.StaticValue;
-				if (expr != null &&
-					(expr is not MemberExpression me || me.Member is not MethodInfo) &&
-					(expr is not (CallExpression or InvokeExpression)))
-				{
-					throw new GeneratorException($"Expression type must be a method.", CurrentFile, xamlNode);
-				}
-			}
-
-			objProp.Value = value;
-
+			objProp.Value = GetObjectValue(xamlDom, obj, objProp, xamlNode, throwIfBindWithoutDataType);
 			return objProp;
-
-			void CheckPropertyTypeNotBinding()
-			{
-				if (BindingType.IsAssignableFrom(propType))
-				{
-					throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
-				}
-			}
-
-			void HandleParseException(ParseException ex)
-			{
-				var offset = value!.Property.MemberName.Length +
-						2 + // ="    Note, if there are spaces in between, they are not considered
-						xamlNode.Children[0].ValueOffset +
-						ex.Position;
-				throw new ParseException(ex.Message, offset, ex.Length);
-			}
 		}
 		catch (ParseException ex)
 		{
@@ -365,6 +285,90 @@ public class XamlDomParser
 		catch (Exception ex) when (ex is not GeneratorException)
 		{
 			throw new GeneratorException(ex.Message, CurrentFile, xamlNode);
+		}
+	}
+
+	public XamlObjectValue GetObjectValue(XamlDomBase xamlDom, XamlObject obj, XamlObjectProperty objProp, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	{
+		var value = new XamlObjectValue();
+
+		var propType = objProp.MemberType;
+		if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xSet)
+		{
+			try
+			{
+				CheckPropertyTypeNotBinding();
+				var staticNode = xamlNode.Children[0];
+				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
+				includeNamespaces.ForEach(ns => xamlDom.AddNamespace(ns.ClrNamespace!));
+				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
+				CorrectMethod(objProp, value.StaticValue.Type);
+			}
+			catch (ParseException ex)
+			{
+				HandleParseException(ex);
+			}
+		}
+		else if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xBind)
+		{
+			try
+			{
+				CheckPropertyTypeNotBinding();
+				var defaultBindModeAttr =
+					EnumerableExtensions.SelectSequence(objProp.XamlNode.Element, e => e.Parent, objProp.XamlNode.Element is XElement)
+					.Cast<XElement>()
+					.Select(e => e.Attribute(xDefaultBindMode))
+					.FirstOrDefault(a => a != null);
+				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
+				value.BindValue = BindingParser.Parse(xamlDom, objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, throwIfBindWithoutDataType, ref _localVarIndex);
+				if (value.BindValue.SourceExpression != null)
+				{
+					if (value.BindValue.Converter == null)
+					{
+						value.BindValue.SourceExpression = CorrectSourceExpression(value.BindValue.SourceExpression, objProp);
+					}
+					CorrectMethod(objProp, value.BindValue.SourceExpression.Type);
+				}
+				obj.GenerateMember = true;
+			}
+			catch (ParseException ex)
+			{
+				HandleParseException(ex);
+			}
+		}
+		else
+		{
+			throw new GeneratorException($"The value cannot be processed.", CurrentFile, xamlNode);
+		}
+
+		if (objProp.TargetEvent != null)
+		{
+			var expr = value.BindValue?.Expression ?? value.StaticValue;
+			if (expr != null &&
+				(expr is not MemberExpression me || me.Member is not MethodInfo) &&
+				(expr is not (CallExpression or InvokeExpression)))
+			{
+				throw new GeneratorException($"Expression type must be a method.", CurrentFile, xamlNode);
+			}
+		}
+
+		return value;
+
+		void CheckPropertyTypeNotBinding()
+		{
+			if (BindingType.IsAssignableFrom(propType))
+			{
+				throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
+			}
+		}
+
+		void HandleParseException(ParseException ex)
+		{
+			var offset = objProp.MemberName.Length +
+					2 + // ="    Note, if there are spaces in between, they are not considered
+					xamlNode.Children[0].ValueOffset +
+					ex.Position;
+			throw new ParseException(ex.Message, offset, ex.Length);
 		}
 	}
 
