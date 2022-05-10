@@ -2,6 +2,19 @@
 
 namespace CompiledBindings;
 
+public class XamlDomBase
+{
+	public HashSet<string> IncludeNamespaces { get; } = new HashSet<string>();
+
+	public void AddNamespace(string ns)
+	{
+		if (!IncludeNamespaces.Contains(ns))
+		{
+			IncludeNamespaces.Add(ns);
+		}
+	}
+}
+
 public class XamlObject
 {
 	public XamlObject(XamlNode xamlNode, TypeInfo type)
@@ -42,8 +55,6 @@ public class XamlObjectProperty
 	public EventInfo? TargetEvent { get; set; }
 
 	public TypeInfo MemberType => TargetMethod?.Parameters.Last().ParameterType ?? TargetProperty?.PropertyType ?? TargetEvent!.EventType;
-
-	public HashSet<string> IncludeNamespaces { get; } = new HashSet<string>();
 }
 
 public class XamlObjectValue

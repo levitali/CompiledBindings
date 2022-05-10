@@ -309,7 +309,7 @@ namespace XFTest.Views
 				targetRoot.label7.Text = (value2 + 1).ToString();
 #line (45, 16) - (45, 51) 45 "Page1.xml"
 				targetRoot.label8.Text = (value4 ?? 0).ToString();
-#line (46, 16) - (46, 43) 46 "Page1.xml"
+#line (46, 16) - (46, 46) 46 "Page1.xml"
 				targetRoot.label9.Text = (!value1).ToString();
 #line (47, 16) - (47, 54) 47 "Page1.xml"
 				targetRoot.label10.Text = value6?.DecimalProp.ToString();
@@ -528,7 +528,7 @@ namespace XFTest.Views
 						var value1 = typedSender.BooleanProp;
 #line (43, 13) - (43, 58) 43 "Page1.xml"
 						targetRoot.label6.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
-#line (46, 16) - (46, 43) 46 "Page1.xml"
+#line (46, 16) - (46, 46) 46 "Page1.xml"
 						targetRoot.label9.Text = (!value1).ToString();
 #line (50, 13) - (50, 58) 50 "Page1.xml"
 						var value2 = value1.ToString();

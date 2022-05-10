@@ -132,9 +132,9 @@ public class XamlDomParser
 		return namespaces;
 	}
 
-	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	public XamlObjectProperty GetObjectProperty(XamlDomBase xamlDom, XamlObject obj, XamlNode xamlNode, bool throwIfBindWithoutDataType)
 	{
-		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, throwIfBindWithoutDataType);
+		return GetObjectProperty(xamlDom, obj, xamlNode.Name.LocalName, xamlNode, throwIfBindWithoutDataType);
 	}
 
 	public static string GenerateName(XElement element, HashSet<string> usedNames)
@@ -181,7 +181,7 @@ public class XamlDomParser
 		throw new GeneratorException($"The type {className} was not found.", CurrentFile, xobject);
 	}
 
-	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	private XamlObjectProperty GetObjectProperty(XamlDomBase xamlDom, XamlObject obj, string memberName, XamlNode xamlNode, bool throwIfBindWithoutDataType)
 	{
 		try
 		{
@@ -256,10 +256,7 @@ public class XamlDomParser
 										.FirstOrDefault(m => m.Parameters.Count == 2 && m.Parameters[0].ParameterType.IsAssignableFrom(obj.Type));
 								if (method != null)
 								{
-									if (!objProp.IncludeNamespaces.Contains(clrNs))
-									{
-										objProp.IncludeNamespaces.Add(clrNs);
-									}
+									xamlDom.AddNamespace(clrNs);
 									break;
 								}
 							}
@@ -288,7 +285,7 @@ public class XamlDomParser
 					CheckPropertyTypeNotBinding();
 					var staticNode = xamlNode.Children[0];
 					value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
-					includeNamespaces.ForEach(ns => objProp.IncludeNamespaces.Add(ns.ClrNamespace!));
+					includeNamespaces.ForEach(ns => xamlDom.AddNamespace(ns.ClrNamespace!));
 					value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 					CorrectMethod(objProp, value.StaticValue.Type);
 				}
@@ -308,7 +305,7 @@ public class XamlDomParser
 						.Select(e => e.Attribute(xDefaultBindMode))
 						.FirstOrDefault(a => a != null);
 					var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-					value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, throwIfBindWithoutDataType, ref _localVarIndex);
+					value.BindValue = BindingParser.Parse(xamlDom, objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, throwIfBindWithoutDataType, ref _localVarIndex);
 					if (value.BindValue.SourceExpression != null)
 					{
 						if (value.BindValue.Converter == null)

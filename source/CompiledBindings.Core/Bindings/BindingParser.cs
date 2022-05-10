@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, bool throwIfWithoutDataType, ref int localVarIndex)
+	public static Bind Parse(XamlDomBase xamlDom, XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, bool throwIfWithoutDataType, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value?.TrimEnd();
@@ -136,7 +136,7 @@ public static class BindingParser
 					{
 						throw new ParseException(ex.Message, currentPos + ex.Position, ex.Length);
 					}
-					includeNamespaces.ForEach(ns => prop.IncludeNamespaces.Add(ns.ClrNamespace!));
+					includeNamespaces.ForEach(ns => xamlDom.AddNamespace(ns.ClrNamespace!));
 				}
 				if (name == "Path")
 				{

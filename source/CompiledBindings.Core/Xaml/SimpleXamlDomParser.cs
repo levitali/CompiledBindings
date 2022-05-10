@@ -183,7 +183,7 @@ public class SimpleXamlDomParser : XamlDomParser
 							try
 							{
 								var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-								var prop = GetObjectProperty(obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null);
+								var prop = GetObjectProperty(result, obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null);
 								obj.Properties.Add(prop);
 
 								var bind = prop.Value.BindValue;
@@ -298,7 +298,7 @@ public class SimpleXamlDomParser : XamlDomParser
 	}
 }
 
-public class SimpleXamlDom
+public class SimpleXamlDom : XamlDomBase
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public SimpleXamlDom(XElement rootElement)

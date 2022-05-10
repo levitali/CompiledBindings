@@ -50,10 +50,9 @@ $@"namespace {parseResult.TargetType.Type.Namespace}
 		output.AppendLine(
 $@"	using System.Threading;");
 
-		var usings = parseResult.EnumerateAllProperties().SelectMany(p => p.IncludeNamespaces).Distinct().ToList();
-		if (usings.Count > 0)
+		if (parseResult.IncludeNamespaces.Count > 0)
 		{
-			foreach (string ns in usings)
+			foreach (string ns in parseResult.IncludeNamespaces)
 			{
 				output.AppendLine(
 $@"	using {ns};");
