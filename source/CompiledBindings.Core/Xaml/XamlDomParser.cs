@@ -288,7 +288,7 @@ public class XamlDomParser
 		}
 	}
 
-	public XamlObjectValue GetObjectValue(XamlDomBase xamlDom, XamlObject obj, XamlObjectProperty objProp, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	private XamlObjectValue GetObjectValue(XamlDomBase xamlDom, XamlObject obj, XamlObjectProperty objProp, XamlNode xamlNode, bool throwIfBindWithoutDataType)
 	{
 		var value = new XamlObjectValue();
 
@@ -315,7 +315,7 @@ public class XamlDomParser
 			{
 				CheckPropertyTypeNotBinding();
 				var defaultBindModeAttr =
-					EnumerableExtensions.SelectSequence(objProp.XamlNode.Element, e => e.Parent, objProp.XamlNode.Element is XElement)
+					EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
 					.Cast<XElement>()
 					.Select(e => e.Attribute(xDefaultBindMode))
 					.FirstOrDefault(a => a != null);

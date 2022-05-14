@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public class SimpleXamlDomParser : XamlDomParser
 {
-	public static readonly XNamespace mNamespace = "http://compiledbindings.com/";
+	public static readonly XNamespace mNamespace = "http://compiledbindings.com";
 	public static readonly XNamespace mxNamespace = "http://compiledbindings.com/x";
 	public static readonly XName mxDataType = mxNamespace + "DataType";
 
@@ -276,7 +276,12 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public virtual bool IsMemExtension(XAttribute a)
 	{
-		return a.Name.Namespace == mNamespace ||
+		var ns = a.Name.Namespace.NamespaceName;
+		if (ns.EndsWith("/"))
+		{
+			ns = ns.Substring(0, ns.Length - 1);
+		}
+		return ns == mNamespace.NamespaceName ||
 			   a.Value.StartsWith("[x:Bind ") ||
 			   a.Value.StartsWith("{x:Set ") ||
 			   a.Value.StartsWith("[x:Set ");

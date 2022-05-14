@@ -254,7 +254,7 @@ $@"{LineDirective(property.XamlNode)}
 		foreach (var variable in updateMethod.LocalVariables)
 		{
 			output.AppendLine(
-$@"{LineDirective(variable.FirstProperty.XamlNode)}
+$@"{LineDirective(variable.XamlNode)}
 {a}			var {variable.Name} = {variable.Expression};");
 		}
 

@@ -40,7 +40,7 @@ public static class ExpressionUtils
 				}
 			}
 
-			var localVar = new LocalVariable("value" + localVarIndex++, expression, pr.Property);
+			var localVar = new LocalVariable("value" + localVarIndex++, expression, pr.Property.XamlNode);
 			var localVarExpr = new VariableExpression(type, localVar.Name);
 			foreach (var prop in group.Distinct(p => p.property))
 			{
@@ -115,16 +115,16 @@ public class PropertySetExpression
 
 public class LocalVariable
 {
-	public LocalVariable(string name, Expression expression, XamlObjectProperty firstProperty)
+	public LocalVariable(string name, Expression expression, XamlNode xamlNode)
 	{
 		Name = name;
 		Expression = expression;
-		FirstProperty = firstProperty;
+		XamlNode = xamlNode;
 	}
 
 	public string Name { get; }
 	public Expression Expression { get; }
-	public XamlObjectProperty FirstProperty { get; }
+	public XamlNode XamlNode { get; }
 }
 
 public class UpdateMethod
