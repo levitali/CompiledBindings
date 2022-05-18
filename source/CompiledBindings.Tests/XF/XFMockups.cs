@@ -20,6 +20,13 @@ namespace Xamarin.Forms
 		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
+	public class Grid
+	{
+		public static void SetRow(VisualElement bindable, int value)
+		{ 
+		}
+	}
+
 	public class Page : VisualElement
 	{
 		public string Title { get; set; }

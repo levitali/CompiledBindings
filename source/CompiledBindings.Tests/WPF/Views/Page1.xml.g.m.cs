@@ -47,6 +47,8 @@ namespace WPFTest.Views
 			}
 #line (45, 13) - (45, 57) 45 "Page1.xml"
 			header1.Text = value1.Header1;
+#line (69, 7) - (69, 49) 69 "Page1.xml"
+			global::WPFTest.TestExtensions.SetMyProperty(checkBox2, 6);
 #line default
 
 			Bindings.Initialize(this);
@@ -483,6 +485,8 @@ namespace WPFTest.Views
 						_settingBinding16 = false;
 					}
 				}
+#line (70, 7) - (70, 36) 70 "Page1.xml"
+				global::System.Windows.Controls.Grid.SetColumn(targetRoot.checkBox2, dataRoot.IntProp);
 #line default
 
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
@@ -873,6 +877,16 @@ namespace WPFTest.Views
 							{
 							}
 						}
+#line default
+						if (!notifyAll)
+						{
+							return;
+						}
+					}
+					if (notifyAll || e.PropertyName == "IntProp")
+					{
+#line (70, 7) - (70, 36) 70 "Page1.xml"
+						global::System.Windows.Controls.Grid.SetColumn(targetRoot.checkBox2, typedSender.IntProp);
 #line default
 					}
 				}

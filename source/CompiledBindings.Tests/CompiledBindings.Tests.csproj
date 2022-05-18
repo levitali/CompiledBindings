@@ -63,6 +63,7 @@
     <Compile Include="General\BarcodeKeys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Base\TestClasses.cs" />
+    <Compile Include="WPF\Extensions\TestExtensions.cs" />
     <Compile Include="WPF\Texts\Strings.cs" />
     <Compile Include="WPF\ViewModels\Page1ViewModel.cs" />
     <Compile Include="WPF\Views\Page1.xml.cs">

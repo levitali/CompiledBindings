@@ -363,6 +363,8 @@ namespace XFTest.Views
 				targetRoot.list.ItemsSource = value3;
 #line (73, 16) - (73, 141) 73 "Page1.xml"
 				targetRoot.label13.Text = $"Decimal value: {value2:0.###}, Boolean value: {value1}, String value: {value5?.TrimStart('0')}";
+#line (74, 7) - (74, 46) 74 "Page1.xml"
+				global::Xamarin.Forms.Grid.SetRow(targetRoot.label13, value4 ?? 9);
 #line default
 
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value6);
@@ -574,6 +576,8 @@ namespace XFTest.Views
 								bindings._settingBinding9 = false;
 							}
 						}
+#line (74, 7) - (74, 46) 74 "Page1.xml"
+						global::Xamarin.Forms.Grid.SetRow(targetRoot.label13, value1 ?? 9);
 #line default
 						if (!notifyAll)
 						{

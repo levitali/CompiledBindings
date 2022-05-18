@@ -198,7 +198,7 @@ public class XamlDomParser
 			if (index != -1)
 			{
 				string typeName = memberName.Substring(0, index);
-				attachedClassName = XamlParser.GetTypeName(typeName, xamlNode.Element, KnownNamespaces);
+				attachedClassName = (xamlNode.Name.Namespace is var n && n == XNamespace.None ? DefaultNamespace : n) + typeName;
 				attachedPropertyName = memberName.Substring(index + 1);
 			}
 
