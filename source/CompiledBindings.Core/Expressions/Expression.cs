@@ -274,7 +274,7 @@ public class BinaryExpression : Expression
 		var type = left.Type;
 		if ((type.Type.IsValueType && left.IsNullable) || right.IsNullable)
 		{
-			if (!type.Type.IsValueNullable())
+			if (!type.Type.IsNullable())
 			{
 				type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
 			}
