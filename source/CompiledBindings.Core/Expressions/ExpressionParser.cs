@@ -608,7 +608,7 @@ public class ExpressionParser
 		NextToken();
 
 		// The resulting format can still be invalid.
-		// Check it now by trying to generated C# code.
+		// Check it now by trying to generate C# code.
 		// Checking now will give the correct error position.
 		var result = new InterpolatedStringExpression(format, expressions);
 		try
