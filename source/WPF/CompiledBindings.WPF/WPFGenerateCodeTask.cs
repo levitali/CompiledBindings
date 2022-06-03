@@ -166,7 +166,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 						if (parseResult.GenerateCode)
 						{
-							parseResult.SetDependecyPropertyChangedEventHandlers("System.Windows.DependencyProperty");
 							parseResult.Validate(file);
 
 							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
@@ -405,7 +404,9 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 				},
 				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
 				TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
-				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"))
+				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"),
+				TypeInfo.GetTypeThrow("System.Windows.DependencyProperty")
+			  )
 	{
 	}
 
@@ -483,21 +484,23 @@ public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 
 	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
 	{
-		var prop = ev.Bindings[0].Property;
+		var dp = ev.Bindings[0].DependencyProperty!;
 		output.AppendLine(
 $@"				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
-						global::{prop.Object.Type.Type.GetCSharpFullName()}.{prop.MemberName}Property, typeof(global::{prop.Object.Type.Type.GetCSharpFullName()}))
+						global::{dp.Definition.DeclaringType.GetCSharpFullName()}.{dp.Definition.Name},
+						typeof(global::{dp.Definition.DeclaringType.GetCSharpFullName()}))
 					.AddValueChanged({targetExpr}, OnTargetChanged{ev.Index});");
 	}
 
 	protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
 	{
-		var prop = ev.Bindings[0].Property;
+		var dp = ev.Bindings[0].DependencyProperty!;
 		output.AppendLine(
 $@"					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
-							global::{prop.Object.Type.Type.GetCSharpFullName()}.{prop.MemberName}Property, typeof(global::{prop.Object.Type.Type.GetCSharpFullName()}))
+							global::{dp.Definition.DeclaringType.GetCSharpFullName()}.{dp.Definition.Name},
+							typeof(global::{dp.Definition.DeclaringType.GetCSharpFullName()}))
 						.RemoveValueChanged({targetExpr}, OnTargetChanged{ev.Index});");
 	}
 

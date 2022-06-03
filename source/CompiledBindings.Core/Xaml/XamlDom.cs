@@ -55,15 +55,49 @@ public class XamlObjectProperty
 	public EventInfo? TargetEvent { get; set; }
 
 	public TypeInfo MemberType => TargetMethod?.Parameters.Last().ParameterType ?? TargetProperty?.PropertyType ?? TargetEvent!.EventType;
+
+	public override string ToString()
+	{
+		if (TargetProperty != null)
+		{
+			return $"{TargetProperty.Definition.Name} = {Value}";
+		}
+		if (TargetMethod != null)
+		{
+			var res = $"{TargetMethod.Definition.Name}({Value})";
+			if (IsAttached)
+			{
+				res = $"{TargetMethod.Definition.DeclaringType.Name}.{res}";
+			}
+			return res;
+		}
+		return $"{TargetEvent!.Definition.Name} += {Value}";
+	}
 }
 
 public class XamlObjectValue
 {
-	public XamlObject? ObjectValue { get; set; }
-	public List<XamlObject>? CollectionValue { get; set; }
 	public Expression? StaticValue { get; set; }
 	public Bind? BindValue { get; set; }
 	public string? CSharpValue { get; set; }
+
+	public override string ToString()
+	{
+		if (StaticValue != null)
+		{
+			return StaticValue.ToString();
+		}
+		if (BindValue != null)
+		{
+			var res = (BindValue.Expression ?? BindValue.BindBackExpression!).ToString();
+			if (res.StartsWith("dataRoot."))
+			{
+				res = res.Substring("dataRoot.".Length);
+			}
+			return res;
+		}
+		return CSharpValue!;
+	}
 }
 
 public class BindingScope

@@ -16,6 +16,8 @@ public class XamlDomParser
 	public readonly XName xSet;
 	public readonly XName xNull;
 	public readonly XName xType;
+	public readonly TypeInfo? DependencyObjectType;
+	public readonly TypeInfo? DependencyPropertyType;
 
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
@@ -25,12 +27,16 @@ public class XamlDomParser
 		XNamespace xNamespace,
 		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
 		TypeInfo converterType,
-		TypeInfo bindingType)
+		TypeInfo bindingType,
+		TypeInfo? dependencyObjectType,
+		TypeInfo? dependencyPropertyType)
 	{
 		DefaultNamespace = defaultNamespace;
 		_getClrNsFromXmlNs = getClrNsFromXmlNs;
 		ConverterType = converterType;
 		BindingType = bindingType;
+		DependencyObjectType = dependencyObjectType;
+		DependencyPropertyType = dependencyPropertyType;
 
 		Style = DefaultNamespace + "Style";
 		DataTemplate = DefaultNamespace + "DataTemplate";
@@ -224,7 +230,7 @@ public class XamlDomParser
 					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Type.FullName}.", CurrentFile, xamlNode);
 				}
 
-				objProp.MemberName = setMethodName;
+				objProp.MemberName = attachedPropertyName!;
 				objProp.TargetMethod = setPropertyMethod;
 				objProp.IsAttached = true;
 			}
@@ -330,6 +336,47 @@ public class XamlDomParser
 					CorrectMethod(objProp, value.BindValue.SourceExpression.Type);
 				}
 				obj.GenerateMember = true;
+
+				if (DependencyPropertyType != null)
+				{
+					if (value.BindValue?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+						value.BindValue.UpdateSourceTrigger != UpdateSourceTrigger.Explicit &&
+						value.BindValue.TargetChangedEvent == null)
+					{
+						string dpName;
+						TypeDefinition type;
+						if (objProp.IsAttached)
+						{
+							dpName = objProp.TargetMethod!.Definition.Name.Substring("Set".Length);
+							type = objProp.TargetMethod.Definition.DeclaringType;
+						}
+						else
+						{
+							dpName = objProp.TargetProperty!.Definition.Name;
+							type = objProp.TargetProperty.Definition.DeclaringType;
+						}
+
+						dpName += "Property";
+						var typeInfo = TypeInfo.GetTypeThrow(type.FullName);
+						var dependencyPropertyType = DependencyPropertyType.Type.FullName;
+
+						IMemberInfo dp = typeInfo.Fields.FirstOrDefault(f =>
+							f.Definition.Name == dpName &&
+							f.Definition.IsStatic &&
+							f.FieldType.Type.FullName == dependencyPropertyType);
+						if (dp == null)
+						{
+							dp = typeInfo.Properties.FirstOrDefault(p =>
+								p.Definition.Name == dpName &&
+								p.Definition.IsStatic() &&
+								p.PropertyType.Type.FullName == dependencyPropertyType);
+						}
+						if (dp != null)
+						{
+							value.BindValue.DependencyProperty = dp;
+						}
+					}
+				}
 			}
 			catch (ParseException ex)
 			{

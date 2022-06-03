@@ -64,7 +64,8 @@
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
         <TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
-        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
+        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}"
+				 local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"/>
         <CheckBox IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}"
 				  local:TestExtensions.MyProperty="{x:Set 6}"
 				  Grid.Column="{x:Bind IntProp}"/>

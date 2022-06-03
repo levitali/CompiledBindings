@@ -15,7 +15,7 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public bool BoolInput { get; set; }
 
-	public int IntProp => 3;
+	public int IntProp { get; set; }
 
 	public decimal DecimalProp { get; }
 

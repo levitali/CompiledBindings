@@ -433,19 +433,35 @@ public static class BindingParser
 			}
 		}
 
-		var twoWayEventHandlers = binds
-			.Where(b => (b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && b.UpdateSourceTrigger != UpdateSourceTrigger.Explicit)
-			.GroupBy(b => (b.Property.Object, b.TargetChangedEvent))
-			.Select((g, i) => new TwoWayEventData
+		var twoWayEventHandlers1 = binds
+			.Where(b => (b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && b.UpdateSourceTrigger != UpdateSourceTrigger.Explicit);
+
+		var twoWayEventHandlers2 = twoWayEventHandlers1
+			.Where(b => b.DependencyProperty != null)
+			.GroupBy(b => (b.Property.Object, b.DependencyProperty))
+			.Select(g => new TwoWayEventData
 			{
 				Bindings = g.ToList(),
-				Index = i
-			})
-			.ToList();
+			});
+
+		var twoWayEventHandlers3 = twoWayEventHandlers1
+			.Where(b => b.DependencyProperty == null)
+			.GroupBy(b => (b.Property.Object, b.TargetChangedEvent))
+			.Select(g => new TwoWayEventData
+			{
+				Bindings = g.ToList(),
+			});
+
+		var twoWayEventHandlers = twoWayEventHandlers2.Concat(twoWayEventHandlers3).ToList();
+		for (int i = 0; i < twoWayEventHandlers.Count; i++)
+		{
+			twoWayEventHandlers[i].Index = i;
+		}
 
 		var props1 = binds
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
-			.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!)).ToList();
+			.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!))
+			.ToList();
 
 		var props2 = notifyPropertyChangedList
 			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.SourceExpression))
@@ -499,7 +515,7 @@ public class BindingsData
 	{
 		foreach (var binding in TwoWayEvents.SelectMany(b => b.Bindings))
 		{
-			if (!binding.IsDPChangeEvent && binding.TargetChangedEvent == null)
+			if (binding.DependencyProperty == null && binding.TargetChangedEvent == null)
 			{
 				throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceTrigger property.", file, binding.Property.XamlNode);
 			}
@@ -536,7 +552,7 @@ public class TwoWayEventData
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public List<Bind> Bindings { get; init; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public int Index { get; init; }
+	public int Index { get; set; }
 };
 
 public class Bind
@@ -559,7 +575,7 @@ public class Bind
 	public Expression? SourceExpression { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
-	public bool IsDPChangeEvent;
+	public IMemberInfo? DependencyProperty;
 	public int Index;
 }
 

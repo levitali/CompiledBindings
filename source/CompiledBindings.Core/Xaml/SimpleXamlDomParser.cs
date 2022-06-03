@@ -12,7 +12,6 @@ public class SimpleXamlDomParser : XamlDomParser
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
 
 	public readonly XName HierarchicalDataTemplate; // WPF
-	public readonly TypeInfo? DependencyObjectType;
 
 	public HashSet<string>? UsedNames { get; private set; }
 
@@ -22,11 +21,11 @@ public class SimpleXamlDomParser : XamlDomParser
 		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
 		TypeInfo converterType,
 		TypeInfo bindingType,
-		TypeInfo? dependencyObjectType = null)
-		: base(xmlns, xNs, getClrNsFromXmlNs, converterType, bindingType)
+		TypeInfo? dependencyObjectType = null,
+		TypeInfo? dependencyPropertyType = null)
+		: base(xmlns, xNs, getClrNsFromXmlNs, converterType, bindingType, dependencyObjectType, dependencyPropertyType)
 	{
 		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
-		DependencyObjectType = dependencyObjectType;
 	}
 
 	public SimpleXamlDom Parse(string file, string lineFile, XDocument xdoc)
@@ -233,8 +232,11 @@ public class SimpleXamlDomParser : XamlDomParser
 							}
 							catch (ParseException ex)
 							{
-								var lineInfo = new LineInfo { File = file };
-								lineInfo.ColumnNumber = attr.Name.LocalName.Length + 1 + ex.Position;
+								var lineInfo = new LineInfo
+								{
+									File = file,
+									ColumnNumber = attr.Name.LocalName.Length + 1 + ex.Position
+								};
 								if (attr is IXmlLineInfo li)
 								{
 									lineInfo.LineNumber = li.LineNumber;
@@ -339,34 +341,6 @@ public class SimpleXamlDom : XamlDomBase
 	public IEnumerable<XamlObjectProperty> EnumerateAllProperties()
 	{
 		return EnumerateAllObjects().SelectMany(o => o.Properties);
-	}
-
-	public void SetDependecyPropertyChangedEventHandlers(string dependencyPropertyType)
-	{
-		foreach (var prop in EnumerateAllProperties())
-		{
-			if (prop.Value.BindValue?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-				prop.Value.BindValue.UpdateSourceTrigger != UpdateSourceTrigger.Explicit &&
-				prop.Value.BindValue.TargetChangedEvent == null)
-			{
-				var dpName = prop.TargetProperty!.Definition.Name + "Property";
-				IMemberInfo dp = prop.Object.Type.Fields.FirstOrDefault(f =>
-					f.Definition.Name == dpName &&
-					f.Definition.IsStatic &&
-					f.FieldType.Type.FullName == dependencyPropertyType);
-				if (dp == null)
-				{
-					dp = prop.Object.Type.Properties.FirstOrDefault(p =>
-						p.Definition.Name == dpName &&
-						p.Definition.IsStatic() &&
-						p.PropertyType.Type.FullName == dependencyPropertyType);
-				}
-				if (dp != null)
-				{
-					prop.Value.BindValue.IsDPChangeEvent = true;
-				}
-			}
-		}
 	}
 
 	public void Validate(string file)

@@ -11,11 +11,11 @@ public class TypeInfo
 	private IList<MethodInfo>? _methods;
 	private IList<MethodInfo>? _constructors;
 	private IList<EventInfo>? _events;
-	private readonly bool? _isNullable;
+	private readonly bool? _canBeNullable;
 	private readonly byte? _nullableContext;
 	private readonly byte[]? _nullabileFlags;
 
-	public TypeInfo(TypeInfo typeInfo, bool isNullable)
+	public TypeInfo(TypeInfo typeInfo, bool canBeNullable)
 	{
 		Type = typeInfo.Type;
 		_properties = typeInfo._properties;
@@ -25,7 +25,7 @@ public class TypeInfo
 		_nullabileFlags = typeInfo._nullabileFlags;
 		_nullableContext = typeInfo._nullableContext;
 
-		_isNullable = isNullable;
+		_canBeNullable = canBeNullable;
 	}
 
 	private TypeInfo(TypeReference type)
@@ -34,7 +34,7 @@ public class TypeInfo
 		_nullableContext = GetNullableContext(type);
 		_nullabileFlags = GetNullableFlags(type);
 		var b = _nullabileFlags?[0] ?? _nullableContext;
-		_isNullable = b is null or 0 ? null : b == 2;
+		_canBeNullable = b is null or 0 ? null : b == 2;
 	}
 
 	private TypeInfo(TypeReference type, bool? isNullable, byte[]? nullabileFlags, byte? nullableContext)
@@ -45,12 +45,12 @@ public class TypeInfo
 
 		if (isNullable != null)
 		{
-			_isNullable = isNullable;
+			_canBeNullable = isNullable;
 		}
 		else
 		{
 			var b = _nullabileFlags?[0] ?? _nullableContext;
-			_isNullable = b is null or 0 ? null : b == 2;
+			_canBeNullable = b is null or 0 ? null : b == 2;
 		}
 	}
 
@@ -58,7 +58,7 @@ public class TypeInfo
 
 	public TypeReference Type { get; }
 
-	public bool IsNullable => Type.IsValueNullable() || (_isNullable != false && !Type.IsValueType);
+	public bool IsNullable => Type.IsValueNullable() || (_canBeNullable != false && !Type.IsValueType);
 
 	public IList<PropertyInfo> Properties => _properties ??=
 		EnumerateTypeAndSubTypes()
@@ -72,15 +72,18 @@ public class TypeInfo
 
 	public IList<FieldInfo> Fields => _fields ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.GetFields().Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes))))
+			.SelectMany(t => t.GetFields())
+			.Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes)))
 			.ToList();
 
 	public IList<MethodInfo> Methods => _methods ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.GetMethods().Where(m => !m.IsConstructor).Select(m => new MethodInfo(
+			.SelectMany(t => t.GetMethods())
+			.Where(m => !m.IsConstructor)
+			.Select(m => new MethodInfo(
 				m,
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
-				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes))))
+				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 			.ToList();
 
 	public IList<MethodInfo> Constructors => _constructors ??=
@@ -93,7 +96,8 @@ public class TypeInfo
 
 	public IList<EventInfo> Events => _events ??=
 		EnumerateTypeAndSubTypes()
-			.SelectMany(t => t.GetEvents().Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes))))
+			.SelectMany(t => t.GetEvents())
+			.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 			.ToList();
 
 	public TypeInfo? GetElementType()
@@ -354,13 +358,6 @@ public class FieldInfo : IMemberInfo
 
 public class MethodInfo : IMemberInfo
 {
-	public MethodInfo(TypeInfo declearingType, MethodDefinition definition)
-	{
-		Definition = definition;
-		Parameters = definition.Parameters.Select(p => new ParameterInfo(p, declearingType.GetTypeSumElement(p.ParameterType, definition.DeclaringType, null, p.CustomAttributes, definition.CustomAttributes))).ToList();
-		ReturnType = declearingType.GetTypeSumElement(definition.ReturnType, definition.DeclaringType, null, definition.MethodReturnType.CustomAttributes, definition.CustomAttributes);
-	}
-
 	public MethodInfo(MethodDefinition definition, IList<ParameterInfo> parameters, TypeInfo returnType)
 	{
 		Definition = definition;

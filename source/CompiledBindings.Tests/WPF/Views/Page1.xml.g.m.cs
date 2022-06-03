@@ -47,7 +47,7 @@ namespace WPFTest.Views
 			}
 #line (45, 13) - (45, 57) 45 "Page1.xml"
 			header1.Text = value1.Header1;
-#line (69, 7) - (69, 49) 69 "Page1.xml"
+#line (70, 7) - (70, 49) 70 "Page1.xml"
 			global::WPFTest.TestExtensions.SetMyProperty(checkBox2, 6);
 #line default
 
@@ -247,6 +247,7 @@ namespace WPFTest.Views
 			bool _settingBinding14;
 			bool _settingBinding15;
 			bool _settingBinding16;
+			bool _settingBinding17;
 			CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
@@ -275,24 +276,34 @@ namespace WPFTest.Views
 
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
-						global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
+						global::System.Windows.Controls.TextBox.TextProperty,
+						typeof(global::System.Windows.Controls.TextBox))
 					.AddValueChanged(_targetRoot.textBox1, OnTargetChanged0);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
-						global::System.Windows.Controls.CheckBox.IsCheckedProperty, typeof(global::System.Windows.Controls.CheckBox))
+						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
 					.AddValueChanged(_targetRoot.checkBox1, OnTargetChanged1);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
-						global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
+						global::System.Windows.Controls.TextBox.TextProperty,
+						typeof(global::System.Windows.Controls.TextBox))
 					.AddValueChanged(_targetRoot.textBox2, OnTargetChanged2);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
-						global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
+						global::System.Windows.Controls.TextBox.TextProperty,
+						typeof(global::System.Windows.Controls.TextBox))
 					.AddValueChanged(_targetRoot.textBox3, OnTargetChanged3);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
-						global::System.Windows.Controls.CheckBox.IsCheckedProperty, typeof(global::System.Windows.Controls.CheckBox))
-					.AddValueChanged(_targetRoot.checkBox2, OnTargetChanged4);
+						global::WPFTest.TestExtensions.MyPropertyProperty,
+						typeof(global::WPFTest.TestExtensions))
+					.AddValueChanged(_targetRoot.textBox3, OnTargetChanged4);
+				global::System.ComponentModel.DependencyPropertyDescriptor
+					.FromProperty(
+						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+					.AddValueChanged(_targetRoot.checkBox2, OnTargetChanged5);
 			}
 
 			public void Cleanup()
@@ -302,24 +313,34 @@ namespace WPFTest.Views
 					_generatedCodeDisposed.Cancel();
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
-							global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
+							global::System.Windows.Controls.TextBox.TextProperty,
+							typeof(global::System.Windows.Controls.TextBox))
 						.RemoveValueChanged(_targetRoot.textBox1, OnTargetChanged0);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
-							global::System.Windows.Controls.CheckBox.IsCheckedProperty, typeof(global::System.Windows.Controls.CheckBox))
+							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
 						.RemoveValueChanged(_targetRoot.checkBox1, OnTargetChanged1);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
-							global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
+							global::System.Windows.Controls.TextBox.TextProperty,
+							typeof(global::System.Windows.Controls.TextBox))
 						.RemoveValueChanged(_targetRoot.textBox2, OnTargetChanged2);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
-							global::System.Windows.Controls.TextBox.TextProperty, typeof(global::System.Windows.Controls.TextBox))
+							global::System.Windows.Controls.TextBox.TextProperty,
+							typeof(global::System.Windows.Controls.TextBox))
 						.RemoveValueChanged(_targetRoot.textBox3, OnTargetChanged3);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
-							global::System.Windows.Controls.CheckBox.IsCheckedProperty, typeof(global::System.Windows.Controls.CheckBox))
-						.RemoveValueChanged(_targetRoot.checkBox2, OnTargetChanged4);
+							global::WPFTest.TestExtensions.MyPropertyProperty,
+							typeof(global::WPFTest.TestExtensions))
+						.RemoveValueChanged(_targetRoot.textBox3, OnTargetChanged4);
+					global::System.ComponentModel.DependencyPropertyDescriptor
+						.FromProperty(
+							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+						.RemoveValueChanged(_targetRoot.checkBox2, OnTargetChanged5);
 					_targetRoot.button1.Click -= _eventHandler13;
 					_eventHandler13 = null;
 					_bindingsTrackings.Cleanup();
@@ -346,10 +367,12 @@ namespace WPFTest.Views
 				var value3 = dataRoot.BooleanProp;
 #line (48, 13) - (48, 39) 48 "Page1.xml"
 				var value4 = dataRoot.DecimalProp;
+#line (68, 6) - (68, 68) 68 "Page1.xml"
+				var value5 = dataRoot.IntProp;
 #line (59, 20) - (59, 80) 59 "Page1.xml"
-				var value5 = value1?.Input1;
+				var value6 = value1?.Input1;
 #line (67, 18) - (67, 91) 67 "Page1.xml"
-				var value6 = value1?.ModifyTextViewModel;
+				var value7 = value1?.ModifyTextViewModel;
 #line (46, 13) - (46, 67) 46 "Page1.xml"
 				targetRoot.header1.Visibility = (value3 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
 #line (48, 13) - (48, 39) 48 "Page1.xml"
@@ -359,14 +382,14 @@ namespace WPFTest.Views
 #line (50, 20) - (50, 50) 50 "Page1.xml"
 				targetRoot.textBlock7.Text = (value4 + 1).ToString();
 #line (51, 18) - (51, 56) 51 "Page1.xml"
-				var value7 = dataRoot.OrderInput;
+				var value8 = dataRoot.OrderInput;
 #line default
-				if (!object.Equals(targetRoot.textBox1.Text, value7))
+				if (!object.Equals(targetRoot.textBox1.Text, value8))
 				{
 					_settingBinding4 = true;
 					try
 					{
-						targetRoot.textBox1.Text = value7;
+						targetRoot.textBox1.Text = value8;
 					}
 					finally
 					{
@@ -374,14 +397,14 @@ namespace WPFTest.Views
 					}
 				}
 #line (52, 19) - (52, 154) 52 "Page1.xml"
-				var value8 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value2, null));
+				var value9 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value2, null));
 #line default
-				if (!object.Equals(targetRoot.checkBox1.IsChecked, value8))
+				if (!object.Equals(targetRoot.checkBox1.IsChecked, value9))
 				{
 					_settingBinding5 = true;
 					try
 					{
-						targetRoot.checkBox1.IsChecked = value8;
+						targetRoot.checkBox1.IsChecked = value9;
 					}
 					finally
 					{
@@ -395,7 +418,7 @@ namespace WPFTest.Views
 #line (58, 20) - (58, 78) 58 "Page1.xml"
 				targetRoot.textBlock8.Text = (value1 != null ? value1.Input1 : "abc");
 #line (59, 20) - (59, 80) 59 "Page1.xml"
-				targetRoot.textBlock9.Text = value5 ?? "aaa";
+				targetRoot.textBlock9.Text = value6 ?? "aaa";
 #line default
 				Set0(bindings._generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
@@ -443,12 +466,12 @@ namespace WPFTest.Views
 					{
 					}
 				}
-				if (!object.Equals(targetRoot.textBox2.Text, value5))
+				if (!object.Equals(targetRoot.textBox2.Text, value6))
 				{
 					_settingBinding14 = true;
 					try
 					{
-						targetRoot.textBox2.Text = value5;
+						targetRoot.textBox2.Text = value6;
 					}
 					finally
 					{
@@ -456,41 +479,43 @@ namespace WPFTest.Views
 					}
 				}
 #line (67, 18) - (67, 91) 67 "Page1.xml"
-				var value9 = value6?.TextInput;
+				var value10 = value7?.TextInput;
 #line default
-				if (!object.Equals(targetRoot.textBox3.Text, value9))
+				if (!object.Equals(targetRoot.textBox3.Text, value10))
 				{
 					_settingBinding15 = true;
 					try
 					{
-						targetRoot.textBox3.Text = value9;
+						targetRoot.textBox3.Text = value10;
 					}
 					finally
 					{
 						_settingBinding15 = false;
 					}
 				}
-#line (68, 19) - (68, 77) 68 "Page1.xml"
-				var value10 = value1?.BoolInput;
+#line (68, 6) - (68, 68) 68 "Page1.xml"
+				global::WPFTest.TestExtensions.SetMyProperty(targetRoot.textBox3, value5);
+#line (69, 19) - (69, 77) 69 "Page1.xml"
+				var value11 = value1?.BoolInput;
 #line default
-				if (!object.Equals(targetRoot.checkBox2.IsChecked, value10))
+				if (!object.Equals(targetRoot.checkBox2.IsChecked, value11))
 				{
-					_settingBinding16 = true;
+					_settingBinding17 = true;
 					try
 					{
-						targetRoot.checkBox2.IsChecked = value10;
+						targetRoot.checkBox2.IsChecked = value11;
 					}
 					finally
 					{
-						_settingBinding16 = false;
+						_settingBinding17 = false;
 					}
 				}
-#line (70, 7) - (70, 36) 70 "Page1.xml"
-				global::System.Windows.Controls.Grid.SetColumn(targetRoot.checkBox2, dataRoot.IntProp);
+#line (71, 7) - (71, 36) 71 "Page1.xml"
+				global::System.Windows.Controls.Grid.SetColumn(targetRoot.checkBox2, value5);
 #line default
 
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
-				_bindingsTrackings.SetPropertyChangedEventHandler2(value6);
+				_bindingsTrackings.SetPropertyChangedEventHandler2(value7);
 			}
 
 			private void OnTargetChanged0(object sender, global::System.EventArgs e)
@@ -585,12 +610,30 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (68, 19) - (68, 77) 68 "Page1.xml"
+#line (68, 6) - (68, 68) 68 "Page1.xml"
+						dataRoot.IntProp = global::WPFTest.TestExtensions.GetMyProperty(_targetRoot.textBox3);
+#line default
+					}
+					catch
+					{
+					}
+				}
+			}
+
+			private void OnTargetChanged5(object sender, global::System.EventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				var targetRoot = _targetRoot;
+				if (!_settingBinding17)
+				{
+					try
+					{
+#line (69, 19) - (69, 77) 69 "Page1.xml"
 						var value = dataRoot.ModifyViewModel;
 #line default
 						if (value != null)
 						{
-#line (68, 19) - (68, 77) 68 "Page1.xml"
+#line (69, 19) - (69, 77) 69 "Page1.xml"
 							value.BoolInput = _targetRoot.checkBox2.IsChecked ?? default;
 #line default
 						}
@@ -825,19 +868,19 @@ namespace WPFTest.Views
 								bindings._settingBinding15 = false;
 							}
 						}
-#line (68, 19) - (68, 77) 68 "Page1.xml"
+#line (69, 19) - (69, 77) 69 "Page1.xml"
 						var value5 = value1?.BoolInput;
 #line default
 						if (!object.Equals(targetRoot.checkBox2.IsChecked, value5))
 						{
-							bindings._settingBinding16 = true;
+							bindings._settingBinding17 = true;
 							try
 							{
 								targetRoot.checkBox2.IsChecked = value5;
 							}
 							finally
 							{
-								bindings._settingBinding16 = false;
+								bindings._settingBinding17 = false;
 							}
 						}
 #line default
@@ -885,8 +928,12 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "IntProp")
 					{
-#line (70, 7) - (70, 36) 70 "Page1.xml"
-						global::System.Windows.Controls.Grid.SetColumn(targetRoot.checkBox2, typedSender.IntProp);
+#line (68, 6) - (68, 68) 68 "Page1.xml"
+						var value1 = typedSender.IntProp;
+#line (68, 6) - (68, 68) 68 "Page1.xml"
+						global::WPFTest.TestExtensions.SetMyProperty(targetRoot.textBox3, value1);
+#line (71, 7) - (71, 36) 71 "Page1.xml"
+						global::System.Windows.Controls.Grid.SetColumn(targetRoot.checkBox2, value1);
 #line default
 					}
 				}
@@ -956,19 +1003,19 @@ namespace WPFTest.Views
 					}
 					if (notifyAll || e.PropertyName == "BoolInput")
 					{
-#line (68, 19) - (68, 77) 68 "Page1.xml"
+#line (69, 19) - (69, 77) 69 "Page1.xml"
 						var value1 = typedSender.BoolInput;
 #line default
 						if (!object.Equals(targetRoot.checkBox2.IsChecked, value1))
 						{
-							bindings._settingBinding16 = true;
+							bindings._settingBinding17 = true;
 							try
 							{
 								targetRoot.checkBox2.IsChecked = value1;
 							}
 							finally
 							{
-								bindings._settingBinding16 = false;
+								bindings._settingBinding17 = false;
 							}
 						}
 #line default

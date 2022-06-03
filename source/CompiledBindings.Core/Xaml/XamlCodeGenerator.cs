@@ -128,11 +128,12 @@ $@"{LineDirective(property.XamlNode)}
 		{
 			if (property.IsAttached)
 			{
+				output.AppendLine(
+$@"{LineDirective(property.XamlNode)}");
 				if (property.TargetMethod.Definition.IsStatic)
 				{
 					output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
-{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
+$@"{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
 				}
 				else
 				{
@@ -142,8 +143,7 @@ $@"{LineDirective(property.XamlNode)}
 						attachRoot += '.';
 					}
 					output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
-{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
+$@"{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
 				}
 			}
 			else

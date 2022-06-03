@@ -182,7 +182,7 @@ $@"
 					targetExpr += "." + first.Property.Object.Name;
 				}
 
-				if (first.IsDPChangeEvent)
+				if (first.DependencyProperty != null)
 				{
 					GenerateSetDependencyPropertyChangedCallback(output, ev, targetExpr);
 				}
@@ -229,7 +229,7 @@ $@"					_generatedCodeDisposed.Cancel();");
 				targetExpr += "." + first.Property.Object.Name;
 			}
 
-			if (first.IsDPChangeEvent)
+			if (first.DependencyProperty != null)
 			{
 				GenerateUnsetDependencyPropertyChangedCallback(output, ev, targetExpr);
 			}
@@ -342,7 +342,7 @@ $@"#line default
 			output.AppendLine();
 
 			var first = ev.Bindings[0];
-			if (first.IsDPChangeEvent)
+			if (first.DependencyProperty != null)
 			{
 				GenerateDependencyPropertyChangedCallback(output, $"OnTargetChanged{ev.Index}");
 			}
@@ -653,7 +653,22 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 				sourceType = expr.Type;
 			}
 
-			var setExpr = memberExpr + "." + bind.Property.MemberName;
+			string setExpr;
+			if (bind.Property.IsAttached)
+			{
+				if (bind.Property.TargetMethod!.Definition.IsStatic)
+				{
+					setExpr = $"global::{bind.Property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.Get{bind.Property.MemberName}({memberExpr})";
+				}
+				else
+				{
+					throw new NotImplementedException();
+				}
+			}
+			else
+			{
+				setExpr = $"{memberExpr}.{bind.Property.MemberName}";
+			}
 			if (bind.Converter != null)
 			{
 				string sourceTypeFullName = sourceType.Type.GetCSharpFullName();
