@@ -62,6 +62,12 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 <Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
  ```
  
+   - **interpolated string**. The interpolated string must start with $ symbol following a string literal in quotes. The string may contain interpolated expressions in {} brackets, with optional format part. The string is resolved when the binding applies, or one of the values of any expression is changed.
+
+ ```xaml
+<Label Text="{x:Bind $'Decimal value: {DecimalProp:0.###}, Boolean value: {BooleanProp}, String value: {StringProp.TrimStart('0')}'}" />
+ ```
+ 
 You can use following **constants** in the expression:
 - numbers with or wihout decimal seperator (point). For example 2.3
 - true, false
@@ -94,8 +100,6 @@ Note, that if the data source is specified, the {x:Bind} extensions are only app
 If the {x:Bind} Markup Extension is used in a DataTemplate and you don't set the IsItemsSource property to true to the binding, setting the ItemsSource of a collection control (see below), you must specify the data type. For Xamarin Forms with x:DataType attribute. For WPF either with DataType attribute, or alternative with mx:DataType attribute.
 
 You can change the data type anywhere in XAML by setting x:DataType (mx:DataType). You can also use {x:Null} as DataType, except in DataTemplates, to reset the data type. Note, that {x:Null} works differently for standard {Binding} and {x:Bind} extensions. For the first one, it turns off producing compiled binding at compile time, so the expression is only resolved at runtime. For the second one, it sets the data type of the control/page/window itself.
-
-#### New in Version 1.0.6
 
 **DataType** property
 

@@ -14,7 +14,8 @@
         <ApplicationTitle>MauiTest</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.MauiTest</ApplicationId>
+        <ApplicationId>com.levital.MauiTest</ApplicationId>
+        <ApplicationId Condition="$(TargetFramework.Contains('-windows'))">59AA269D-F20D-4F3C-B153-FEAE93FF8BD6</ApplicationId>
 
         <!-- Versions -->
         <ApplicationVersion>1</ApplicationVersion>
@@ -45,13 +46,13 @@
 
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <!-- Required - WinUI does not yet have buildTransitive for everything -->
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.0" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.0.1" />
         <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.0.30" />
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
         <OutputType>WinExe</OutputType>
-        <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     </PropertyGroup>
 
     <ItemGroup>
