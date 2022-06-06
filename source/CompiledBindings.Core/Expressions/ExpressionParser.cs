@@ -32,14 +32,14 @@ public class ExpressionParser
 		NextToken();
 	}
 
-	public static Expression Parse(TypeInfo dataType, string member, string? expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
+	public static Expression Parse(TypeInfo dataType, string member, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
 			throw new ParseException(Res.EmptyExpression);
 		}
 
-		var parser = new ExpressionParser(new VariableExpression(dataType, member), expression!, resultType, namespaces);
+		var parser = new ExpressionParser(new VariableExpression(dataType, member), expression, resultType, namespaces);
 
 		var res = parser.ParseExpression();
 		if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))
@@ -53,7 +53,7 @@ public class ExpressionParser
 		return res;
 	}
 
-	// ?:, ?? operator
+	// ?:, ??, as operators
 	private Expression ParseExpression()
 	{
 		var expr = ParseLogicalOr();

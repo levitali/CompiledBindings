@@ -91,7 +91,7 @@ public static class EnumerableExtensions
 		}
 	}
 
-	public static IEnumerable<T> SelectTree<T>(T root, Func<T, IEnumerable<T>> selector, bool includeRoot)
+	public static IEnumerable<T> SelectTree<T>(T root, Func<T, IEnumerable<T>> selector, bool includeRoot = false)
 		where T : class
 	{
 		if (includeRoot)
@@ -125,12 +125,6 @@ public static class EnumerableExtensions
 				}
 			}
 		}
-	}
-
-	public static IEnumerable<T> SelectTree<T>(T root, Func<T, IEnumerable<T>> selector)
-		where T : class
-	{
-		return SelectTree(root, selector, false);
 	}
 
 	public static IEnumerable<T> Distinct<T, TKey>(this IEnumerable<T> source, Func<T, TKey> keySelector)

@@ -305,7 +305,7 @@ public class XamlDomParser
 			{
 				CheckPropertyTypeNotBinding();
 				var staticNode = xamlNode.Children[0];
-				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
+				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
 				includeNamespaces.ForEach(ns => xamlDom.AddNamespace(ns.ClrNamespace!));
 				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 				CorrectMethod(objProp, value.StaticValue.Type);

@@ -19,11 +19,17 @@ public abstract class Expression
 
 	public virtual bool IsNullable => Type.IsNullable || Enumerate().Any(e => e.IsNullable);
 
-	public abstract IEnumerable<Expression> Enumerate();
+	public virtual IEnumerable<Expression> Enumerate()
+	{
+		return Enumerable.Empty<Expression>();
+	}
 
 	public string CSharpCode => _cSharpCode ??= GetCSharpCode();
 
-	public override string ToString() => CSharpCode;
+	public override string ToString()
+	{
+		return CSharpCode;
+	}
 
 	protected abstract string GetCSharpCode();
 
@@ -81,11 +87,6 @@ public class ConstantExpression : Expression
 		};
 	}
 
-	public override IEnumerable<Expression> Enumerate()
-	{
-		return Enumerable.Empty<Expression>();
-	}
-
 	public override bool IsNullable => false;
 }
 
@@ -106,11 +107,6 @@ public class DefaultExpression : Expression
 		return str;
 	}
 
-	public override IEnumerable<Expression> Enumerate()
-	{
-		return Enumerable.Empty<Expression>();
-	}
-
 	public override bool IsNullable => false;
 }
 
@@ -128,11 +124,6 @@ public class VariableExpression : Expression
 	protected override string GetCSharpCode()
 	{
 		return Name;
-	}
-
-	public override IEnumerable<Expression> Enumerate()
-	{
-		return Enumerable.Empty<Expression>();
 	}
 }
 
@@ -427,11 +418,6 @@ public class TypeExpression : Expression
 		return Type.Type.GetCSharpFullName();
 	}
 
-	public override IEnumerable<Expression> Enumerate()
-	{
-		return Enumerable.Empty<Expression>();
-	}
-
 	public override bool IsNullable => false;
 }
 
@@ -633,11 +619,6 @@ public class TypeofExpression : Expression
 	protected override string GetCSharpCode()
 	{
 		return $"typeof(global::{ThisType})";
-	}
-
-	public override IEnumerable<Expression> Enumerate()
-	{
-		return Enumerable.Empty<Expression>();
 	}
 
 	public override bool IsNullable => false;
