@@ -181,7 +181,7 @@ $@"namespace CompiledBindings
 {{
 	using {_platformConstants.BaseClrNamespace};
 
-	public class DataTemplateBindings
+	class DataTemplateBindings
 	{{
 		public static readonly BindableProperty BindingsProperty =
 			BindableProperty.CreateAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), null, propertyChanged: BindingsChanged);
@@ -222,7 +222,7 @@ $@"namespace CompiledBindings
 		}}
 	}}
 
-	public interface IGeneratedDataTemplate
+	interface IGeneratedDataTemplate
 	{{
 		void Initialize(Element rootElement);
 		void Cleanup(Element rootElement);

@@ -67,33 +67,26 @@ public static class BindingParser
 			currentPos += str.Length - str2.Length;
 			str = str2;
 
-			bool parseExpression = false;
-			match = Regex.Match(str, @"^(\w+)\s*(?<!=)=(?!=)\s*(.+)\s*$");
-			if (!match.Success)
-			{
-				if (expression == null)
-				{
-					parseExpression = true;
-				}
-				else
-				{
-					throw new ParseException($"Syntax error.");
-				}
-			}
-
 			string name;
-			if (parseExpression)
+			match = Regex.Match(str, @"^(\w+)\s*(?<!=)=(?!=)\s*(.+)\s*$");
+			if (match.Success)
 			{
-				if (expression != null)
+				name = match.Groups[1].Value;
+
+				if (name == "Path" && expression != null)
 				{
-					throw new ParseException($"Syntax error.");
+					throw new ParseException(Res.SyntaxError);
 				}
+
+				str = match.Groups[2].Value;
+			}
+			else if (expression == null)
+			{
 				name = "Path";
 			}
 			else
 			{
-				name = match.Groups[1].Value;
-				str = match.Groups[2].Value;
+				throw new ParseException(Res.SyntaxError);
 			}
 
 			if (name is "Path" or "BindBack" or "Converter" or "ConverterParameter" or "FallbackValue" or "TargetNullValue")
@@ -495,6 +488,7 @@ public static class BindingParser
 
 	private static class Res
 	{
+		public const string SyntaxError = "Syntax error.";
 		public const string MissingExpression = "Missing expression.";
 		public const string NoDataType = "DataType is unknown. It must be specified when using x:Bind in a DataTemplate.";
 	}

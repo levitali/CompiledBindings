@@ -326,7 +326,7 @@ $@"namespace CompiledBindings
 {{
 	using System.Windows;
 
-	public class DataTemplateBindings
+	class DataTemplateBindings
 	{{
 		public static readonly DependencyProperty BindingsProperty =
 			DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), new PropertyMetadata(BindingsChanged));
@@ -367,7 +367,7 @@ $@"namespace CompiledBindings
 		}}
 	}}
 
-	public interface IGeneratedDataTemplate
+	interface IGeneratedDataTemplate
 	{{
 		void Initialize(FrameworkElement rootElement);
 		void Cleanup(FrameworkElement rootElement);

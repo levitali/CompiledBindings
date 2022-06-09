@@ -60,9 +60,7 @@ public class XamlDomParser
 	public XName xDataType { get; }
 	public TypeInfo ConverterType { get; }
 	public TypeInfo BindingType { get; }
-
 	public IList<XamlNamespace>? KnownNamespaces { get; set; }
-
 	public string CurrentFile { get; set; }
 	public string CurrentLineFile { get; set; }
 	public TypeInfo TargetType { get; set; }
