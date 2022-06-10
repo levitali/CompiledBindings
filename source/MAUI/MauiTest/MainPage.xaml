@@ -1,64 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:MauiTest"
     x:Class="MauiTest.MainPage"
-    x:DataType="local:MainViewModel"
-    BackgroundColor="{DynamicResource SecondaryColor}">
+    x:DataType="local:MainViewModel">
 
     <ScrollView>
-        <Grid
-            RowDefinitions="Auto,Auto,Auto,Auto,Auto,*"
-            Padding="{OnPlatform iOS='30,60,30,30',
-                                 Default='30'}"
-            RowSpacing="25">
+        <VerticalStackLayout
+            VerticalOptions="Center"
+            Padding="30,0"
+            Spacing="25">
+
+            <Image
+                HorizontalOptions="Center"
+                HeightRequest="200"
+                SemanticProperties.Description="Cute dot net bot waving hi to you!"
+                Source="dotnet_bot.png" />
 
             <Label
-                Grid.Row="0"
                 HorizontalOptions="Center"
                 FontSize="32"
                 SemanticProperties.HeadingLevel="Level1"
                 Text="{x:Bind Hello}" />
 
             <Label
-                Grid.Row="1"
                 HorizontalOptions="Center"
                 FontSize="18"
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I"
-                SemanticProperties.HeadingLevel="Level1"
+                SemanticProperties.HeadingLevel="Level2"
                 Text="{x:Set local:MainViewModel.Welcome}" />
 
-            <Label
-                x:Name="CounterLabel"
-                Grid.Row="2"
-                HorizontalOptions="Center"
-                FontAttributes="Bold"
-                FontSize="18"
-                Text="Current count: 0" />
-
             <Entry
-                Grid.Row="3"
                 HorizontalOptions="Center"
                 Placeholder="Input"
                 Text="{x:Bind Input1, Mode=TwoWay}"
                 WidthRequest="200" />
 
             <Button
-                Grid.Row="4"
+                x:Name="CounterBtn"
                 HorizontalOptions="Center"
-                FontAttributes="Bold"
                 SemanticProperties.Hint="Counts the number of times you click"
                 Text="Click me"
                 Clicked="OnCounterClicked" />
 
-            <Image
-                Grid.Row="5"
-                HorizontalOptions="Center"
-                HeightRequest="310"
-                SemanticProperties.Description="Cute dot net bot waving hi to you!"
-                Source="dotnet_bot.png"
-                WidthRequest="250" />
-
-        </Grid>
+        </VerticalStackLayout>
     </ScrollView>
+
 </ContentPage>
