@@ -1,13 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿namespace CompiledBindings.Tests;
 
-namespace CompiledBindings.Tests;
-
-[TestClass]
 public class ExpressionTests
 {
-	[TestMethod]
+	[Test]
 	public void TestExpressions()
 	{
 		int substr = "file:///".Length;
@@ -25,12 +20,10 @@ public class ExpressionTests
 
 		string expression, expectedCode;
 		Expression result;
-		IList<XamlNamespace> dummyNamespaces;
-		int dummyPos;
 
 		expression = "(ListProp.Count - NullIntProp).ToString() ?? '-'";
 		expectedCode = "(dataRoot.ListProp?.Count - dataRoot.NullIntProp)?.ToString() ?? \"-\"";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out dummyNamespaces, out dummyPos);
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out IList<XamlNamespace> dummyNamespaces, out int dummyPos);
 		Assert.AreEqual(result.CSharpCode, expectedCode);
 
 		var expression2 = "(RefProp.NullStructProp + RefProp.StructProp).TestMethod()";

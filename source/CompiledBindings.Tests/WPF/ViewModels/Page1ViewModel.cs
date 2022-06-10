@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows.Media;
 
 namespace WPFTest.ViewModels;
@@ -34,9 +32,15 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public Task<string> TaskProp => Task.FromResult(string.Empty);
 
-	public Task<ImageSource> LoadImageAsync() => null!;
+	public Task<ImageSource> LoadImageAsync()
+	{
+		return null!;
+	}
 
-	public string Calculate(ParamClass prm) => "";
+	public string Calculate(ParamClass prm)
+	{
+		return "";
+	}
 }
 
 public class Page1ModifyViewModel : INotifyPropertyChanged

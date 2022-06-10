@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Threading.Tasks;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -11,18 +9,21 @@ using WPFTest.ViewModels;
 
 namespace WPFTest.Views;
 
-partial class Page1
+internal partial class Page1
 {
-	private Page1ViewModel _viewModel = new Page1ViewModel();
+	private readonly Page1ViewModel _viewModel = new Page1ViewModel();
 
-	private ListView listView = new ListView();
+	private readonly ListView listView = new ListView();
 
 	public string? Title { get; set; }
 
-	public Task<ImageSource> LoadImageAsync() => null!;
+	public Task<ImageSource> LoadImageAsync()
+	{
+		return null!;
+	}
 }
 
-static partial class UIElementExtensions
+internal static partial class UIElementExtensions
 {
 	public static void SetVisible(this UIElement element, bool isVisible) { }
 }
@@ -42,6 +43,9 @@ public class InverseBooleanConverter : IValueConverter
 
 public static class XamlUtils
 {
-	public static Visibility TrueToVisible(bool? value, bool hide = false) => default;
+	public static Visibility TrueToVisible(bool? value, bool hide = false)
+	{
+		return default;
+	}
 }
 

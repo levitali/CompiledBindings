@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net472</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <RootNamespace>CompiledBindings</RootNamespace>
         <AssemblyName>CompiledBindings.MAUI</AssemblyName>
         <Product>CompiledBindings</Product>
@@ -10,21 +10,18 @@
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
-        <OutputPath>..\..\..\bin\</OutputPath>
+        <OutputPath>..\..\..\bin\maui\build</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
+		<PackageReference Include="Microsoft.Build.Framework" Version="17.2.0" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.2.0" />
         <PackageReference Include="Mono.Cecil" Version="0.11.4" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\CompiledBindings.Core\CompiledBindings.Core.csproj" />
       <ProjectReference Include="..\..\XF\CompiledBindings.XF\CompiledBindings.XF.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Reference Include="Microsoft.Build.Framework" />
-        <Reference Include="Microsoft.Build.Utilities.v4.0" />
     </ItemGroup>
 
 </Project>

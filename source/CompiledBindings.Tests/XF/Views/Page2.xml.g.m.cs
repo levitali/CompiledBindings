@@ -108,21 +108,21 @@ namespace XFTest.Views
 				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
 #line (24, 16) - (24, 67) 24 "Page2.xml"
-				var value1 = dataRoot._viewModel?.FuncProp?.Invoke("test");
+				var value1 = dataRoot._viewModel.FuncProp?.Invoke("test");
 #line (21, 16) - (21, 62) 21 "Page2.xml"
-				var value2 = dataRoot._viewModel?.CurrentItem;
+				var value2 = dataRoot._viewModel.CurrentItem;
 #line (29, 13) - (29, 65) 29 "Page2.xml"
-				var value3 = dataRoot._viewModel?.GetIcon();
+				var value3 = dataRoot._viewModel.GetIcon();
 #line (26, 16) - (26, 59) 26 "Page2.xml"
-				var value4 = dataRoot._viewModel?.Group?[0];
+				var value4 = dataRoot._viewModel.Group?[0];
 #line (24, 16) - (24, 67) 24 "Page2.xml"
 				var value5 = value1?.GuidProp.ToString();
 #line (21, 16) - (21, 62) 21 "Page2.xml"
 				targetRoot.label1.Text = value2?.GuidProp.ToString();
 #line (22, 16) - (22, 141) 22 "Page2.xml"
-				targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel?.StringProp, typeof(global::System.String), dataRoot._viewModel?.DecimalProp + 1, null));
+				targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel.StringProp, typeof(global::System.String), dataRoot._viewModel.DecimalProp + 1, null));
 #line (23, 16) - (23, 72) 23 "Page2.xml"
-				targetRoot.label3.Text = dataRoot._viewModel?.CalculateString().TrimNumber();
+				targetRoot.label3.Text = dataRoot._viewModel.CalculateString().TrimNumber();
 #line (24, 16) - (24, 67) 24 "Page2.xml"
 				targetRoot.label4.Text = value5;
 #line (25, 16) - (25, 72) 25 "Page2.xml"
@@ -247,7 +247,7 @@ namespace XFTest.Views
 					if (notifyAll || e.PropertyName == "StringProp")
 					{
 #line (22, 16) - (22, 141) 22 "Page2.xml"
-						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(typedSender.StringProp, typeof(global::System.String), dataRoot._viewModel?.DecimalProp + 1, null));
+						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(typedSender.StringProp, typeof(global::System.String), dataRoot._viewModel.DecimalProp + 1, null));
 #line default
 						if (!notifyAll)
 						{
@@ -257,7 +257,7 @@ namespace XFTest.Views
 					if (notifyAll || e.PropertyName == "DecimalProp")
 					{
 #line (22, 16) - (22, 141) 22 "Page2.xml"
-						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel?.StringProp, typeof(global::System.String), typedSender.DecimalProp + 1, null));
+						targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel.StringProp, typeof(global::System.String), typedSender.DecimalProp + 1, null));
 #line default
 						if (!notifyAll)
 						{

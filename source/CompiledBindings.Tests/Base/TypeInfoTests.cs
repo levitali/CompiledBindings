@@ -1,14 +1,10 @@
-﻿using System.Linq;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using XFTest.ViewModels;
+﻿using XFTest.ViewModels;
 
 namespace CompiledBindings.Tests;
 
-[TestClass]
 public class TypeInfoTests
 {
-	[TestMethod]
+	[Test]
 	public void TestTypeInfo()
 	{
 		int substr = "file:///".Length;

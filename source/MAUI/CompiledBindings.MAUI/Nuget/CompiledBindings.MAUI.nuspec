@@ -14,14 +14,14 @@
     </metadata>
     <files>
         <file src="..\Targets\CompiledBindings.MAUI.targets" target="build" />
-        <file src="..\..\..\..\bin\net472\CompiledBindings.MAUI.dll" target="build" />
-        <file src="..\..\..\..\bin\net472\CompiledBindings.XF.dll" target="build" />
-        <file src="..\..\..\..\bin\net472\CompiledBindings.Core.dll" target="build" />
-        <file src="..\..\..\..\bin\net472\Mono.Cecil.dll" target="build" />
-        <file src="..\..\..\..\bin\net472\Mono.Cecil.Mdb.dll" target="build" />
-        <file src="..\..\..\..\bin\net472\Mono.Cecil.Pdb.dll" target="build" />
-        <file src="..\..\..\..\bin\net472\Mono.Cecil.Rocks.dll" target="build" />
+        <file src="..\..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.dll" target="build" />
+        <file src="..\..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.XF.dll" target="build" />
+        <file src="..\..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.Core.dll" target="build" />
+        <file src="..\..\..\..\bin\maui\build\netstandard2.0\Mono.Cecil.dll" target="build" />
+        <file src="..\..\..\..\bin\maui\build\netstandard2.0\Mono.Cecil.Mdb.dll" target="build" />
+		<file src="..\..\..\..\bin\maui\build\netstandard2.0\Mono.Cecil.Pdb.dll" target="build" />
+		<file src="..\..\..\..\bin\maui\build\netstandard2.0\Mono.Cecil.Rocks.dll" target="build" />
 
-        <file src="..\..\..\..\bin\net6.0\CompiledBindings.dll" target="lib\net6.0\" />
+        <file src="..\..\..\..\bin\maui\lib\net6.0\CompiledBindings.dll" target="lib\net6.0\" />
     </files>
 </package>

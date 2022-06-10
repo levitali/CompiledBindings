@@ -1,22 +1,14 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿namespace CompiledBindings.Tests.XF;
 
-namespace CompiledBindings.Tests.XF;
-
-[TestClass]
 public class XFTests
 {
-	[TestMethod]
+	[Test]
 	public void Page1()
 	{
 		TestPage("Page1");
 	}
 
-	[TestMethod]
+	[Test]
 	public void Page2()
 	{
 		TestPage("Page2");
@@ -33,7 +25,8 @@ public class XFTests
 		});
 		try
 		{
-			var xamlFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml");
+			var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			var xamlFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml");
 			var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
 
 			var xamlDomParser = new XFXamlDomParser(new PlatformConstants());
@@ -43,7 +36,7 @@ public class XFTests
 			var codeGenerator = new XFCodeGenerator("latest", "17.0.0", new PlatformConstants());
 			var code = codeGenerator.GenerateCode(parseResult);
 
-			var csharpFile = Path.Combine(Environment.CurrentDirectory, "XF", "Views", $"{pageName}.xml.g.m.cs");
+			var csharpFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml.g.m.cs");
 			var expectedCode = File.ReadAllText(csharpFile);
 
 			Assert.AreEqual(code, expectedCode);

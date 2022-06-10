@@ -1,155 +1,81 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E0BD5531-4CAF-43D9-BFF2-DC1EA7F58B21}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CompiledBindings.Tests</RootNamespace>
-    <AssemblyName>CompiledBindings.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
-    <IsCodedUITest>False</IsCodedUITest>
-    <TestProjectType>UnitTest</TestProjectType>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.Build.Tasks.v4.0" />
-    <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Base\ExpressionTests.cs" />
-    <Compile Include="General\FocusState.cs" />
-    <Compile Include="Base\TypeInfoTests.cs" />
-    <Compile Include="General\BarcodeKeys.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Base\TestClasses.cs" />
-    <Compile Include="WPF\Extensions\TestExtensions.cs" />
-    <Compile Include="WPF\Texts\Strings.cs" />
-    <Compile Include="WPF\ViewModels\Page1ViewModel.cs" />
-    <Compile Include="WPF\Views\Page1.xml.cs">
-      <DependentUpon>Page1.xml</DependentUpon>
-    </Compile>
-    <None Include="WPF\Views\Page1.xml.g.m.cs">
-      <DependentUpon>Page1.xml</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Compile Include="WPF\Views\Page2.xml.cs">
-      <DependentUpon>Page2.xml</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <None Include="WPF\Views\Page2.xml.g.m.cs">
-      <DependentUpon>Page2.xml</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <Compile Include="WPF\WPFTests.cs" />
-    <Compile Include="XF\Texts\Strings.cs" />
-    <None Include="XF\Views\Page1.xml.g.m.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>Page1.xml</DependentUpon>
-    </None>
-    <Compile Include="XF\ViewModels\Page2ViewModel.cs" />
-    <Compile Include="XF\Views\Page1.xml.cs">
-      <DependentUpon>Page1.xml</DependentUpon>
-    </Compile>
-    <Compile Include="XF\Views\Page2.xml.cs">
-      <DependentUpon>Page2.xml</DependentUpon>
-    </Compile>
-    <None Include="XF\Views\Page2.xml.g.m.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>Page2.xml</DependentUpon>
-    </None>
-    <Compile Include="XF\XFMockups.cs" />
-    <Compile Include="XF\ViewModels\Page1ViewModel.cs" />
-    <Compile Include="XF\XFTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Mono.Cecil">
-      <Version>0.11.4</Version>
-    </PackageReference>
-    <PackageReference Include="MSTest.TestAdapter">
-      <Version>2.2.8</Version>
-    </PackageReference>
-    <PackageReference Include="MSTest.TestFramework">
-      <Version>2.2.8</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings.Core\CompiledBindings.Core.csproj">
-      <Project>{5c7e00fd-1c0d-45d1-b4e8-b18c729c2fd8}</Project>
-      <Name>CompiledBindings.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WPF\CompiledBindings.WPF\CompiledBindings.WPF.csproj">
-      <Project>{2260c42c-97ef-496e-9614-4bedffebcdf6}</Project>
-      <Name>CompiledBindings.WPF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XF\CompiledBindings.XF\CompiledBindings.XF.csproj">
-      <Project>{db845705-796a-414a-b3c3-849b15006f50}</Project>
-      <Name>CompiledBindings.XF</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="XF\Views\Page1.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="XF\Views\Page2.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="WPF\Views\Page1.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <Generator>MSBuild:Compile</Generator>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="WPF\Views\Page2.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<IsPackable>false</IsPackable>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="WPF\Views\Page1.xml.g.m.cs" />
+		<Compile Remove="WPF\Views\Page2.xml.g.m.cs" />
+		<Compile Remove="XF\Views\Page1.xml.g.m.cs" />
+		<Compile Remove="XF\Views\Page2.xml.g.m.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="WPF\Views\Page1.xml.cs">
+			<DependentUpon>Page1.xml</DependentUpon>
+		</Compile>
+		<Compile Update="WPF\Views\Page2.xml.cs">
+			<DependentUpon>Page2.xml</DependentUpon>
+		</Compile>
+		<Compile Update="XF\Views\Page1.xml.cs">
+			<DependentUpon>Page1.xml</DependentUpon>
+		</Compile>
+		<Compile Update="XF\Views\Page2.xml.cs">
+			<DependentUpon>Page2.xml</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="WPF\Views\Page1.xml.g.m.cs">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page1.xml</DependentUpon>
+		</None>
+		<None Include="WPF\Views\Page2.xml.g.m.cs">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page2.xml</DependentUpon>
+		</None>
+		<None Include="XF\Views\Page2.xml.g.m.cs">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page2.xml</DependentUpon>
+		</None>
+		<None Include="XF\Views\Page1.xml.g.m.cs">
+			<DependentUpon>Page1.xml</DependentUpon>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="WPF\Views\Page1.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="WPF\Views\Page2.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="XF\Views\Page1.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="XF\Views\Page2.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+		<PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+		<PackageReference Include="coverlet.collector" Version="3.1.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\WPF\CompiledBindings.WPF\CompiledBindings.WPF.csproj" />
+		<ProjectReference Include="..\XF\CompiledBindings.XF\CompiledBindings.XF.csproj" />
+	</ItemGroup>
+
 </Project>

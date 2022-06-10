@@ -14,13 +14,13 @@
   </metadata>
   <files>
     <file src="..\Targets\CompiledBindings.XF.targets" target="build" />
-    <file src="..\..\..\..\bin\net472\CompiledBindings.XF.dll" target="build" />
-    <file src="..\..\..\..\bin\net472\CompiledBindings.Core.dll" target="build" />
-    <file src="..\..\..\..\bin\net472\Mono.Cecil.dll" target="build" />
-    <file src="..\..\..\..\bin\net472\Mono.Cecil.Mdb.dll" target="build" />
-    <file src="..\..\..\..\bin\net472\Mono.Cecil.Pdb.dll" target="build" />
-    <file src="..\..\..\..\bin\net472\Mono.Cecil.Rocks.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Mdb.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Pdb.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Rocks.dll" target="build" />
 
-    <file src="..\..\..\..\bin\netstandard2.0\CompiledBindings.dll" target="lib\netstandard2.0\" />
+    <file src="..\..\..\..\bin\xf\lib\netstandard2.0\CompiledBindings.dll" target="lib\netstandard2.0\" />
   </files>
 </package>

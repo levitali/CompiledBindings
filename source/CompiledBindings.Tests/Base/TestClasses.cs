@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using XFTest.ViewModels;
+﻿using XFTest.ViewModels;
 
 #nullable enable
 
@@ -26,7 +24,10 @@ public class Class1
 
 	public static Class2 Instance { get; } = new Class2();
 
-	public static string? Method1(Type t) => null;
+	public static string? Method1(Type t)
+	{
+		return null;
+	}
 }
 
 public class Class2

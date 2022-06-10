@@ -6,7 +6,7 @@
         <Company>levitali</Company>
         <Version>1.0.10</Version>
         <LangVersion>latest</LangVersion>
-        <OutputPath>..\..\..\bin\</OutputPath>
+        <OutputPath>..\..\..\bin\maui\lib</OutputPath>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <UseMaui>true</UseMaui>

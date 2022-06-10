@@ -1,22 +1,14 @@
-﻿using System;
-using System.ComponentModel;
-using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿namespace CompiledBindings.Tests.WPF;
 
-namespace CompiledBindings.Tests.WPF;
-
-[TestClass]
 public class WPFTests
 {
-	[TestMethod]
+	[Test]
 	public void Page1()
 	{
 		TestPage("Page1");
 	}
 
-	[TestMethod]
+	[Test]
 	public void Page2()
 	{
 		TestPage("Page2");
@@ -36,7 +28,8 @@ public class WPFTests
 		});
 		try
 		{
-			var xamlFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml");
+			var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			var xamlFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.xml");
 			var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
 
 			var xamlDomParser = new WpfXamlDomParser();
@@ -46,7 +39,7 @@ public class WPFTests
 			var codeGenerator = new WpfCodeGenerator("latest", "17.0.0");
 			var code = codeGenerator.GenerateCode(parseResult);
 
-			var csharpFile = Path.Combine(Environment.CurrentDirectory, "WPF", "Views", $"{pageName}.xml.g.m.cs");
+			var csharpFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.xml.g.m.cs");
 			var expectedCode = File.ReadAllText(csharpFile);
 
 			Assert.AreEqual(code, expectedCode);
