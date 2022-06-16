@@ -52,10 +52,10 @@
 	  <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
 	</ItemGroup>
 
-	<UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.MAUI.dll" />
-	<UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.MAUI.dll" />
-	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
-	<UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
+	<UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.dll" />
+	<UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.dll" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.Core.dll" />
+	<UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.Core.dll" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
