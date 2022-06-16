@@ -57,7 +57,14 @@ Note, that the Collapsed and Visible values here are inferred from Visibility pr
 <Label x:DataType="{x:Null}" Text="{x:Bind ((local:Movie)itemsList.SelectedItem).Title}"/>
  ```
  
-  - **new operator**. The class must be fully specified with namespace
+ - **as operator**. The class, to which cast is made, must be fully specified with namespace (the namespace must be declared).
+ ```xaml
+<CollectionView x:Name="itemsList"/>
+<Label x:DataType="{x:Null}" Text="{x:Bind (itemsList.SelectedItem as local:Movie).Title}"/>
+ ```
+In the example, if the SelectedItem is not a Movie, empty text is set.
+
+- **new operator**. The class must be fully specified with namespace
  ```xaml
 <Label Text="{x:Bind SomeFunction(Property1, new local:Class1(Property2)}" />
  ```
