@@ -293,3 +293,13 @@ You can also declare the CLR-Namespaces globally with "global using" syntax. For
  ```xaml
   xmlns:local="global using:CompiledBindingsDemo"
   ```
+
+### Settings breakpoints for x:Bind and x:Set extensions
+
+You can set breakpoints in XAML on the lines with x:Bind or x:Set extensions. A breakpoint will be hit whenever the property is set.
+
+![BreakpointInXaml](https://user-images.githubusercontent.com/884112/174088009-4426bccb-c681-44a4-8bcc-36d30913b830.jpg)
+
+Note, that only one breakpoint per line is possible.
+
+To inspect values of the binding expression you can use the "dataRoot" variable in the Watch window to refer to the binding root object.
