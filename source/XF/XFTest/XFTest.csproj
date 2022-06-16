@@ -21,10 +21,10 @@
         <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
     </ItemGroup>
 
-    <UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.XF.dll" />
-    <UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.XF.dll" />
-    <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
-    <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\net472\CompiledBindings.Core.dll" />
+    <UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
+    <UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
+    <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" />
+    <UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" />
 
     <PropertyGroup>
         <LocalAssemblyGenerated>false</LocalAssemblyGenerated>

@@ -312,7 +312,7 @@ namespace XFTest.Views
 #line (46, 16) - (46, 46) 46 "Page1.xml"
 				targetRoot.label9.Text = (!value1).ToString();
 #line (47, 16) - (47, 54) 47 "Page1.xml"
-				targetRoot.label10.Text = value6?.DecimalProp.ToString();
+				targetRoot.label10.Text = value6.DecimalProp.ToString();
 #line (50, 13) - (50, 58) 50 "Page1.xml"
 				var value7 = value1.ToString();
 #line default
@@ -591,7 +591,7 @@ namespace XFTest.Views
 #line (47, 16) - (47, 54) 47 "Page1.xml"
 						var value2 = value1[0];
 #line (47, 16) - (47, 54) 47 "Page1.xml"
-						targetRoot.label10.Text = value2?.DecimalProp.ToString();
+						targetRoot.label10.Text = value2.DecimalProp.ToString();
 #line (58, 13) - (58, 63) 58 "Page1.xml"
 						targetRoot.list.ItemsSource = value1;
 #line default

@@ -121,7 +121,7 @@ public static class TypeInfoUtils
 		}
 
 		string baseTypeFullName = baseType.FullName;
-		return (baseType.ResolveEx()?.IsInterface == true ? type.GetAllInterfaces() : EnumerableExtensions.SelectSequence(type, t => t.ResolveEx()?.BaseType, true))
+		return (baseType.ResolveEx()?.IsInterface == true ? type.GetAllInterfaces() : EnumerableExtensions.SelectSequence(type, t => t.GetBaseType(), true))
 			.Any(t => t.FullName == baseTypeFullName);
 	}
 

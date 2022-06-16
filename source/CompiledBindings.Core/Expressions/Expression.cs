@@ -308,7 +308,7 @@ public class CallExpression : Expression, IAccessExpression
 		}
 	}
 
-	public override bool IsNullable => Type.IsNullable;
+	public override bool IsNullable => Expression.IsNullable || Type.IsNullable;
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
