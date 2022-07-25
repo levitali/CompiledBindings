@@ -109,41 +109,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				var sourceCodeTargetPath = Path.Combine(targetDir, Path.GetFileNameWithoutExtension(targetRelativePath) + ".g.m.cs");
 				var xamlFile = Path.Combine(IntermediateOutputPath, targetRelativePath);
 
-				/*
-				if (File.Exists(sourceCodeTargetPath))
-				{
-					using (var stream = File.OpenRead(sourceCodeTargetPath))
-					using (var streamReader = new StreamReader(stream))
-					{
-						var firstLine = streamReader.ReadLine();
-						if (firstLine != null)
-						{
-							var parts = firstLine.Split(' ');
-							if (parts.Length == 3 &&
-								parts[0] == "//checksum" &&
-								uint.TryParse(parts[1], out var checksum1) &&
-								bool.TryParse(parts[2], out var dataTemplates))
-							{
-								var checksum2 = Crc32.GetCrc32(file);
-								if (checksum1 == checksum2 && File.Exists(xamlFile))
-								{
-									generateDataTemplateBindings |= dataTemplates;
-
-									generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
-
-									newXaml = new TaskItem(xamlFile);
-									xaml.CopyMetadataTo(newXaml);
-									newXaml.SetMetadata("Link", targetRelativePath);
-
-									SetNewXaml();
-									continue;
-								}
-							}
-						}
-					}
-				}
-				*/
-
 				try
 				{
 					var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
@@ -185,21 +150,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 							if (parseResult.DataTemplates.Count > 0)
 							{
-								string? rootName = null;
-								if (parseResult.DataTemplates.SelectMany(dt => dt.EnumerateAllProperties()).Any(p => p.Value.BindValue?.Resources.Count > 0))
-								{
-									var xNameAttr = xdoc.Root.Attribute(xamlDomParser.xName);
-									if (xNameAttr != null)
-									{
-										rootName = xNameAttr.Value;
-									}
-									else
-									{
-										rootName = XamlDomParser.GenerateName(xdoc.Root, xamlDomParser.UsedNames!);
-										xdoc.Root.Add(new XAttribute(xamlDomParser.xName, rootName));
-									}
-								}
-
 								var compiledBindingsNs = "clr-namespace:CompiledBindings";
 								var localNs = "clr-namespace:" + parseResult.TargetType!.Type.Namespace;
 
@@ -231,15 +181,16 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 								{
 									var dataTemplate = parseResult.DataTemplates[i];
 									var rootElement = dataTemplate.RootElement.Elements().First();
-									if (dataTemplate.EnumerateAllProperties().Any(p => p.Value.BindValue?.Resources.Count > 0))
-									{
-										rootElement.Add(
-											new XAttribute(mbui + "DataTemplateBindings.Root",
-												$"{{Binding ElementName={rootName}}}"));
-									}
+									var staticResources = dataTemplate.EnumerateAllProperties()
+										.Select(p => p.Value.BindValue?.Resources)
+										.Where(r => r != null)
+										.SelectMany(r => r.Select(r => r.name))
+										.Distinct();
+
 									rootElement.Add(
 										new XElement(mbui + "DataTemplateBindings.Bindings",
-											new XElement(local + $"{parseResult.TargetType.Type.Name}_DataTemplate{i}")));
+											new XElement(local + $"{parseResult.TargetType.Type.Name}_DataTemplate{i}",
+												staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
 								}
 							}
 
@@ -326,7 +277,7 @@ $@"namespace CompiledBindings
 {{
 	using System.Windows;
 
-	class DataTemplateBindings
+	public class DataTemplateBindings
 	{{
 		public static readonly DependencyProperty BindingsProperty =
 			DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), new PropertyMetadata(BindingsChanged));
@@ -352,22 +303,9 @@ $@"namespace CompiledBindings
 				((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
 			}}
 		}}
-
-		public static readonly DependencyProperty RootProperty =
-			DependencyProperty.RegisterAttached(""Root"", typeof(FrameworkElement), typeof(DataTemplateBindings), new PropertyMetadata(null));
-
-		public static FrameworkElement GetRoot(DependencyObject @object)
-		{{
-			return (FrameworkElement)@object.GetValue(RootProperty);
-		}}
-
-		public static void SetRoot(DependencyObject @object, FrameworkElement value)
-		{{
-			@object.SetValue(RootProperty, value);
-		}}
 	}}
 
-	interface IGeneratedDataTemplate
+	public interface IGeneratedDataTemplate
 	{{
 		void Initialize(FrameworkElement rootElement);
 		void Cleanup(FrameworkElement rootElement);
@@ -447,31 +385,9 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 	{
 	}
 
-	protected override void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+	protected override string CreateGetResourceCode(string resourceName)
 	{
-		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
-		if (resources.Count > 0)
-		{
-			string root;
-			if (isDataTemplate)
-			{
-				output.AppendLine(
-$@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElement});");
-				root = "root?";
-			}
-			else
-			{
-				root = "this";
-			}
-
-			foreach (var resource in resources)
-			{
-				output.AppendLine(
-$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root}.Resources[""{resource.name}""] ?? global::System.Windows.Application.Current.Resources[""{resource.name}""] ?? throw new global::System.Exception(""Resource '{resource.name}' not found.""));");
-			}
-
-			output.AppendLine();
-		}
+		return $@"this.Resources[""{resourceName}""] ?? global::System.Windows.Application.Current.Resources[""{resourceName}""] ?? throw new global::System.Exception(""Resource '{resourceName}' not found."")";
 	}
 }
 

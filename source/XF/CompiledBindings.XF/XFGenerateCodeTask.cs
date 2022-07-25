@@ -196,19 +196,6 @@ $@"namespace CompiledBindings
 			@object.SetValue(BindingsProperty, value);
 		}}
 
-		public static readonly BindableProperty RootProperty =
-			BindableProperty.CreateAttached(""Root"", typeof(VisualElement), typeof(DataTemplateBindings), null);
-
-		public static VisualElement GetRoot(BindableObject @object)
-		{{
-			return (VisualElement)@object.GetValue(RootProperty);
-		}}
-
-		public static void SetRoot(BindableObject @object, VisualElement value)
-		{{
-			@object.SetValue(RootProperty, value);
-		}}
-
 		static void BindingsChanged(BindableObject bindable, object oldValue, object newValue)
 		{{
 			if (oldValue != null)
@@ -222,7 +209,7 @@ $@"namespace CompiledBindings
 		}}
 	}}
 
-	interface IGeneratedDataTemplate
+	public interface IGeneratedDataTemplate
 	{{
 		void Initialize(Element rootElement);
 		void Cleanup(Element rootElement);
@@ -308,33 +295,9 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 		_platformConstants = platformConstants;
 	}
 
-	protected override void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+	protected override string CreateGetResourceCode(string resourceName)
 	{
-		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
-		if (resources.Count > 0)
-		{
-			string root1, root2;
-			if (isDataTemplate)
-			{
-				output.AppendLine(
-$@"			var root = global::CompiledBindings.DataTemplateBindings.GetRoot({rootElement});");
-				root1 = "root?";
-				root2 = "root";
-			}
-			else
-			{
-				root1 = "this";
-				root2 = "this";
-			}
-
-			foreach (var resource in resources)
-			{
-				output.AppendLine(
-$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({root1}.Resources.ContainsKey(""{resource.name}"") == true ? {root2}.Resources[""{resource.name}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resource.name}""]);");
-			}
-
-			output.AppendLine();
-		}
+		return $@"this.Resources.ContainsKey(""{resourceName}"") == true ? this.Resources[""{resourceName}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resourceName}""]";
 	}
 }
 

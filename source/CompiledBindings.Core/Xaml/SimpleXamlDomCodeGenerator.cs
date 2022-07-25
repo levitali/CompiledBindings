@@ -2,7 +2,7 @@
 
 namespace CompiledBindings;
 
-public class SimpleXamlDomCodeGenerator : XamlCodeGenerator
+public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 {
 	private readonly BindingsCodeGenerator _bindingsCodeGenerator;
 	private readonly string _bindingContextStart;
@@ -97,19 +97,40 @@ $@"	}}");
 		return output.ToString();
 	}
 
-	private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult)
+	private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult, bool isDataTemplate)
 	{
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
 		foreach (var resource in resources)
 		{
-			output.AppendLine(
+			if (isDataTemplate)
+			{
+				output.AppendLine(
+$@"		public global::{resource.type.Type.GetCSharpFullName()} {resource.name} {{ get; set; }}");
+			}
+			else
+			{
+				output.AppendLine(
 $@"		global::{resource.type.Type.GetCSharpFullName()} {resource.name};");
+			}
 		}
 	}
 
-	protected virtual void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+	private void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult)
 	{
+		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
+		if (resources.Count > 0)
+		{
+			foreach (var resource in resources)
+			{
+				output.AppendLine(
+$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({CreateGetResourceCode(resource.name)});");
+			}
+
+			output.AppendLine();
+		}
 	}
+
+	protected abstract string CreateGetResourceCode(string resourceName);
 
 	private void GenerateInitializeMethod(StringBuilder output, SimpleXamlDom parseResult)
 	{
@@ -117,7 +138,7 @@ $@"		global::{resource.type.Type.GetCSharpFullName()} {resource.name};");
 		{
 			GenerateVariablesDeclarations(output, parseResult, true);
 		}
-		GenerateResourceDeclarations(output, parseResult);
+		GenerateResourceDeclarations(output, parseResult, false);
 
 		output.AppendLine(
 $@"		private bool _generatedCodeInitialized;
@@ -232,7 +253,10 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 			output.AppendLine();
 		}
 
-		GenerateInitializeResources(output, parseResult, rootElement, isDataTemplate);
+		if (!isDataTemplate)
+		{
+			GenerateInitializeResources(output, parseResult);
+		}
 
 		_bindingsCodeGenerator.GenerateUpdateMethodBody(output, parseResult.UpdateMethod);
 		output.AppendLine();
@@ -286,7 +310,7 @@ $@"
 	{{");
 
 		GenerateVariablesDeclarations(output, parseResult, false);
-		GenerateResourceDeclarations(output, parseResult);
+		GenerateResourceDeclarations(output, parseResult, true);
 
 		// Initialize method
 		output.AppendLine(

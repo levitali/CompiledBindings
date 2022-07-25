@@ -1079,16 +1079,13 @@ namespace WPFTest.Views
 		private global::System.Windows.Controls.TextBlock textBlock1;
 		private global::System.Windows.Controls.TextBlock textBlock2;
 		private global::System.Windows.Controls.TextBlock textBlock3;
-		global::System.Windows.Data.IValueConverter InverseBooleanConverter;
+		public global::System.Windows.Data.IValueConverter InverseBooleanConverter { get; set; }
 
 		public void Initialize(global::System.Windows.FrameworkElement rootElement)
 		{
 			textBlock1 = (global::System.Windows.Controls.TextBlock)rootElement.FindName("textBlock1");
 			textBlock2 = (global::System.Windows.Controls.TextBlock)rootElement.FindName("textBlock2");
 			textBlock3 = (global::System.Windows.Controls.TextBlock)rootElement.FindName("textBlock3");
-
-			var root = global::CompiledBindings.DataTemplateBindings.GetRoot(rootElement);
-			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(root?.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
 
 #line default
 

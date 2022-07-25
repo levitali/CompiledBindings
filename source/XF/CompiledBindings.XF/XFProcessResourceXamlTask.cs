@@ -152,9 +152,13 @@ public class XFProcessResourceXamlTask : Task
 										int dataTemplateIndex = 0, nsIndex = 0;
 										foreach (var dataTemplate in dataTemplates)
 										{
-											if (!dataTemplate.Descendants().SelectMany(e => e.Attributes()).Any(a =>
-												xamlDomParser.IsMemExtension(a) &&
-												EnumerableExtensions.SelectSequence(a.Parent, e => e.Parent, true).First(e => e.Name == xamlDomParser.DataTemplate) == dataTemplate))
+											var memExtensions = dataTemplate.Descendants()
+												.SelectMany(e => e.Attributes())
+												.Where(a =>
+													xamlDomParser.IsMemExtension(a) &&
+													EnumerableExtensions.SelectSequence(a.Parent, e => e.Parent, true).First(e => e.Name == xamlDomParser.DataTemplate) == dataTemplate)
+												.ToList();
+											if (memExtensions.Count == 0)
 											{
 												continue;
 											}
@@ -193,9 +197,16 @@ public class XFProcessResourceXamlTask : Task
 												}
 											}
 
+											var regex = new Regex(@"{StaticResource\s+(\w+)}");
+
+											var staticResources = memExtensions
+												.SelectMany(a => regex.Matches(a.Value).Cast<Match>())
+												.Select(m => m.Groups[1].Value)
+												.Distinct();
+											var propInitializers = string.Join(" ", staticResources.Select(r => $"{r}={{StaticResource {r}}}"));
+
 											var rootElement = dataTemplate.Elements().First();
-											InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Root=\"{{Binding Source={{x:Reference {rootName}}}}}\"");
-											InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{className}_DataTemplate{dataTemplateIndex++}}}\"");
+											InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{className}_DataTemplate{dataTemplateIndex++} {propInitializers}}}\"");
 										}
 									}
 								}
