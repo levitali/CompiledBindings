@@ -277,7 +277,7 @@ $@"namespace CompiledBindings
 {{
 	using System.Windows;
 
-	public class DataTemplateBindings
+	class DataTemplateBindings
 	{{
 		public static readonly DependencyProperty BindingsProperty =
 			DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), new PropertyMetadata(BindingsChanged));

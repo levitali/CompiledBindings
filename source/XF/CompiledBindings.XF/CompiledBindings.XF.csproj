@@ -6,7 +6,7 @@
 		<AssemblyName>CompiledBindings.XF</AssemblyName>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.11</Version>
+		<Version>1.0.12</Version>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
