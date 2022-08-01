@@ -233,7 +233,7 @@ public static class TypeInfoUtils
 	{
 		if (type is IGenericInstance gi)
 		{
-			return $"{Regex.Replace(type.GetElementType().FullName, @"(.+?)`(\d+)", "$1")}<{string.Join(",", gi.GenericArguments.Select(a => $"global::{GetCSharpFullName(a)}"))}>";
+			return $"{Regex.Replace(type.GetElementType().FullName, @"(.+?)`(\d+)", "$1")}<{string.Join(", ", gi.GenericArguments.Select(a => $"global::{GetCSharpFullName(a)}"))}>";
 		}
 		return type.FullName.Replace('/', '.');
 	}

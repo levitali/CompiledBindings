@@ -333,22 +333,29 @@ public static class BindingParser
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
 			.GroupBy(e => e.expr.Expression.CSharpCode)
-			.Select(g => new NotifyPropertyChangedData
+			.Select(g => 			
 			{
-				SourceExpression = g.First().expr.Expression,
-				Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
+				var expr1 = g.First().expr.Expression;
+				return new NotifyPropertyChangedData
 				{
-					var expr = g2.First().expr;
-					return new NotifyPropertyChangedProperty
+					Expression = expr1,
+					SourceExpression = expr1,
+					Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
 					{
-						Property = (PropertyInfo)expr.Member,
-						Expression = expr,
-						Bindings = g2.Select(e => e.bind).Distinct().ToList(),
-					};
-				})
-				.ToList(),
+						var expr2 = g2.First().expr;
+						var bindings = g2.Select(e => e.bind).Distinct().ToList();
+						return new NotifyPropertyChangedProperty
+						{
+							Property = (PropertyInfo)expr2.Member,
+							Expression = expr2,
+							Bindings = new ReadOnlyCollection<Bind>(bindings),
+							SetBindings = bindings.ToList(), // Make copy
+						};
+					})
+					.ToList()
+				};
 			})
-			.OrderBy(g => g.SourceExpression.CSharpCode)
+			.OrderBy(g => g.Expression.CSharpCode)
 			.ToList();
 
 		bool CheckPropertyNotifiable(MemberExpression expr)
@@ -371,10 +378,15 @@ public static class BindingParser
 			{
 				var expr = prop.Expression.CSharpCode;
 				foreach (var notifPropData2 in notifyPropertyChangedList
-					.Where(g => g != notifPropData && GetSourceExpr(g.SourceExpression).CSharpCode.StartsWith(expr)))
+					.Where(g => g != notifPropData && GetSourceExpr(g.Expression).CSharpCode.StartsWith(expr)))
 				{
 					var notifPropData2Clone = notifPropData2.Clone();
 					prop.DependentNotifyProperties.Add(notifPropData2Clone);
+
+					foreach (var b in notifPropData2.Properties.SelectMany(p => p.Bindings))
+					{
+						prop.SetBindings.Remove(b);
+					}
 				}
 
 				static Expression GetSourceExpr(Expression expr)
@@ -394,11 +406,10 @@ public static class BindingParser
 
 		foreach (var notifPropData in notifyPropertyChangedList)
 		{
-			var typedSender = new VariableExpression(new TypeInfo(notifPropData.SourceExpression.Type, false), "typedSender");
 			foreach (var prop in notifPropData.Properties)
 			{
-				var expr = new MemberExpression(typedSender, prop.Property, prop.Property.PropertyType);
-				var setExpressions = prop.Bindings
+				var expr = new VariableExpression(prop.Property.PropertyType, "value");
+				var setExpressions = prop.SetBindings
 					.Select(b =>
 					{
 						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
@@ -408,12 +419,12 @@ public static class BindingParser
 
 				foreach (var prop2 in prop.DependentNotifyProperties)
 				{
-					setExpressions.Add(new PropertySetExpression(prop2.Properties[0].Bindings[0].Property, prop2.SourceExpression.CloneReplace(prop.Expression, expr)));
+					setExpressions.Add(new PropertySetExpression(prop2.Properties[0].Bindings[0].Property, prop2.Expression.CloneReplace(prop.Expression, expr)));
 				}
 
 				var localVars = ExpressionUtils.GroupExpressions(setExpressions);
 
-				for (int i1 = prop.Bindings.Count, i2 = 0; i2 < prop.DependentNotifyProperties.Count; i1++, i2++)
+				for (int i1 = prop.SetBindings.Count, i2 = 0; i2 < prop.DependentNotifyProperties.Count; i1++, i2++)
 				{
 					prop.DependentNotifyProperties[i2].SourceExpression = setExpressions[i1].Expression;
 				}
@@ -421,7 +432,7 @@ public static class BindingParser
 				prop.UpdateMethod = new UpdateMethod
 				{
 					LocalVariables = localVars,
-					SetExpressions = setExpressions.Take(prop.Bindings.Count).Cast<PropertySetExpression>().ToList()
+					SetExpressions = setExpressions.Take(prop.SetBindings.Count).Cast<PropertySetExpression>().ToList()
 				};
 			}
 		}
@@ -457,7 +468,7 @@ public static class BindingParser
 			.ToList();
 
 		var props2 = notifyPropertyChangedList
-			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.SourceExpression))
+			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.Expression))
 			.ToList();
 
 		var props3 = props1.Concat(props2).ToList();
@@ -519,6 +530,7 @@ public class BindingsData
 
 public class NotifyPropertyChangedData
 {
+	public Expression Expression { get; init; }
 	public Expression SourceExpression { get; set; }
 	public List<NotifyPropertyChangedProperty> Properties { get; init; }
 	public int Index { get; set; }
@@ -532,7 +544,8 @@ public class NotifyPropertyChangedProperty
 {
 	public PropertyInfo Property { get; init; }
 	public Expression Expression { get; init; }
-	public List<Bind> Bindings { get; init; }
+	public ReadOnlyCollection<Bind> Bindings { get; init; }
+	public List<Bind> SetBindings { get; init; }
 	public UpdateMethod UpdateMethod { get; set; }
 	public List<NotifyPropertyChangedData> DependentNotifyProperties { get; } = new List<NotifyPropertyChangedData>();
 };

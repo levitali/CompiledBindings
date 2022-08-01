@@ -431,7 +431,7 @@ $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()}))
+								global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}))
 							.AddValueChanged({cacheVar}, {methodName});");
 	}
 
@@ -440,7 +440,7 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()}))
+								global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}))
 							.RemoveValueChanged({cacheVar}, {methodName});");
 	}
 }

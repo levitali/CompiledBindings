@@ -30,7 +30,7 @@ public class XamlCodeGenerator
 
 	public bool LangNullables { get; }
 
-	public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, string? bindingsAccess, ref int localVarIndex, ref int localFuncIndex, string? a)
+	public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, ref int localVarIndex, ref int localFuncIndex, string? a)
 	{
 		var memberExpr = targetRootVariable;
 		if (property.Object.Name != null && !property.Object.IsRoot)
@@ -106,9 +106,9 @@ public class XamlCodeGenerator
 				{
 					output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
-{a}			{bindingsAccess}_eventHandler{property.Value.BindValue.Index} = {value};
+{a}			_eventHandler{property.Value.BindValue.Index} = {value};
 #line default
-{a}			{setExpr} += {bindingsAccess}_eventHandler{property.Value.BindValue.Index};");
+{a}			{setExpr} += _eventHandler{property.Value.BindValue.Index};");
 				}
 				else
 				{
@@ -172,14 +172,14 @@ $@"{LineDirective(property.XamlNode)}
 			output.AppendLine(
 $@"{a}			if (!object.Equals({setExpr}, {varName}))
 {a}			{{
-{a}				{bindingsAccess}_settingBinding{property.Value.BindValue.Index} = true;
+{a}				_settingBinding{property.Value.BindValue.Index} = true;
 {a}				try
 {a}				{{
 {a}					{setExpr} = {varName};
 {a}				}}
 {a}				finally
 {a}				{{
-{a}					{bindingsAccess}_settingBinding{property.Value.BindValue.Index} = false;
+{a}					_settingBinding{property.Value.BindValue.Index} = false;
 {a}				}}
 {a}			}}");
 		}
@@ -192,10 +192,9 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 		{
 			if (isAsync)
 			{
-				var bindings = property.Value.BindValue != null ? "bindings." : null;
 				output.AppendLine(
 $@"#line default
-{a}			Set{localFuncIndex}({bindings}_generatedCodeDisposed.Token);
+{a}			Set{localFuncIndex}(_generatedCodeDisposed.Token);
 {a}			async void Set{localFuncIndex++}(CancellationToken cancellationToken)
 {a}			{{
 {a}				try
@@ -238,7 +237,7 @@ $@"{LineDirective(property.XamlNode)}
 		}
 	}
 
-	public void GenerateUpdateMethodBody(StringBuilder output, UpdateMethod updateMethod, string? targetRootVariable = null, string? bindingsAccess = null, string? a = null)
+	public void GenerateUpdateMethodBody(StringBuilder output, UpdateMethod updateMethod, string? targetRootVariable = null, string? a = null)
 	{
 		int localVarIndex = updateMethod.LocalVariables.Count + 1;
 		int localFuncIndex = 0;
@@ -247,7 +246,7 @@ $@"{LineDirective(property.XamlNode)}
 		{
 			foreach (var prop in updateMethod.SetProperties)
 			{
-				GenerateSetValue(output, prop, null, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, a);
+				GenerateSetValue(output, prop, null, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
 			}
 		}
 
@@ -260,7 +259,7 @@ $@"{LineDirective(variable.XamlNode)}
 
 		foreach (var prop in updateMethod.SetExpressions)
 		{
-			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, bindingsAccess, ref localVarIndex, ref localFuncIndex, a);
+			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
 		}
 		output.AppendLine(
 $@"#line default");

@@ -11,7 +11,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
 	{
 		bool isDiffDataRoot = targetClassName != bindingsData.DataType.Type.Name || targetNamespace != bindingsData.DataType.Type.Namespace;
-		var rootGroup = bindingsData.NotifyPropertyChangedList.SingleOrDefault(g => g.SourceExpression is VariableExpression pe && pe.Name == "dataRoot");
+		var rootGroup = bindingsData.NotifyPropertyChangedList.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
@@ -55,7 +55,7 @@ $@"			{targetClassName} _targetRoot;");
 		if (isDiffDataRoot)
 		{
 			output.AppendLine(
-$@"			global::{ bindingsData.DataType.Type.GetCSharpFullName()} _dataRoot;");
+$@"			global::{bindingsData.DataType.Type.GetCSharpFullName()} _dataRoot;");
 		}
 
 		if (bindingsData.NotifyPropertyChangedList.Count > 0)
@@ -154,7 +154,7 @@ $@"
 			output.AppendLine();
 			foreach (var binding in eventBindings)
 			{
-				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", null, ref dummyLocalVar, ref dummyLocalFunc, "\t");
+				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", ref dummyLocalVar, ref dummyLocalFunc, "\t");
 			}
 			output.AppendLine(
 $@"#line default");
@@ -312,6 +312,49 @@ $@"			}}");
 
 		#endregion
 
+		#region UpdateXX_XXX Methods
+
+		foreach (var notifyGroup in bindingsData.NotifyPropertyChangedList)
+		{
+			foreach (var prop in notifyGroup.Properties)
+			{
+				output.AppendLine();
+
+				var prmType = prop.Property.PropertyType.Type.GetCSharpFullName();
+				output.AppendLine(
+$@"			private void Update{notifyGroup.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
+			{{");
+				output.AppendLine(
+$@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
+				GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "_targetRoot", a: "\t");
+				foreach (var dependentGroup in prop.DependentNotifyProperties)
+				{
+					foreach (var prop2 in dependentGroup.Properties)
+					{
+						var expr = dependentGroup.SourceExpression.CSharpCode;
+						if (dependentGroup.SourceExpression.IsNullable)
+						{
+							expr += '?';
+						}
+						expr += '.' + prop2.Property.Definition.Name;
+						if (dependentGroup.SourceExpression.IsNullable && !prop2.Property.PropertyType.Type.IsNullable())
+						{
+							expr += " ?? default";
+						}
+						output.AppendLine(
+$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({expr});");
+					}
+					output.AppendLine(
+$@"				_bindingsTrackings.SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
+				}
+
+				output.AppendLine(
+$@"			}}");
+			}
+		}
+
+		#endregion UpdateXX_XXX Methods
+
 		#region UpdateSourceOfExplicitTwoWayBindings
 
 		var explicitBindings = bindingsData.Bindings.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource && b.UpdateSourceTrigger == UpdateSourceTrigger.Explicit);
@@ -412,7 +455,7 @@ $@"				global::System.WeakReference _bindingsWeakRef;");
 			foreach (var group in bindingsData.NotifyPropertyChangedList)
 			{
 				output.AppendLine(
-$@"				global::{group.SourceExpression.Type.Type.GetCSharpFullName()} _propertyChangeSource{group.Index};");
+$@"				global::{group.Expression.Type.Type.GetCSharpFullName()} _propertyChangeSource{group.Index};");
 			}
 
 			GenerateTrackingsExtraFieldDeclarations(output, bindingsData);
@@ -457,7 +500,7 @@ $@"				}}");
 				string cacheVar = "_propertyChangeSource" + notifyGroup.Index;
 				output.AppendLine(
 $@"
-				public void SetPropertyChangedEventHandler{notifyGroup.Index}(global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()} value)
+				public void SetPropertyChangedEventHandler{notifyGroup.Index}(global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()} value)
 				{{
 					if ({cacheVar} != null && !object.ReferenceEquals({cacheVar}, value))
 					{{");
@@ -480,7 +523,7 @@ $@"					}}
 
 			foreach (var notifyGroup in bindingsData.NotifyPropertyChangedList)
 			{
-				if (iNotifyPropertyChangedType.IsAssignableFrom(notifyGroup.SourceExpression.Type))
+				if (iNotifyPropertyChangedType.IsAssignableFrom(notifyGroup.Expression.Type))
 				{
 					output.AppendLine(
 $@"
@@ -493,9 +536,7 @@ $@"					var bindings = TryGetBindings();
 						return;
 					}}
 
-					var targetRoot = bindings._targetRoot;
-					var dataRoot = bindings.{(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
-					var typedSender = (global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()})sender;
+					var typedSender = (global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()})sender;
 					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
 ");
 
@@ -505,12 +546,8 @@ $@"					var bindings = TryGetBindings();
 						output.AppendLine(
 $@"					if (notifyAll || e.PropertyName == ""{prop.Property.Definition.Name}"")
 					{{");
-						GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", a: "\t\t\t");
-						foreach (var dependentGroup in prop.DependentNotifyProperties)
-						{
-							output.AppendLine(
-$@"						SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
-						}
+						output.AppendLine(
+$@"						bindings.Update{notifyGroup.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
 
 						if (i < notifyGroup.Properties.Count - 1)
 						{
@@ -542,16 +579,10 @@ $@"					var bindings = TryGetBindings();
 						return;
 					}}
 
-					var targetRoot = bindings._targetRoot;
-					var dataRoot = bindings.{(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
-					var typedSender = (global::{notifyGroup.SourceExpression.Type.Type.GetCSharpFullName()})sender;");
+					var typedSender = (global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()})sender;");
 
-						GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "targetRoot", bindingsAccess: "bindings.", a: "\t\t");
-						foreach (var dependentGroup in prop.DependentNotifyProperties)
-						{
-							output.AppendLine(
-$@"					SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
-						}
+						output = output.AppendLine(
+$@"					bindings.Update{notifyGroup.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name})");
 						output.AppendLine(
 $@"				}}");
 					}
@@ -601,7 +632,7 @@ $@"		}}");
 
 		void GenerateSetPropertyChangedEventHandler(NotifyPropertyChangedData notifyGroup, string cacheVar, string? a)
 		{
-			if (iNotifyPropertyChangedType.IsAssignableFrom(notifyGroup.SourceExpression.Type))
+			if (iNotifyPropertyChangedType.IsAssignableFrom(notifyGroup.Expression.Type))
 			{
 				output.AppendLine(
 $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged += OnPropertyChanged{notifyGroup.Index};");
@@ -617,7 +648,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 
 		void GenerateUnsetPropertyChangedEventHandler(NotifyPropertyChangedData notifyGroup, string cacheVar, string? a)
 		{
-			if (iNotifyPropertyChangedType.IsAssignableFrom(notifyGroup.SourceExpression.Type))
+			if (iNotifyPropertyChangedType.IsAssignableFrom(notifyGroup.Expression.Type))
 			{
 				output.AppendLine(
 $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged -= OnPropertyChanged{notifyGroup.Index};");

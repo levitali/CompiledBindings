@@ -81,7 +81,7 @@ namespace WPFTest.Views
 #line (14, 20) - (14, 40) 14 "Page2.xml"
 				targetRoot.textBlock1.Text = dataRoot.Prop1;
 #line default
-				Set0(bindings._generatedCodeDisposed.Token);
+				Set0(_generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
 				{
 					try
