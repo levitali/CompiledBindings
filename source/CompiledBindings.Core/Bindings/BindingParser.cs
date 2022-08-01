@@ -104,7 +104,7 @@ public static class BindingParser
 					};
 					resources.Add((resourceName, resourceType));
 
-					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, xamlDomParser.ConverterType.Type), xamlDomParser.ConverterType);
+					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType.Type), resourceType);
 					expr = new VariableExpression(targetType, "targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(resourceType, false));
 
