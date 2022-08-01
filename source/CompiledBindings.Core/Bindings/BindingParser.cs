@@ -392,10 +392,10 @@ public static class BindingParser
 			}
 		}
 
-		foreach (var propChangeData in notifyPropertyChangedList)
+		foreach (var notifPropData in notifyPropertyChangedList)
 		{
-			var typedSender = new VariableExpression(new TypeInfo(propChangeData.SourceExpression.Type, false), "typedSender");
-			foreach (var prop in propChangeData.Properties)
+			var typedSender = new VariableExpression(new TypeInfo(notifPropData.SourceExpression.Type, false), "typedSender");
+			foreach (var prop in notifPropData.Properties)
 			{
 				var expr = new MemberExpression(typedSender, prop.Property, prop.Property.PropertyType);
 				var setExpressions = prop.Bindings
@@ -494,16 +494,16 @@ public static class BindingParser
 	}
 }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
 public class BindingsData
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public TypeInfo? TargetType { get; init; }
 	public TypeInfo DataType { get; init; }
 	public IList<Bind> Bindings { get; init; }
 	public List<NotifyPropertyChangedData> NotifyPropertyChangedList { get; init; }
 	public List<TwoWayEventData> TwoWayEvents { get; init; }
 	public UpdateMethod UpdateMethod { get; init; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 	public void Validate(string file)
 	{
@@ -519,11 +519,9 @@ public class BindingsData
 
 public class NotifyPropertyChangedData
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public Expression SourceExpression { get; set; }
 	public List<NotifyPropertyChangedProperty> Properties { get; init; }
 	public int Index { get; set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public NotifyPropertyChangedData Clone()
 	{
 		return (NotifyPropertyChangedData)MemberwiseClone();
@@ -532,26 +530,21 @@ public class NotifyPropertyChangedData
 
 public class NotifyPropertyChangedProperty
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public PropertyInfo Property { get; init; }
 	public Expression Expression { get; init; }
 	public List<Bind> Bindings { get; init; }
 	public UpdateMethod UpdateMethod { get; set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public List<NotifyPropertyChangedData> DependentNotifyProperties { get; } = new List<NotifyPropertyChangedData>();
 };
 
 public class TwoWayEventData
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public List<Bind> Bindings { get; init; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public int Index { get; set; }
 };
 
 public class Bind
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public XamlObjectProperty Property { get; init; }
 	public Expression? Expression { get; init; }
 	public Expression? BindBackExpression { get; init; }
@@ -567,7 +560,6 @@ public class Bind
 	public List<(string name, TypeInfo type)> Resources { get; init; }
 
 	public Expression? SourceExpression { get; set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 	public IMemberInfo? DependencyProperty;
 	public int Index;
