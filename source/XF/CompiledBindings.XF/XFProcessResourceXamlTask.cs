@@ -203,7 +203,7 @@ public class XFProcessResourceXamlTask : Task
 												.SelectMany(a => regex.Matches(a.Value).Cast<Match>())
 												.Select(m => m.Groups[1].Value)
 												.Distinct();
-											var propInitializers = string.Join(" ", staticResources.Select(r => $"{r}={{StaticResource {r}}}"));
+											var propInitializers = string.Join(", ", staticResources.Select(r => $"{r}={{StaticResource {r}}}"));
 
 											var rootElement = dataTemplate.Elements().First();
 											InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{className}_DataTemplate{dataTemplateIndex++} {propInitializers}}}\"");
