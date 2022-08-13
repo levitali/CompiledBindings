@@ -75,11 +75,9 @@ namespace WPFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
-				var bindings = this;
 #line (14, 20) - (14, 40) 14 "Page2.xml"
-				targetRoot.textBlock1.Text = dataRoot.Prop1;
+				_targetRoot.textBlock1.Text = dataRoot.Prop1;
 #line default
 				Set0(_generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
@@ -91,7 +89,7 @@ namespace WPFTest.Views
 #line default
 						if (!cancellationToken.IsCancellationRequested)
 						{
-							targetRoot.textBlock2.Text = value;
+							_targetRoot.textBlock2.Text = value;
 						}
 					}
 					catch

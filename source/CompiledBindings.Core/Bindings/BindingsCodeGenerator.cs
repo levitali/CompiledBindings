@@ -286,15 +286,9 @@ $@"
 					throw new System.InvalidOperationException();
 				}}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
-		if (asyncFunctions)
-		{
-			output.AppendLine(
-$@"				var bindings = this;");
-		}
 
-		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "targetRoot", a: "\t");
+		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "_targetRoot", a: "\t");
 
 		foreach (var propUpdate in bindingsData.UpdateProperties)
 		{
@@ -394,8 +388,7 @@ $@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].T
 
 			output.AppendLine(
 $@"			{{
-				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};
-				var targetRoot = _targetRoot;");
+				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 
 			if (first.TargetChangedEvent?.Definition.Name == "PropertyChanged")
 			{

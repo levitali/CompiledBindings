@@ -105,16 +105,15 @@ namespace XFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
 #line (29, 13) - (29, 65) 29 "Page2.xml"
 				var value1 = dataRoot._viewModel.GetIcon();
 #line (23, 16) - (23, 72) 23 "Page2.xml"
-				targetRoot.label3.Text = dataRoot._viewModel.CalculateString().TrimNumber();
+				_targetRoot.label3.Text = dataRoot._viewModel.CalculateString().TrimNumber();
 #line (29, 13) - (29, 65) 29 "Page2.xml"
-				targetRoot.label8.FontFamily = value1.Item1;
+				_targetRoot.label8.FontFamily = value1.Item1;
 #line (30, 13) - (30, 54) 30 "Page2.xml"
-				targetRoot.label8.Text = value1.Item2;
+				_targetRoot.label8.Text = value1.Item2;
 #line default
 				Update0_FuncProp(dataRoot._viewModel.FuncProp);
 				Update0_CurrentItem(dataRoot._viewModel.CurrentItem);
@@ -136,7 +135,7 @@ namespace XFTest.Views
 			{
 				var dataRoot = _targetRoot;
 #line (22, 16) - (22, 141) 22 "Page2.xml"
-				_targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(value, typeof(global::System.String), dataRoot._viewModel.DecimalProp + 1, null));
+				_targetRoot.label2.Text = ((global::System.String)_targetRoot.someConverter.Convert(value, typeof(global::System.String), dataRoot._viewModel.DecimalProp + 1, null));
 #line default
 			}
 
@@ -144,13 +143,16 @@ namespace XFTest.Views
 			{
 				var dataRoot = _targetRoot;
 #line (22, 16) - (22, 141) 22 "Page2.xml"
-				_targetRoot.label2.Text = ((global::System.String)targetRoot.someConverter.Convert(dataRoot._viewModel.StringProp, typeof(global::System.String), value + 1, null));
+				_targetRoot.label2.Text = ((global::System.String)_targetRoot.someConverter.Convert(dataRoot._viewModel.StringProp, typeof(global::System.String), value + 1, null));
 #line default
 			}
 
 			private void Update0_FuncProp(global::System.Func<global::System.String, global::XFTest.ViewModels.ItemViewModel> value)
 			{
 				var dataRoot = _targetRoot;
+#line (24, 16) - (24, 67) 24 "Page2.xml"
+				var value1 = value?.Invoke("test");
+#line default
 				Update2_GuidProp(value1?.GuidProp ?? default);
 				_bindingsTrackings.SetPropertyChangedEventHandler2(value1);
 			}
@@ -158,6 +160,9 @@ namespace XFTest.Views
 			private void Update0_Group(global::XFTest.ViewModels.GroupViewModel value)
 			{
 				var dataRoot = _targetRoot;
+#line (26, 16) - (26, 59) 26 "Page2.xml"
+				var value1 = value?[0];
+#line default
 				Update3_GuidProp(value1?.GuidProp ?? default);
 				_bindingsTrackings.SetPropertyChangedEventHandler3(value1);
 			}

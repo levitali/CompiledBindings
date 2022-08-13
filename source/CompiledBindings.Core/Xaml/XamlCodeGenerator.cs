@@ -250,7 +250,7 @@ $@"{LineDirective(property.XamlNode)}
 			}
 		}
 
-		if (updateMethod.SetExpressions.Count > 0)
+		if (updateMethod.LocalVariables.Count > 0 || updateMethod.SetExpressions.Count > 0)
 		{
 			foreach (var variable in updateMethod.LocalVariables)
 			{

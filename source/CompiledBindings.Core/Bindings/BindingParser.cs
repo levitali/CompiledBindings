@@ -105,7 +105,7 @@ public static class BindingParser
 					resources.Add((resourceName, resourceType));
 
 					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType.Type), resourceType);
-					expr = new VariableExpression(targetType, "targetRoot");
+					expr = new VariableExpression(targetType, "_targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(resourceType, false));
 
 					int pos2 = str.IndexOf(',');
@@ -439,29 +439,29 @@ public static class BindingParser
 						return new PropertySetExpression(p.Bindings[0].Property, expression);
 					})
 					.ToList();
-				var setExpression3 = prop.DependentNotifyProperties
+				var setExpressions3 = prop.DependentNotifyProperties
 					.Select(d => new PropertySetExpression(d.Properties[0].Bindings[0].Property, d.Expression.CloneReplace(prop.Expression, expr)))
 					.ToList();
 
-				var setExpressions = setExpressions1.Concat(setExpressions2).Concat(setExpression3).ToList();
+				var setExpressions = setExpressions1.Concat(setExpressions2).Concat(setExpressions3).ToList();
 
 				var localVars = ExpressionUtils.GroupExpressions(setExpressions);
 
-				int i = setExpressions1.Count;
+				int i = 0;
 				foreach (var p in prop.DependentNotifyProperties.SelectMany(d => d.Properties))
 				{
-					p.SourceExpression = setExpressions[i++].Expression;
+					p.SourceExpression = setExpressions2[i++].Expression;
 				}
-				
-				for (int i1 = setExpressions1.Count + setExpressions2.Count, i2 = 0; i2 < prop.DependentNotifyProperties.Count; i1++, i2++)
+
+				for (i = 0; i < setExpressions3.Count; i++)
 				{
-					prop.DependentNotifyProperties[i2].SourceExpression = setExpressions[i1].Expression;
+					prop.DependentNotifyProperties[i].SourceExpression = setExpressions3[i].Expression;
 				}
 
 				prop.UpdateMethod = new UpdateMethod
 				{
 					LocalVariables = localVars,
-					SetExpressions = setExpressions.Take(prop.SetBindings.Count).Cast<PropertySetExpression>().ToList()
+					SetExpressions = setExpressions1
 				};
 			}
 		}

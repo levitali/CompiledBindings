@@ -115,8 +115,10 @@ namespace XFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
+#line (71, 13) - (71, 92) 71 "Page1.xml"
+				var value1 = dataRoot.list.SelectedItem;
+#line default
 				Update0_BooleanProp((((global::XFTest.ViewModels.EntityViewModel)value1))?.BooleanProp ?? default);
 				Update1_SelectedItem(value1);
 
@@ -134,6 +136,9 @@ namespace XFTest.Views
 			private void Update1_SelectedItem(global::System.Object value)
 			{
 				var dataRoot = _targetRoot;
+#line (71, 13) - (71, 92) 71 "Page1.xml"
+				var value1 = (((global::XFTest.ViewModels.EntityViewModel)value));
+#line default
 				Update0_BooleanProp(value1?.BooleanProp ?? default);
 				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
 			}
@@ -287,7 +292,6 @@ namespace XFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				Update0_BooleanProp(dataRoot.BooleanProp);
 				Update0_DecimalProp(dataRoot.DecimalProp);
@@ -421,7 +425,6 @@ namespace XFTest.Views
 			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				switch (p1.PropertyName)
 				{
 					case "IsFocused":
@@ -455,7 +458,6 @@ namespace XFTest.Views
 			private void OnTargetChanged1(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				switch (p1.PropertyName)
 				{
 					case "Text":
@@ -478,7 +480,6 @@ namespace XFTest.Views
 			private void OnTargetChanged2(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				switch (p1.PropertyName)
 				{
 					case "SelectedItem":
@@ -719,7 +720,6 @@ namespace XFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				Update0_Model(dataRoot.Model);
 				Update0_BooleanProp(dataRoot.BooleanProp);
@@ -929,8 +929,10 @@ namespace XFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
+#line (31, 15) - (31, 79) 31 "Page1.xml"
+				var value1 = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel);
+#line default
 				Update0_ExtraProp(value1?.ExtraProp);
 				Update1_BooleanProp(dataRoot.BooleanProp);
 
@@ -1126,7 +1128,6 @@ namespace XFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				Update0_DecimalProp(dataRoot?.DecimalProp ?? default);
 				Update0_StringProp(dataRoot?.StringProp);

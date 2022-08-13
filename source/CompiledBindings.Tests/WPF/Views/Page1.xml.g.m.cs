@@ -117,7 +117,6 @@ namespace WPFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _targetRoot;
 				Update0_DecimalProp(dataRoot._viewModel.DecimalProp);
 				Update1_SelectedItem(dataRoot.listView.SelectedItem);
@@ -361,11 +360,9 @@ namespace WPFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
-				var bindings = this;
 #line (61, 20) - (61, 79) 61 "Page1.xml"
-				targetRoot.textBlock11.Text = dataRoot.Calculate(new WPFTest.ViewModels.ParamClass("text"));
+				_targetRoot.textBlock11.Text = dataRoot.Calculate(new WPFTest.ViewModels.ParamClass("text"));
 #line default
 				Set0(_generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
@@ -377,7 +374,7 @@ namespace WPFTest.Views
 #line default
 						if (!cancellationToken.IsCancellationRequested)
 						{
-							targetRoot.image2.Source = value;
+							_targetRoot.image2.Source = value;
 						}
 					}
 					catch
@@ -402,7 +399,7 @@ namespace WPFTest.Views
 #line (46, 13) - (46, 67) 46 "Page1.xml"
 				_targetRoot.header1.Visibility = (value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
 #line (49, 13) - (49, 101) 49 "Page1.xml"
-				_targetRoot.textBlock6.Visibility = ((global::System.Windows.Visibility)targetRoot.TrueToVisibleConverter.Convert(value, typeof(global::System.Windows.Visibility), null, null));
+				_targetRoot.textBlock6.Visibility = ((global::System.Windows.Visibility)_targetRoot.TrueToVisibleConverter.Convert(value, typeof(global::System.Windows.Visibility), null, null));
 #line default
 			}
 
@@ -438,7 +435,7 @@ namespace WPFTest.Views
 			{
 				var dataRoot = _dataRoot;
 #line (52, 19) - (52, 154) 52 "Page1.xml"
-				var value1 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
+				var value1 = ((global::System.Nullable<global::System.Boolean>)_targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
 #line default
 				if (!object.Equals(_targetRoot.checkBox1.IsChecked, value1))
 				{
@@ -461,7 +458,7 @@ namespace WPFTest.Views
 #line (52, 19) - (52, 154) 52 "Page1.xml"
 				var value1 = value.Length > 0;
 #line (52, 19) - (52, 154) 52 "Page1.xml"
-				var value2 = ((global::System.Nullable<global::System.Boolean>)targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
+				var value2 = ((global::System.Nullable<global::System.Boolean>)_targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
 #line default
 				if (!object.Equals(_targetRoot.checkBox1.IsChecked, value2))
 				{
@@ -609,7 +606,6 @@ namespace WPFTest.Views
 			private void OnTargetChanged0(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				if (!_settingBinding4)
 				{
 					try
@@ -627,13 +623,12 @@ namespace WPFTest.Views
 			private void OnTargetChanged1(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				if (!_settingBinding5)
 				{
 					try
 					{
 #line (52, 19) - (52, 154) 52 "Page1.xml"
-						dataRoot.BoolInput = (global::System.Boolean)targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
+						dataRoot.BoolInput = (global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
 #line default
 					}
 					catch
@@ -645,7 +640,6 @@ namespace WPFTest.Views
 			private void OnTargetChanged2(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				if (!_settingBinding14)
 				{
 					try
@@ -669,7 +663,6 @@ namespace WPFTest.Views
 			private void OnTargetChanged3(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				if (!_settingBinding15)
 				{
 					try
@@ -693,7 +686,6 @@ namespace WPFTest.Views
 			private void OnTargetChanged4(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				if (!_settingBinding16)
 				{
 					try
@@ -711,7 +703,6 @@ namespace WPFTest.Views
 			private void OnTargetChanged5(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				var targetRoot = _targetRoot;
 				if (!_settingBinding17)
 				{
 					try
@@ -1021,7 +1012,6 @@ namespace WPFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				Update0_BooleanProp(dataRoot.BooleanProp);
 				Update0_Model(dataRoot.Model);
@@ -1042,7 +1032,7 @@ namespace WPFTest.Views
 #line (26, 21) - (26, 84) 26 "Page1.xml"
 				_targetRoot.textBlock2.Visibility = WPFTest.Views.XamlUtils.TrueToVisible(value);
 #line (27, 28) - (27, 111) 27 "Page1.xml"
-				_targetRoot.textBlock3.IsEnabled = ((global::System.Boolean)targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Boolean), null, null));
+				_targetRoot.textBlock3.IsEnabled = ((global::System.Boolean)_targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Boolean), null, null));
 #line default
 			}
 
@@ -1233,7 +1223,6 @@ namespace WPFTest.Views
 					throw new System.InvalidOperationException();
 				}
 
-				var targetRoot = _targetRoot;
 				var dataRoot = _dataRoot;
 				Update0_Title(dataRoot.Title);
 			}
