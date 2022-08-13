@@ -293,9 +293,16 @@ $@"
 			output.AppendLine(
 $@"				var bindings = this;");
 		}
+
 		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "targetRoot", a: "\t");
 
-		var setPropHandlers = bindingsData.NotifyPropertyChangedList.Where(g => g != rootGroup).ToList();
+		foreach (var propUpdate in bindingsData.UpdateProperties)
+		{
+			output.AppendLine(
+$@"				Update{propUpdate.Parent.Index}_{propUpdate.Property.Definition.Name}({propUpdate.SourceExpression.CSharpCode});");
+		}
+
+		var setPropHandlers = bindingsData.UpdateNotifyPropertyChangedList.Where(g => g != rootGroup).ToList();
 		if (setPropHandlers.Count > 0)
 		{
 			output.AppendLine();
@@ -331,18 +338,8 @@ $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 				{
 					foreach (var prop2 in dependentGroup.Properties)
 					{
-						var expr = dependentGroup.SourceExpression.CSharpCode;
-						if (dependentGroup.SourceExpression.IsNullable)
-						{
-							expr += '?';
-						}
-						expr += '.' + prop2.Property.Definition.Name;
-						if (dependentGroup.SourceExpression.IsNullable && !prop2.Property.PropertyType.Type.IsNullable())
-						{
-							expr += " ?? default";
-						}
 						output.AppendLine(
-$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({expr});");
+$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression.CSharpCode});");
 					}
 					output.AppendLine(
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");

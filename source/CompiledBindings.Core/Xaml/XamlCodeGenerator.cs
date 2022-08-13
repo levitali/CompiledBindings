@@ -250,19 +250,22 @@ $@"{LineDirective(property.XamlNode)}
 			}
 		}
 
-		foreach (var variable in updateMethod.LocalVariables)
+		if (updateMethod.SetExpressions.Count > 0)
 		{
-			output.AppendLine(
+			foreach (var variable in updateMethod.LocalVariables)
+			{
+				output.AppendLine(
 $@"{LineDirective(variable.XamlNode)}
 {a}			var {variable.Name} = {variable.Expression};");
-		}
+			}
 
-		foreach (var prop in updateMethod.SetExpressions)
-		{
-			GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
-		}
-		output.AppendLine(
+			foreach (var prop in updateMethod.SetExpressions)
+			{
+				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
+			}
+			output.AppendLine(
 $@"#line default");
+		}
 	}
 
 	public string LineDirective(XamlNode xamlNode)

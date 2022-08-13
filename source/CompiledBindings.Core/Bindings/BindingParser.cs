@@ -336,24 +336,27 @@ public static class BindingParser
 			.Select(g => 			
 			{
 				var expr1 = g.First().expr.Expression;
-				return new NotifyPropertyChangedData
+				var d = new NotifyPropertyChangedData
 				{
 					Expression = expr1,
-					SourceExpression = expr1,
-					Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
-					{
-						var expr2 = g2.First().expr;
-						var bindings = g2.Select(e => e.bind).Distinct().ToList();
-						return new NotifyPropertyChangedProperty
-						{
-							Property = (PropertyInfo)expr2.Member,
-							Expression = expr2,
-							Bindings = new ReadOnlyCollection<Bind>(bindings),
-							SetBindings = bindings.ToList(), // Make copy
-						};
-					})
-					.ToList()
+					SourceExpression = expr1,					
 				};
+				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
+				{
+					var expr2 = g2.First().expr;
+					var bindings = g2.Select(e => e.bind).Distinct().ToList();
+					return new NotifyPropertyChangedProperty
+					{
+						Parent = d,
+						Property = (PropertyInfo)expr2.Member,
+						Expression = expr2,
+						SourceExpression = expr2,
+						Bindings = new ReadOnlyCollection<Bind>(bindings),
+						SetBindings = bindings.ToList(), // Make copy
+					};
+				})
+				.ToList();
+				return d;
 			})
 			.OrderBy(g => g.Expression.CSharpCode)
 			.ToList();
@@ -372,7 +375,7 @@ public static class BindingParser
 			notifyPropertyChangedList[i].Index = i;
 		}
 
-		foreach (var notifPropData in notifyPropertyChangedList.OrderByDescending(d => d.SourceExpression.CSharpCode))
+		foreach (var notifPropData in notifyPropertyChangedList.OrderByDescending(d => d.Expression.CSharpCode))
 		{
 			foreach (var prop in notifPropData.Properties)
 			{
@@ -414,22 +417,43 @@ public static class BindingParser
 			foreach (var prop in notifPropData.Properties)
 			{
 				var expr = new VariableExpression(prop.Property.PropertyType, "value");
-				var setExpressions = prop.SetBindings
+				
+				var setExpressions1 = prop.SetBindings
 					.Select(b =>
 					{
 						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
 						return new PropertySetExpression(b.Property, expression);
 					})
 					.ToList();
+				var setExpressions2 = prop.DependentNotifyProperties
+					.SelectMany(d => d.Properties)
+					.Select(p =>
+					{
+						var expression = p.Expression.CloneReplace(prop.Expression, expr);
+						if (p.Property.PropertyType.Type.IsValueType &&
+							!p.Property.PropertyType.Type.IsValueNullable() &&
+							expression.IsNullable)
+						{
+							expression = new CoalesceExpression(expression, Expression.DefaultExpression);
+						}
+						return new PropertySetExpression(p.Bindings[0].Property, expression);
+					})
+					.ToList();
+				var setExpression3 = prop.DependentNotifyProperties
+					.Select(d => new PropertySetExpression(d.Properties[0].Bindings[0].Property, d.Expression.CloneReplace(prop.Expression, expr)))
+					.ToList();
 
-				foreach (var prop2 in prop.DependentNotifyProperties)
-				{
-					setExpressions.Add(new PropertySetExpression(prop2.Properties[0].Bindings[0].Property, prop2.Expression.CloneReplace(prop.Expression, expr)));
-				}
+				var setExpressions = setExpressions1.Concat(setExpressions2).Concat(setExpression3).ToList();
 
 				var localVars = ExpressionUtils.GroupExpressions(setExpressions);
 
-				for (int i1 = prop.SetBindings.Count, i2 = 0; i2 < prop.DependentNotifyProperties.Count; i1++, i2++)
+				int i = setExpressions1.Count;
+				foreach (var p in prop.DependentNotifyProperties.SelectMany(d => d.Properties))
+				{
+					p.SourceExpression = setExpressions[i++].Expression;
+				}
+				
+				for (int i1 = setExpressions1.Count + setExpressions2.Count, i2 = 0; i2 < prop.DependentNotifyProperties.Count; i1++, i2++)
 				{
 					prop.DependentNotifyProperties[i2].SourceExpression = setExpressions[i1].Expression;
 				}
@@ -467,22 +491,63 @@ public static class BindingParser
 			twoWayEventHandlers[i].Index = i;
 		}
 
-		var props1 = binds
+		var binds1 = binds
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
+			.ToList();
+
+		var updateNotifyPropertyChangedList = notifyPropertyChangedList.ToList();
+		var notifProps = notifyPropertyChangedList
+			.SelectMany(d => d.Properties)
+			.OrderByDescending(p => p.Bindings.Count)
+			.ToList();
+		var propUpdates = new List<NotifyPropertyChangedProperty>();
+		while (notifProps.Count > 0)
+		{
+			var prop = notifProps[0];
+			propUpdates.Add(prop.Clone());
+			prop.Bindings.ForEach(b => binds1.Remove(b));
+			notifProps = notifProps
+				.Except(EnumerableExtensions.SelectTree(prop, p => p.DependentNotifyProperties.SelectMany(d => d.Properties), true))
+				.ToList();
+			updateNotifyPropertyChangedList = updateNotifyPropertyChangedList
+				.Except(prop.DependentNotifyProperties.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifyProperties)), f => f.Index)
+				.ToList();
+		}
+
+		var props1 = binds1
 			.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!))
 			.ToList();
 
-		var props2 = notifyPropertyChangedList
+		var props2 = propUpdates
+			.Select(p =>
+			{
+				var expr = p.Expression;
+				if (p.Property.PropertyType.Type.IsValueType &&
+				    !p.Property.PropertyType.Type.IsValueNullable() &&
+					expr.IsNullable)
+				{
+					expr = new CoalesceExpression(expr, Expression.DefaultExpression);
+				}
+				return new PropertySetExpression(p.Bindings[0].Property, expr);
+			})
+			.ToList();
+
+		var props3 = updateNotifyPropertyChangedList
 			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.Expression))
 			.ToList();
 
-		var props3 = props1.Concat(props2).ToList();
+		var props4 = props1.Concat(props2).Concat(props3).ToList();
 
-		var localVars2 = ExpressionUtils.GroupExpressions(props3);
+		var localVars2 = ExpressionUtils.GroupExpressions(props4);
 
 		for (int i = 0; i < props2.Count; i++)
 		{
-			notifyPropertyChangedList[i].SourceExpression = props2[i].Expression;
+			propUpdates[i].SourceExpression = props2[i].Expression;
+		}
+
+		for (int i = 0; i < props3.Count; i++)
+		{
+			updateNotifyPropertyChangedList[i].SourceExpression = props3[i].Expression;
 		}
 
 		var updateMethod = new UpdateMethod
@@ -497,8 +562,10 @@ public static class BindingParser
 			TargetType = targetType,
 			Bindings = binds,
 			NotifyPropertyChangedList = notifyPropertyChangedList,
+			UpdateNotifyPropertyChangedList = updateNotifyPropertyChangedList,
 			TwoWayEvents = twoWayEventHandlers,
-			UpdateMethod = updateMethod
+			UpdateMethod = updateMethod,
+			UpdateProperties = propUpdates,
 		};
 	}
 
@@ -518,8 +585,10 @@ public class BindingsData
 	public TypeInfo DataType { get; init; }
 	public IList<Bind> Bindings { get; init; }
 	public List<NotifyPropertyChangedData> NotifyPropertyChangedList { get; init; }
+	public List<NotifyPropertyChangedData> UpdateNotifyPropertyChangedList { get; init; }
 	public List<TwoWayEventData> TwoWayEvents { get; init; }
 	public UpdateMethod UpdateMethod { get; init; }
+	public List<NotifyPropertyChangedProperty> UpdateProperties { get; init; }
 
 	public void Validate(string file)
 	{
@@ -537,7 +606,7 @@ public class NotifyPropertyChangedData
 {
 	public Expression Expression { get; init; }
 	public Expression SourceExpression { get; set; }
-	public List<NotifyPropertyChangedProperty> Properties { get; init; }
+	public List<NotifyPropertyChangedProperty> Properties { get; set; }
 	public int Index { get; set; }
 	public NotifyPropertyChangedData Clone()
 	{
@@ -547,12 +616,16 @@ public class NotifyPropertyChangedData
 
 public class NotifyPropertyChangedProperty
 {
+	public NotifyPropertyChangedData Parent { get; init; }
 	public PropertyInfo Property { get; init; }
 	public Expression Expression { get; init; }
+	public Expression SourceExpression { get; set; }
 	public ReadOnlyCollection<Bind> Bindings { get; init; }
 	public List<Bind> SetBindings { get; init; }
 	public UpdateMethod UpdateMethod { get; set; }
 	public List<NotifyPropertyChangedData> DependentNotifyProperties { get; } = new List<NotifyPropertyChangedData>();
+
+	public NotifyPropertyChangedProperty Clone() => (NotifyPropertyChangedProperty)MemberwiseClone();
 };
 
 public class TwoWayEventData
