@@ -126,7 +126,6 @@ namespace XFTest.Views
 
 			private void Update0_CurrentItem(global::XFTest.ViewModels.ItemViewModel value)
 			{
-				var dataRoot = _targetRoot;
 				Update1_GuidProp(value?.GuidProp ?? default);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
 			}
@@ -149,7 +148,6 @@ namespace XFTest.Views
 
 			private void Update0_FuncProp(global::System.Func<global::System.String, global::XFTest.ViewModels.ItemViewModel> value)
 			{
-				var dataRoot = _targetRoot;
 #line (24, 16) - (24, 67) 24 "Page2.xml"
 				var value1 = value?.Invoke("test");
 #line default
@@ -159,7 +157,6 @@ namespace XFTest.Views
 
 			private void Update0_Group(global::XFTest.ViewModels.GroupViewModel value)
 			{
-				var dataRoot = _targetRoot;
 #line (26, 16) - (26, 59) 26 "Page2.xml"
 				var value1 = value?[0];
 #line default
@@ -169,7 +166,6 @@ namespace XFTest.Views
 
 			private void Update1_GuidProp(global::System.Guid value)
 			{
-				var dataRoot = _targetRoot;
 #line (21, 16) - (21, 62) 21 "Page2.xml"
 				_targetRoot.label1.Text = value.ToString();
 #line default
@@ -177,7 +173,6 @@ namespace XFTest.Views
 
 			private void Update2_GuidProp(global::System.Guid value)
 			{
-				var dataRoot = _targetRoot;
 #line (24, 16) - (24, 67) 24 "Page2.xml"
 				var value1 = value.ToString();
 #line (24, 16) - (24, 67) 24 "Page2.xml"
@@ -189,7 +184,6 @@ namespace XFTest.Views
 
 			private void Update3_GuidProp(global::System.Guid value)
 			{
-				var dataRoot = _targetRoot;
 #line (26, 16) - (26, 59) 26 "Page2.xml"
 				_targetRoot.label6.Text = value.ToString();
 #line default

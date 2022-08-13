@@ -127,7 +127,6 @@ namespace WPFTest.Views
 
 			private void Update0_DecimalProp(global::System.Decimal value)
 			{
-				var dataRoot = _targetRoot;
 #line (42, 13) - (42, 52) 42 "Page1.xml"
 				_targetRoot.textBlock5.Text = value.ToString();
 #line default
@@ -135,7 +134,6 @@ namespace WPFTest.Views
 
 			private void Update1_SelectedItem(global::System.Object value)
 			{
-				var dataRoot = _targetRoot;
 #line (64, 13) - (64, 81) 64 "Page1.xml"
 				_targetRoot.button1.IsEnabled = value != null;
 #line default
@@ -395,7 +393,6 @@ namespace WPFTest.Views
 
 			private void Update0_BooleanProp(global::System.Boolean value)
 			{
-				var dataRoot = _dataRoot;
 #line (46, 13) - (46, 67) 46 "Page1.xml"
 				_targetRoot.header1.Visibility = (value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
 #line (49, 13) - (49, 101) 49 "Page1.xml"
@@ -405,7 +402,6 @@ namespace WPFTest.Views
 
 			private void Update0_DecimalProp(global::System.Decimal value)
 			{
-				var dataRoot = _dataRoot;
 #line (48, 13) - (48, 39) 48 "Page1.xml"
 				_targetRoot.textBlock6.Text = value.ToString();
 #line (50, 20) - (50, 50) 50 "Page1.xml"
@@ -415,7 +411,6 @@ namespace WPFTest.Views
 
 			private void Update0_OrderInput(global::System.String value)
 			{
-				var dataRoot = _dataRoot;
 				if (!object.Equals(_targetRoot.textBox1.Text, value))
 				{
 					_settingBinding4 = true;
@@ -479,7 +474,6 @@ namespace WPFTest.Views
 
 			private void Update0_ListProp(global::System.Collections.Generic.IList<global::WPFTest.ViewModels.EntityViewModel> value)
 			{
-				var dataRoot = _dataRoot;
 #line (56, 13) - (56, 43) 56 "Page1.xml"
 				_targetRoot.listView.ItemsSource = value;
 #line default
@@ -487,7 +481,6 @@ namespace WPFTest.Views
 
 			private void Update0_ModifyViewModel(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
-				var dataRoot = _dataRoot;
 #line (58, 20) - (58, 78) 58 "Page1.xml"
 				_targetRoot.textBlock8.Text = (value != null ? value.Input1 : "abc");
 #line default
@@ -499,7 +492,6 @@ namespace WPFTest.Views
 
 			private void Update0_TaskProp(global::System.Threading.Tasks.Task<global::System.String> value)
 			{
-				var dataRoot = _dataRoot;
 #line default
 				Set0(_generatedCodeDisposed.Token);
 				async void Set0(CancellationToken cancellationToken)
@@ -532,7 +524,6 @@ namespace WPFTest.Views
 
 			private void Update0_IntProp(global::System.Int32 value)
 			{
-				var dataRoot = _dataRoot;
 #line (68, 6) - (68, 68) 68 "Page1.xml"
 				global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value);
 #line (71, 7) - (71, 36) 71 "Page1.xml"
@@ -542,7 +533,6 @@ namespace WPFTest.Views
 
 			private void Update1_Input1(global::System.String value)
 			{
-				var dataRoot = _dataRoot;
 #line (59, 20) - (59, 80) 59 "Page1.xml"
 				_targetRoot.textBlock9.Text = value ?? "aaa";
 				if (!object.Equals(_targetRoot.textBox2.Text, value))
@@ -562,14 +552,12 @@ namespace WPFTest.Views
 
 			private void Update1_ModifyTextViewModel(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
 			{
-				var dataRoot = _dataRoot;
 				Update2_TextInput(value.TextInput);
 				_bindingsTrackings.SetPropertyChangedEventHandler2(value);
 			}
 
 			private void Update1_BoolInput(global::System.Boolean value)
 			{
-				var dataRoot = _dataRoot;
 				if (!object.Equals(_targetRoot.checkBox2.IsChecked, value))
 				{
 					_settingBinding17 = true;
@@ -587,7 +575,6 @@ namespace WPFTest.Views
 
 			private void Update2_TextInput(global::System.String value)
 			{
-				var dataRoot = _dataRoot;
 				if (!object.Equals(_targetRoot.textBox3.Text, value))
 				{
 					_settingBinding15 = true;
@@ -1019,14 +1006,12 @@ namespace WPFTest.Views
 
 			private void Update0_Model(global::WPFTest.ViewModels.EntityModel value)
 			{
-				var dataRoot = _dataRoot;
 				Update1_SByteProp(value.SByteProp);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
 			}
 
 			private void Update0_BooleanProp(global::System.Boolean value)
 			{
-				var dataRoot = _dataRoot;
 #line (25, 21) - (25, 47) 25 "Page1.xml"
 				_targetRoot.textBlock2.Text = value.ToString();
 #line (26, 21) - (26, 84) 26 "Page1.xml"
@@ -1038,7 +1023,6 @@ namespace WPFTest.Views
 
 			private void Update1_SByteProp(global::System.SByte value)
 			{
-				var dataRoot = _dataRoot;
 #line (23, 28) - (23, 58) 23 "Page1.xml"
 				_targetRoot.textBlock1.Text = value.ToString();
 #line default
@@ -1229,7 +1213,6 @@ namespace WPFTest.Views
 
 			private void Update0_Title(global::System.String value)
 			{
-				var dataRoot = _dataRoot;
 #line (34, 24) - (34, 44) 34 "Page1.xml"
 				_targetRoot.textBlock4.Text = value;
 #line default

@@ -284,9 +284,11 @@ $@"
 				if (_targetRoot == null)
 				{{
 					throw new System.InvalidOperationException();
-				}}
+				}}");
+		output.AppendLine();
 
-				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
+		output.AppendLine(
+$@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 
 		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "_targetRoot", a: "\t");
 
@@ -325,8 +327,19 @@ $@"			}}");
 				output.AppendLine(
 $@"			private void Update{notifyGroup.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
 			{{");
-				output.AppendLine(
+
+				if (prop.UpdateMethod.SetExpressions.Select(d => d.Expression)
+					.Concat(prop.UpdateMethod.LocalVariables.Select(v => v.Expression))
+					.Concat(prop.DependentNotifyProperties.SelectMany(d => d.Properties.Select(p => p.SourceExpression)))
+					.SelectMany(e => e.EnumerateTree())
+					.OfType<VariableExpression>()
+					.Any(e => e.Name == "dataRoot"))
+				{
+
+					output.AppendLine(
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
+				}
+
 				GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "_targetRoot", a: "\t");
 				foreach (var dependentGroup in prop.DependentNotifyProperties)
 				{

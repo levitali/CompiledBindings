@@ -127,7 +127,6 @@ namespace XFTest.Views
 
 			private void Update0_BooleanProp(global::System.Boolean value)
 			{
-				var dataRoot = _targetRoot;
 #line (71, 13) - (71, 92) 71 "Page1.xml"
 				_targetRoot.button1.IsEnabled = value;
 #line default
@@ -135,7 +134,6 @@ namespace XFTest.Views
 
 			private void Update1_SelectedItem(global::System.Object value)
 			{
-				var dataRoot = _targetRoot;
 #line (71, 13) - (71, 92) 71 "Page1.xml"
 				var value1 = (((global::XFTest.ViewModels.EntityViewModel)value));
 #line default
@@ -343,7 +341,6 @@ namespace XFTest.Views
 
 			private void Update0_NullableIntProp(global::System.Nullable<global::System.Int32> value)
 			{
-				var dataRoot = _dataRoot;
 #line (45, 16) - (45, 51) 45 "Page1.xml"
 				_targetRoot.label8.Text = (value ?? 0).ToString();
 #line (53, 13) - (53, 56) 53 "Page1.xml"
@@ -368,7 +365,6 @@ namespace XFTest.Views
 
 			private void Update0_ListProp(global::System.Collections.Generic.IList<global::XFTest.ViewModels.EntityViewModel> value)
 			{
-				var dataRoot = _dataRoot;
 #line (47, 16) - (47, 54) 47 "Page1.xml"
 				var value1 = value[0];
 #line (58, 13) - (58, 63) 58 "Page1.xml"
@@ -380,7 +376,6 @@ namespace XFTest.Views
 
 			private void Update0_FocusedField(global::UI.FocusState<global::XFTest.ViewModels.Page1ViewModel.Field> value)
 			{
-				var dataRoot = _dataRoot;
 #line (51, 13) - (51, 56) 51 "Page1.xml"
 				_targetRoot.entry1.SetFocused(value[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line default
@@ -408,7 +403,6 @@ namespace XFTest.Views
 
 			private void Update0_ArrayProp(global::System.Int32[] value)
 			{
-				var dataRoot = _dataRoot;
 #line (57, 13) - (57, 53) 57 "Page1.xml"
 				_targetRoot.list.IsVisible = value?.Length > 0;
 #line default
@@ -416,7 +410,6 @@ namespace XFTest.Views
 
 			private void Update1_DecimalProp(global::System.Decimal value)
 			{
-				var dataRoot = _dataRoot;
 #line (47, 16) - (47, 54) 47 "Page1.xml"
 				_targetRoot.label10.Text = value.ToString();
 #line default
@@ -727,14 +720,12 @@ namespace XFTest.Views
 
 			private void Update0_Model(global::XFTest.ViewModels.EntityModel value)
 			{
-				var dataRoot = _dataRoot;
 				Update1_SByteProp(value?.SByteProp ?? default);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
 			}
 
 			private void Update0_BooleanProp(global::System.Boolean value)
 			{
-				var dataRoot = _dataRoot;
 #line (21, 24) - (21, 50) 21 "Page1.xml"
 				_targetRoot.label2.Text = value.ToString();
 #line default
@@ -742,7 +733,6 @@ namespace XFTest.Views
 
 			private void Update1_SByteProp(global::System.SByte value)
 			{
-				var dataRoot = _dataRoot;
 #line (20, 24) - (20, 54) 20 "Page1.xml"
 				_targetRoot.label1.Text = value.ToString();
 #line default
@@ -941,7 +931,6 @@ namespace XFTest.Views
 
 			private void Update0_ExtraProp(global::System.String value)
 			{
-				var dataRoot = _dataRoot;
 #line (31, 15) - (31, 79) 31 "Page1.xml"
 				_targetRoot.label4.Text = value;
 #line default
@@ -949,7 +938,6 @@ namespace XFTest.Views
 
 			private void Update1_BooleanProp(global::System.Boolean value)
 			{
-				var dataRoot = _dataRoot;
 #line (30, 36) - (30, 62) 30 "Page1.xml"
 				_targetRoot.label3.Text = value.ToString();
 #line default
@@ -1135,7 +1123,6 @@ namespace XFTest.Views
 
 			private void Update0_DecimalProp(global::System.Decimal value)
 			{
-				var dataRoot = _dataRoot;
 #line (63, 32) - (63, 58) 63 "Page1.xml"
 				_targetRoot.label11.Text = value.ToString();
 #line default
@@ -1143,7 +1130,6 @@ namespace XFTest.Views
 
 			private void Update0_StringProp(global::System.String value)
 			{
-				var dataRoot = _dataRoot;
 #line (64, 14) - (64, 54) 64 "Page1.xml"
 				_targetRoot.label12.Text = value?.TrimStart('0');
 #line default
