@@ -372,7 +372,7 @@ public static class BindingParser
 			notifyPropertyChangedList[i].Index = i;
 		}
 
-		foreach (var notifPropData in notifyPropertyChangedList)
+		foreach (var notifPropData in notifyPropertyChangedList.OrderByDescending(d => d.SourceExpression.CSharpCode))
 		{
 			foreach (var prop in notifPropData.Properties)
 			{
@@ -380,8 +380,13 @@ public static class BindingParser
 				foreach (var notifPropData2 in notifyPropertyChangedList
 					.Where(g => g != notifPropData && GetSourceExpr(g.Expression).CSharpCode.StartsWith(expr)))
 				{
-					var notifPropData2Clone = notifPropData2.Clone();
-					prop.DependentNotifyProperties.Add(notifPropData2Clone);
+					if (!prop.DependentNotifyProperties
+						.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifyProperties))
+						.Any(d => d.Index == notifPropData2.Index))
+					{
+						var notifPropData2Clone = notifPropData2.Clone();
+						prop.DependentNotifyProperties.Add(notifPropData2Clone);
+					}
 
 					foreach (var b in notifPropData2.Properties.SelectMany(p => p.Bindings))
 					{

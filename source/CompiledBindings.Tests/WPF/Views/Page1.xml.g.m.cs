@@ -628,8 +628,6 @@ namespace WPFTest.Views
 				Update1_ModifyTextViewModel(value?.ModifyTextViewModel);
 				Update1_BoolInput(value?.BoolInput ?? default);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
-				Update2_TextInput(value?.ModifyTextViewModel?.TextInput);
-				_bindingsTrackings.SetPropertyChangedEventHandler2(value?.ModifyTextViewModel);
 			}
 
 			private void Update0_TaskProp(global::System.Threading.Tasks.Task<global::System.String> value)
