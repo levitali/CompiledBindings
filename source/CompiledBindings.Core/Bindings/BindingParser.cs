@@ -381,7 +381,7 @@ public static class BindingParser
 			{
 				var expr = prop.Expression.CSharpCode;
 				foreach (var notifPropData2 in notifyPropertyChangedList
-					.Where(g => g != notifPropData && GetSourceExpr(g.Expression).CSharpCode.StartsWith(expr)))
+					.Where(g => g != notifPropData && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.CSharpCode == expr)))
 				{
 					if (!prop.DependentNotifyProperties
 						.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifyProperties))
