@@ -120,9 +120,9 @@ namespace XFTest.Views
 				Update0_FuncProp(dataRoot._viewModel.FuncProp);
 				Update0_CurrentItem(dataRoot._viewModel.CurrentItem);
 				Update0_CurrentItem2(dataRoot._viewModel.CurrentItem2);
+				Update0_Group(dataRoot._viewModel.Group);
 				Update0_StringProp(dataRoot._viewModel.StringProp);
 				Update0_DecimalProp(dataRoot._viewModel.DecimalProp);
-				Update0_Group(dataRoot._viewModel.Group);
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
 			}

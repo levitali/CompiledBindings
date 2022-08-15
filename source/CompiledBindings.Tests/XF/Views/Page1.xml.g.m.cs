@@ -116,11 +116,7 @@ namespace XFTest.Views
 				}
 
 				var dataRoot = _targetRoot;
-#line (71, 13) - (71, 92) 71 "Page1.xml"
-				var value1 = dataRoot.list.SelectedItem;
-#line default
-				Update0_BooleanProp((((global::XFTest.ViewModels.EntityViewModel)value1))?.BooleanProp ?? default);
-				Update1_SelectedItem(value1);
+				Update1_SelectedItem(dataRoot.list.SelectedItem);
 
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.list);
 			}

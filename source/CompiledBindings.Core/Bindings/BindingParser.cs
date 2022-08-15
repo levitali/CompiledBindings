@@ -375,7 +375,7 @@ public static class BindingParser
 			notifyPropertyChangedList[i].Index = i;
 		}
 
-		foreach (var notifPropData in notifyPropertyChangedList.OrderByDescending(d => d.Expression.CSharpCode))
+		foreach (var notifPropData in notifyPropertyChangedList.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
 		{
 			foreach (var prop in notifPropData.Properties)
 			{
@@ -395,19 +395,6 @@ public static class BindingParser
 					{
 						prop.SetBindings.Remove(b);
 					}
-				}
-
-				static Expression GetSourceExpr(Expression expr)
-				{
-					if (expr is ParenExpression pe)
-					{
-						return GetSourceExpr(pe.Expression);
-					}
-					else if (expr is CastExpression ce)
-					{
-						return GetSourceExpr(ce.Expression);
-					}
-					return expr;
 				}
 			}
 		}
@@ -499,6 +486,7 @@ public static class BindingParser
 		var notifProps = notifyPropertyChangedList
 			.SelectMany(d => d.Properties)
 			.OrderByDescending(p => p.Bindings.Count)
+			.ThenByDescending(p => p.DependentNotifyProperties.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifyProperties)).Count())
 			.ToList();
 		var propUpdates = new List<NotifyPropertyChangedProperty>();
 		while (notifProps.Count > 0)
@@ -567,6 +555,20 @@ public static class BindingParser
 			UpdateMethod = updateMethod,
 			UpdateProperties = propUpdates,
 		};
+
+
+		static Expression GetSourceExpr(Expression expr)
+		{
+			if (expr is ParenExpression pe)
+			{
+				return GetSourceExpr(pe.Expression);
+			}
+			else if (expr is CastExpression ce)
+			{
+				return GetSourceExpr(ce.Expression);
+			}
+			return expr;
+		}
 	}
 
 	private static class Res
