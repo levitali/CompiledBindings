@@ -287,11 +287,31 @@ namespace XFTest.Views
 				}
 
 				var dataRoot = _dataRoot;
+#line (42, 13) - (42, 39) 42 "Page1.xml"
+				var value1 = dataRoot.DecimalProp;
+#line (42, 13) - (42, 39) 42 "Page1.xml"
+				_targetRoot.label6.Text = value1.ToString();
+#line (44, 16) - (44, 46) 44 "Page1.xml"
+				_targetRoot.label7.Text = (value1 + 1).ToString();
+#line (54, 22) - (54, 68) 54 "Page1.xml"
+				var value2 = dataRoot.StringProp;
+#line default
+				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value2))
+				{
+					_settingBinding10 = true;
+					try
+					{
+						_targetRoot.pickerEx1.SelectedItem = value2;
+					}
+					finally
+					{
+						_settingBinding10 = false;
+					}
+				}
+#line default
 				Update0_BooleanProp(dataRoot.BooleanProp);
-				Update0_DecimalProp(dataRoot.DecimalProp);
 				Update0_NullableIntProp(dataRoot.NullableIntProp);
 				Update0_ListProp(dataRoot.ListProp);
-				Update0_StringProp(dataRoot.StringProp);
 				Update0_FocusedField(dataRoot.FocusedField);
 				Update0_ArrayProp(dataRoot.ArrayProp);
 			}

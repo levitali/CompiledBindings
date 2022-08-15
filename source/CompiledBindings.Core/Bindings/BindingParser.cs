@@ -333,13 +333,13 @@ public static class BindingParser
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
 			.GroupBy(e => e.expr.Expression.CSharpCode)
-			.Select(g => 			
+			.Select(g =>
 			{
 				var expr1 = g.First().expr.Expression;
 				var d = new NotifyPropertyChangedData
 				{
 					Expression = expr1,
-					SourceExpression = expr1,					
+					SourceExpression = expr1,
 				};
 				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
 				{
@@ -403,8 +403,13 @@ public static class BindingParser
 		{
 			foreach (var prop in notifPropData.Properties)
 			{
-				var expr = new VariableExpression(prop.Property.PropertyType, "value");
-				
+				var type = prop.Property.PropertyType;
+				if (!type.IsNullable && prop.Expression.IsNullable)
+				{
+					type = new TypeInfo(type, true);
+				}
+				var expr = new VariableExpression(type, "value");
+
 				var setExpressions1 = prop.SetBindings
 					.Select(b =>
 					{
@@ -494,9 +499,7 @@ public static class BindingParser
 			var prop = notifProps[0];
 			propUpdates.Add(prop.Clone());
 			prop.Bindings.ForEach(b => binds1.Remove(b));
-			notifProps = notifProps
-				.Except(EnumerableExtensions.SelectTree(prop, p => p.DependentNotifyProperties.SelectMany(d => d.Properties), true))
-				.ToList();
+			notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
 			updateNotifyPropertyChangedList = updateNotifyPropertyChangedList
 				.Except(prop.DependentNotifyProperties.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifyProperties)), f => f.Index)
 				.ToList();
@@ -511,7 +514,7 @@ public static class BindingParser
 			{
 				var expr = p.Expression;
 				if (p.Property.PropertyType.Type.IsValueType &&
-				    !p.Property.PropertyType.Type.IsValueNullable() &&
+					!p.Property.PropertyType.Type.IsValueNullable() &&
 					expr.IsNullable)
 				{
 					expr = new CoalesceExpression(expr, Expression.DefaultExpression);

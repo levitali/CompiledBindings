@@ -386,7 +386,6 @@ namespace WPFTest.Views
 				Update0_ArrayProp(dataRoot.ArrayProp);
 				Update0_IntProp(dataRoot.IntProp);
 				Update0_OrderInput(dataRoot.OrderInput);
-				Update0_BoolInput(dataRoot.BoolInput);
 				Update0_ListProp(dataRoot.ListProp);
 				Update0_TaskProp(dataRoot.TaskProp);
 			}
@@ -552,7 +551,7 @@ namespace WPFTest.Views
 
 			private void Update1_ModifyTextViewModel(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
 			{
-				Update2_TextInput(value.TextInput);
+				Update2_TextInput(value?.TextInput);
 				_bindingsTrackings.SetPropertyChangedEventHandler2(value);
 			}
 
