@@ -216,7 +216,7 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::System.Windows.Controls.ListView)sender;
-					bindings.Update1_SelectedItem(typedSender.SelectedItem)
+					bindings.Update1_SelectedItem(typedSender.SelectedItem);
 				}
 
 				Page1_Bindings TryGetBindings()

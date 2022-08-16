@@ -585,7 +585,7 @@ $@"					var bindings = TryGetBindings();
 					var typedSender = (global::{notifySource.Expression.Type.Type.GetCSharpFullName()})sender;");
 
 						output = output.AppendLine(
-$@"					bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name})");
+$@"					bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
 						output.AppendLine(
 $@"				}}");
 					}
