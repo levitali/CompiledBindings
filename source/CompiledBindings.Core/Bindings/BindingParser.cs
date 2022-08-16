@@ -326,7 +326,8 @@ public static class BindingParser
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
-		var notifyPropertyChangedList = binds
+		// Go through all expressions in bindings and find notifiable properties, grouped by notifiable source
+		var notifySources = binds
 			.Where(b => b.Property.TargetEvent == null &&
 						b.SourceExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
@@ -336,7 +337,7 @@ public static class BindingParser
 			.Select(g =>
 			{
 				var expr1 = g.First().expr.Expression;
-				var d = new NotifyPropertyChangedData
+				var d = new NotifySource
 				{
 					Expression = expr1,
 					SourceExpression = expr1,
@@ -345,7 +346,7 @@ public static class BindingParser
 				{
 					var expr2 = g2.First().expr;
 					var bindings = g2.Select(e => e.bind).Distinct().ToList();
-					return new NotifyPropertyChangedProperty
+					return new NotifyProperty
 					{
 						Parent = d,
 						Property = (PropertyInfo)expr2.Member,
@@ -367,30 +368,35 @@ public static class BindingParser
 				   !pi.Definition.IsStatic() &&
 				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
 				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
-				   !pi.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute" && (bool)a.ConstructorArguments[0].Value == true);
+				   !pi.IsReadOnly;
 		}
 
-		for (int i = 0; i < notifyPropertyChangedList.Count; i++)
+		// Set indexes to notifiable source used as IDs 
+		for (int i = 0; i < notifySources.Count; i++)
 		{
-			notifyPropertyChangedList[i].Index = i;
+			notifySources[i].Index = i;
 		}
 
-		foreach (var notifPropData in notifyPropertyChangedList.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
+		// Get through all notifiable properties, and find dependable notification source, SetPropertyChangedEventHandler of which must be called when the property is changed
+		foreach (var notifPropData in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
 		{
 			foreach (var prop in notifPropData.Properties)
 			{
 				var expr = prop.Expression.CSharpCode;
-				foreach (var notifPropData2 in notifyPropertyChangedList
+				foreach (var notifPropData2 in notifySources
 					.Where(g => g != notifPropData && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.CSharpCode == expr)))
 				{
-					if (!prop.DependentNotifyProperties
-						.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifyProperties))
+					// Skip the notification source, if it's already added to some child
+					if (!prop.DependentNotifySources
+						.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources))
 						.Any(d => d.Index == notifPropData2.Index))
 					{
 						var notifPropData2Clone = notifPropData2.Clone();
-						prop.DependentNotifyProperties.Add(notifPropData2Clone);
+						prop.DependentNotifySources.Add(notifPropData2Clone);
 					}
 
+					// The bindings are set in the "child" UpdateXX_XX method.
+					// Remove them from this notifiable property
 					foreach (var b in notifPropData2.Properties.SelectMany(p => p.Bindings))
 					{
 						prop.SetBindings.Remove(b);
@@ -399,63 +405,61 @@ public static class BindingParser
 			}
 		}
 
-		foreach (var notifPropData in notifyPropertyChangedList)
+		// Go through all notifiable properties, and create expressions to call when the property is changed
+		foreach (var prop in notifySources.SelectMany(s => s.Properties))
 		{
-			foreach (var prop in notifPropData.Properties)
+			var type = prop.Property.PropertyType;
+			if (!type.IsNullable && prop.Expression.IsNullable)
 			{
-				var type = prop.Property.PropertyType;
-				if (!type.IsNullable && prop.Expression.IsNullable)
-				{
-					type = new TypeInfo(type, true);
-				}
-				var expr = new VariableExpression(type, "value");
-
-				var setExpressions1 = prop.SetBindings
-					.Select(b =>
-					{
-						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
-						return new PropertySetExpression(b.Property, expression);
-					})
-					.ToList();
-				var setExpressions2 = prop.DependentNotifyProperties
-					.SelectMany(d => d.Properties)
-					.Select(p =>
-					{
-						var expression = p.Expression.CloneReplace(prop.Expression, expr);
-						if (p.Property.PropertyType.Type.IsValueType &&
-							!p.Property.PropertyType.Type.IsValueNullable() &&
-							expression.IsNullable)
-						{
-							expression = new CoalesceExpression(expression, Expression.DefaultExpression);
-						}
-						return new PropertySetExpression(p.Bindings[0].Property, expression);
-					})
-					.ToList();
-				var setExpressions3 = prop.DependentNotifyProperties
-					.Select(d => new PropertySetExpression(d.Properties[0].Bindings[0].Property, d.Expression.CloneReplace(prop.Expression, expr)))
-					.ToList();
-
-				var setExpressions = setExpressions1.Concat(setExpressions2).Concat(setExpressions3).ToList();
-
-				var localVars = ExpressionUtils.GroupExpressions(setExpressions);
-
-				int i = 0;
-				foreach (var p in prop.DependentNotifyProperties.SelectMany(d => d.Properties))
-				{
-					p.SourceExpression = setExpressions2[i++].Expression;
-				}
-
-				for (i = 0; i < setExpressions3.Count; i++)
-				{
-					prop.DependentNotifyProperties[i].SourceExpression = setExpressions3[i].Expression;
-				}
-
-				prop.UpdateMethod = new UpdateMethod
-				{
-					LocalVariables = localVars,
-					SetExpressions = setExpressions1
-				};
+				type = new TypeInfo(type, true);
 			}
+			var expr = new VariableExpression(type, "value");
+
+			var setExpressions1 = prop.SetBindings
+				.Select(b =>
+				{
+					var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
+					return new PropertySetExpression(b.Property, expression);
+				})
+				.ToList();
+			var setExpressions2 = prop.DependentNotifySources
+				.SelectMany(d => d.Properties)
+				.Select(p =>
+				{
+					var expression = p.Expression.CloneReplace(prop.Expression, expr);
+					if (p.Property.PropertyType.Type.IsValueType &&
+						!p.Property.PropertyType.Type.IsValueNullable() &&
+						expression.IsNullable)
+					{
+						expression = new CoalesceExpression(expression, Expression.DefaultExpression);
+					}
+					return new PropertySetExpression(p.Bindings[0].Property, expression);
+				})
+				.ToList();
+			var setExpressions3 = prop.DependentNotifySources
+				.Select(d => new PropertySetExpression(d.Properties[0].Bindings[0].Property, d.Expression.CloneReplace(prop.Expression, expr)))
+				.ToList();
+
+			var setExpressions = setExpressions1.Concat(setExpressions2).Concat(setExpressions3).ToList();
+
+			var localVars = ExpressionUtils.GroupExpressions(setExpressions);
+
+			int i = 0;
+			foreach (var p in prop.DependentNotifySources.SelectMany(d => d.Properties))
+			{
+				p.SourceExpression = setExpressions2[i++].Expression;
+			}
+
+			for (i = 0; i < setExpressions3.Count; i++)
+			{
+				prop.DependentNotifySources[i].SourceExpression = setExpressions3[i].Expression;
+			}
+
+			prop.UpdateMethod = new UpdateMethod
+			{
+				LocalVariables = localVars,
+				SetExpressions = setExpressions1
+			};
 		}
 
 		var twoWayEventHandlers1 = binds
@@ -487,21 +491,29 @@ public static class BindingParser
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.ToList();
 
-		var updateNotifyPropertyChangedList = notifyPropertyChangedList.ToList();
-		var notifProps = notifyPropertyChangedList
+		// Get the list of properties, UpdateXX_XXX methods of which can be used in the main Update method
+
+		var updateMethodNotifyProps = new List<NotifyProperty>();
+		var notifProps = notifySources  // all notifiable properties
 			.SelectMany(d => d.Properties)
+			// First use UpdateXX_XX methods which set the most bindings
 			.OrderByDescending(p => p.Bindings.Count)
-			.ThenByDescending(p => p.DependentNotifyProperties.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifyProperties)).Count())
+			// Ensure that the "parent" UpdateXX_XX are used
+			.ThenByDescending(p => p.DependentNotifySources.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifySources)).Count())
 			.ToList();
-		var propUpdates = new List<NotifyPropertyChangedProperty>();
+		var updateNotifySources = notifySources.ToList(); // the list of notifiable source, for which SetPropertyChangedEventHandler must be called in the main Update method
+
 		while (notifProps.Count > 0)
 		{
 			var prop = notifProps[0];
-			propUpdates.Add(prop.Clone());
+			updateMethodNotifyProps.Add(prop.Clone());
+			// These bindings are set in the UpdateXX_XX method. No more set them in the main Update method
 			prop.Bindings.ForEach(b => binds1.Remove(b));
+			// Do not consider UpdateXX_XX methods, which set the same bindings
 			notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
-			updateNotifyPropertyChangedList = updateNotifyPropertyChangedList
-				.Except(prop.DependentNotifyProperties.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifyProperties)), f => f.Index)
+			// Remove calls of SetPropertyChangedEventHandler methods, which are called in this UpdateXX_XX one
+			updateNotifySources = updateNotifySources
+				.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
 				.ToList();
 		}
 
@@ -509,7 +521,7 @@ public static class BindingParser
 			.Select(b => new PropertySetExpression(b.Property, b.SourceExpression!))
 			.ToList();
 
-		var props2 = propUpdates
+		var props2 = updateMethodNotifyProps
 			.Select(p =>
 			{
 				var expr = p.Expression;
@@ -523,7 +535,7 @@ public static class BindingParser
 			})
 			.ToList();
 
-		var props3 = updateNotifyPropertyChangedList
+		var props3 = updateNotifySources
 			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, g.Expression))
 			.ToList();
 
@@ -533,12 +545,12 @@ public static class BindingParser
 
 		for (int i = 0; i < props2.Count; i++)
 		{
-			propUpdates[i].SourceExpression = props2[i].Expression;
+			updateMethodNotifyProps[i].SourceExpression = props2[i].Expression;
 		}
 
 		for (int i = 0; i < props3.Count; i++)
 		{
-			updateNotifyPropertyChangedList[i].SourceExpression = props3[i].Expression;
+			updateNotifySources[i].SourceExpression = props3[i].Expression;
 		}
 
 		var updateMethod = new UpdateMethod
@@ -552,11 +564,11 @@ public static class BindingParser
 			DataType = dataType,
 			TargetType = targetType,
 			Bindings = binds,
-			NotifyPropertyChangedList = notifyPropertyChangedList,
-			UpdateNotifyPropertyChangedList = updateNotifyPropertyChangedList,
+			NotifySources = notifySources,
+			UpdateMethodNotifySources = updateNotifySources,
 			TwoWayEvents = twoWayEventHandlers,
 			UpdateMethod = updateMethod,
-			UpdateProperties = propUpdates,
+			UpdateMethodNotifyProperties = updateMethodNotifyProps,
 		};
 
 
@@ -589,11 +601,11 @@ public class BindingsData
 	public TypeInfo? TargetType { get; init; }
 	public TypeInfo DataType { get; init; }
 	public IList<Bind> Bindings { get; init; }
-	public List<NotifyPropertyChangedData> NotifyPropertyChangedList { get; init; }
-	public List<NotifyPropertyChangedData> UpdateNotifyPropertyChangedList { get; init; }
+	public List<NotifySource> NotifySources { get; init; }
+	public List<NotifySource> UpdateMethodNotifySources { get; init; }
 	public List<TwoWayEventData> TwoWayEvents { get; init; }
 	public UpdateMethod UpdateMethod { get; init; }
-	public List<NotifyPropertyChangedProperty> UpdateProperties { get; init; }
+	public List<NotifyProperty> UpdateMethodNotifyProperties { get; init; }
 
 	public void Validate(string file)
 	{
@@ -607,30 +619,30 @@ public class BindingsData
 	}
 };
 
-public class NotifyPropertyChangedData
+public class NotifySource
 {
 	public Expression Expression { get; init; }
 	public Expression SourceExpression { get; set; }
-	public List<NotifyPropertyChangedProperty> Properties { get; set; }
+	public List<NotifyProperty> Properties { get; set; }
 	public int Index { get; set; }
-	public NotifyPropertyChangedData Clone()
+	public NotifySource Clone()
 	{
-		return (NotifyPropertyChangedData)MemberwiseClone();
+		return (NotifySource)MemberwiseClone();
 	}
 };
 
-public class NotifyPropertyChangedProperty
+public class NotifyProperty
 {
-	public NotifyPropertyChangedData Parent { get; init; }
+	public NotifySource Parent { get; init; }
 	public PropertyInfo Property { get; init; }
 	public Expression Expression { get; init; }
 	public Expression SourceExpression { get; set; }
 	public ReadOnlyCollection<Bind> Bindings { get; init; }
 	public List<Bind> SetBindings { get; init; }
 	public UpdateMethod UpdateMethod { get; set; }
-	public List<NotifyPropertyChangedData> DependentNotifyProperties { get; } = new List<NotifyPropertyChangedData>();
+	public List<NotifySource> DependentNotifySources { get; } = new();
 
-	public NotifyPropertyChangedProperty Clone() => (NotifyPropertyChangedProperty)MemberwiseClone();
+	public NotifyProperty Clone() => (NotifyProperty)MemberwiseClone();
 };
 
 public class TwoWayEventData

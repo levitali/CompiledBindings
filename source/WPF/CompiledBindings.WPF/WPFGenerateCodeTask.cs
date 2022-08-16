@@ -426,21 +426,21 @@ $@"					global::System.ComponentModel.DependencyPropertyDescriptor
 $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 	}
 
-	protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifyPropertyChangedData notifyGroup, NotifyPropertyChangedProperty notifyProp, string cacheVar, string methodName)
+	protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 	{
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}))
+								global::{notifySource.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Type.GetCSharpFullName()}))
 							.AddValueChanged({cacheVar}, {methodName});");
 	}
 
-	protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifyPropertyChangedData notifyGroup, NotifyPropertyChangedProperty notifyProp, string cacheVar, string methodName)
+	protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 	{
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifyGroup.Expression.Type.Type.GetCSharpFullName()}))
+								global::{notifySource.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Type.GetCSharpFullName()}))
 							.RemoveValueChanged({cacheVar}, {methodName});");
 	}
 }

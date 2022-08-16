@@ -287,33 +287,41 @@ namespace XFTest.Views
 				}
 
 				var dataRoot = _dataRoot;
+#line (58, 13) - (58, 63) 58 "Page1.xml"
+				var value1 = dataRoot.ListProp;
 #line (42, 13) - (42, 39) 42 "Page1.xml"
-				var value1 = dataRoot.DecimalProp;
+				var value2 = dataRoot.DecimalProp;
+#line (47, 16) - (47, 54) 47 "Page1.xml"
+				var value3 = value1[0];
 #line (42, 13) - (42, 39) 42 "Page1.xml"
-				_targetRoot.label6.Text = value1.ToString();
+				_targetRoot.label6.Text = value2.ToString();
 #line (44, 16) - (44, 46) 44 "Page1.xml"
-				_targetRoot.label7.Text = (value1 + 1).ToString();
+				_targetRoot.label7.Text = (value2 + 1).ToString();
 #line (54, 22) - (54, 68) 54 "Page1.xml"
-				var value2 = dataRoot.StringProp;
+				var value4 = dataRoot.StringProp;
 #line default
-				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value2))
+				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value4))
 				{
 					_settingBinding10 = true;
 					try
 					{
-						_targetRoot.pickerEx1.SelectedItem = value2;
+						_targetRoot.pickerEx1.SelectedItem = value4;
 					}
 					finally
 					{
 						_settingBinding10 = false;
 					}
 				}
+#line (58, 13) - (58, 63) 58 "Page1.xml"
+				_targetRoot.list.ItemsSource = value1;
 #line default
 				Update0_BooleanProp(dataRoot.BooleanProp);
 				Update0_NullableIntProp(dataRoot.NullableIntProp);
-				Update0_ListProp(dataRoot.ListProp);
 				Update0_FocusedField(dataRoot.FocusedField);
 				Update0_ArrayProp(dataRoot.ArrayProp);
+				Update1_DecimalProp(value3.DecimalProp);
+
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value3);
 			}
 
 			private void Update0_DecimalProp(global::System.Decimal value)
@@ -377,17 +385,6 @@ namespace XFTest.Views
 #line (74, 7) - (74, 46) 74 "Page1.xml"
 				global::Xamarin.Forms.Grid.SetRow(_targetRoot.label13, value ?? 9);
 #line default
-			}
-
-			private void Update0_ListProp(global::System.Collections.Generic.IList<global::XFTest.ViewModels.EntityViewModel> value)
-			{
-#line (47, 16) - (47, 54) 47 "Page1.xml"
-				var value1 = value[0];
-#line (58, 13) - (58, 63) 58 "Page1.xml"
-				_targetRoot.list.ItemsSource = value;
-#line default
-				Update1_DecimalProp(value1.DecimalProp);
-				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
 			private void Update0_FocusedField(global::UI.FocusState<global::XFTest.ViewModels.Page1ViewModel.Field> value)
@@ -588,14 +585,6 @@ namespace XFTest.Views
 							return;
 						}
 					}
-					if (notifyAll || e.PropertyName == "ListProp")
-					{
-						bindings.Update0_ListProp(typedSender.ListProp);
-						if (!notifyAll)
-						{
-							return;
-						}
-					}
 					if (notifyAll || e.PropertyName == "FocusedField")
 					{
 						bindings.Update0_FocusedField(typedSender.FocusedField);
@@ -730,14 +719,13 @@ namespace XFTest.Views
 				}
 
 				var dataRoot = _dataRoot;
-				Update0_Model(dataRoot.Model);
+#line (20, 24) - (20, 54) 20 "Page1.xml"
+				var value1 = dataRoot.Model;
+#line default
 				Update0_BooleanProp(dataRoot.BooleanProp);
-			}
+				Update1_SByteProp(value1?.SByteProp ?? default);
 
-			private void Update0_Model(global::XFTest.ViewModels.EntityModel value)
-			{
-				Update1_SByteProp(value?.SByteProp ?? default);
-				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
 			private void Update0_BooleanProp(global::System.Boolean value)
@@ -810,14 +798,6 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
 					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
 
-					if (notifyAll || e.PropertyName == "Model")
-					{
-						bindings.Update0_Model(typedSender.Model);
-						if (!notifyAll)
-						{
-							return;
-						}
-					}
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
 						bindings.Update0_BooleanProp(typedSender.BooleanProp);
@@ -915,7 +895,7 @@ namespace XFTest.Views
 
 				Update();
 
-				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot);
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 			}
 
 			public void Cleanup()
@@ -937,22 +917,12 @@ namespace XFTest.Views
 
 				var dataRoot = _dataRoot;
 #line (31, 15) - (31, 79) 31 "Page1.xml"
-				var value1 = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel);
+				_targetRoot.label4.Text = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel)?.ExtraProp;
 #line default
-				Update0_ExtraProp(value1?.ExtraProp);
-				Update1_BooleanProp(dataRoot.BooleanProp);
-
-				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
+				Update0_BooleanProp(dataRoot.BooleanProp);
 			}
 
-			private void Update0_ExtraProp(global::System.String value)
-			{
-#line (31, 15) - (31, 79) 31 "Page1.xml"
-				_targetRoot.label4.Text = value;
-#line default
-			}
-
-			private void Update1_BooleanProp(global::System.Boolean value)
+			private void Update0_BooleanProp(global::System.Boolean value)
 			{
 #line (30, 36) - (30, 62) 30 "Page1.xml"
 				_targetRoot.label3.Text = value.ToString();
@@ -962,8 +932,7 @@ namespace XFTest.Views
 			class Page1_DataTemplate1_BindingsTrackings_rootElement
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::XFTest.ViewModels.ExtEntityViewModel _propertyChangeSource0;
-				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource1;
+				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
 
 				public Page1_DataTemplate1_BindingsTrackings_rootElement(Page1_DataTemplate1_Bindings_rootElement bindings)
 				{
@@ -973,10 +942,9 @@ namespace XFTest.Views
 				public void Cleanup()
 				{
 					SetPropertyChangedEventHandler0(null);
-					SetPropertyChangedEventHandler1(null);
 				}
 
-				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.ExtEntityViewModel value)
+				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
 				{
 					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
 					{
@@ -990,38 +958,7 @@ namespace XFTest.Views
 					}
 				}
 
-				public void SetPropertyChangedEventHandler1(global::XFTest.ViewModels.EntityViewModel value)
-				{
-					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
-					if (_propertyChangeSource1 == null && value != null)
-					{
-						_propertyChangeSource1 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged += OnPropertyChanged1;
-					}
-				}
-
 				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-				{
-					var bindings = TryGetBindings();
-					if (bindings == null)
-					{
-						return;
-					}
-
-					var typedSender = (global::XFTest.ViewModels.ExtEntityViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "ExtraProp")
-					{
-						bindings.Update0_ExtraProp(typedSender.ExtraProp);
-					}
-				}
-
-				private void OnPropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -1034,7 +971,7 @@ namespace XFTest.Views
 
 					if (notifyAll || e.PropertyName == "BooleanProp")
 					{
-						bindings.Update1_BooleanProp(typedSender.BooleanProp);
+						bindings.Update0_BooleanProp(typedSender.BooleanProp);
 					}
 				}
 

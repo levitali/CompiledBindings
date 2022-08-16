@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 
 namespace WPFTest.ViewModels;
 
@@ -15,18 +14,19 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public int IntProp { get; set; }
 
+	[ReadOnly(false)]
 	public decimal DecimalProp { get; }
 
-	public bool BooleanProp { get; }
+	public bool BooleanProp { get; set; }
 
-	public Page1ModifyViewModel? ModifyViewModel { get; }
+	public Page1ModifyViewModel? ModifyViewModel { get; set; }
 
 	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
 	{
 		new EntityViewModel { DecimalProp = 1, BooleanProp = true },
 	};
 
-	public int[] ArrayProp { get; } = new int[0];
+	public int[] ArrayProp { get; set; } = new int[0];
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
