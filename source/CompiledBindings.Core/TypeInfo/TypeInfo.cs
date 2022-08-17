@@ -339,32 +339,17 @@ public class PropertyInfo : IMemberInfo
 	public PropertyDefinition Definition { get; }
 	public TypeInfo PropertyType { get; }
 
-	public bool IsReadOnly
-	{
-		get
-		{
-			if (_isReadOnly == null)
-			{
-				var attr = Definition.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute");
-				if (attr != null)
-				{
-					_isReadOnly = (bool)attr.ConstructorArguments[0].Value == true;
-				}
-				else
-				{
-					var instructions = Definition.GetMethod.Body.Instructions;
-					_isReadOnly = instructions.Count == 3 &&
-						instructions[0].OpCode == OpCodes.Ldarg_0 &&
-						instructions[1].OpCode == OpCodes.Ldfld &&
-						instructions[2].OpCode == OpCodes.Ret &&
-						instructions[1].Operand is FieldDefinition fld &&
-						fld.IsInitOnly;
-				}
-
-			}
-			return _isReadOnly.Value;
-		}
-	}
+	public bool IsReadOnly => _isReadOnly ??=
+		Definition.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute") is var attr && attr != null
+		? (bool)attr.ConstructorArguments[0].Value
+		: Definition.GetMethod.Body?.Instructions is var instructions &&
+			instructions != null &&
+			instructions.Count == 3 &&
+			instructions[0].OpCode == OpCodes.Ldarg_0 &&
+			instructions[1].OpCode == OpCodes.Ldfld &&
+			instructions[2].OpCode == OpCodes.Ret &&
+			instructions[1].Operand is FieldDefinition fld &&
+			fld.IsInitOnly;
 
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => PropertyType;
