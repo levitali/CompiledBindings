@@ -455,7 +455,7 @@ public static class BindingParser
 				prop.DependentNotifySources[i].SourceExpression = setExpressions3[i].Expression;
 			}
 
-			prop.UpdateMethod = new UpdateMethod
+			prop.UpdateExpressions = new ExpressionGroup
 			{
 				LocalVariables = localVars,
 				SetExpressions = setExpressions1
@@ -553,7 +553,7 @@ public static class BindingParser
 			updateNotifySources[i].SourceExpression = props3[i].Expression;
 		}
 
-		var updateMethod = new UpdateMethod
+		var updateExpressions = new ExpressionGroup
 		{
 			LocalVariables = localVars2,
 			SetExpressions = props1
@@ -567,7 +567,7 @@ public static class BindingParser
 			NotifySources = notifySources,
 			UpdateMethodNotifySources = updateNotifySources,
 			TwoWayEvents = twoWayEventHandlers,
-			UpdateMethod = updateMethod,
+			UpdateMethodExpressions = updateExpressions,
 			UpdateMethodNotifyProperties = updateMethodNotifyProps,
 		};
 
@@ -604,7 +604,7 @@ public class BindingsData
 	public List<NotifySource> NotifySources { get; init; }
 	public List<NotifySource> UpdateMethodNotifySources { get; init; }
 	public List<TwoWayEventData> TwoWayEvents { get; init; }
-	public UpdateMethod UpdateMethod { get; init; }
+	public ExpressionGroup UpdateMethodExpressions { get; init; }
 	public List<NotifyProperty> UpdateMethodNotifyProperties { get; init; }
 
 	public void Validate(string file)
@@ -639,7 +639,7 @@ public class NotifyProperty
 	public Expression SourceExpression { get; set; }
 	public ReadOnlyCollection<Bind> Bindings { get; init; }
 	public List<Bind> SetBindings { get; init; }
-	public UpdateMethod UpdateMethod { get; set; }
+	public ExpressionGroup UpdateExpressions { get; set; }
 	public List<NotifySource> DependentNotifySources { get; } = new();
 
 	public NotifyProperty Clone() => (NotifyProperty)MemberwiseClone();

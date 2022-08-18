@@ -290,7 +290,7 @@ $@"
 		output.AppendLine(
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 
-		GenerateUpdateMethodBody(output, bindingsData.UpdateMethod, targetRootVariable: "_targetRoot", a: "\t");
+		GenerateUpdateMethodBody(output, bindingsData.UpdateMethodExpressions, targetRootVariable: "_targetRoot", a: "\t");
 
 		foreach (var propUpdate in bindingsData.UpdateMethodNotifyProperties)
 		{
@@ -328,8 +328,8 @@ $@"			}}");
 $@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
 			{{");
 
-				if (prop.UpdateMethod.SetExpressions.Select(d => d.Expression)
-					.Concat(prop.UpdateMethod.LocalVariables.Select(v => v.Expression))
+				if (prop.UpdateExpressions.SetExpressions.Select(d => d.Expression)
+					.Concat(prop.UpdateExpressions.LocalVariables.Select(v => v.Expression))
 					.Concat(prop.DependentNotifySources.SelectMany(d => d.Properties.Select(p => p.SourceExpression)))
 					.SelectMany(e => e.EnumerateTree())
 					.OfType<VariableExpression>()
@@ -340,7 +340,7 @@ $@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(gl
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 				}
 
-				GenerateUpdateMethodBody(output, prop.UpdateMethod, targetRootVariable: "_targetRoot", a: "\t");
+				GenerateUpdateMethodBody(output, prop.UpdateExpressions, targetRootVariable: "_targetRoot", a: "\t");
 				foreach (var dependentGroup in prop.DependentNotifySources)
 				{
 					foreach (var prop2 in dependentGroup.Properties)

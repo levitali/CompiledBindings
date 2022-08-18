@@ -237,7 +237,7 @@ $@"{LineDirective(property.XamlNode)}
 		}
 	}
 
-	public void GenerateUpdateMethodBody(StringBuilder output, UpdateMethod updateMethod, string? targetRootVariable = null, string? a = null)
+	public void GenerateUpdateMethodBody(StringBuilder output, ExpressionGroup updateMethod, string? targetRootVariable = null, string? a = null)
 	{
 		int localVarIndex = updateMethod.LocalVariables.Count + 1;
 		int localFuncIndex = 0;

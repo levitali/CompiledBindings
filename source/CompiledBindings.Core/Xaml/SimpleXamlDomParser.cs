@@ -80,7 +80,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				}
 			}
 
-			rootResult.UpdateMethod = ExpressionUtils.CreateUpdateMethod(rootResult.XamlObjects);
+			rootResult.UpdateMethod = ExpressionUtils.GroupExpressions(rootResult.XamlObjects);
 
 			DataType = savedDataType;
 
@@ -320,7 +320,7 @@ public class SimpleXamlDom : XamlDomBase
 	public List<XamlObject>? XamlObjects;
 	public bool HasDestructor;
 
-	public UpdateMethod UpdateMethod;
+	public ExpressionGroup UpdateMethod;
 
 	public List<SimpleXamlDom> DataTemplates = new List<SimpleXamlDom>();
 

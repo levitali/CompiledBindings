@@ -52,18 +52,18 @@ public static class ExpressionUtils
 		return localVars;
 	}
 
-	public static UpdateMethod CreateUpdateMethod(IEnumerable<XamlObject> objects)
+	public static ExpressionGroup GroupExpressions(IEnumerable<XamlObject> objects)
 	{
-		return CreateUpdateMethod(objects.SelectMany(o => o.Properties));
+		return GroupExpressions(objects.SelectMany(o => o.Properties));
 	}
 
-	public static UpdateMethod CreateUpdateMethod(IEnumerable<XamlObjectProperty> properties)
+	public static ExpressionGroup GroupExpressions(IEnumerable<XamlObjectProperty> properties)
 	{
 		var setExpressions = properties.Where(p => p.Value.StaticValue != null).Select(p => new PropertySetExpression(p, p.Value.StaticValue!)).ToList();
 		var setProperties = properties.Where(p => p.Value.CSharpValue != null).ToList();
 
 		var localVars = GroupExpressions(setExpressions);
-		var updateMethod = new UpdateMethod
+		var updateMethod = new ExpressionGroup
 		{
 			LocalVariables = localVars,
 			SetExpressions = setExpressions,
@@ -127,7 +127,7 @@ public class LocalVariable
 	public XamlNode XamlNode { get; }
 }
 
-public class UpdateMethod
+public class ExpressionGroup
 {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public List<LocalVariable> LocalVariables { get; init; }
