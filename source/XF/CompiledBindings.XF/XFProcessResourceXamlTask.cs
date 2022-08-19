@@ -18,7 +18,7 @@ namespace CompiledBindings;
 
 public class XFProcessResourceXamlTask : Task
 {
-	private PlatformConstants _platformConstants;
+	private readonly PlatformConstants _platformConstants;
 
 	public XFProcessResourceXamlTask() : this(new PlatformConstants())
 	{
@@ -142,7 +142,9 @@ public class XFProcessResourceXamlTask : Task
 										string rootName;
 										var xNameAttr = xdoc.Root.Attribute(xamlDomParser.xName);
 										if (xNameAttr != null)
+										{
 											rootName = xNameAttr.Value;
+										}
 										else
 										{
 											rootName = XamlDomParser.GenerateName(xdoc.Root, usedNames);
@@ -318,7 +320,7 @@ public class XFProcessResourceXamlTask : Task
 		}
 	}
 
-	class TextLine
+	private class TextLine
 	{
 		public string Text;
 		public int RemovedTextOffset;

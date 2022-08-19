@@ -138,10 +138,7 @@ public static class BindingParser
 				else if (name == "BindBack")
 				{
 					bindBackExpression = expr;
-					if (mode == null)
-					{
-						mode = BindingMode.TwoWay;
-					}
+					mode ??= BindingMode.TwoWay;
 				}
 				else if (name == "FallbackValue")
 				{

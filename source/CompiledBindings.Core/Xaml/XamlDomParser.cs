@@ -362,13 +362,10 @@ public class XamlDomParser
 							f.Definition.Name == dpName &&
 							f.Definition.IsStatic &&
 							f.FieldType.Type.FullName == dependencyPropertyType);
-						if (dp == null)
-						{
-							dp = typeInfo.Properties.FirstOrDefault(p =>
+						dp ??= typeInfo.Properties.FirstOrDefault(p =>
 								p.Definition.Name == dpName &&
 								p.Definition.IsStatic() &&
 								p.PropertyType.Type.FullName == dependencyPropertyType);
-						}
 						if (dp != null)
 						{
 							value.BindValue.DependencyProperty = dp;
@@ -424,7 +421,7 @@ public class XamlDomParser
 			prop.MemberType?.Type.FullName == "System.String" && expression.Type.Type.FullName != "System.String")
 		{
 			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
-			if (expression is (UnaryExpression or BinaryExpression or CoalesceExpression))
+			if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
 			{
 				expression = new ParenExpression(expression);
 			}

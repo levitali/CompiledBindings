@@ -100,17 +100,17 @@ $@"	}}");
 	private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult, bool isDataTemplate)
 	{
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
-		foreach (var resource in resources)
+		foreach (var (name, type) in resources)
 		{
 			if (isDataTemplate)
 			{
 				output.AppendLine(
-$@"		public global::{resource.type.Type.GetCSharpFullName()} {resource.name} {{ get; set; }}");
+$@"		public global::{type.Type.GetCSharpFullName()} {name} {{ get; set; }}");
 			}
 			else
 			{
 				output.AppendLine(
-$@"		global::{resource.type.Type.GetCSharpFullName()} {resource.name};");
+$@"		global::{type.Type.GetCSharpFullName()} {name};");
 			}
 		}
 	}
@@ -120,10 +120,10 @@ $@"		global::{resource.type.Type.GetCSharpFullName()} {resource.name};");
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
 		if (resources.Count > 0)
 		{
-			foreach (var resource in resources)
+			foreach (var (name, type) in resources)
 			{
 				output.AppendLine(
-$@"			{resource.name} = (global::{resource.type.Type.GetCSharpFullName()})({CreateGetResourceCode(resource.name)});");
+$@"			{name} = (global::{type.Type.GetCSharpFullName()})({CreateGetResourceCode(name)});");
 			}
 
 			output.AppendLine();

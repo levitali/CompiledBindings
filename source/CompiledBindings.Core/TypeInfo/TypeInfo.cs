@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public class TypeInfo
 {
-	private static readonly Dictionary<string, TypeInfo> _typeCache = new Dictionary<string, TypeInfo>(StringComparer.OrdinalIgnoreCase);
+	private static readonly Dictionary<string, TypeInfo> _typeCache = new(StringComparer.OrdinalIgnoreCase);
 
 	private IList<PropertyInfo>? _properties;
 	private IList<FieldInfo>? _fields;
@@ -224,10 +224,7 @@ public class TypeInfo
 					if (gp[i].Name == type.Name)
 					{
 						type = type2.GetGenericArguments()[i];
-						if (isNullable == null)
-						{
-							isNullable = GetIsNullableSubElement(i + 1);
-						}
+						isNullable ??= GetIsNullableSubElement(i + 1);
 						goto Label_Break1;
 					}
 				}
@@ -266,7 +263,7 @@ Label_Break1:
 
 		if (isNullable == null)
 		{
-			var b = (nullableFlags?[0] ?? nullableContext);
+			var b = nullableFlags?[0] ?? nullableContext;
 			isNullable = b is null or 0 ? null : b == 2;
 		}
 

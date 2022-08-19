@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -16,7 +15,7 @@ namespace CompiledBindings;
 public class XFGenerateCodeTask : Task, ICancelableTask
 {
 	private CancellationTokenSource? _cancellationTokenSource;
-	private PlatformConstants _platformConstants;
+	private readonly PlatformConstants _platformConstants;
 
 	public XFGenerateCodeTask() : this(new PlatformConstants())
 	{
@@ -279,7 +278,7 @@ public class XFXamlDomParser : SimpleXamlDomParser
 
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 {
-	PlatformConstants _platformConstants;
+	private readonly PlatformConstants _platformConstants;
 
 	public XFCodeGenerator(string langVersion, string msbuildVersion, PlatformConstants platformConstants)
 		: base(new BindingsCodeGenerator(langVersion, msbuildVersion),

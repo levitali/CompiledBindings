@@ -4,7 +4,7 @@ namespace CompiledBindings;
 
 public class ExpressionParser
 {
-	private static readonly Dictionary<string, Expression> _keywords = new Dictionary<string, Expression>
+	private static readonly Dictionary<string, Expression> _keywords = new()
 	{
 		{ "true", new ConstantExpression(true) },
 		{ "false", new ConstantExpression(false) },
@@ -12,7 +12,7 @@ public class ExpressionParser
 	};
 	private readonly VariableExpression _root;
 	private readonly IList<XamlNamespace> _namespaces;
-	private readonly List<XamlNamespace> _includeNamespaces = new List<XamlNamespace>();
+	private readonly List<XamlNamespace> _includeNamespaces = new();
 	private readonly string _text;
 	private int _textPos;
 	private readonly int _textLen;
@@ -469,23 +469,16 @@ public class ExpressionParser
 
 	private Expression ParsePrimaryStart()
 	{
-		switch (_token.id)
+		return _token.id switch
 		{
-			case TokenId.Identifier:
-				return ParseIdentifier();
-			case TokenId.InterpolatedString:
-				return ParseInterpolatedString();
-			case TokenId.StringLiteral:
-				return ParseStringLiteral();
-			case TokenId.IntegerLiteral:
-				return ParseIntegerLiteral();
-			case TokenId.RealLiteral:
-				return ParseRealLiteral();
-			case TokenId.OpenParen:
-				return ParseParenExpression();
-			default:
-				throw new ParseException(Res.ExpressionExpected, _token.pos);
-		}
+			TokenId.Identifier => ParseIdentifier(),
+			TokenId.InterpolatedString => ParseInterpolatedString(),
+			TokenId.StringLiteral => ParseStringLiteral(),
+			TokenId.IntegerLiteral => ParseIntegerLiteral(),
+			TokenId.RealLiteral => ParseRealLiteral(),
+			TokenId.OpenParen => ParseParenExpression(),
+			_ => throw new ParseException(Res.ExpressionExpected, _token.pos),
+		};
 	}
 
 	private Expression ParseNewExpression()
@@ -546,7 +539,7 @@ public class ExpressionParser
 			}
 
 			// Find the start of interpolated expression
-			var pos  = _text.IndexOf('{', _textPos);
+			var pos = _text.IndexOf('{', _textPos);
 			if (endPos < pos || pos == -1)
 			{
 				break;
@@ -680,7 +673,7 @@ public class ExpressionParser
 			}
 
 			NextToken();
-			if (value >= int.MinValue && value <= int.MaxValue)
+			if (value is >= int.MinValue and <= int.MaxValue)
 			{
 				return CreateLiteral((int)value, text);
 			}
@@ -695,14 +688,14 @@ public class ExpressionParser
 		string text = _token.text;
 		object? value = null;
 		char last = text[text.Length - 1];
-		if (last == 'F' || last == 'f')
+		if (last is 'F' or 'f')
 		{
 			if (float.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out float f))
 			{
 				value = f;
 			}
 		}
-		else if (last == 'M' || last == 'm')
+		else if (last is 'M' or 'm')
 		{
 			if (decimal.TryParse(text.Substring(0, text.Length - 1), NumberStyles.Float | NumberStyles.AllowThousands, NumberFormatInfo.InvariantInfo, out decimal d))
 			{
@@ -928,7 +921,7 @@ public class ExpressionParser
 				}
 			}
 		}
-	Label_CreateMemberExpression:
+Label_CreateMemberExpression:
 		return new MemberExpression(instance, member, memberType);
 	}
 
@@ -1242,11 +1235,11 @@ public class ExpressionParser
 							NextChar();
 						} while (char.IsDigit(_ch));
 					}
-					if (_ch == 'E' || _ch == 'e')
+					if (_ch is 'E' or 'e')
 					{
 						t = TokenId.RealLiteral;
 						NextChar();
-						if (_ch == '+' || _ch == '-')
+						if (_ch is '+' or '-')
 						{
 							NextChar();
 						}
@@ -1257,7 +1250,7 @@ public class ExpressionParser
 							NextChar();
 						} while (char.IsDigit(_ch));
 					}
-					if (_ch == 'F' || _ch == 'f')
+					if (_ch is 'F' or 'f')
 					{
 						NextChar();
 					}

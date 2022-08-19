@@ -6,8 +6,8 @@ public static class TypeInfoUtils
 {
 	private static List<AssemblyDefinition>? _assemblies;
 	private static Dictionary<string, TypeDefinition>? _allTypes;
-	private static readonly Dictionary<TypeReference, TypeDefinition> _resolveCache = new Dictionary<TypeReference, TypeDefinition>();
-	private static readonly Dictionary<TypeReference, TypeReference> _baseTypeCache = new Dictionary<TypeReference, TypeReference>();
+	private static readonly Dictionary<TypeReference, TypeDefinition> _resolveCache = new();
+	private static readonly Dictionary<TypeReference, TypeReference> _baseTypeCache = new();
 
 	public static IList<AssemblyDefinition>? Assemblies => _assemblies;
 
@@ -21,10 +21,7 @@ public static class TypeInfoUtils
 			ReadSymbols = true
 		};
 		var assembly = AssemblyDefinition.ReadAssembly(file, prm);
-		if (_assemblies == null)
-		{
-			_assemblies = new List<AssemblyDefinition>();
-		}
+		_assemblies ??= new List<AssemblyDefinition>();
 
 		_assemblies.Add(assembly);
 		_allTypes = null;

@@ -22,7 +22,7 @@ public static class Crc32
 				}
 				else
 				{
-					dw = (dw >> 1);
+					dw >>= 1;
 				}
 			}
 			_crc32Table[i] = dw;
@@ -33,19 +33,8 @@ public static class Crc32
 	{
 		const int BufferSize = 4096;
 
-		using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize))
-		{
-			return GetCrc32(fs);
-		}
-	}
-
-	public static uint GetCrc32(byte[] byteBuffer)
-	{
-		using (var ms = new MemoryStream(byteBuffer))
-		{
-			ms.Position = 0;
-			return GetCrc32(ms);
-		}
+		using var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize);
+		return GetCrc32(fs);
 	}
 
 	private static uint GetCrc32(Stream stream)

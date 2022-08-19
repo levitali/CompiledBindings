@@ -42,9 +42,9 @@ public static class ExpressionUtils
 
 			var localVar = new LocalVariable("value" + localVarIndex++, expression, pr.Property.XamlNode);
 			var localVarExpr = new VariableExpression(type, localVar.Name);
-			foreach (var prop in group.Distinct(p => p.property))
+			foreach (var (property, expr) in group.Distinct(p => p.property))
 			{
-				prop.property.Expression = prop.property.Expression.CloneReplace(prop.expr, localVarExpr);
+				property.Expression = property.Expression.CloneReplace(expr, localVarExpr);
 			}
 			localVars.Add(localVar);
 		}
@@ -75,7 +75,7 @@ public static class ExpressionUtils
 
 	private class ExpressionComparer : IComparer<Expression>
 	{
-		public static readonly ExpressionComparer Instance = new ExpressionComparer();
+		public static readonly ExpressionComparer Instance = new();
 
 		public int Compare(Expression x, Expression y)
 		{

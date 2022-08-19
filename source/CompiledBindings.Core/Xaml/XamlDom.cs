@@ -104,6 +104,6 @@ public class BindingScope
 {
 	public string? ViewName;
 	public TypeInfo? DataType;
-	public List<Bind> Bindings = new List<Bind>();
+	public List<Bind> Bindings = new();
 	public BindingsData? BindingsData;
 }

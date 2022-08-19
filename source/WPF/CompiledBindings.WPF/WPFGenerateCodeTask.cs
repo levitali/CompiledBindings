@@ -328,15 +328,12 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 			   "http://schemas.microsoft.com/winfx/2006/xaml",
 				getClrNsFromXmlNs: xmlNs =>
 				{
-					if (_nsMappings == null)
-					{
-						_nsMappings = TypeInfoUtils.Assemblies
+					_nsMappings ??= TypeInfoUtils.Assemblies
 							.SelectMany(ass => ass.CustomAttributes.Where(at => at.AttributeType.FullName == "System.Windows.Markup.XmlnsDefinitionAttribute"))
 							.Select(at => (
 								XmlNamespace: (string)at.ConstructorArguments[0].Value,
 								ClrNamespace: (string)at.ConstructorArguments[1].Value))
 							.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
-					}
 
 					return _nsMappings[xmlNs];
 				},

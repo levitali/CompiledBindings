@@ -146,8 +146,8 @@ public class XamlNode
 
 public class XamlNamespace
 {
-	private static readonly Regex _usingRegex = new Regex(@"^\s*(?:(global\s+))?using\s*:(.+)$");
-	private static readonly Regex _clrNamespaceRegex = new Regex(@"^clr-namespace:(.+?)(?:;.+)?$");
+	private static readonly Regex _usingRegex = new(@"^\s*(?:(global\s+))?using\s*:(.+)$");
+	private static readonly Regex _clrNamespaceRegex = new(@"^clr-namespace:(.+?)(?:;.+)?$");
 
 	public XamlNamespace(string prefix, XNamespace ns)
 	{

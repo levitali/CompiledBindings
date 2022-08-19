@@ -316,13 +316,13 @@ public class SimpleXamlDom : XamlDomBase
 
 	public XElement RootElement { get; }
 	public TypeInfo? TargetType;
-	public List<BindingScope> BindingScopes = new List<BindingScope>();
+	public List<BindingScope> BindingScopes = new();
 	public List<XamlObject>? XamlObjects;
 	public bool HasDestructor;
 
 	public ExpressionGroup UpdateMethod;
 
-	public List<SimpleXamlDom> DataTemplates = new List<SimpleXamlDom>();
+	public List<SimpleXamlDom> DataTemplates = new();
 
 	public bool GenerateInitializeMethod =>
 		BindingScopes.Count > 0 ||
