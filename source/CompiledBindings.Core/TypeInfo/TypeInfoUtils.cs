@@ -239,11 +239,11 @@ public static class TypeInfoUtils
 	{
 		if (type is IGenericInstance gi)
 		{
-			return $"{Regex.Replace(type.GetElementType().Name, @"(.+?)`(\d+)", "$1")}<{string.Join(",", gi.GenericArguments.Select(a => GetCSharpName(a)))}>";
+			return $"{Regex.Replace(type.GetElementType().Name, @"(.+?)`(\d+)", "$1")}<{string.Join(", ", gi.GenericArguments.Select(a => GetCSharpName(a)))}>";
 		}
 		else if (type.HasGenericParameters)
 		{
-			return $"{Regex.Replace(type.Name, @"(.+?)`(\d+)", "$1")}<{string.Join(",", type.GenericParameters.Select(a => a.Name))}>";
+			return $"{Regex.Replace(type.Name, @"(.+?)`(\d+)", "$1")}<{string.Join(", ", type.GenericParameters.Select(a => a.Name))}>";
 		}
 		return type.Name;
 	}

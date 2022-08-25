@@ -49,6 +49,9 @@ public class Page1ModifyViewModel : INotifyPropertyChanged
 
 	public bool BoolInput { get; set; }
 
+	public int IntInput { get; set; }
+
+	[ReadOnly(false)]
 	public Page1ModifyTextViewModel ModifyTextViewModel { get; } = new Page1ModifyTextViewModel();
 
 	public void OnClick(bool parameter)
@@ -61,6 +64,7 @@ public class Page1ModifyViewModel : INotifyPropertyChanged
 public class Page1ModifyTextViewModel : INotifyPropertyChanged
 {
 	public string? TextInput { get; set; }
+	public bool? BoolInput { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 }

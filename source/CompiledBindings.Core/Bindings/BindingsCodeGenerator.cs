@@ -290,24 +290,7 @@ $@"
 		output.AppendLine(
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 
-		GenerateUpdateMethodBody(output, bindingsData.UpdateMethodExpressions, targetRootVariable: "_targetRoot", a: "\t");
-
-		foreach (var propUpdate in bindingsData.UpdateMethodNotifyProperties)
-		{
-			output.AppendLine(
-$@"				Update{propUpdate.Parent.Index}_{propUpdate.Property.Definition.Name}({propUpdate.SourceExpression.CSharpCode});");
-		}
-
-		var setPropHandlers = bindingsData.UpdateMethodNotifySources.Where(g => g != rootGroup).ToList();
-		if (setPropHandlers.Count > 0)
-		{
-			output.AppendLine();
-			foreach (var group in setPropHandlers)
-			{
-				output.AppendLine(
-$@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
-			}
-		}
+		GenerateUpdateMethod(bindingsData.UpdateMethod);
 
 		// Close Update method
 		output.AppendLine(
@@ -315,11 +298,31 @@ $@"			}}");
 
 		#endregion
 
+		#region UpateXX Methods
+
+		foreach (var notifySource in bindingsData.NotifySources.Where(s => s.UpdateMethod != null))
+		{
+			output.AppendLine();
+			output.AppendLine(
+$@"			private void Update{notifySource.Index}(global::{notifySource.Expression.Type.Type.GetCSharpFullName()} value)
+			{{");
+			GenerateUpdateMethod(notifySource.UpdateMethod!);
+			if (notifySource.Index != rootGroup?.Index)
+			{
+				output.AppendLine(
+$@"				_bindingsTrackings.SetPropertyChangedEventHandler{notifySource.Index}(value);");
+			}
+			output.AppendLine(
+$@"			}}");
+		}
+
+		#endregion
+
 		#region UpdateXX_XXX Methods
 
 		foreach (var notifySource in bindingsData.NotifySources)
 		{
-			foreach (var prop in notifySource.Properties)
+			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateExpressions != null))
 			{
 				output.AppendLine();
 
@@ -328,7 +331,7 @@ $@"			}}");
 $@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
 			{{");
 
-				if (prop.UpdateExpressions.SetExpressions.Select(d => d.Expression)
+				if (prop.UpdateExpressions!.SetExpressions.Select(d => d.Expression)
 					.Concat(prop.UpdateExpressions.LocalVariables.Select(v => v.Expression))
 					.Concat(prop.DependentNotifySources.SelectMany(d => d.Properties.Select(p => p.SourceExpression)))
 					.SelectMany(e => e.EnumerateTree())
@@ -345,8 +348,17 @@ $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 				{
 					foreach (var prop2 in dependentGroup.Properties)
 					{
-						output.AppendLine(
-$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression.CSharpCode});");
+						var ns = prop2.NotifySource;
+						if (ns != null)
+						{
+							output.AppendLine(
+$@"				Update{ns.Index}({prop2.SourceExpression});");
+						}
+						else
+						{
+							output.AppendLine(
+$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression});");
+						}
 					}
 					output.AppendLine(
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
@@ -539,26 +551,56 @@ $@"					var bindings = TryGetBindings();
 						return;
 					}}
 
-					var typedSender = (global::{notifySource.Expression.Type.Type.GetCSharpFullName()})sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-");
+					var typedSender = (global::{notifySource.Expression.Type.Type.GetCSharpFullName()})sender;");
 
-					for (int i = 0; i < notifySource.Properties.Count; i++)
+					if (notifySource.Properties.Count > 1)
 					{
-						var prop = notifySource.Properties[i];
 						output.AppendLine(
-$@"					if (notifyAll || e.PropertyName == ""{prop.Property.Definition.Name}"")
+$@"					if (string.IsNullOrEmpty(e.PropertyName))
 					{{");
 						output.AppendLine(
-$@"						bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
+$@"						bindings.Update{notifySource.Index}(typedSender);");
+						output.AppendLine(
+$@"					}}");
 
-						if (i < notifySource.Properties.Count - 1)
+						for (int i = 0; i < notifySource.Properties.Count; i++)
+						{
+							var prop = notifySource.Properties[i];
+							output.AppendLine(
+$@"					else if (e.PropertyName == ""{prop.Property.Definition.Name}"")
+					{{");
+							var ns = prop.NotifySource;
+							if (ns != null)
+							{
+								output.AppendLine(
+$@"						bindings.Update{ns.Index}(typedSender.{prop.Property.Definition.Name});");
+							}
+							else
+							{
+								output.AppendLine(
+$@"						bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
+							}
+							output.AppendLine(
+$@"					}}");
+						}
+					}
+					else
+					{
+						var prop = notifySource.Properties[0];
+						var propName = prop.Property.Definition.Name;
+						output.AppendLine(
+$@"					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == ""{propName}"")
+					{{");
+						var ns = prop.NotifySource;
+						if (ns != null)
 						{
 							output.AppendLine(
-$@"						if (!notifyAll)
-						{{
-							return;
-						}}");
+$@"						bindings.Update{ns.Index}(typedSender.{prop.Property.Definition.Name});");
+						}
+						else
+						{
+							output.AppendLine(
+$@"						bindings.Update{notifySource.Index}_{propName}(typedSender.{propName});");
 						}
 						output.AppendLine(
 $@"					}}");
@@ -632,6 +674,45 @@ $@"		}}");
 		#endregion
 
 		#region Local Functions
+
+		void GenerateUpdateMethod(UpdateMethodData updateMethod)
+		{
+			GenerateUpdateMethodBody(output, updateMethod.Expressions, targetRootVariable: "_targetRoot", a: "\t");
+
+			foreach (var notifSource in updateMethod.UpdateNotifySources)
+			{
+				output.AppendLine(
+	$@"				Update{notifSource.Index}({notifSource.SourceExpression});");
+			}
+
+			foreach (var propUpdate in updateMethod.UpdateNotifyProperties)
+			{
+				var ns = propUpdate.NotifySource;
+				if (ns != null)
+				{
+					output.AppendLine(
+$@"				Update{ns.Index}({propUpdate.SourceExpression});");
+				}
+				else
+				{
+					output.AppendLine(
+$@"				Update{propUpdate.Parent.Index}_{propUpdate.Property.Definition.Name}({propUpdate.SourceExpression});");
+				}
+			}
+
+			var setPropHandlers = updateMethod.SetEventHandlers.Where(g => g != rootGroup).ToList();
+			if (setPropHandlers.Count > 0)
+			{
+				output.AppendLine();
+				foreach (var group in setPropHandlers)
+				{
+					output.AppendLine(
+	$@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
+				}
+			}
+
+		}
+
 
 		void GenerateSetPropertyChangedEventHandler(NotifySource notifySource, string cacheVar, string? a)
 		{

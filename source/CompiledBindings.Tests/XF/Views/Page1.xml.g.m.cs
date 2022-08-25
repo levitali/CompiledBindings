@@ -191,9 +191,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "BooleanProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
 					{
 						bindings.Update0_BooleanProp(typedSender.BooleanProp);
 					}
@@ -208,9 +206,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::Xamarin.Forms.CollectionView)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "SelectedItem")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "SelectedItem")
 					{
 						bindings.Update1_SelectedItem(typedSender.SelectedItem);
 					}
@@ -289,39 +285,45 @@ namespace XFTest.Views
 				var dataRoot = _dataRoot;
 #line (58, 13) - (58, 63) 58 "Page1.xml"
 				var value1 = dataRoot.ListProp;
-#line (42, 13) - (42, 39) 42 "Page1.xml"
-				var value2 = dataRoot.DecimalProp;
 #line (47, 16) - (47, 54) 47 "Page1.xml"
-				var value3 = value1[0];
-#line (42, 13) - (42, 39) 42 "Page1.xml"
-				_targetRoot.label6.Text = value2.ToString();
-#line (44, 16) - (44, 46) 44 "Page1.xml"
-				_targetRoot.label7.Text = (value2 + 1).ToString();
-#line (54, 22) - (54, 68) 54 "Page1.xml"
-				var value4 = dataRoot.StringProp;
+				var value2 = value1[0];
+#line (58, 13) - (58, 63) 58 "Page1.xml"
+				_targetRoot.list.ItemsSource = value1;
 #line default
-				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value4))
+				Update0(dataRoot);
+				Update1_DecimalProp(value2.DecimalProp);
+
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value2);
+			}
+
+			private void Update0(global::XFTest.ViewModels.Page1ViewModel value)
+			{
+#line (42, 13) - (42, 39) 42 "Page1.xml"
+				var value1 = value.DecimalProp;
+#line (42, 13) - (42, 39) 42 "Page1.xml"
+				_targetRoot.label6.Text = value1.ToString();
+#line (44, 16) - (44, 46) 44 "Page1.xml"
+				_targetRoot.label7.Text = (value1 + 1).ToString();
+#line (54, 22) - (54, 68) 54 "Page1.xml"
+				var value2 = value.StringProp;
+#line default
+				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value2))
 				{
 					_settingBinding10 = true;
 					try
 					{
-						_targetRoot.pickerEx1.SelectedItem = value4;
+						_targetRoot.pickerEx1.SelectedItem = value2;
 					}
 					finally
 					{
 						_settingBinding10 = false;
 					}
 				}
-#line (58, 13) - (58, 63) 58 "Page1.xml"
-				_targetRoot.list.ItemsSource = value1;
 #line default
-				Update0_BooleanProp(dataRoot.BooleanProp);
-				Update0_NullableIntProp(dataRoot.NullableIntProp);
-				Update0_FocusedField(dataRoot.FocusedField);
-				Update0_ArrayProp(dataRoot.ArrayProp);
-				Update1_DecimalProp(value3.DecimalProp);
-
-				_bindingsTrackings.SetPropertyChangedEventHandler1(value3);
+				Update0_BooleanProp(value.BooleanProp);
+				Update0_NullableIntProp(value.NullableIntProp);
+				Update0_FocusedField(value.FocusedField);
+				Update0_ArrayProp(value.ArrayProp);
 			}
 
 			private void Update0_DecimalProp(global::System.Decimal value)
@@ -559,49 +561,31 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.Page1ViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "DecimalProp")
+					if (string.IsNullOrEmpty(e.PropertyName))
+					{
+						bindings.Update0(typedSender);
+					}
+					else if (e.PropertyName == "DecimalProp")
 					{
 						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "BooleanProp")
+					else if (e.PropertyName == "BooleanProp")
 					{
 						bindings.Update0_BooleanProp(typedSender.BooleanProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "NullableIntProp")
+					else if (e.PropertyName == "NullableIntProp")
 					{
 						bindings.Update0_NullableIntProp(typedSender.NullableIntProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "FocusedField")
+					else if (e.PropertyName == "FocusedField")
 					{
 						bindings.Update0_FocusedField(typedSender.FocusedField);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "StringProp")
+					else if (e.PropertyName == "StringProp")
 					{
 						bindings.Update0_StringProp(typedSender.StringProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "ArrayProp")
+					else if (e.PropertyName == "ArrayProp")
 					{
 						bindings.Update0_ArrayProp(typedSender.ArrayProp);
 					}
@@ -616,9 +600,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "DecimalProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "DecimalProp")
 					{
 						bindings.Update1_DecimalProp(typedSender.DecimalProp);
 					}
@@ -796,9 +778,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "BooleanProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
 					{
 						bindings.Update0_BooleanProp(typedSender.BooleanProp);
 					}
@@ -813,9 +793,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "SByteProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "SByteProp")
 					{
 						bindings.Update1_SByteProp(typedSender.SByteProp);
 					}
@@ -967,9 +945,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "BooleanProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
 					{
 						bindings.Update0_BooleanProp(typedSender.BooleanProp);
 					}
@@ -1070,8 +1046,13 @@ namespace XFTest.Views
 				}
 
 				var dataRoot = _dataRoot;
-				Update0_DecimalProp(dataRoot?.DecimalProp ?? default);
-				Update0_StringProp(dataRoot?.StringProp);
+				Update0(dataRoot);
+			}
+
+			private void Update0(global::XFTest.ViewModels.EntityViewModel value)
+			{
+				Update0_DecimalProp(value?.DecimalProp ?? default);
+				Update0_StringProp(value?.StringProp);
 			}
 
 			private void Update0_DecimalProp(global::System.Decimal value)
@@ -1126,17 +1107,15 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "DecimalProp")
+					if (string.IsNullOrEmpty(e.PropertyName))
+					{
+						bindings.Update0(typedSender);
+					}
+					else if (e.PropertyName == "DecimalProp")
 					{
 						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "StringProp")
+					else if (e.PropertyName == "StringProp")
 					{
 						bindings.Update0_StringProp(typedSender.StringProp);
 					}

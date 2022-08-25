@@ -117,13 +117,17 @@ namespace XFTest.Views
 #line (31, 13) - (31, 54) 31 "Page2.xml"
 				_targetRoot.label9.Text = value1.Item2;
 #line default
-				Update0_FuncProp(dataRoot._viewModel.FuncProp);
-				Update0_CurrentItem(dataRoot._viewModel.CurrentItem);
-				Update0_CurrentItem2(dataRoot._viewModel.CurrentItem2);
-				Update0_Group(dataRoot._viewModel.Group);
-				Update0_StringProp(dataRoot._viewModel.StringProp);
+				Update0(dataRoot._viewModel);
+			}
 
-				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
+			private void Update0(global::XFTest.ViewModels.Page2ViewModel value)
+			{
+				Update0_FuncProp(value.FuncProp);
+				Update0_CurrentItem(value.CurrentItem);
+				Update0_CurrentItem2(value.CurrentItem2);
+				Update0_Group(value.Group);
+				Update0_StringProp(value.StringProp);
+				_bindingsTrackings.SetPropertyChangedEventHandler0(value);
 			}
 
 			private void Update0_CurrentItem(global::XFTest.ViewModels.ItemViewModel value)
@@ -306,49 +310,31 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.Page2ViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "CurrentItem")
+					if (string.IsNullOrEmpty(e.PropertyName))
+					{
+						bindings.Update0(typedSender);
+					}
+					else if (e.PropertyName == "CurrentItem")
 					{
 						bindings.Update0_CurrentItem(typedSender.CurrentItem);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "CurrentItem2")
+					else if (e.PropertyName == "CurrentItem2")
 					{
 						bindings.Update0_CurrentItem2(typedSender.CurrentItem2);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "StringProp")
+					else if (e.PropertyName == "StringProp")
 					{
 						bindings.Update0_StringProp(typedSender.StringProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "DecimalProp")
+					else if (e.PropertyName == "DecimalProp")
 					{
 						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "FuncProp")
+					else if (e.PropertyName == "FuncProp")
 					{
 						bindings.Update0_FuncProp(typedSender.FuncProp);
-						if (!notifyAll)
-						{
-							return;
-						}
 					}
-					if (notifyAll || e.PropertyName == "Group")
+					else if (e.PropertyName == "Group")
 					{
 						bindings.Update0_Group(typedSender.Group);
 					}
@@ -363,9 +349,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.ItemViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "GuidProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "GuidProp")
 					{
 						bindings.Update1_GuidProp(typedSender.GuidProp);
 					}
@@ -380,9 +364,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.Item2ViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "Prop1")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "Prop1")
 					{
 						bindings.Update2_Prop1(typedSender.Prop1);
 					}
@@ -397,9 +379,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.ItemViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "GuidProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "GuidProp")
 					{
 						bindings.Update3_GuidProp(typedSender.GuidProp);
 					}
@@ -414,9 +394,7 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.ItemViewModel)sender;
-					var notifyAll = string.IsNullOrEmpty(e.PropertyName);
-
-					if (notifyAll || e.PropertyName == "GuidProp")
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "GuidProp")
 					{
 						bindings.Update4_GuidProp(typedSender.GuidProp);
 					}

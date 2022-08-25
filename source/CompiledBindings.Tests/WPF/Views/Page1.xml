@@ -7,6 +7,7 @@
     xmlns:mx="http://compiledbindings.com/x"
     xmlns:viewModels="using:WPFTest.ViewModels"
     xmlns:views="clr-namespace:WPFTest.Views"
+	xmlns:system="using:System"
     mc:Ignorable="d mx"
     x:Class="WPFTest.Views.Page1"
     mx:DataType="viewModels:Page1ViewModel"
@@ -49,7 +50,9 @@
             Visibility="{x:Bind Converter={StaticResource TrueToVisibleConverter}, Path=BooleanProp}" />
         <TextBlock Text="{x:Bind DecimalProp + 1}" />
         <TextBox Text="{x:Bind OrderInput, Mode=TwoWay}" />
-        <CheckBox IsChecked="{x:Bind BoolInput, Mode=TwoWay, Converter={StaticResource InverseBooleanConverter}, ConverterParameter=ArrayProp.Length > 0}" />
+		<TextBlock
+            Text="{x:Bind (system:Int32)DecimalProp + IntProp + ModifyViewModel.IntInput}" />
+		<CheckBox IsChecked="{x:Bind BoolInput, Mode=TwoWay, Converter={StaticResource InverseBooleanConverter}, ConverterParameter=ArrayProp.Length > 0}" />
         <ListView
             x:Name="listView"
             ItemTemplate="{StaticResource test1Template}"
@@ -64,9 +67,10 @@
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
         <TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
-        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}"
+		<TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}"
 				 local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"/>
-        <CheckBox IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}"
+		<TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}"/>
+		<CheckBox IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}"
 				  local:TestExtensions.MyProperty="{x:Set 6}"
 				  Grid.Column="{x:Bind IntProp}"/>
     </StackPanel>
