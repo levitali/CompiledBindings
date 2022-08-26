@@ -556,33 +556,34 @@ $@"					var bindings = TryGetBindings();
 					if (notifySource.Properties.Count > 1)
 					{
 						output.AppendLine(
-$@"					if (string.IsNullOrEmpty(e.PropertyName))
-					{{");
-						output.AppendLine(
-$@"						bindings.Update{notifySource.Index}(typedSender);");
-						output.AppendLine(
-$@"					}}");
+$@"					switch (e.PropertyName)
+					{{
+						case null:
+						case """":
+							bindings.Update{notifySource.Index}(typedSender);
+							break;");
 
 						for (int i = 0; i < notifySource.Properties.Count; i++)
 						{
 							var prop = notifySource.Properties[i];
 							output.AppendLine(
-$@"					else if (e.PropertyName == ""{prop.Property.Definition.Name}"")
-					{{");
+$@"						case ""{prop.Property.Definition.Name}"":");
 							var ns = prop.NotifySource;
 							if (ns != null)
 							{
 								output.AppendLine(
-$@"						bindings.Update{ns.Index}(typedSender.{prop.Property.Definition.Name});");
+$@"							bindings.Update{ns.Index}(typedSender.{prop.Property.Definition.Name});");
 							}
 							else
 							{
 								output.AppendLine(
-$@"						bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
+$@"							bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
 							}
 							output.AppendLine(
-$@"					}}");
+$@"							break;");
 						}
+						output.AppendLine(
+$@"					}}");
 					}
 					else
 					{

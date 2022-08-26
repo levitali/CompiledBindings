@@ -310,33 +310,30 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.Page2ViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName))
+					switch (e.PropertyName)
 					{
-						bindings.Update0(typedSender);
-					}
-					else if (e.PropertyName == "CurrentItem")
-					{
-						bindings.Update0_CurrentItem(typedSender.CurrentItem);
-					}
-					else if (e.PropertyName == "CurrentItem2")
-					{
-						bindings.Update0_CurrentItem2(typedSender.CurrentItem2);
-					}
-					else if (e.PropertyName == "StringProp")
-					{
-						bindings.Update0_StringProp(typedSender.StringProp);
-					}
-					else if (e.PropertyName == "DecimalProp")
-					{
-						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-					}
-					else if (e.PropertyName == "FuncProp")
-					{
-						bindings.Update0_FuncProp(typedSender.FuncProp);
-					}
-					else if (e.PropertyName == "Group")
-					{
-						bindings.Update0_Group(typedSender.Group);
+						case null:
+						case "":
+							bindings.Update0(typedSender);
+							break;
+						case "CurrentItem":
+							bindings.Update0_CurrentItem(typedSender.CurrentItem);
+							break;
+						case "CurrentItem2":
+							bindings.Update0_CurrentItem2(typedSender.CurrentItem2);
+							break;
+						case "StringProp":
+							bindings.Update0_StringProp(typedSender.StringProp);
+							break;
+						case "DecimalProp":
+							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							break;
+						case "FuncProp":
+							bindings.Update0_FuncProp(typedSender.FuncProp);
+							break;
+						case "Group":
+							bindings.Update0_Group(typedSender.Group);
+							break;
 					}
 				}
 

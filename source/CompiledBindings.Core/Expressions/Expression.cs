@@ -40,7 +40,7 @@ public abstract class Expression
 
 	public Expression CloneReplace(Expression current, Expression replace)
 	{
-		if (current.CSharpCode == CSharpCode)
+		if (current.CSharpCode.Equals(CSharpCode))
 		{
 			return replace;
 		}

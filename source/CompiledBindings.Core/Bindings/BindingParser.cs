@@ -381,7 +381,7 @@ public static class BindingParser
 			{
 				var expr = prop.Expression.CSharpCode;
 				foreach (var notifPropData2 in notifySources
-					.Where(g => g != notifySource && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.CSharpCode == expr)))
+					.Where(g => g != notifySource && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.CSharpCode.Equals(expr))))
 				{
 					// Skip the notification source, if it's already added to some child
 					if (!prop.DependentNotifySources
@@ -410,7 +410,7 @@ public static class BindingParser
 			{
 				var bindings = notifySource.Properties.SelectMany(_ => _.Bindings).Distinct().ToList();
 				var value = new VariableExpression(notifySource.SourceExpression.Type, "value");
-				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, new List<NotifySource>(), notifySource, e => e.CloneReplace(notifySource.SourceExpression, value));
+				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, e => e.CloneReplace(notifySource.SourceExpression, value));
 			}
 
 			foreach (var prop in notifySource.Properties.Where(_ => _.NotifySource == null))
@@ -473,7 +473,7 @@ public static class BindingParser
 		var binds1 = binds
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.ToList();
-		var updateMethod = CreateUpdateMethodData(binds1, notifySources.ToList(), null, e => e);
+		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, e => e);
 
 		var twoWayEventHandlers1 = binds
 			.Where(b => (b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && b.UpdateSourceTrigger != UpdateSourceTrigger.Explicit);
@@ -523,43 +523,47 @@ public static class BindingParser
 			return expr;
 		}
 
-		static UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource> notifySources, NotifySource? notifySource, Func<Expression, Expression> replace)
+		UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Func<Expression, Expression> replace)
 		{
-			var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+			var notifySources1 = (notifySources ?? Enumerable.Empty<NotifySource>()).ToList();
 
 			var updateNotifySources = new List<NotifySource>();
-			var notifySources3 = notifySources
+
+			// Get the notify sources, for which UpdateXX methods are generated
+			var notifySources2 = notifySources1
 				.Where(s => s.Properties.Count > 1 && iNotifyPropertyChangedType.IsAssignableFrom(s.SourceExpression.Type))
 				.OrderByDescending(s => s.Properties.SelectMany(p => p.Bindings).Distinct().Count())
 				.ToList();
-			while (notifySources3.Count > 0)
+
+			while (notifySources2.Count > 0)
 			{
-				var s = notifySources3[0];
+				var s = notifySources2[0];
 				updateNotifySources.Add(s);
-				notifySources3.RemoveAt(0);
-				notifySources.Remove(s);
-				notifySources3 = notifySources3
+
+				notifySources2.RemoveAt(0);
+				notifySources1.Remove(s);
+
+				notifySources2 = notifySources2
 					.Where(n => !n.Properties.SelectMany(p => p.Bindings).Intersect(s.Properties.SelectMany(_ => _.Bindings)).Any())
 					.ToList();
-				notifySources = notifySources
+				notifySources1 = notifySources1
 					.Where(n => !n.Properties.SelectMany(p => p.Bindings).Intersect(s.Properties.SelectMany(_ => _.Bindings)).Any())
 					.ToList();
+
 				s.Properties.SelectMany(_ => _.Bindings).ForEach(_ => bindings.Remove(_));
 			}
 
 			var updateMethodNotifyProps = new List<NotifyProperty>();
 
-			IEnumerable<NotifySource> notifySources2 = notifySources;
+			IEnumerable<NotifySource> notifySources3 = notifySources1;
 			if (notifySource != null)
 			{
-				notifySources2 = notifySources2.Append(notifySource);
+				notifySources3 = notifySources3.Append(notifySource);
 			}
 
-			var notifProps = notifySources2  // all notifiable properties
+			var notifProps = notifySources3  // all notifiable properties
 				.SelectMany(d => d.Properties)
-				// First use UpdateXX_XX methods which set the most bindings
 				.OrderByDescending(p => p.Bindings.Count)
-				// Ensure that the "parent" UpdateXX_XX are used
 				.ThenByDescending(p => p.DependentNotifySources.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifySources)).Count())
 				.ToList();
 
@@ -572,7 +576,7 @@ public static class BindingParser
 				// Do not consider UpdateXX_XX methods, which set the same bindings
 				notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
 				// Remove calls of SetPropertyChangedEventHandler methods, which are called in this UpdateXX_XX one
-				notifySources = notifySources
+				notifySources1 = notifySources1
 					.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
 					.ToList();
 			}
@@ -595,7 +599,7 @@ public static class BindingParser
 				})
 				.ToList();
 
-			var props3 = notifySources
+			var props3 = notifySources1
 				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
 				.ToList();
 
@@ -610,7 +614,7 @@ public static class BindingParser
 
 			for (int i = 0; i < props3.Count; i++)
 			{
-				notifySources[i].SourceExpression = props3[i].Expression;
+				notifySources1[i].SourceExpression = props3[i].Expression;
 			}
 
 			var updateExpressions = new ExpressionGroup
@@ -624,7 +628,7 @@ public static class BindingParser
 				UpdateNotifySources = updateNotifySources,
 				UpdateNotifyProperties = updateMethodNotifyProps,
 				Expressions = updateExpressions,
-				SetEventHandlers = notifySources,
+				SetEventHandlers = notifySources1,
 			};
 		}
 	}
@@ -682,14 +686,14 @@ public class NotifyProperty
 	public Expression SourceExpression { get; set; }
 	public ReadOnlyCollection<Bind> Bindings { get; init; }
 	public List<Bind> SetBindings { get; init; }
-	public ExpressionGroup UpdateExpressions { get; set; }
+	public ExpressionGroup? UpdateExpressions { get; set; }
 	public List<NotifySource> DependentNotifySources { get; } = new();
 
 	public NotifySource? NotifySource
 	{
 		get
 		{
-			var s = DependentNotifySources.SelectTree(_ => _.Properties.SelectMany(_ => _.DependentNotifySources)).FirstOrDefault(_ => _.Expression.CSharpCode == Expression.CSharpCode);
+			var s = DependentNotifySources.FirstOrDefault(_ => _.Expression.CSharpCode.Equals(Expression.CSharpCode));
 			if (s?.Properties.Count > 1)
 			{
 				return s;

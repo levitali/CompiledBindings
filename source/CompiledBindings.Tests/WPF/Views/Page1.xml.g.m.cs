@@ -854,41 +854,36 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::WPFTest.ViewModels.Page1ViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName))
+					switch (e.PropertyName)
 					{
-						bindings.Update0(typedSender);
-					}
-					else if (e.PropertyName == "BooleanProp")
-					{
-						bindings.Update0_BooleanProp(typedSender.BooleanProp);
-					}
-					else if (e.PropertyName == "DecimalProp")
-					{
-						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-					}
-					else if (e.PropertyName == "OrderInput")
-					{
-						bindings.Update0_OrderInput(typedSender.OrderInput);
-					}
-					else if (e.PropertyName == "IntProp")
-					{
-						bindings.Update0_IntProp(typedSender.IntProp);
-					}
-					else if (e.PropertyName == "ModifyViewModel")
-					{
-						bindings.Update1(typedSender.ModifyViewModel);
-					}
-					else if (e.PropertyName == "BoolInput")
-					{
-						bindings.Update0_BoolInput(typedSender.BoolInput);
-					}
-					else if (e.PropertyName == "ArrayProp")
-					{
-						bindings.Update0_ArrayProp(typedSender.ArrayProp);
-					}
-					else if (e.PropertyName == "TaskProp")
-					{
-						bindings.Update0_TaskProp(typedSender.TaskProp);
+						case null:
+						case "":
+							bindings.Update0(typedSender);
+							break;
+						case "BooleanProp":
+							bindings.Update0_BooleanProp(typedSender.BooleanProp);
+							break;
+						case "DecimalProp":
+							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							break;
+						case "OrderInput":
+							bindings.Update0_OrderInput(typedSender.OrderInput);
+							break;
+						case "IntProp":
+							bindings.Update0_IntProp(typedSender.IntProp);
+							break;
+						case "ModifyViewModel":
+							bindings.Update1(typedSender.ModifyViewModel);
+							break;
+						case "BoolInput":
+							bindings.Update0_BoolInput(typedSender.BoolInput);
+							break;
+						case "ArrayProp":
+							bindings.Update0_ArrayProp(typedSender.ArrayProp);
+							break;
+						case "TaskProp":
+							bindings.Update0_TaskProp(typedSender.TaskProp);
+							break;
 					}
 				}
 
@@ -901,25 +896,24 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::WPFTest.ViewModels.Page1ModifyViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName))
+					switch (e.PropertyName)
 					{
-						bindings.Update1(typedSender);
-					}
-					else if (e.PropertyName == "IntInput")
-					{
-						bindings.Update1_IntInput(typedSender.IntInput);
-					}
-					else if (e.PropertyName == "Input1")
-					{
-						bindings.Update1_Input1(typedSender.Input1);
-					}
-					else if (e.PropertyName == "ModifyTextViewModel")
-					{
-						bindings.Update2(typedSender.ModifyTextViewModel);
-					}
-					else if (e.PropertyName == "BoolInput")
-					{
-						bindings.Update1_BoolInput(typedSender.BoolInput);
+						case null:
+						case "":
+							bindings.Update1(typedSender);
+							break;
+						case "IntInput":
+							bindings.Update1_IntInput(typedSender.IntInput);
+							break;
+						case "Input1":
+							bindings.Update1_Input1(typedSender.Input1);
+							break;
+						case "ModifyTextViewModel":
+							bindings.Update2(typedSender.ModifyTextViewModel);
+							break;
+						case "BoolInput":
+							bindings.Update1_BoolInput(typedSender.BoolInput);
+							break;
 					}
 				}
 
@@ -932,17 +926,18 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::WPFTest.ViewModels.Page1ModifyTextViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName))
+					switch (e.PropertyName)
 					{
-						bindings.Update2(typedSender);
-					}
-					else if (e.PropertyName == "TextInput")
-					{
-						bindings.Update2_TextInput(typedSender.TextInput);
-					}
-					else if (e.PropertyName == "BoolInput")
-					{
-						bindings.Update2_BoolInput(typedSender.BoolInput);
+						case null:
+						case "":
+							bindings.Update2(typedSender);
+							break;
+						case "TextInput":
+							bindings.Update2_TextInput(typedSender.TextInput);
+							break;
+						case "BoolInput":
+							bindings.Update2_BoolInput(typedSender.BoolInput);
+							break;
 					}
 				}
 

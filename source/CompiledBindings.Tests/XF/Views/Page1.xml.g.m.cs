@@ -561,33 +561,30 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.Page1ViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName))
+					switch (e.PropertyName)
 					{
-						bindings.Update0(typedSender);
-					}
-					else if (e.PropertyName == "DecimalProp")
-					{
-						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-					}
-					else if (e.PropertyName == "BooleanProp")
-					{
-						bindings.Update0_BooleanProp(typedSender.BooleanProp);
-					}
-					else if (e.PropertyName == "NullableIntProp")
-					{
-						bindings.Update0_NullableIntProp(typedSender.NullableIntProp);
-					}
-					else if (e.PropertyName == "FocusedField")
-					{
-						bindings.Update0_FocusedField(typedSender.FocusedField);
-					}
-					else if (e.PropertyName == "StringProp")
-					{
-						bindings.Update0_StringProp(typedSender.StringProp);
-					}
-					else if (e.PropertyName == "ArrayProp")
-					{
-						bindings.Update0_ArrayProp(typedSender.ArrayProp);
+						case null:
+						case "":
+							bindings.Update0(typedSender);
+							break;
+						case "DecimalProp":
+							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							break;
+						case "BooleanProp":
+							bindings.Update0_BooleanProp(typedSender.BooleanProp);
+							break;
+						case "NullableIntProp":
+							bindings.Update0_NullableIntProp(typedSender.NullableIntProp);
+							break;
+						case "FocusedField":
+							bindings.Update0_FocusedField(typedSender.FocusedField);
+							break;
+						case "StringProp":
+							bindings.Update0_StringProp(typedSender.StringProp);
+							break;
+						case "ArrayProp":
+							bindings.Update0_ArrayProp(typedSender.ArrayProp);
+							break;
 					}
 				}
 
@@ -1107,17 +1104,18 @@ namespace XFTest.Views
 					}
 
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName))
+					switch (e.PropertyName)
 					{
-						bindings.Update0(typedSender);
-					}
-					else if (e.PropertyName == "DecimalProp")
-					{
-						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-					}
-					else if (e.PropertyName == "StringProp")
-					{
-						bindings.Update0_StringProp(typedSender.StringProp);
+						case null:
+						case "":
+							bindings.Update0(typedSender);
+							break;
+						case "DecimalProp":
+							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							break;
+						case "StringProp":
+							bindings.Update0_StringProp(typedSender.StringProp);
+							break;
 					}
 				}
 
