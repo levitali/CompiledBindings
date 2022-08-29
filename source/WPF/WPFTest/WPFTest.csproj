@@ -5,6 +5,7 @@
     <TargetFrameworks>net6.0-windows</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
+	<Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net461'">
@@ -39,7 +40,68 @@
     </MarkupCompilePass1>
     <Delete Files="$(IntermediateOutputPath)$(AssemblyName)_MarkupCompile.lref" />
     <MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />
-    <Csc Condition=" '$(LocalAssemblyGenerated)' == 'false' " AdditionalLibPaths="$(AdditionalLibPaths)" AddModules="@(AddModules)" AdditionalFiles="@(AdditionalFiles)" AllowUnsafeBlocks="$(AllowUnsafeBlocks)" ApplicationConfiguration="$(AppConfigForCompiler)" BaseAddress="$(BaseAddress)" CheckForOverflowUnderflow="$(CheckForOverflowUnderflow)" CodeAnalysisRuleSet="$(ResolvedCodeAnalysisRuleSet)" CodePage="$(CodePage)" DebugType="$(DebugType)" DefineConstants="$(DefineConstants)" DelaySign="$(DelaySign)" DisabledWarnings="$(NoWarn)" DocumentationFile="@(DocFileItem)" EmitDebugInformation="$(DebugSymbols)" EnvironmentVariables="$(CscEnvironment)" ErrorEndLocation="$(ErrorEndLocation)" ErrorLog="$(ErrorLog)" ErrorReport="$(ErrorReport)" FileAlignment="$(FileAlignment)" GenerateFullPaths="$(GenerateFullPaths)" HighEntropyVA="$(HighEntropyVA)" KeyContainer="$(KeyContainerName)" KeyFile="$(KeyOriginatorFile)" LangVersion="$(LangVersion)" LinkResources="@(LinkResource)" MainEntryPoint="$(StartupObject)" ModuleAssemblyName="$(ModuleAssemblyName)" NoConfig="true" NoLogo="$(NoLogo)" NoStandardLib="$(NoCompilerStandardLib)" NoWin32Manifest="$(NoWin32Manifest)" Optimize="$(Optimize)" OutputAssembly="$(IntermediateOutputPath)intermediate\$(AssemblyName)$(TargetExt)" PdbFile="$(PdbFile)" Platform="$(PlatformTarget)" Prefer32Bit="$(Prefer32Bit)" PreferredUILang="$(PreferredUILang)" References="@(ReferencePath)" ReportAnalyzer="$(ReportAnalyzer)" Resources="@(_CoreCompileResourceInputs);@(CompiledLicenseFile)" ResponseFiles="$(CompilerResponseFile)" Sources="@(Compile);@(Compile1)" SubsystemVersion="$(SubsystemVersion)" TargetType="$(OutputType)" ToolExe="$(CscToolExe)" ToolPath="$(CscToolPath)" TreatWarningsAsErrors="$(TreatWarningsAsErrors)" UseHostCompilerIfAvailable="$(UseHostCompilerIfAvailable)" UseSharedCompilation="$(UseSharedCompilation)" Utf8Output="$(Utf8Output)" VsSessionGuid="$(VsSessionGuid)" WarningLevel="$(WarningLevel)" WarningsAsErrors="$(WarningsAsErrors)" WarningsNotAsErrors="$(WarningsNotAsErrors)" Win32Icon="$(ApplicationIcon)" Win32Manifest="$(Win32Manifest)" Win32Resource="$(Win32Resource)" />
+	  <Csc Condition=" '$(LocalAssemblyGenerated)' == 'false' "
+			   AdditionalLibPaths="$(AdditionalLibPaths)"
+			   AddModules="@(AddModules)"
+			   AdditionalFiles="@(AdditionalFiles)"
+			   AllowUnsafeBlocks="$(AllowUnsafeBlocks)"
+			   AnalyzerConfigFiles="@(EditorConfigFiles)"
+			   Analyzers="@(Analyzer)"
+			   ApplicationConfiguration="$(AppConfigForCompiler)"
+			   BaseAddress="$(BaseAddress)"
+			   CheckForOverflowUnderflow="$(CheckForOverflowUnderflow)"
+			   CodeAnalysisRuleSet="$(ResolvedCodeAnalysisRuleSet)"
+			   CodePage="$(CodePage)"
+			   DebugType="$(DebugType)"
+			   DefineConstants="$(DefineConstants)"
+			   DelaySign="$(DelaySign)"
+			   DisabledWarnings="$(NoWarn)"
+			   DocumentationFile="@(DocFileItem)"
+			   EmitDebugInformation="$(DebugSymbols)"
+			   EnvironmentVariables="$(CscEnvironment)"
+			   ErrorEndLocation="$(ErrorEndLocation)"
+			   ErrorLog="$(ErrorLog)"
+			   ErrorReport="$(ErrorReport)"
+			   FileAlignment="$(FileAlignment)"
+			   GenerateFullPaths="$(GenerateFullPaths)"
+			   HighEntropyVA="$(HighEntropyVA)"
+			   KeyContainer="$(KeyContainerName)"
+			   KeyFile="$(KeyOriginatorFile)"
+			   LangVersion="$(LangVersion)"
+			   LinkResources="@(LinkResource)"
+			   MainEntryPoint="$(StartupObject)"
+			   ModuleAssemblyName="$(ModuleAssemblyName)"
+			   NoConfig="true"
+			   NoLogo="$(NoLogo)"
+			   NoStandardLib="$(NoCompilerStandardLib)"
+			   NoWin32Manifest="$(NoWin32Manifest)"
+			   Nullable="$(Nullable)"
+			   Optimize="$(Optimize)"
+			   OutputAssembly="$(IntermediateOutputPath)intermediate\$(AssemblyName)$(TargetExt)"
+			   PdbFile="$(PdbFile)"
+			   Platform="$(PlatformTarget)"
+			   Prefer32Bit="$(Prefer32Bit)"
+			   PreferredUILang="$(PreferredUILang)"
+			   References="@(ReferencePath)"
+			   ReportAnalyzer="$(ReportAnalyzer)"
+			   Resources="@(_CoreCompileResourceInputs);@(CompiledLicenseFile)"
+			   ResponseFiles="$(CompilerResponseFile)"
+		       Sources="@(Compile);@(Compile1)"
+			   SubsystemVersion="$(SubsystemVersion)"
+			   TargetType="$(OutputType)"
+			   ToolExe="$(CscToolExe)"
+			   ToolPath="$(CscToolPath)"
+			   TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
+			   UseHostCompilerIfAvailable="$(UseHostCompilerIfAvailable)"
+			   UseSharedCompilation="$(UseSharedCompilation)"
+			   Utf8Output="$(Utf8Output)"
+			   VsSessionGuid="$(VsSessionGuid)"
+			   WarningLevel="$(WarningLevel)"
+			   WarningsAsErrors="$(WarningsAsErrors)"
+			   WarningsNotAsErrors="$(WarningsNotAsErrors)"
+			   Win32Icon="$(ApplicationIcon)"
+			   Win32Manifest="$(Win32Manifest)"
+			   Win32Resource="$(Win32Resource)"/>
     <PropertyGroup>
       <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
     </PropertyGroup>

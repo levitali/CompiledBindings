@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel;
 
-#nullable enable
-
 namespace MauiTest;
 
 public class MainViewModel : INotifyPropertyChanged

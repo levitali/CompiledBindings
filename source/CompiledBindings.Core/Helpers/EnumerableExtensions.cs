@@ -8,11 +8,11 @@ public static class EnumerableExtensions
 	{
 		if (source == null)
 		{
-			throw new ArgumentNullException("source");
+			throw new ArgumentNullException(nameof(source));
 		}
 		if (predicate == null)
 		{
-			throw new ArgumentNullException("predicate");
+			throw new ArgumentNullException(nameof(predicate));
 		}
 		int index = 0;
 		foreach (T value in source)
@@ -30,11 +30,11 @@ public static class EnumerableExtensions
 	{
 		if (source == null)
 		{
-			throw new ArgumentException("source");
+			throw new ArgumentNullException(nameof(source));
 		}
 		if (index < 0)
 		{
-			throw new ArgumentOutOfRangeException("index");
+			throw new ArgumentOutOfRangeException(nameof(index));
 		}
 		int i = 0;
 		foreach (T item in source)

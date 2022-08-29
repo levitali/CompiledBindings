@@ -254,14 +254,7 @@ public class ExpressionParser
 			}
 			var expr = ParseUnary();
 			ValidateNotMethodAccess(expr);
-			if (op.id == TokenId.Minus)
-			{
-				expr = new UnaryExpression(expr, "-");
-			}
-			else
-			{
-				expr = new UnaryExpression(expr, "!");
-			}
+			expr = new UnaryExpression(expr, op.id == TokenId.Minus ? "-" : "!");
 			return expr;
 		}
 		return ParsePrimary();

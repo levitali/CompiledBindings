@@ -1,9 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Xaml;
-
-[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2009/xaml", "CompiledBindings.Markup")]
-
-#nullable enable
+﻿[assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2009/xaml", "CompiledBindings.Markup")]
 
 namespace CompiledBindings.Markup;
 

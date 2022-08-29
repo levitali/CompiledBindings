@@ -374,7 +374,6 @@ public static class BindingParser
 			notifySources[i].Index = i;
 		}
 
-		// Get through all notifiable properties, and find dependable notification source, SetPropertyChangedEventHandler of which must be called when the property is changed
 		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
 		{
 			foreach (var prop in notifySource.Properties)
@@ -394,7 +393,6 @@ public static class BindingParser
 					}
 
 					// The bindings are set in the "child" UpdateXX_XX method.
-					// Remove them from this notifiable property
 					foreach (var b in notifPropData2.Properties.SelectMany(p => p.Bindings))
 					{
 						prop.SetBindings.Remove(b);

@@ -208,7 +208,7 @@ $@"namespace CompiledBindings
 		}}
 	}}
 
-	public interface IGeneratedDataTemplate
+	interface IGeneratedDataTemplate
 	{{
 		void Initialize(Element rootElement);
 		void Cleanup(Element rootElement);
