@@ -28,7 +28,7 @@
                     <DataTemplate x:DataType="viewModels:EntityViewModel">
                         <Grid>
                             <Label Text="{x:Bind BooleanProp}" />
-							<Label Text="{x:Bind (this as viewModels:ExtEntityViewModel).ExtraProp}" />
+                            <Label Text="{x:Bind (this as viewModels:ExtEntityViewModel).ExtraProp}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -49,19 +49,18 @@
             IsFocused="{x:Bind FocusedField[Field1], Mode=OneWayToSource}"
             Text="{x:Bind BooleanProp, BindBack=SetValue}"
             m:SetFocused="{x:Bind FocusedField[Field1]}" />
-		<Entry
-            Text="{x:Bind NullableIntProp, Mode=TwoWay}" />
-        <ui:PickerEx SelectedItem="{x:Bind StringProp, Mode=TwoWay}"/>
+        <Entry Text="{x:Bind NullableIntProp, Mode=TwoWay}" />
+        <ui:PickerEx SelectedItem="{x:Bind StringProp, Mode=TwoWay}" />
         <CollectionView
             x:Name="list"
             IsVisible="{x:Bind ArrayProp.Length > 0}"
             ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
-            
+
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <Label Text="{x:Bind DecimalProp}" />
-						<Label Text="{x:Bind StringProp.TrimStart('0')}" />
+                        <Label Text="{x:Bind StringProp.TrimStart('0')}" />
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -70,8 +69,9 @@
             x:DataType="{x:Null}"
             IsEnabled="{x:Bind ((viewModels:EntityViewModel)list.SelectedItem).BooleanProp}"
             Clicked="[x:Set Save]" />
-        <Label Text="{x:Bind $'Decimal value: {DecimalProp:0.###}, Boolean value: {BooleanProp}, String value: {StringProp.TrimStart('0')}'}"
-			   Grid.Row="{x:Bind NullableIntProp ?? 9}"/>
+        <Label
+            Grid.Row="{x:Bind NullableIntProp ?? 9}"
+            Text="{x:Bind $'Decimal value: {DecimalProp:0.###}, Boolean value: {BooleanProp}, String value: {StringProp.TrimStart('0')}'}" />
     </StackLayout>
 
 </Page>

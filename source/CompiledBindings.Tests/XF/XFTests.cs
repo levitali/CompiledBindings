@@ -14,6 +14,12 @@ public class XFTests
 		TestPage("Page2");
 	}
 
+	[Test]
+	public void Page3()
+	{
+		TestPage("Page3");
+	}
+
 	private void TestPage(string pageName)
 	{
 		int substr = "file:///".Length;

@@ -569,8 +569,8 @@ public static class BindingParser
 			{
 				var prop = notifProps[0];
 				updateMethodNotifyProps.Add(prop.Clone());
-				// These bindings are set in the UpdateXX_XX method. No more set them in the main Update method
-				prop.Bindings.ForEach(b => bindings.Remove(b));
+				// These bindings are set in the UpdateXX_XX method. No more set them in the Update method
+				prop.UpdatedBindings.ForEach(b => bindings.Remove(b));
 				// Do not consider UpdateXX_XX methods, which set the same bindings
 				notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
 				// Remove calls of SetPropertyChangedEventHandler methods, which are called in this UpdateXX_XX one
@@ -674,6 +674,8 @@ public class NotifySource
 	{
 		return (NotifySource)MemberwiseClone();
 	}
+
+	public IEnumerable<Bind> UpdatedBindings => Properties.SelectMany(_ => _.Bindings).Distinct();
 };
 
 public class NotifyProperty
@@ -699,6 +701,8 @@ public class NotifyProperty
 			return null;
 		}
 	}
+
+	public IEnumerable<Bind> UpdatedBindings => NotifySource?.UpdatedBindings ?? Bindings;
 
 	public NotifyProperty Clone() => (NotifyProperty)MemberwiseClone();
 };

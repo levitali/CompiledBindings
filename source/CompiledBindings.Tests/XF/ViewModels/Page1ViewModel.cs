@@ -61,6 +61,8 @@ public class EntityModel : INotifyPropertyChanged
 {
 	public sbyte SByteProp { get; set; }
 
+	public ushort UShortProp { get; set; }
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 }
 

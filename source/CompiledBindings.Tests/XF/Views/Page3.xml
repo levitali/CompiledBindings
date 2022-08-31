@@ -1,0 +1,23 @@
+﻿<Page
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:extensions="using:XFTest.Extensions"
+    xmlns:local="clr-namespace:XFTest"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mx="http://compiledbindings.com/x"
+    xmlns:test="using:Test"
+    xmlns:viewModels="using:XFTest.ViewModels"
+    xmlns:views="clr-namespace:XFTest.Views"
+    mc:Ignorable="m mx"
+    x:Class="XFTest.Views.Page3"
+    x:DataType="viewModels:Page3ViewModel">
+
+	<Grid>
+		<Label IsVisible="{x:Bind Entity ne null and IsLoading}"/>
+		<!--<Label IsVisible="{x:Bind Entity.SByteProp ne 3 and IsLoading}"/>-->
+		<Label Text="{x:Bind Entity.SByteProp}"/>
+		<Label Text="{x:Bind Entity.UShortProp}"/>
+	</Grid>
+
+</Page>

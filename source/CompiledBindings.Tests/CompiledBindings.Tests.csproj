@@ -14,6 +14,7 @@
 		<Compile Remove="WPF\Views\Page2.xml.g.m.cs" />
 		<Compile Remove="XF\Views\Page1.xml.g.m.cs" />
 		<Compile Remove="XF\Views\Page2.xml.g.m.cs" />
+		<Compile Remove="XF\Views\Page3.xml.g.m.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -28,6 +29,9 @@
 		</Compile>
 		<Compile Update="XF\Views\Page2.xml.cs">
 			<DependentUpon>Page2.xml</DependentUpon>
+		</Compile>
+		<Compile Update="XF\Views\Page3.xml.cs">
+			<DependentUpon>Page3.xml</DependentUpon>
 		</Compile>
 	</ItemGroup>
 
@@ -48,6 +52,10 @@
 			<DependentUpon>Page1.xml</DependentUpon>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Include="XF\Views\Page3.xml.g.m.cs">
+			<DependentUpon>Page3.xml</DependentUpon>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -62,6 +70,9 @@
 		</None>
 		<None Update="XF\Views\Page2.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="XF\Views\Page3.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 

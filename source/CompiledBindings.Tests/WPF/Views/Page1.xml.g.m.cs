@@ -400,6 +400,8 @@ namespace WPFTest.Views
 				var value1 = value.DecimalProp;
 #line (71, 6) - (71, 68) 71 "Page1.xml"
 				var value2 = value.IntProp;
+#line (61, 20) - (61, 78) 61 "Page1.xml"
+				var value3 = value.ModifyViewModel;
 #line (49, 13) - (49, 39) 49 "Page1.xml"
 				_targetRoot.textBlock6.Text = value1.ToString();
 #line (51, 20) - (51, 50) 51 "Page1.xml"
@@ -408,8 +410,10 @@ namespace WPFTest.Views
 				global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value2);
 #line (75, 7) - (75, 36) 75 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value2);
+#line (61, 20) - (61, 78) 61 "Page1.xml"
+				_targetRoot.textBlock9.Text = (value3 != null ? value3.Input1 : "abc");
 #line default
-				Update1(value.ModifyViewModel);
+				Update1(value3);
 				Update0_BooleanProp(value.BooleanProp);
 				Update0_ArrayProp(value.ArrayProp);
 				Update0_OrderInput(value.OrderInput);
