@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public static class BindingParser
 {
@@ -25,7 +23,6 @@ public static class BindingParser
 		bool dataTypeSet = false;
 		BindingMode? mode = null;
 		bool isItemsSource = false;
-		UpdateSourceTrigger updateSourceTrigger = UpdateSourceTrigger.Event;
 		EventInfo? targetChangedEvent = null;
 		List<(string name, TypeInfo type)> resources = new();
 
@@ -201,17 +198,10 @@ public static class BindingParser
 				}
 				else
 				{
-					if (value == "Explicit")
+					targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == value);
+					if (targetChangedEvent == null)
 					{
-						updateSourceTrigger = UpdateSourceTrigger.Explicit;
-					}
-					else
-					{
-						targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == value);
-						if (targetChangedEvent == null)
-						{
-							throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
-						}
+						throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
 					}
 				}
 			}
@@ -243,7 +233,7 @@ public static class BindingParser
 			throw new ParseException("IsItemsSource cannot be used for OneWayToSource bindings.");
 		}
 
-		if ((mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && targetChangedEvent == null && updateSourceTrigger != UpdateSourceTrigger.Explicit)
+		if ((mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && targetChangedEvent == null)
 		{
 			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 			if (iNotifyPropChanged.IsAssignableFrom(prop.Object.Type))
@@ -308,7 +298,6 @@ public static class BindingParser
 			FallbackValue = fallbackValue,
 			Mode = mode ?? defaultBindMode,
 			IsItemsSource = isItemsSource,
-			UpdateSourceTrigger = updateSourceTrigger,
 			TargetChangedEvent = targetChangedEvent,
 			Resources = resources,
 			SourceExpression = sourceExpression,
@@ -474,8 +463,7 @@ public static class BindingParser
 			.ToList();
 		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, e => e);
 
-		var twoWayEventHandlers1 = binds
-			.Where(b => (b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && b.UpdateSourceTrigger != UpdateSourceTrigger.Explicit);
+		var twoWayEventHandlers1 = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
 		var twoWayEventHandlers2 = twoWayEventHandlers1
 			.Where(b => b.DependencyProperty != null)
@@ -545,7 +533,7 @@ public static class BindingParser
 				notifySources2 = notifySources2
 					.Except(EnumerableExtensions.SelectTree(s, _ => _.Properties.SelectMany(_ => _.DependentNotifySources)), _ => _.Index)
 					.ToList();
-				
+
 				notifySources1 = notifySources1
 					.Except(EnumerableExtensions.SelectTree(s, _ => _.Properties.SelectMany(_ => _.DependentNotifySources)), _ => _.Index)
 					.ToList();
@@ -575,12 +563,8 @@ public static class BindingParser
 			{
 				var prop = notifProps[0];
 				updateMethodNotifyProps.Add(prop.Clone());
-				// These bindings are set in the UpdateXX_XX method. No more set them in the Update method
-				//prop.UpdatedBindings.ForEach(b => bindings.Remove(b));
 				prop.Bindings.ForEach(b => bindings.Remove(b));
-				// Do not consider UpdateXX_XX methods, which set the same bindings
 				notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
-				// Remove calls of SetPropertyChangedEventHandler methods, which are called in this UpdateXX_XX one
 				notifySources1 = notifySources1
 					.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
 					.ToList();
@@ -681,8 +665,6 @@ public class NotifySource
 	{
 		return (NotifySource)MemberwiseClone();
 	}
-
-	//public IEnumerable<Bind> UpdatedBindings => Properties.SelectMany(_ => _.Bindings).Distinct();
 };
 
 public class NotifyProperty
@@ -708,8 +690,6 @@ public class NotifyProperty
 			return null;
 		}
 	}
-
-	//public IEnumerable<Bind> UpdatedBindings => NotifySource?.UpdatedBindings ?? Bindings;
 
 	public NotifyProperty Clone() => (NotifyProperty)MemberwiseClone();
 };
@@ -738,7 +718,6 @@ public class Bind
 	public Expression? Converter { get; init; }
 	public Expression? ConverterParameter { get; init; }
 	public Expression? FallbackValue { get; init; }
-	public UpdateSourceTrigger? UpdateSourceTrigger { get; init; }
 	public TypeInfo? DataType { get; init; }
 	public bool DataTypeSet { get; init; }
 	public EventInfo? TargetChangedEvent { get; set; }
@@ -748,12 +727,6 @@ public class Bind
 
 	public IMemberInfo? DependencyProperty;
 	public int Index;
-}
-
-public enum UpdateSourceTrigger
-{
-	Event,
-	Explicit,
 }
 
 public enum BindingMode

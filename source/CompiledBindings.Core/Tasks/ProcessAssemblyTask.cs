@@ -3,7 +3,7 @@
 
 namespace CompiledBindings;
 
-public class ProcessAssemblyTask : Task
+public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 {
 	[Required]
 	public ITaskItem[] ReferenceAssemblies { get; set; }

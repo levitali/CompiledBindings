@@ -4,4 +4,3 @@
 public static class IsExternalInit
 {
 }
-

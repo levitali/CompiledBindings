@@ -1,8 +1,6 @@
-﻿#nullable enable
+﻿namespace CompiledBindings;
 
-namespace CompiledBindings;
-
-public class UpdateReferenceCopyLocalTask : Task
+public class UpdateReferenceCopyLocalTask : Microsoft.Build.Utilities.Task
 {
 	[Required]
 	public ITaskItem[] ReferenceCopyLocalFiles { get; set; } = null!;

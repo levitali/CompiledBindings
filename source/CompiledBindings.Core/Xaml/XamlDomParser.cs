@@ -338,7 +338,6 @@ public class XamlDomParser
 				if (DependencyPropertyType != null)
 				{
 					if (value.BindValue?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-						value.BindValue.UpdateSourceTrigger != UpdateSourceTrigger.Explicit &&
 						value.BindValue.TargetChangedEvent == null)
 					{
 						string dpName;

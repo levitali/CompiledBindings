@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public class BindingsCodeGenerator : XamlCodeGenerator
 {
@@ -353,17 +351,8 @@ $@"				_bindingsTrackings.SetPropertyChangedEventHandler{notifySource2.Index}(va
 					{
 						foreach (var prop2 in dependentGroup.Properties)
 						{
-							var ns = prop2.NotifySource;
-							if (ns != null)
-							{
-								output.AppendLine(
-$@"				Update{ns.Index}({prop2.SourceExpression});");
-							}
-							else
-							{
-								output.AppendLine(
+							output.AppendLine(
 $@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression});");
-							}
 						}
 						output.AppendLine(
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
@@ -376,29 +365,6 @@ $@"			}}");
 		}
 
 		#endregion UpdateXX_XXX Methods
-
-		#region UpdateSourceOfExplicitTwoWayBindings
-
-		var explicitBindings = bindingsData.Bindings.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource && b.UpdateSourceTrigger == UpdateSourceTrigger.Explicit);
-		if (@interface || explicitBindings.Any())
-		{
-			output.AppendLine(
-$@"
-			public void UpdateSourceOfExplicitTwoWayBindings()
-			{{
-				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
-
-			foreach (var bind in explicitBindings)
-			{
-				GenerateSetSource(bind, null);
-			}
-
-			output.AppendLine(
-$@"#line default
-			}}");
-		}
-
-		#endregion
 
 		#region OnTargetChanged methods
 
@@ -672,7 +638,7 @@ $@"				Update{notifSource.Index}({notifSource.SourceExpression});");
 
 			foreach (var propUpdate in updateMethod.UpdateNotifyProperties)
 			{
-					output.AppendLine(
+				output.AppendLine(
 $@"				Update{propUpdate.Parent.Index}_{propUpdate.Property.Definition.Name}({propUpdate.SourceExpression});");
 			}
 
