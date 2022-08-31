@@ -118,6 +118,8 @@ namespace XFTest.Views
 				_targetRoot.label9.Text = value1.Item2;
 #line default
 				Update0(dataRoot._viewModel);
+
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
 			}
 
 			private void Update0(global::XFTest.ViewModels.Page2ViewModel value)
@@ -127,7 +129,6 @@ namespace XFTest.Views
 				Update0_CurrentItem2(value.CurrentItem2);
 				Update0_Group(value.Group);
 				Update0_StringProp(value.StringProp);
-				_bindingsTrackings.SetPropertyChangedEventHandler0(value);
 			}
 
 			private void Update0_CurrentItem(global::XFTest.ViewModels.ItemViewModel value)

@@ -96,18 +96,22 @@ namespace XFTest.Views
 
 			private void Update0(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (17, 10) - (17, 58) 17 "Page3.xml"
-				var value1 = value.Entity;
-#line (17, 10) - (17, 58) 17 "Page3.xml"
-				_targetRoot.label1.IsVisible = value1 != null && value.IsLoading;
-#line default
-				Update1(value1);
+				Update0_Entity(value.Entity);
 			}
 
 			private void Update1(global::XFTest.ViewModels.EntityModel value)
 			{
 				Update1_SByteProp(value?.SByteProp ?? default);
 				Update1_UShortProp(value?.UShortProp ?? default);
+			}
+
+			private void Update0_Entity(global::XFTest.ViewModels.EntityModel value)
+			{
+				var dataRoot = _dataRoot;
+#line (17, 10) - (17, 58) 17 "Page3.xml"
+				_targetRoot.label1.IsVisible = value != null && dataRoot.IsLoading;
+#line default
+				Update1(value);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
 			}
 
@@ -194,7 +198,7 @@ namespace XFTest.Views
 							bindings.Update0(typedSender);
 							break;
 						case "Entity":
-							bindings.Update1(typedSender.Entity);
+							bindings.Update0_Entity(typedSender.Entity);
 							break;
 						case "IsLoading":
 							bindings.Update0_IsLoading(typedSender.IsLoading);

@@ -29,6 +29,7 @@ public static class BindingParser
 		EventInfo? targetChangedEvent = null;
 		List<(string name, TypeInfo type)> resources = new();
 
+		// Try to find DataType property in the binding before parsing any expression
 		// TODO: how to match optional comma and not include it in the group?
 		var match = Regex.Match(str, @"^.*DataType\s*(?<!=)=(?!=)(.+)");
 		if (match.Success)
@@ -368,7 +369,7 @@ public static class BindingParser
 				   !pi.IsReadOnly;
 		}
 
-		// Set indexes to notifiable source used as IDs 
+		// Set indexes to notifiable source used as IDs
 		for (int i = 0; i < notifySources.Count; i++)
 		{
 			notifySources[i].Index = i;
@@ -411,7 +412,7 @@ public static class BindingParser
 				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, e => e.CloneReplace(notifySource.SourceExpression, value));
 			}
 
-			foreach (var prop in notifySource.Properties.Where(_ => _.NotifySource == null))
+			foreach (var prop in notifySource.Properties)
 			{
 				var type = prop.Property.PropertyType;
 				if (!type.IsNullable && prop.Expression.IsNullable)
@@ -525,27 +526,28 @@ public static class BindingParser
 		{
 			var notifySources1 = (notifySources ?? Enumerable.Empty<NotifySource>()).ToList();
 
-			var updateNotifySources = new List<NotifySource>();
-
-			// Get the notify sources, for which UpdateXX methods are generated
+			//Get the notify sources, for which UpdateXX methods are generated
 			var notifySources2 = notifySources1
 				.Where(s => s.Properties.Count > 1 && iNotifyPropertyChangedType.IsAssignableFrom(s.SourceExpression.Type))
 				.OrderByDescending(s => s.Properties.SelectMany(p => p.Bindings).Distinct().Count())
 				.ToList();
 
+			// Find all UpdateXX methods, which can be called from the main Update
+			var updateNotifySources = new List<NotifySource>();
 			while (notifySources2.Count > 0)
 			{
 				var s = notifySources2[0];
 				updateNotifySources.Add(s);
 
 				notifySources2.RemoveAt(0);
-				notifySources1.Remove(s);
 
+				// Remove also all child notify sources
 				notifySources2 = notifySources2
-					.Where(n => !n.Properties.SelectMany(p => p.Bindings).Intersect(s.Properties.SelectMany(_ => _.Bindings)).Any())
+					.Except(EnumerableExtensions.SelectTree(s, _ => _.Properties.SelectMany(_ => _.DependentNotifySources)), _ => _.Index)
 					.ToList();
+				
 				notifySources1 = notifySources1
-					.Where(n => !n.Properties.SelectMany(p => p.Bindings).Intersect(s.Properties.SelectMany(_ => _.Bindings)).Any())
+					.Except(EnumerableExtensions.SelectTree(s, _ => _.Properties.SelectMany(_ => _.DependentNotifySources)), _ => _.Index)
 					.ToList();
 
 				s.Properties.SelectMany(_ => _.Bindings).ForEach(_ => bindings.Remove(_));
@@ -558,8 +560,12 @@ public static class BindingParser
 			{
 				notifySources3 = notifySources3.Append(notifySource);
 			}
+			else
+			{
+				notifySources3 = notifySources1.Except(updateNotifySources);
+			}
 
-			var notifProps = notifySources3  // all notifiable properties
+			var notifProps = notifySources3
 				.SelectMany(d => d.Properties)
 				.OrderByDescending(p => p.Bindings.Count)
 				.ThenByDescending(p => p.DependentNotifySources.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifySources)).Count())
@@ -570,7 +576,8 @@ public static class BindingParser
 				var prop = notifProps[0];
 				updateMethodNotifyProps.Add(prop.Clone());
 				// These bindings are set in the UpdateXX_XX method. No more set them in the Update method
-				prop.UpdatedBindings.ForEach(b => bindings.Remove(b));
+				//prop.UpdatedBindings.ForEach(b => bindings.Remove(b));
+				prop.Bindings.ForEach(b => bindings.Remove(b));
 				// Do not consider UpdateXX_XX methods, which set the same bindings
 				notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
 				// Remove calls of SetPropertyChangedEventHandler methods, which are called in this UpdateXX_XX one
@@ -675,7 +682,7 @@ public class NotifySource
 		return (NotifySource)MemberwiseClone();
 	}
 
-	public IEnumerable<Bind> UpdatedBindings => Properties.SelectMany(_ => _.Bindings).Distinct();
+	//public IEnumerable<Bind> UpdatedBindings => Properties.SelectMany(_ => _.Bindings).Distinct();
 };
 
 public class NotifyProperty
@@ -702,7 +709,7 @@ public class NotifyProperty
 		}
 	}
 
-	public IEnumerable<Bind> UpdatedBindings => NotifySource?.UpdatedBindings ?? Bindings;
+	//public IEnumerable<Bind> UpdatedBindings => NotifySource?.UpdatedBindings ?? Bindings;
 
 	public NotifyProperty Clone() => (NotifyProperty)MemberwiseClone();
 };
