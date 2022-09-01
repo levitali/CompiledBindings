@@ -51,7 +51,6 @@ public class Page1ModifyViewModel : INotifyPropertyChanged
 
 	public int IntInput { get; set; }
 
-	[ReadOnly(false)]
 	public Page1ModifyTextViewModel ModifyTextViewModel { get; } = new Page1ModifyTextViewModel();
 
 	public void OnClick(bool parameter)

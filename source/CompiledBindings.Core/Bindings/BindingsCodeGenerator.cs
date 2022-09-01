@@ -337,23 +337,27 @@ $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 				}
 
 				GenerateUpdateMethodBody(output, prop.UpdateExpressions, targetRootVariable: "_targetRoot", a: "\t");
-				var notifySource2 = prop.NotifySource;
-				if (notifySource2 != null)
+				if (prop.DependentNotifySources.Count > 0)
 				{
-					output.AppendLine(
-$@"				Update{notifySource2.Index}(value);");
-					output.AppendLine(
-$@"				_bindingsTrackings.SetPropertyChangedEventHandler{notifySource2.Index}(value);");
-				}
-				else
-				{
+					var notifySource2 = prop.NotifySource;
+					if (notifySource2 != null)
+					{
+						output.AppendLine(
+	$@"				Update{notifySource2.Index}(value);");
+					}
+					else
+					{
+						foreach (var dependentGroup in prop.DependentNotifySources)
+						{
+							foreach (var prop2 in dependentGroup.Properties)
+							{
+								output.AppendLine(
+$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression});");
+							}
+						}
+					}
 					foreach (var dependentGroup in prop.DependentNotifySources)
 					{
-						foreach (var prop2 in dependentGroup.Properties)
-						{
-							output.AppendLine(
-$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression});");
-						}
 						output.AppendLine(
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
 					}

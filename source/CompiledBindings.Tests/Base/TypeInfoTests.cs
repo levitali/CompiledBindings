@@ -7,11 +7,10 @@ public class TypeInfoTests
 	[Test]
 	public void TestTypeInfo()
 	{
-		int substr = "file:///".Length;
 		TypeInfoUtils.LoadReferences(new string[]
 		{
-			typeof(string).Assembly.CodeBase.Substring(substr),
-			Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
+			typeof(string).Assembly.Location,
+			Assembly.GetExecutingAssembly().Location
 		});
 
 		var class1TypeInfo = TypeInfo.GetTypeThrow(typeof(Class1));
@@ -21,7 +20,7 @@ public class TypeInfoTests
 		Assert.IsTrue(funcProp2.PropertyType.IsNullable);
 
 		var genericArgs = funcProp2.PropertyType.GetGenericArguments();
-		Assert.IsFalse(genericArgs[0].IsNullable);
+		Assert.IsFalse(genericArgs![0].IsNullable);
 		Assert.IsTrue(genericArgs[1].IsNullable);
 
 		var method = funcProp2.PropertyType.Methods.Single(m => m.Definition.Name == "Invoke");

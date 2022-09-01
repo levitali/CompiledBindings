@@ -22,16 +22,15 @@ public class XFTests
 
 	private void TestPage(string pageName)
 	{
-		int substr = "file:///".Length;
 		TypeInfoUtils.LoadReferences(new string[]
 		{
-				typeof(object).Assembly.CodeBase.Substring(substr),
-				typeof(INotifyPropertyChanged).Assembly.CodeBase.Substring(substr),
-				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
+			typeof(object).Assembly.Location,
+			typeof(INotifyPropertyChanged).Assembly.Location,
+			Assembly.GetExecutingAssembly().Location
 		});
 		try
 		{
-			var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+			var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 			var xamlFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml");
 			var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
 

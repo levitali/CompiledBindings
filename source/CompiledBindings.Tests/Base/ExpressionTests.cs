@@ -5,11 +5,10 @@ public class ExpressionTests
 	[Test]
 	public void TestExpressions()
 	{
-		int substr = "file:///".Length;
 		TypeInfoUtils.LoadReferences(new string[]
 		{
-				typeof(string).Assembly.CodeBase.Substring(substr),
-				Assembly.GetExecutingAssembly().CodeBase.Substring(substr)
+			typeof(string).Assembly.Location,
+			Assembly.GetExecutingAssembly().Location
 		});
 
 		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);

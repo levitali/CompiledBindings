@@ -418,7 +418,6 @@ namespace WPFTest.Views
 
 			private void Update1(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
-				Update1_ModifyTextViewModel(value?.ModifyTextViewModel);
 				Update1_Input1(value?.Input1);
 				Update1_IntInput(value?.IntInput ?? default);
 				Update1_BoolInput(value?.BoolInput ?? default);
@@ -482,11 +481,14 @@ namespace WPFTest.Views
 
 			private void Update0_ModifyViewModel(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
+#line (70, 12) - (70, 85) 70 "Page1.xml"
+				var value1 = value?.ModifyTextViewModel;
 #line (61, 20) - (61, 78) 61 "Page1.xml"
 				_targetRoot.textBlock9.Text = (value != null ? value.Input1 : "abc");
 #line default
 				Update1(value);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
+				_bindingsTrackings.SetPropertyChangedEventHandler2(value1);
 			}
 
 			private void Update0_BoolInput(global::System.Boolean value)
@@ -592,12 +594,6 @@ namespace WPFTest.Views
 					}
 				}
 #line default
-			}
-
-			private void Update1_ModifyTextViewModel(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
-			{
-				Update2(value);
-				_bindingsTrackings.SetPropertyChangedEventHandler2(value);
 			}
 
 			private void Update1_BoolInput(global::System.Boolean value)
@@ -920,9 +916,6 @@ namespace WPFTest.Views
 							break;
 						case "Input1":
 							bindings.Update1_Input1(typedSender.Input1);
-							break;
-						case "ModifyTextViewModel":
-							bindings.Update1_ModifyTextViewModel(typedSender.ModifyTextViewModel);
 							break;
 						case "BoolInput":
 							bindings.Update1_BoolInput(typedSender.BoolInput);

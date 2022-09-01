@@ -520,27 +520,27 @@ public static class BindingParser
 				.OrderByDescending(s => s.Properties.SelectMany(p => p.Bindings).Distinct().Count())
 				.ToList();
 
-			// Find all UpdateXX methods, which can be called from the main Update
+			// Find UpdateXX methods, which can be called from the main Update
 			var updateNotifySources = new List<NotifySource>();
 			while (notifySources2.Count > 0)
 			{
 				var s = notifySources2[0];
 				updateNotifySources.Add(s);
-
 				notifySources2.RemoveAt(0);
 
 				// Remove also all child notify sources
 				notifySources2 = notifySources2
 					.Except(EnumerableExtensions.SelectTree(s, _ => _.Properties.SelectMany(_ => _.DependentNotifySources)), _ => _.Index)
 					.ToList();
-
 				notifySources1 = notifySources1
 					.Except(EnumerableExtensions.SelectTree(s, _ => _.Properties.SelectMany(_ => _.DependentNotifySources)), _ => _.Index)
 					.ToList();
 
+				// Remove bindings set in this UpdateXX method
 				s.Properties.SelectMany(_ => _.Bindings).ForEach(_ => bindings.Remove(_));
 			}
 
+			// Find UpdateXX_XX methods, which can be used in this Update
 			var updateMethodNotifyProps = new List<NotifyProperty>();
 
 			IEnumerable<NotifySource> notifySources3 = notifySources1;
@@ -569,6 +569,12 @@ public static class BindingParser
 					.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
 					.ToList();
 			}
+
+			// Replace and group expressions of
+			// - Bindings, set direct in this Update method
+			// - UpdateXX methods
+			// - UpdateXX_XX methods
+			// - SetPropertyHandler methods
 
 			var props1 = bindings
 				.Select(b => new PropertySetExpression(b.Property, replace(b.SourceExpression!)))
