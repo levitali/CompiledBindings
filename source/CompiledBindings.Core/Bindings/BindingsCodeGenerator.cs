@@ -285,9 +285,6 @@ $@"
 				}}");
 		output.AppendLine();
 
-		output.AppendLine(
-$@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
-
 		GenerateUpdateMethod(bindingsData.UpdateMethod);
 
 		// Close Update method
@@ -315,7 +312,7 @@ $@"			}}");
 
 		foreach (var notifySource in bindingsData.NotifySources)
 		{
-			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateMethod != null)/*.Where(_ => _.UpdateExpressions != null)*/)
+			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateMethod != null))
 			{
 				output.AppendLine();
 
@@ -323,22 +320,7 @@ $@"			}}");
 				output.AppendLine(
 $@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
 			{{");
-
-				if (prop.UpdateMethod!.Expressions.SetExpressions.Select(d => d.Expression)
-					.Concat(prop.UpdateMethod!.Expressions.LocalVariables.Select(v => v.Expression))
-					.Concat(prop.UpdateMethod.UpdateNotifySources.Select(s => s.SourceExpression))
-					.Concat(prop.UpdateMethod.UpdateNotifyProperties.Select(p => p.SourceExpression))
-					.SelectMany(e => e.EnumerateTree())
-					.OfType<VariableExpression>()
-					.Any(e => e.Name == "dataRoot"))
-				{
-
-					output.AppendLine(
-$@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
-				}
-
 				GenerateUpdateMethod(prop.UpdateMethod!);
-
 				output.AppendLine(
 $@"			}}");
 			}
@@ -608,6 +590,19 @@ $@"		}}");
 
 		void GenerateUpdateMethod(UpdateMethodData updateMethod)
 		{
+			if (updateMethod!.Expressions.SetExpressions.Select(d => d.Expression)
+				.Concat(updateMethod!.Expressions.LocalVariables.Select(v => v.Expression))
+				.Concat(updateMethod.UpdateNotifySources.Select(s => s.SourceExpression))
+				.Concat(updateMethod.UpdateNotifyProperties.Select(p => p.SourceExpression))
+				.SelectMany(e => e.EnumerateTree())
+				.OfType<VariableExpression>()
+				.Any(e => e.Name == "dataRoot"))
+			{
+
+				output.AppendLine(
+$@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
+			}
+
 			GenerateSetExpressions(output, updateMethod.Expressions, targetRootVariable: "_targetRoot", a: "\t");
 
 			foreach (var notifSource in updateMethod.UpdateNotifySources)
