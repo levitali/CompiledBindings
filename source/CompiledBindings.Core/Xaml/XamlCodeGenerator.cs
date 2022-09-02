@@ -237,29 +237,29 @@ $@"{LineDirective(property.XamlNode)}
 		}
 	}
 
-	public void GenerateUpdateMethodBody(StringBuilder output, ExpressionGroup updateMethod, string? targetRootVariable = null, string? a = null)
+	public void GenerateSetExpressions(StringBuilder output, ExpressionGroup expressionGroup, string? targetRootVariable = null, string? a = null)
 	{
-		int localVarIndex = updateMethod.LocalVariables.Count + 1;
+		int localVarIndex = expressionGroup.LocalVariables.Count + 1;
 		int localFuncIndex = 0;
 
-		if (updateMethod.SetProperties != null)
+		if (expressionGroup.SetProperties != null)
 		{
-			foreach (var prop in updateMethod.SetProperties)
+			foreach (var prop in expressionGroup.SetProperties)
 			{
 				GenerateSetValue(output, prop, null, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
 			}
 		}
 
-		if (updateMethod.LocalVariables.Count > 0 || updateMethod.SetExpressions.Count > 0)
+		if (expressionGroup.LocalVariables.Count > 0 || expressionGroup.SetExpressions.Count > 0)
 		{
-			foreach (var variable in updateMethod.LocalVariables)
+			foreach (var variable in expressionGroup.LocalVariables)
 			{
 				output.AppendLine(
 $@"{LineDirective(variable.XamlNode)}
 {a}			var {variable.Name} = {variable.Expression};");
 			}
 
-			foreach (var prop in updateMethod.SetExpressions)
+			foreach (var prop in expressionGroup.SetExpressions)
 			{
 				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
 			}

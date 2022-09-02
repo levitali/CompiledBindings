@@ -117,7 +117,6 @@ namespace XFTest.Views
 
 				var dataRoot = _targetRoot;
 				Update1_SelectedItem(dataRoot.list.SelectedItem);
-
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.list);
 			}
 
@@ -292,7 +291,6 @@ namespace XFTest.Views
 #line default
 				Update0(dataRoot);
 				Update1_DecimalProp(value2.DecimalProp);
-
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value2);
 			}
 
@@ -703,7 +701,6 @@ namespace XFTest.Views
 #line default
 				Update0_BooleanProp(dataRoot.BooleanProp);
 				Update1_SByteProp(value1?.SByteProp ?? default);
-
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 

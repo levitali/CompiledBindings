@@ -118,7 +118,6 @@ namespace XFTest.Views
 				_targetRoot.label9.Text = value1.Item2;
 #line default
 				Update0(dataRoot._viewModel);
-
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
 			}
 

@@ -410,51 +410,7 @@ public static class BindingParser
 				}
 				var expr = new VariableExpression(type, "value");
 
-				var setExpressions1 = prop.SetBindings
-					.Select(b =>
-					{
-						var expression = b.SourceExpression!.CloneReplace(prop.Expression, expr);
-						return new PropertySetExpression(b.Property, expression);
-					})
-					.ToList();
-				var setExpressions2 = prop.DependentNotifySources
-					.SelectMany(d => d.Properties)
-					.Select(p =>
-					{
-						var expression = p.Expression.CloneReplace(prop.Expression, expr);
-						if (p.Property.PropertyType.Type.IsValueType &&
-							!p.Property.PropertyType.Type.IsValueNullable() &&
-							expression.IsNullable)
-						{
-							expression = new CoalesceExpression(expression, Expression.DefaultExpression);
-						}
-						return new PropertySetExpression(p.Bindings[0].Property, expression);
-					})
-					.ToList();
-				var setExpressions3 = prop.DependentNotifySources
-					.Select(d => new PropertySetExpression(d.Properties[0].Bindings[0].Property, d.Expression.CloneReplace(prop.Expression, expr)))
-					.ToList();
-
-				var setExpressions = setExpressions1.Concat(setExpressions2).Concat(setExpressions3).ToList();
-
-				var localVars = ExpressionUtils.GroupExpressions(setExpressions);
-
-				int i = 0;
-				foreach (var p in prop.DependentNotifySources.SelectMany(d => d.Properties))
-				{
-					p.SourceExpression = setExpressions2[i++].Expression;
-				}
-
-				for (i = 0; i < setExpressions3.Count; i++)
-				{
-					prop.DependentNotifySources[i].SourceExpression = setExpressions3[i].Expression;
-				}
-
-				prop.UpdateExpressions = new ExpressionGroup
-				{
-					LocalVariables = localVars,
-					SetExpressions = setExpressions1
-				};
+				prop.UpdateMethod = CreateUpdateMethodData(prop.SetBindings, prop.DependentNotifySources, null, e => e.CloneReplace(prop.Expression, expr));
 			}
 		}
 
@@ -580,7 +536,11 @@ public static class BindingParser
 				.Select(b => new PropertySetExpression(b.Property, replace(b.SourceExpression!)))
 				.ToList();
 
-			var props2 = updateMethodNotifyProps
+			var props2 = updateNotifySources
+				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
+				.ToList();
+
+			var props3 = updateMethodNotifyProps
 				.Select(p =>
 				{
 					var expr = replace(p.Expression);
@@ -594,22 +554,27 @@ public static class BindingParser
 				})
 				.ToList();
 
-			var props3 = notifySources1
+			var props4 = notifySources1
 				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
 				.ToList();
 
-			var props4 = props1.Concat(props2).Concat(props3).ToList();
+			var props5 = props1.Concat(props2).Concat(props3).Concat(props4).ToList();
 
-			var localVars2 = ExpressionUtils.GroupExpressions(props4);
+			var localVars2 = ExpressionUtils.GroupExpressions(props5);
 
-			for (int i = 0; i < props2.Count; i++)
+			for (int i = 0; i < updateNotifySources.Count; i++)
 			{
-				updateMethodNotifyProps[i].SourceExpression = props2[i].Expression;
+				updateNotifySources[i].SourceExpression = props2[i].Expression;
 			}
 
 			for (int i = 0; i < props3.Count; i++)
 			{
-				notifySources1[i].SourceExpression = props3[i].Expression;
+				updateMethodNotifyProps[i].SourceExpression = props3[i].Expression;
+			}
+
+			for (int i = 0; i < props4.Count; i++)
+			{
+				notifySources1[i].SourceExpression = props4[i].Expression;
 			}
 
 			var updateExpressions = new ExpressionGroup
@@ -667,6 +632,7 @@ public class NotifySource
 	public List<NotifyProperty> Properties { get; set; }
 	public UpdateMethodData? UpdateMethod { get; set; }
 	public int Index { get; set; }
+
 	public NotifySource Clone()
 	{
 		return (NotifySource)MemberwiseClone();
@@ -681,23 +647,13 @@ public class NotifyProperty
 	public Expression SourceExpression { get; set; }
 	public ReadOnlyCollection<Bind> Bindings { get; init; }
 	public List<Bind> SetBindings { get; init; }
-	public ExpressionGroup? UpdateExpressions { get; set; }
 	public List<NotifySource> DependentNotifySources { get; } = new();
+	public UpdateMethodData? UpdateMethod { get; set; }
 
-	public NotifySource? NotifySource
+	public NotifyProperty Clone()
 	{
-		get
-		{
-			var s = DependentNotifySources.FirstOrDefault(_ => _.Expression.CSharpCode.Equals(Expression.CSharpCode));
-			if (s?.Properties.Count > 1)
-			{
-				return s;
-			}
-			return null;
-		}
+		return (NotifyProperty)MemberwiseClone();
 	}
-
-	public NotifyProperty Clone() => (NotifyProperty)MemberwiseClone();
 };
 
 public class UpdateMethodData

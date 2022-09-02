@@ -315,7 +315,7 @@ $@"			}}");
 
 		foreach (var notifySource in bindingsData.NotifySources)
 		{
-			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateExpressions != null))
+			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateMethod != null)/*.Where(_ => _.UpdateExpressions != null)*/)
 			{
 				output.AppendLine();
 
@@ -324,9 +324,10 @@ $@"			}}");
 $@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
 			{{");
 
-				if (prop.UpdateExpressions!.SetExpressions.Select(d => d.Expression)
-					.Concat(prop.UpdateExpressions.LocalVariables.Select(v => v.Expression))
-					.Concat(prop.DependentNotifySources.SelectMany(d => d.Properties.Select(p => p.SourceExpression)))
+				if (prop.UpdateMethod!.Expressions.SetExpressions.Select(d => d.Expression)
+					.Concat(prop.UpdateMethod!.Expressions.LocalVariables.Select(v => v.Expression))
+					.Concat(prop.UpdateMethod.UpdateNotifySources.Select(s => s.SourceExpression))
+					.Concat(prop.UpdateMethod.UpdateNotifyProperties.Select(p => p.SourceExpression))
 					.SelectMany(e => e.EnumerateTree())
 					.OfType<VariableExpression>()
 					.Any(e => e.Name == "dataRoot"))
@@ -336,32 +337,7 @@ $@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(gl
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 				}
 
-				GenerateUpdateMethodBody(output, prop.UpdateExpressions, targetRootVariable: "_targetRoot", a: "\t");
-				if (prop.DependentNotifySources.Count > 0)
-				{
-					var notifySource2 = prop.NotifySource;
-					if (notifySource2 != null)
-					{
-						output.AppendLine(
-	$@"				Update{notifySource2.Index}(value);");
-					}
-					else
-					{
-						foreach (var dependentGroup in prop.DependentNotifySources)
-						{
-							foreach (var prop2 in dependentGroup.Properties)
-							{
-								output.AppendLine(
-$@"				Update{dependentGroup.Index}_{prop2.Property.Definition.Name}({prop2.SourceExpression});");
-							}
-						}
-					}
-					foreach (var dependentGroup in prop.DependentNotifySources)
-					{
-						output.AppendLine(
-$@"				_bindingsTrackings.SetPropertyChangedEventHandler{dependentGroup.Index}({dependentGroup.SourceExpression});");
-					}
-				}
+				GenerateUpdateMethod(prop.UpdateMethod!);
 
 				output.AppendLine(
 $@"			}}");
@@ -632,7 +608,7 @@ $@"		}}");
 
 		void GenerateUpdateMethod(UpdateMethodData updateMethod)
 		{
-			GenerateUpdateMethodBody(output, updateMethod.Expressions, targetRootVariable: "_targetRoot", a: "\t");
+			GenerateSetExpressions(output, updateMethod.Expressions, targetRootVariable: "_targetRoot", a: "\t");
 
 			foreach (var notifSource in updateMethod.UpdateNotifySources)
 			{
@@ -646,18 +622,12 @@ $@"				Update{notifSource.Index}({notifSource.SourceExpression});");
 $@"				Update{propUpdate.Parent.Index}_{propUpdate.Property.Definition.Name}({propUpdate.SourceExpression});");
 			}
 
-			var setPropHandlers = updateMethod.SetEventHandlers.Where(g => g != rootGroup).ToList();
-			if (setPropHandlers.Count > 0)
+			foreach (var group in updateMethod.SetEventHandlers.Where(g => g != rootGroup))
 			{
-				output.AppendLine();
-				foreach (var group in setPropHandlers)
-				{
-					output.AppendLine(
-	$@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
-				}
+				output.AppendLine(
+$@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
 			}
 		}
-
 
 		void GenerateSetPropertyChangedEventHandler(NotifySource notifySource, string cacheVar, string? a)
 		{

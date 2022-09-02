@@ -258,7 +258,7 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 			GenerateInitializeResources(output, parseResult);
 		}
 
-		_bindingsCodeGenerator.GenerateUpdateMethodBody(output, parseResult.UpdateMethod);
+		_bindingsCodeGenerator.GenerateSetExpressions(output, parseResult.UpdateMethod);
 		output.AppendLine();
 
 		for (int i = 0; i < parseResult.BindingScopes.Count; i++)
