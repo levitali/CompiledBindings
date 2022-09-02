@@ -276,13 +276,9 @@ public static class BindingParser
 			{
 				var localVarName = "v" + localVarIndex++;
 				sourceExpression = new FallbackExpression(
-					expr.Expression,
+					sourceExpression,
 					fallbackValue,
-					((Expression)expr).CloneReplace(
-						expr.Expression,
-						new VariableExpression(new TypeInfo(sourceExpression.Type, false), localVarName)),
-					localVarName,
-					sourceExpression.Type);
+					localVarName);
 			}
 		}
 
@@ -533,7 +529,16 @@ public static class BindingParser
 			// - SetPropertyHandler methods
 
 			var props1 = bindings
-				.Select(b => new PropertySetExpression(b.Property, replace(b.SourceExpression!)))
+				.Select(b =>
+				{
+					var expr = b.SourceExpression!;
+					// Code generation of bindings with Fallback is not optimized
+					if (expr is not FallbackExpression)
+					{
+						expr = replace(expr);
+					}
+					return new PropertySetExpression(b.Property, expr);
+				})
 				.ToList();
 
 			var props2 = updateNotifySources

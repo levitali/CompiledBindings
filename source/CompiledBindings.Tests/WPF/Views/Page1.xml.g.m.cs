@@ -482,8 +482,6 @@ namespace WPFTest.Views
 			{
 #line (72, 13) - (72, 86) 72 "Page1.xml"
 				var value1 = value?.ModifyTextViewModel;
-#line (61, 20) - (61, 78) 61 "Page1.xml"
-				_targetRoot.textBlock9.Text = (value != null ? value.Input1 : "abc");
 #line default
 				Update1(value);
 				Update2(value1);
@@ -579,6 +577,9 @@ namespace WPFTest.Views
 
 			private void Update1_Input1(global::System.String value)
 			{
+				var dataRoot = _dataRoot;
+#line (61, 20) - (61, 78) 61 "Page1.xml"
+				_targetRoot.textBlock9.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
 #line (62, 20) - (62, 80) 62 "Page1.xml"
 				_targetRoot.textBlock10.Text = value ?? "aaa";
 				if (!object.Equals(_targetRoot.textBox2.Text, value))

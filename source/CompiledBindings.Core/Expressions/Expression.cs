@@ -193,6 +193,7 @@ public class UnaryExpression : Expression
 	{
 		yield return Expression;
 	}
+	
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
 		var clone = (UnaryExpression)base.CloneReplaceCore(current, replace);
@@ -627,51 +628,74 @@ public class TypeofExpression : Expression
 public class FallbackExpression : Expression
 {
 	private readonly string _localVarName;
+	private Expression? _notNull;
 
-	public FallbackExpression(Expression expression, Expression fallbackExpression, Expression notNullExpression, string localVarName, TypeInfo type) : base(type)
+	public FallbackExpression(Expression expression, Expression fallbackExpression, string localVarName) : base(expression.Type)
 	{
-		Debug.Assert(notNullExpression is IAccessExpression);
-
 		Expression = expression;
 		Fallback = fallbackExpression;
-		NotNull = notNullExpression;
 		_localVarName = localVarName;
+
+		Debug.Assert(NullableExpression != null);
 	}
 
 	public Expression Expression { get; private set; }
 	public Expression Fallback { get; private set; }
-	public Expression NotNull { get; private set; }
+
+	public Expression NullableExpression => (Expression)Expression.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().First(e => e.Expression.IsNullable).Expression;
 
 	public override IEnumerable<Expression> Enumerate()
 	{
 		yield return Expression;
 		yield return Fallback;
-		yield return NotNull;
 	}
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
 		var expression = Expression.CloneReplace(current, replace);
-		if (expression is VariableExpression ve)
+		var expr = expression
+			.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+		if (expr == null)
+		{
+			return expression;
+		}
+
+		var fallback = Fallback.CloneReplace(current, replace);
+
+		if (expr.Expression is VariableExpression ve)
 		{
 			return new ConditionalExpression(
-				new BinaryExpression(expression, Expression.NullExpression, "!="),
+				new BinaryExpression(ve, Expression.NullExpression, "!="),
 				NotNull.CloneReplace(
 					((IAccessExpression)NotNull).Expression,
 					new VariableExpression(new TypeInfo(ve.Type, false), ve.Name)),
-				Fallback);
+				fallback);
 		}
 
 		var clone = (FallbackExpression)base.CloneReplaceCore(current, replace);
 		clone.Expression = expression;
-		clone.Fallback = Fallback.CloneReplace(current, replace);
-		clone.NotNull = NotNull.CloneReplace(current, replace);
+		clone.Fallback = fallback;
 		return clone;
 	}
 
 	protected override string GetCSharpCode()
 	{
-		return $"{Expression} is var {_localVarName} && {_localVarName} != null ? {NotNull} : {Fallback}";
+		return $"{NullableExpression} is var {_localVarName} && {_localVarName} != null ? {NotNull} : {Fallback}";
+	}
+
+	private Expression NotNull
+	{
+		get
+		{
+			if (_notNull == null)
+			{
+				var expr = NullableExpression;
+				_notNull = Expression.CloneReplace(
+					expr,
+					new VariableExpression(new TypeInfo(Expression.Type, false), _localVarName));
+			}
+			return _notNull;
+		}
 	}
 }
 
