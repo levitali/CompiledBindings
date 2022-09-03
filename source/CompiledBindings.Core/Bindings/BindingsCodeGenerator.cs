@@ -285,7 +285,7 @@ $@"
 				}}");
 		output.AppendLine();
 
-		GenerateUpdateMethod(bindingsData.UpdateMethod);
+		GenerateUpdateMethodBody(bindingsData.UpdateMethod);
 
 		// Close Update method
 		output.AppendLine(
@@ -297,13 +297,7 @@ $@"			}}");
 
 		foreach (var notifySource in bindingsData.NotifySources.Where(s => s.UpdateMethod != null))
 		{
-			output.AppendLine();
-			output.AppendLine(
-$@"			private void Update{notifySource.Index}(global::{notifySource.Expression.Type.Type.GetCSharpFullName()} value)
-			{{");
-			GenerateUpdateMethod(notifySource.UpdateMethod!);
-			output.AppendLine(
-$@"			}}");
+			GenerateUpdateMethod(notifySource.UpdateMethod!, notifySource.Expression.Type, $"Update{notifySource.Index}");
 		}
 
 		#endregion
@@ -314,15 +308,7 @@ $@"			}}");
 		{
 			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateMethod != null))
 			{
-				output.AppendLine();
-
-				var prmType = prop.Property.PropertyType.Type.GetCSharpFullName();
-				output.AppendLine(
-$@"			private void Update{notifySource.Index}_{prop.Property.Definition.Name}(global::{prmType} value)
-			{{");
-				GenerateUpdateMethod(prop.UpdateMethod!);
-				output.AppendLine(
-$@"			}}");
+				GenerateUpdateMethod(prop.UpdateMethod!, prop.Property.PropertyType, $"Update{notifySource.Index}_{prop.Property.Definition.Name}");
 			}
 		}
 
@@ -588,7 +574,18 @@ $@"		}}");
 
 		#region Local Functions
 
-		void GenerateUpdateMethod(UpdateMethodData updateMethod)
+		void GenerateUpdateMethod(UpdateMethodData updateMethod, TypeInfo parameterType, string name)
+		{
+			output.AppendLine();
+			output.AppendLine(
+$@"			private void {name}(global::{parameterType.Type.GetCSharpFullName()} value)
+			{{");
+			GenerateUpdateMethodBody(updateMethod);
+			output.AppendLine(
+$@"			}}");
+		}
+
+		void GenerateUpdateMethodBody(UpdateMethodData updateMethod)
 		{
 			if (updateMethod!.Expressions.SetExpressions.Select(d => d.Expression)
 				.Concat(updateMethod!.Expressions.LocalVariables.Select(v => v.Expression))
