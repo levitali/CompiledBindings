@@ -85,11 +85,11 @@ namespace WPFTest.Views
 					try
 					{
 #line (15, 20) - (15, 40) 15 "Page2.xml"
-						var value = await dataRoot.Prop2;
+						var result = await dataRoot.Prop2;
 #line default
 						if (!cancellationToken.IsCancellationRequested)
 						{
-							_targetRoot.textBlock2.Text = value;
+							_targetRoot.textBlock2.Text = result;
 						}
 					}
 					catch

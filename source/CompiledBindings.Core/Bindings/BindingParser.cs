@@ -308,6 +308,7 @@ public static class BindingParser
 		}
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
 
 		// Go through all expressions in bindings and find notifiable properties, grouped by notifiable source
 		var notifySources = binds
@@ -532,12 +533,15 @@ public static class BindingParser
 				.Select(b =>
 				{
 					var expr = b.SourceExpression!;
-					// Code generation of bindings with Fallback is not optimized
-					if (expr is not FallbackExpression)
+					var expr2 = replace(expr);
+					if (expr is FallbackExpression && expr2 is not FallbackExpression && !taskType.IsAssignableFrom(expr.Type))
 					{
-						expr = replace(expr);
+						// The replaced expression is not FallbackExpression any more.
+						// This means, that the part, which must be checked for nullability is replaced.
+						// To solve it use full expression.
+						expr2 = expr;
 					}
-					return new PropertySetExpression(b.Property, expr);
+					return new PropertySetExpression(b.Property, expr2);
 				})
 				.ToList();
 

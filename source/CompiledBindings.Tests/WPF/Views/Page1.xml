@@ -75,6 +75,7 @@
             Grid.Column="{x:Bind IntProp}"
             local:TestExtensions.MyProperty="{x:Set 6}"
             IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}" />
-    </StackPanel>
+			<TextBlock Text="{x:Bind ModifyViewModel.ModifyTaskProp, FallbackValue='Loading...'}" />
+		</StackPanel>
 
 </Page>

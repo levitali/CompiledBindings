@@ -34,11 +34,11 @@ namespace WPFTest.Views
 				try
 				{
 #line (41, 16) - (41, 48) 41 "Page1.xml"
-					var value = await this.LoadImageAsync();
+					var result = await this.LoadImageAsync();
 #line default
 					if (!cancellationToken.IsCancellationRequested)
 					{
-						image1.Source = value;
+						image1.Source = result;
 					}
 				}
 				catch
@@ -378,11 +378,11 @@ namespace WPFTest.Views
 					try
 					{
 #line (65, 16) - (65, 49) 65 "Page1.xml"
-						var value = await dataRoot.LoadImageAsync();
+						var result = await dataRoot.LoadImageAsync();
 #line default
 						if (!cancellationToken.IsCancellationRequested)
 						{
-							_targetRoot.image2.Source = value;
+							_targetRoot.image2.Source = result;
 						}
 					}
 					catch
@@ -420,6 +420,7 @@ namespace WPFTest.Views
 				Update1_Input1(value?.Input1);
 				Update1_IntInput(value?.IntInput ?? default);
 				Update1_BoolInput(value?.BoolInput ?? default);
+				Update1_ModifyTaskProp(value?.ModifyTaskProp);
 			}
 
 			private void Update2(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
@@ -546,18 +547,18 @@ namespace WPFTest.Views
 #line (63, 20) - (63, 71) 63 "Page1.xml"
 						var task = value;
 #line default
-						if (!task.IsCompleted)
+						if (task.IsCompleted != true)
 						{
 #line (63, 20) - (63, 71) 63 "Page1.xml"
 							_targetRoot.textBlock11.Text = "Loading...";
 #line default
 						}
 #line (63, 20) - (63, 71) 63 "Page1.xml"
-						var value = await task;
+						var result = await task;
 #line default
 						if (!cancellationToken.IsCancellationRequested)
 						{
-							_targetRoot.textBlock11.Text = value;
+							_targetRoot.textBlock11.Text = result;
 						}
 					}
 					catch
@@ -609,6 +610,42 @@ namespace WPFTest.Views
 					finally
 					{
 						_settingBinding20 = false;
+					}
+				}
+#line default
+			}
+
+			private void Update1_ModifyTaskProp(global::System.Threading.Tasks.Task<global::System.String> value)
+			{
+#line default
+				Set0(_generatedCodeDisposed.Token);
+				async void Set0(CancellationToken cancellationToken)
+				{
+					try
+					{
+#line (78, 15) - (78, 88) 78 "Page1.xml"
+						var task = value;
+#line default
+						if (task?.IsCompleted != true)
+						{
+#line (78, 15) - (78, 88) 78 "Page1.xml"
+							_targetRoot.textBlock13.Text = "Loading...";
+#line default
+							if (task == null)
+							{
+								return;
+							}
+						}
+#line (78, 15) - (78, 88) 78 "Page1.xml"
+						var result = await task;
+#line default
+						if (!cancellationToken.IsCancellationRequested)
+						{
+							_targetRoot.textBlock13.Text = result;
+						}
+					}
+					catch
+					{
 					}
 				}
 #line default
@@ -920,6 +957,9 @@ namespace WPFTest.Views
 							break;
 						case "BoolInput":
 							bindings.Update1_BoolInput(typedSender.BoolInput);
+							break;
+						case "ModifyTaskProp":
+							bindings.Update1_ModifyTaskProp(typedSender.ModifyTaskProp);
 							break;
 					}
 				}

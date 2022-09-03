@@ -205,22 +205,38 @@ $@"#line default
 					output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
 {a}					var task = {value};
-#line default
-{a}					if (!task.IsCompleted)
+#line default");
+					var taskVar = "task";
+					var isTaskNullable = expression!.IsNullable;
+					if (isTaskNullable)
+					{
+						taskVar += '?';
+					}
+					output.AppendLine(
+$@"{a}					if ({taskVar}.IsCompleted != true)
 {a}					{{
 {LineDirective(property.XamlNode)}
 {a}						{setExpr}{(isMethodCall ? $"({fallbackValue})" : $" = {fallbackValue}")};
-#line default
-{a}					}}");
+#line default");
+					if (isTaskNullable)
+					{
+						output.AppendLine(
+$@"{a}						if (task == null)
+{a}						{{
+{a}							return;
+{a}						}}");
+					}
+					output.AppendLine(
+$@"{a}					}}");
 					value = "task";
 				}
 				output.AppendLine(
 $@"{LineDirective(property.XamlNode)}
-{a}					var value = await {value};
+{a}					var result = await {value};
 #line default
 {a}					if (!cancellationToken.IsCancellationRequested)
 {a}					{{
-{a}						{setExpr}{(isMethodCall ? $"(value)" : $" = value")};
+{a}						{setExpr}{(isMethodCall ? "(result)" : " = result")};
 {a}					}}
 {a}				}}
 {a}				catch
