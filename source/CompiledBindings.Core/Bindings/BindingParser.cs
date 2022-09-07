@@ -318,13 +318,15 @@ public static class BindingParser
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
 			.Where(e => CheckPropertyNotifiable(e.expr))
 			.GroupBy(e => e.expr.Expression.CSharpCode)
-			.Select(g =>
+			.OrderBy(g => g.Key)
+			.Select((g, i) =>
 			{
 				var expr1 = g.First().expr.Expression;
 				var d = new NotifySource
 				{
 					Expression = expr1,
 					SourceExpression = expr1,
+					Index = i,
 				};
 				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
 				{
@@ -343,7 +345,6 @@ public static class BindingParser
 				.ToList();
 				return d;
 			})
-			.OrderBy(g => g.Expression.CSharpCode)
 			.ToList();
 
 		bool CheckPropertyNotifiable(MemberExpression expr)
@@ -353,12 +354,6 @@ public static class BindingParser
 				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
 				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
 				   !pi.IsReadOnly;
-		}
-
-		// Set indexes to notifiable source used as IDs
-		for (int i = 0; i < notifySources.Count; i++)
-		{
-			notifySources[i].Index = i;
 		}
 
 		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
@@ -640,7 +635,7 @@ public class NotifySource
 	public Expression SourceExpression { get; set; }
 	public List<NotifyProperty> Properties { get; set; }
 	public UpdateMethodData? UpdateMethod { get; set; }
-	public int Index { get; set; }
+	public int Index { get; init; }
 
 	public NotifySource Clone()
 	{
