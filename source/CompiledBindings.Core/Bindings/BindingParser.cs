@@ -529,7 +529,9 @@ public static class BindingParser
 				{
 					var expr = b.SourceExpression!;
 					var expr2 = replace(expr);
-					if (expr is FallbackExpression && expr2 is not FallbackExpression && !taskType.IsAssignableFrom(expr.Type))
+					if (expr.EnumerateTree().OfType<FallbackExpression>().Any() &&
+					    !expr2.EnumerateTree().OfType<FallbackExpression>().Any() && 
+						!taskType.IsAssignableFrom(expr.Type))
 					{
 						// The replaced expression is not FallbackExpression any more.
 						// This means, that the part, which must be checked for nullability is replaced.
