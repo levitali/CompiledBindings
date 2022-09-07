@@ -65,11 +65,6 @@ namespace WPFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _targetRoot;
 #line (14, 20) - (14, 40) 14 "Page2.xml"
 				_targetRoot.textBlock1.Text = dataRoot.Prop1;

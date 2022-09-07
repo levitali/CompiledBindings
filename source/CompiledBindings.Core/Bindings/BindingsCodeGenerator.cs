@@ -260,16 +260,8 @@ $@"					_targetRoot = null;
 		output.AppendLine(
 $@"
 			public void Update()
-			{{
-				if (_targetRoot == null)
-				{{
-					throw new System.InvalidOperationException();
-				}}");
-		output.AppendLine();
-
+			{{");
 		GenerateUpdateMethodBody(bindingsData.UpdateMethod);
-
-		// Close Update method
 		output.AppendLine(
 $@"			}}");
 

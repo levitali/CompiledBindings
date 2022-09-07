@@ -57,13 +57,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page3 targetRoot, global::XFTest.ViewModels.Page3ViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page3_BindingsTrackings_this(this);
@@ -85,11 +78,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 				Update0(dataRoot);
 			}

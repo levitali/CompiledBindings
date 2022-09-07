@@ -107,11 +107,6 @@ namespace WPFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _targetRoot;
 				Update0_DecimalProp(dataRoot._viewModel.DecimalProp);
 				Update1_SelectedItem(dataRoot.listView.SelectedItem);
@@ -349,11 +344,6 @@ namespace WPFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 #line (59, 13) - (59, 43) 59 "Page1.xml"
 				_targetRoot.listView.ItemsSource = dataRoot.ListProp;
@@ -1061,11 +1051,6 @@ namespace WPFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 #line (24, 28) - (24, 58) 24 "Page1.xml"
 				var value1 = dataRoot.Model;
@@ -1248,11 +1233,6 @@ namespace WPFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 				Update0_Title(dataRoot.Title);
 			}

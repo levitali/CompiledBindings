@@ -80,11 +80,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page2 dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = dataRoot;
 				_bindingsTrackings = new Page2_BindingsTrackings_this(this);
 
@@ -102,11 +97,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _targetRoot;
 #line (30, 13) - (30, 65) 30 "Page2.xml"
 				var value1 = dataRoot._viewModel.GetIcon();

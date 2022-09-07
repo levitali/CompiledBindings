@@ -88,11 +88,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page1 dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = dataRoot;
 				_bindingsTrackings = new Page1_BindingsTrackings(this);
 
@@ -110,11 +105,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _targetRoot;
 				Update1_SelectedItem(dataRoot.list.SelectedItem);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.list);
@@ -241,13 +231,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page1 targetRoot, global::XFTest.ViewModels.Page1ViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page1_BindingsTrackings_this(this);
@@ -276,11 +259,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 #line (57, 13) - (57, 63) 57 "Page1.xml"
 				var value1 = dataRoot.ListProp;
@@ -662,13 +640,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page1_DataTemplate0 targetRoot, global::XFTest.ViewModels.EntityViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page1_DataTemplate0_BindingsTrackings_rootElement(this);
@@ -690,11 +661,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 #line (20, 24) - (20, 54) 20 "Page1.xml"
 				var value1 = dataRoot.Model;
@@ -854,13 +820,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page1_DataTemplate1 targetRoot, global::XFTest.ViewModels.EntityViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page1_DataTemplate1_BindingsTrackings_rootElement(this);
@@ -882,11 +841,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 #line (31, 36) - (31, 100) 31 "Page1.xml"
 				_targetRoot.label4.Text = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel)?.ExtraProp;
@@ -1006,13 +960,6 @@ namespace XFTest.Views
 
 			public void Initialize(Page1_DataTemplate2 targetRoot, global::XFTest.ViewModels.EntityViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page1_DataTemplate2_BindingsTrackings_rootElement(this);
@@ -1034,11 +981,6 @@ namespace XFTest.Views
 
 			public void Update()
 			{
-				if (_targetRoot == null)
-				{
-					throw new System.InvalidOperationException();
-				}
-
 				var dataRoot = _dataRoot;
 				Update0(dataRoot);
 			}
