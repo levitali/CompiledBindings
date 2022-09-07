@@ -8,8 +8,6 @@ using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-#nullable enable
-
 namespace CompiledBindings;
 
 public class WPFGenerateCodeTask : Task, ICancelableTask

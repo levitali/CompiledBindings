@@ -1,6 +1,6 @@
 ﻿namespace WPFTest;
 
-#nullable enable
+
 
 public sealed partial class Strings
 {

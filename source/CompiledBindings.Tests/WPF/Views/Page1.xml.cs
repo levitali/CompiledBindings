@@ -5,7 +5,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using WPFTest.ViewModels;
 
-#nullable enable
+
 
 namespace WPFTest.Views;
 

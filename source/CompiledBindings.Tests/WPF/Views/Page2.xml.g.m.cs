@@ -40,11 +40,6 @@ namespace WPFTest.Views
 
 			public void Initialize(Page2 dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = dataRoot;
 				_generatedCodeDisposed = new CancellationTokenSource();
 

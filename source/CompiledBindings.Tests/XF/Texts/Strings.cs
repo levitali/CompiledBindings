@@ -1,6 +1,6 @@
 ﻿namespace XFTest;
 
-#nullable enable
+
 
 public sealed partial class Strings
 {

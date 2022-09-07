@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public class TypeInfo
 {

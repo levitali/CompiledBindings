@@ -44,7 +44,7 @@ public class XFTests
 			var csharpFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml.g.m.cs");
 			var expectedCode = File.ReadAllText(csharpFile);
 
-			Assert.AreEqual(code, expectedCode);
+			Assert.That(code.Equals(expectedCode));
 		}
 		finally
 		{

@@ -6,8 +6,6 @@ using System.Windows.Markup;
 
 namespace CompiledBindings.Markup;
 
-#nullable enable
-
 public class BindExtension : MarkupExtension
 {
 	public BindExtension()

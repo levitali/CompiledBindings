@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-#nullable enable
+
 #pragma warning disable 0067
 
 namespace WPFTest.ViewModels;

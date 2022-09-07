@@ -90,11 +90,6 @@ namespace WPFTest.Views
 
 			public void Initialize(Page1 dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = dataRoot;
 				_bindingsTrackings = new Page1_BindingsTrackings(this);
 
@@ -252,13 +247,6 @@ namespace WPFTest.Views
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_generatedCodeDisposed = new CancellationTokenSource();
@@ -1052,13 +1040,6 @@ namespace WPFTest.Views
 
 			public void Initialize(Page1_DataTemplate0 targetRoot, global::WPFTest.ViewModels.EntityViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page1_DataTemplate0_BindingsTrackings_rootElement(this);
@@ -1246,13 +1227,6 @@ namespace WPFTest.Views
 
 			public void Initialize(Page1_DataTemplate1 targetRoot, global::WPFTest.ViewModels.EntityViewModel dataRoot)
 			{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
 				_bindingsTrackings = new Page1_DataTemplate1_BindingsTrackings_rootElement(this);

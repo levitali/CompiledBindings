@@ -1,6 +1,6 @@
 ﻿using XFTest.ViewModels;
 
-#nullable enable
+
 
 namespace CompiledBindings.Tests;
 
@@ -65,7 +65,7 @@ public class NullableDisabledBaseClass
 	public object SelectedItem { get; set; }
 }
 
-#nullable enable
+
 
 public class NullableEnabledDerivedClass : NullableDisabledBaseClass
 {

@@ -1,5 +1,4 @@
-﻿#nullable enable
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+﻿#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 namespace CompiledBindings;
 

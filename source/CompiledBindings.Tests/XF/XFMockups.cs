@@ -101,7 +101,7 @@ namespace Xamarin.Forms
 	}
 }
 
-#nullable enable
+
 
 namespace UI
 {

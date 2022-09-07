@@ -4,7 +4,7 @@ using Xamarin.Forms.Xaml;
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2009/xaml", "CompiledBindings.Markup")]
 
-#nullable enable
+
 
 namespace CompiledBindings.Markup;
 

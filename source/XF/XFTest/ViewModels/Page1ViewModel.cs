@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 
-#nullable enable
+
 
 namespace XFTest.ViewModels
 {

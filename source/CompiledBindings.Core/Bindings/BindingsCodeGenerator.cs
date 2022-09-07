@@ -98,19 +98,6 @@ $@"			CancellationTokenSource _generatedCodeDisposed;");
 $@"
 			public void Initialize({targetClassName} targetRoot, global::{bindingsData.DataType.Type.GetCSharpFullName()} dataRoot)
 			{{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (targetRoot == null)
-					throw new System.ArgumentNullException(nameof(targetRoot));");
-			if (bindingsData.DataType.Type.IsNullable())
-			{
-				output.AppendLine(
-$@"				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));");
-			}
-
-			output.AppendLine(
-$@"
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;");
 		}
@@ -120,11 +107,6 @@ $@"
 $@"
 			public void Initialize({targetClassName} dataRoot)
 			{{
-				if (_targetRoot != null)
-					throw new System.InvalidOperationException();
-				if (dataRoot == null)
-					throw new System.ArgumentNullException(nameof(dataRoot));
-
 				_targetRoot = dataRoot;");
 		}
 

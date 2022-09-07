@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public class XamlParser
 {
@@ -197,4 +195,3 @@ public class XamlNamespace
 			.ToList();
 	}
 }
-

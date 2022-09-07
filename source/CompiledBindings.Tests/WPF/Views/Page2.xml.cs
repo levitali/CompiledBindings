@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-#nullable enable
+
 
 namespace WPFTest.Views;
 

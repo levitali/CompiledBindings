@@ -2,7 +2,7 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-#nullable enable
+
 
 namespace CompiledBindings.Markup;
 
