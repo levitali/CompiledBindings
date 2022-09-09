@@ -4,8 +4,6 @@ using Xamarin.Forms.Xaml;
 
 [assembly: XmlnsDefinition("http://schemas.microsoft.com/winfx/2009/xaml", "CompiledBindings.Markup")]
 
-
-
 namespace CompiledBindings.Markup;
 
 [ContentProperty("Path")]
@@ -28,6 +26,8 @@ public class BindExtension : IMarkupExtension
 	public object? TargetNullValue { get; set; }
 
 	public bool IsItemsSource { get; set; }
+
+	public object? UpdateSourceTrigger { get; set; }
 
 	public object? ProvideValue(IServiceProvider serviceProvider)
 	{

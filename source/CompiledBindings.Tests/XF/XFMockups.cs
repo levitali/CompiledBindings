@@ -11,13 +11,17 @@ using Xamarin.Forms;
 
 namespace Xamarin.Forms
 {
-	public class VisualElement : INotifyPropertyChanged
+	public class BindableObject : INotifyPropertyChanged
+	{
+		public event PropertyChangedEventHandler PropertyChanged;
+	}
+
+	public class VisualElement : BindableObject 
 	{
 		public bool IsVisible { get; set; }
 		public bool IsEnabled { get; set; }
 
 		public event EventHandler Focused;
-		public event PropertyChangedEventHandler PropertyChanged;
 	}
 
 	public class Grid : VisualElement

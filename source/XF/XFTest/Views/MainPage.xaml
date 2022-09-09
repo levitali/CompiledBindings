@@ -2,6 +2,7 @@
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:converters="clr-namespace:XFTest.Converters"
+    xmlns:local="clr-namespace:XFTest"
     xmlns:vm="clr-namespace:XFTest.ViewModels"
     x:Class="XFTest.MainPage"
     x:DataType="vm:Page1ViewModel">
@@ -23,8 +24,13 @@
 
     <StackLayout>
 
-        <Entry Text="{x:Bind ModifyViewModel.Input1, Mode=OneWayToSource}" />
-        <Entry Text="{x:Bind ModifyViewModel.Input2, Mode=TwoWay}" />
+        <Entry
+            x:Name="input1"
+            local:FocusManager.Focused="{x:Bind FocusedField[UserName], Mode=TwoWay, UpdateSourceTrigger=Focused}"
+            Text="{x:Bind ModifyViewModel.Input1, Mode=OneWayToSource}" />
+        <Entry
+            local:FocusManager.Focused="{x:Bind FocusedField[Password], Mode=TwoWay, UpdateSourceTrigger=Focused}"
+            Text="{x:Bind ModifyViewModel.Input2, Mode=TwoWay}" />
 
         <Label Text="{x:Set local:Strings.Instance.Header1}" />
         <Label
@@ -35,6 +41,9 @@
         <CollectionView
             ItemTemplate="{StaticResource test1Template}"
             ItemsSource="{x:Bind ListProp}" />
+        <Button
+            Text="Test set focus"
+            Clicked="TestSetFocus_Click" />
 
     </StackLayout>
 </ContentPage>

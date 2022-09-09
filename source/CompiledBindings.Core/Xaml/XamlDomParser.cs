@@ -444,7 +444,7 @@ public class XamlDomParser
 
 	private void CorrectMethod(XamlObjectProperty prop, TypeInfo type)
 	{
-		if (prop.TargetMethod != null)
+		if (prop.TargetMethod != null && !prop.IsAttached)
 		{
 			// Try to find best suitable method.
 			// Note! So far TypeInfoUtils.IsAssignableFrom method does not handle all cases.
