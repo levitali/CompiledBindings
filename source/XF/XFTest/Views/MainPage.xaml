@@ -26,10 +26,10 @@
 
         <Entry
             x:Name="input1"
-            local:FocusManager.Focused="{x:Bind FocusedField[UserName], Mode=TwoWay, UpdateSourceTrigger=Focused}"
+            local:FocusManager.Focused="{x:Bind FocusedField[UserName], Mode=TwoWay, UpdateSourceTrigger=Focused|Unfocused}"
             Text="{x:Bind ModifyViewModel.Input1, Mode=OneWayToSource}" />
         <Entry
-            local:FocusManager.Focused="{x:Bind FocusedField[Password], Mode=TwoWay, UpdateSourceTrigger=Focused}"
+            local:FocusManager.Focused="{x:Bind FocusedField[Password], Mode=TwoWay, UpdateSourceTrigger=Focused|Unfocused}"
             Text="{x:Bind ModifyViewModel.Input2, Mode=TwoWay}" />
 
         <Label Text="{x:Set local:Strings.Instance.Header1}" />

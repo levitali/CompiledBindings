@@ -8,6 +8,7 @@
     xmlns:system="using:System"
     xmlns:viewModels="using:WPFTest.ViewModels"
     xmlns:views="clr-namespace:WPFTest.Views"
+		xmlns:ui="using:UI"
     mc:Ignorable="d mx"
     x:Class="WPFTest.Views.Page1"
     mx:DataType="viewModels:Page1ViewModel"
@@ -70,7 +71,8 @@
         <TextBox
             local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"
             Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
-        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}" />
+        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}"
+								 ui:FocusManager.Focused="{x:Bind FocusedField[Field1], Mode=TwoWay, UpdateSourceTrigger=GotFocus|LostFocus}"/>
         <CheckBox
             Grid.Column="{x:Bind IntProp}"
             local:TestExtensions.MyProperty="{x:Set 6}"

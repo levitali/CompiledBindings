@@ -394,6 +394,8 @@ public class EventInfo : IMemberInfo
 
 	public TypeInfo EventType { get; }
 
+	public string Signature => string.Join(",", GetEventHandlerParameterTypes().Select(t => t.Type.FullName));
+
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => EventType;
 

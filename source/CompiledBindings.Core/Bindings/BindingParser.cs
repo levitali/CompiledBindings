@@ -23,7 +23,7 @@ public static class BindingParser
 		bool dataTypeSet = false;
 		BindingMode? mode = null;
 		bool isItemsSource = false;
-		EventInfo? targetChangedEvent = null;
+		List<EventInfo> targetChangedEvents = new();
 		List<(string name, TypeInfo type)> resources = new();
 
 		// Try to find DataType property in the binding before parsing any expression
@@ -198,10 +198,14 @@ public static class BindingParser
 				}
 				else
 				{
-					targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == value);
-					if (targetChangedEvent == null)
+					foreach (var eventName in value.Split('|').Select(_ => _.Trim()).Distinct())
 					{
-						throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
+						var targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == eventName);
+						if (targetChangedEvent == null)
+						{
+							throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
+						}
+						targetChangedEvents.Add(targetChangedEvent);
 					}
 				}
 			}
@@ -233,12 +237,12 @@ public static class BindingParser
 			throw new ParseException("IsItemsSource cannot be used for OneWayToSource bindings.");
 		}
 
-		if ((mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && targetChangedEvent == null)
+		if ((mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && targetChangedEvents.Count == 0)
 		{
 			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 			if (iNotifyPropChanged.IsAssignableFrom(prop.Object.Type))
 			{
-				targetChangedEvent = iNotifyPropChanged.Events.First();
+				targetChangedEvents.Add(iNotifyPropChanged.Events.First());
 			}
 		}
 		// Note! It is not checked now whether an event is set for a not explicit two way binding.
@@ -294,7 +298,7 @@ public static class BindingParser
 			FallbackValue = fallbackValue,
 			Mode = mode ?? defaultBindMode,
 			IsItemsSource = isItemsSource,
-			TargetChangedEvent = targetChangedEvent,
+			TargetChangedEvents = targetChangedEvents,
 			Resources = resources,
 			SourceExpression = sourceExpression,
 		};
@@ -411,25 +415,27 @@ public static class BindingParser
 			.ToList();
 		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, e => e);
 
-		var twoWayEventHandlers1 = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
+		var twoWayBinds = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
-		var twoWayEventHandlers2 = twoWayEventHandlers1
-			.Where(b => b.DependencyProperty != null)
+		var twoWayEventHandlers1 = twoWayBinds
+			.Where(b => b.TargetChangedEvents.Count > 0)
+			.SelectMany(b => b.TargetChangedEvents.Select(e => (bind: b, evnt: e)))
+			.GroupBy(e => (e.bind.Property.Object, e.evnt.Signature))
+			.Select(g => new TwoWayEventData
+			{
+				Events = g.Select(_ => _.evnt).Distinct().ToList(),
+				Bindings = g.Select(_ => _.bind).Distinct().ToList(),
+			});
+
+		var twoWayEventHandlers2 = twoWayBinds
+			.Where(b => b.TargetChangedEvents.Count == 0 && b.DependencyProperty != null)
 			.GroupBy(b => (b.Property.Object, b.DependencyProperty))
 			.Select(g => new TwoWayEventData
 			{
 				Bindings = g.ToList(),
 			});
 
-		var twoWayEventHandlers3 = twoWayEventHandlers1
-			.Where(b => b.DependencyProperty == null)
-			.GroupBy(b => (b.Property.Object, b.TargetChangedEvent))
-			.Select(g => new TwoWayEventData
-			{
-				Bindings = g.ToList(),
-			});
-
-		var twoWayEventHandlers = twoWayEventHandlers2.Concat(twoWayEventHandlers3).ToList();
+		var twoWayEventHandlers = twoWayEventHandlers1.Concat(twoWayEventHandlers2).ToList();
 		for (int i = 0; i < twoWayEventHandlers.Count; i++)
 		{
 			twoWayEventHandlers[i].Index = i;
@@ -617,17 +623,6 @@ public class BindingsData
 	public List<NotifySource> NotifySources { get; init; }
 	public List<TwoWayEventData> TwoWayEvents { get; init; }
 	public UpdateMethodData UpdateMethod { get; init; }
-
-	public void Validate(string file)
-	{
-		foreach (var binding in TwoWayEvents.SelectMany(b => b.Bindings))
-		{
-			if (binding.DependencyProperty == null && binding.TargetChangedEvent == null)
-			{
-				throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceTrigger property.", file, binding.Property.XamlNode);
-			}
-		}
-	}
 };
 
 public class NotifySource
@@ -673,6 +668,7 @@ public class UpdateMethodData
 public class TwoWayEventData
 {
 	public List<Bind> Bindings { get; init; }
+	public List<EventInfo>? Events { get; init; }
 	public int Index { get; set; }
 };
 
@@ -688,7 +684,7 @@ public class Bind
 	public Expression? FallbackValue { get; init; }
 	public TypeInfo? DataType { get; init; }
 	public bool DataTypeSet { get; init; }
-	public EventInfo? TargetChangedEvent { get; set; }
+	public List<EventInfo> TargetChangedEvents { get; init; }
 	public List<(string name, TypeInfo type)> Resources { get; init; }
 
 	public Expression? SourceExpression { get; set; }

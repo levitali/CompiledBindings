@@ -1,4 +1,6 @@
 ﻿using System.Windows.Media;
+using UI;
+using static XFTest.ViewModels.Page1ViewModel;
 
 namespace WPFTest.ViewModels;
 
@@ -40,6 +42,14 @@ public class Page1ViewModel : INotifyPropertyChanged
 	public string Calculate(ParamClass prm)
 	{
 		return "";
+	}
+
+	public FocusState<Field> FocusedField { get; private set; } = new FocusState<Field>();
+
+	public enum Field
+	{
+		Field1,
+		Field2
 	}
 }
 

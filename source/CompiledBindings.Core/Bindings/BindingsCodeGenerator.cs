@@ -162,16 +162,23 @@ $@"
 					targetExpr += "." + first.Property.Object.Name;
 				}
 
-				if (first.DependencyProperty != null)
+				if (ev.Events != null)
+				{
+					foreach (var evnt in ev.Events)
+					{
+						var targetExpr2 = targetExpr + "." + evnt.Definition.Name;
+
+						output.AppendLine(
+$@"				{targetExpr2} += OnTargetChanged{ev.Index};");
+					}
+				}
+				else if (first.DependencyProperty != null)
 				{
 					GenerateSetDependencyPropertyChangedCallback(output, ev, targetExpr);
 				}
 				else
 				{
-					targetExpr += "." + first.TargetChangedEvent!.Definition.Name;
-
-					output.AppendLine(
-$@"				{targetExpr} += OnTargetChanged{ev.Index};");
+					Debug.Assert(false);
 				}
 			}
 		}
@@ -209,15 +216,22 @@ $@"					_generatedCodeDisposed.Cancel();");
 				targetExpr += "." + first.Property.Object.Name;
 			}
 
-			if (first.DependencyProperty != null)
+			if (ev.Events != null)
+			{
+				foreach (var evnt in ev.Events)
+				{
+					var targetExpr2 = targetExpr + "." + evnt.Definition.Name;
+					output.AppendLine(
+$@"					{targetExpr2} -= OnTargetChanged{ev.Index};");
+				}
+			}
+			else if (first.DependencyProperty != null)
 			{
 				GenerateUnsetDependencyPropertyChangedCallback(output, ev, targetExpr);
 			}
 			else
 			{
-				targetExpr += "." + first.TargetChangedEvent!.Definition.Name;
-				output.AppendLine(
-$@"					{targetExpr} -= OnTargetChanged{ev.Index};");
+				Debug.Assert(false);
 			}
 		}
 
@@ -295,21 +309,25 @@ $@"			}}");
 			output.AppendLine();
 
 			var first = ev.Bindings[0];
-			if (first.DependencyProperty != null)
+			if (ev.Events != null)
+			{
+				output.AppendLine(
+$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Events[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Type.GetCSharpFullName()} p{i}"))})");
+			}
+			else if (first.DependencyProperty != null)
 			{
 				GenerateDependencyPropertyChangedCallback(output, $"OnTargetChanged{ev.Index}");
 			}
 			else
 			{
-				output.AppendLine(
-$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Bindings[0].TargetChangedEvent!.GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Type.GetCSharpFullName()} p{i}"))})");
+				Debug.Assert(false);
 			}
 
 			output.AppendLine(
 $@"			{{
 				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 
-			if (first.TargetChangedEvent?.Definition.Name == "PropertyChanged")
+			if (ev.Events?[0].Definition.Name == "PropertyChanged")
 			{
 				output.AppendLine(
 $@"				switch (p1.PropertyName)

@@ -23,9 +23,9 @@ namespace WPFTest.Views
 			TrueToVisibleConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["TrueToVisibleConverter"] ?? global::System.Windows.Application.Current.Resources["TrueToVisibleConverter"] ?? throw new global::System.Exception("Resource 'TrueToVisibleConverter' not found."));
 			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
 
-#line (14, 5) - (14, 50) 14 "Page1.xml"
+#line (15, 5) - (15, 50) 15 "Page1.xml"
 			var value1 = WPFTest.Strings.Instance;
-#line (14, 5) - (14, 50) 14 "Page1.xml"
+#line (15, 5) - (15, 50) 15 "Page1.xml"
 			Title = value1.Title;
 #line default
 			Set0(_generatedCodeDisposed.Token);
@@ -33,7 +33,7 @@ namespace WPFTest.Views
 			{
 				try
 				{
-#line (41, 16) - (41, 48) 41 "Page1.xml"
+#line (42, 16) - (42, 48) 42 "Page1.xml"
 					var result = await this.LoadImageAsync();
 #line default
 					if (!cancellationToken.IsCancellationRequested)
@@ -45,9 +45,9 @@ namespace WPFTest.Views
 				{
 				}
 			}
-#line (47, 13) - (47, 57) 47 "Page1.xml"
+#line (48, 13) - (48, 57) 48 "Page1.xml"
 			header1.Text = value1.Header1;
-#line (76, 13) - (76, 55) 76 "Page1.xml"
+#line (78, 13) - (78, 55) 78 "Page1.xml"
 			global::WPFTest.TestExtensions.SetMyProperty(checkBox2, 6);
 #line default
 
@@ -116,14 +116,14 @@ namespace WPFTest.Views
 
 			private void Update0_DecimalProp(global::System.Decimal value)
 			{
-#line (44, 13) - (44, 52) 44 "Page1.xml"
+#line (45, 13) - (45, 52) 45 "Page1.xml"
 				_targetRoot.textBlock5.Text = value.ToString();
 #line default
 			}
 
 			private void Update1_SelectedItem(global::System.Object value)
 			{
-#line (67, 13) - (67, 81) 67 "Page1.xml"
+#line (68, 13) - (68, 81) 68 "Page1.xml"
 				_targetRoot.button1.IsEnabled = value != null;
 #line default
 			}
@@ -237,7 +237,8 @@ namespace WPFTest.Views
 			bool _settingBinding16;
 			bool _settingBinding17;
 			bool _settingBinding18;
-			bool _settingBinding20;
+			bool _settingBinding19;
+			bool _settingBinding21;
 			CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
@@ -249,7 +250,7 @@ namespace WPFTest.Views
 
 				Update();
 
-#line (68, 13) - (68, 65) 68 "Page1.xml"
+#line (69, 13) - (69, 65) 69 "Page1.xml"
 				_eventHandler14 = (p1, p2) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
 #line default
 				_targetRoot.button1.Click += _eventHandler14;
@@ -257,41 +258,43 @@ namespace WPFTest.Views
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 
+				_targetRoot.textBox4.GotFocus += OnTargetChanged0;
+				_targetRoot.textBox4.LostFocus += OnTargetChanged0;
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
 						global::System.Windows.Controls.TextBox.TextProperty,
 						typeof(global::System.Windows.Controls.TextBox))
-					.AddValueChanged(_targetRoot.textBox1, OnTargetChanged0);
+					.AddValueChanged(_targetRoot.textBox1, OnTargetChanged1);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
 						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
-					.AddValueChanged(_targetRoot.checkBox1, OnTargetChanged1);
+					.AddValueChanged(_targetRoot.checkBox1, OnTargetChanged2);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
 						global::System.Windows.Controls.TextBox.TextProperty,
 						typeof(global::System.Windows.Controls.TextBox))
-					.AddValueChanged(_targetRoot.textBox2, OnTargetChanged2);
+					.AddValueChanged(_targetRoot.textBox2, OnTargetChanged3);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
 						global::WPFTest.TestExtensions.MyPropertyProperty,
 						typeof(global::WPFTest.TestExtensions))
-					.AddValueChanged(_targetRoot.textBox3, OnTargetChanged3);
-				global::System.ComponentModel.DependencyPropertyDescriptor
-					.FromProperty(
-						global::System.Windows.Controls.TextBox.TextProperty,
-						typeof(global::System.Windows.Controls.TextBox))
 					.AddValueChanged(_targetRoot.textBox3, OnTargetChanged4);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
 						global::System.Windows.Controls.TextBox.TextProperty,
 						typeof(global::System.Windows.Controls.TextBox))
-					.AddValueChanged(_targetRoot.textBox4, OnTargetChanged5);
+					.AddValueChanged(_targetRoot.textBox3, OnTargetChanged5);
+				global::System.ComponentModel.DependencyPropertyDescriptor
+					.FromProperty(
+						global::System.Windows.Controls.TextBox.TextProperty,
+						typeof(global::System.Windows.Controls.TextBox))
+					.AddValueChanged(_targetRoot.textBox4, OnTargetChanged6);
 				global::System.ComponentModel.DependencyPropertyDescriptor
 					.FromProperty(
 						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
-					.AddValueChanged(_targetRoot.checkBox2, OnTargetChanged6);
+					.AddValueChanged(_targetRoot.checkBox2, OnTargetChanged7);
 			}
 
 			public void Cleanup()
@@ -299,41 +302,43 @@ namespace WPFTest.Views
 				if (_targetRoot != null)
 				{
 					_generatedCodeDisposed.Cancel();
+					_targetRoot.textBox4.GotFocus -= OnTargetChanged0;
+					_targetRoot.textBox4.LostFocus -= OnTargetChanged0;
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::System.Windows.Controls.TextBox.TextProperty,
 							typeof(global::System.Windows.Controls.TextBox))
-						.RemoveValueChanged(_targetRoot.textBox1, OnTargetChanged0);
+						.RemoveValueChanged(_targetRoot.textBox1, OnTargetChanged1);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
-						.RemoveValueChanged(_targetRoot.checkBox1, OnTargetChanged1);
+						.RemoveValueChanged(_targetRoot.checkBox1, OnTargetChanged2);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::System.Windows.Controls.TextBox.TextProperty,
 							typeof(global::System.Windows.Controls.TextBox))
-						.RemoveValueChanged(_targetRoot.textBox2, OnTargetChanged2);
+						.RemoveValueChanged(_targetRoot.textBox2, OnTargetChanged3);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::WPFTest.TestExtensions.MyPropertyProperty,
 							typeof(global::WPFTest.TestExtensions))
-						.RemoveValueChanged(_targetRoot.textBox3, OnTargetChanged3);
-					global::System.ComponentModel.DependencyPropertyDescriptor
-						.FromProperty(
-							global::System.Windows.Controls.TextBox.TextProperty,
-							typeof(global::System.Windows.Controls.TextBox))
 						.RemoveValueChanged(_targetRoot.textBox3, OnTargetChanged4);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::System.Windows.Controls.TextBox.TextProperty,
 							typeof(global::System.Windows.Controls.TextBox))
-						.RemoveValueChanged(_targetRoot.textBox4, OnTargetChanged5);
+						.RemoveValueChanged(_targetRoot.textBox3, OnTargetChanged5);
+					global::System.ComponentModel.DependencyPropertyDescriptor
+						.FromProperty(
+							global::System.Windows.Controls.TextBox.TextProperty,
+							typeof(global::System.Windows.Controls.TextBox))
+						.RemoveValueChanged(_targetRoot.textBox4, OnTargetChanged6);
 					global::System.ComponentModel.DependencyPropertyDescriptor
 						.FromProperty(
 							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
-						.RemoveValueChanged(_targetRoot.checkBox2, OnTargetChanged6);
+						.RemoveValueChanged(_targetRoot.checkBox2, OnTargetChanged7);
 					_targetRoot.button1.Click -= _eventHandler14;
 					_eventHandler14 = null;
 					_bindingsTrackings.Cleanup();
@@ -345,9 +350,9 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
-#line (59, 13) - (59, 43) 59 "Page1.xml"
+#line (60, 13) - (60, 43) 60 "Page1.xml"
 				_targetRoot.listView.ItemsSource = dataRoot.ListProp;
-#line (64, 20) - (64, 79) 64 "Page1.xml"
+#line (65, 20) - (65, 79) 65 "Page1.xml"
 				_targetRoot.textBlock12.Text = dataRoot.Calculate(new WPFTest.ViewModels.ParamClass("text"));
 #line default
 				Set0(_generatedCodeDisposed.Token);
@@ -355,7 +360,7 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (65, 16) - (65, 49) 65 "Page1.xml"
+#line (66, 16) - (66, 49) 66 "Page1.xml"
 						var result = await dataRoot.LoadImageAsync();
 #line default
 						if (!cancellationToken.IsCancellationRequested)
@@ -373,17 +378,17 @@ namespace WPFTest.Views
 
 			private void Update0(global::WPFTest.ViewModels.Page1ViewModel value)
 			{
-#line (50, 13) - (50, 39) 50 "Page1.xml"
+#line (51, 13) - (51, 39) 51 "Page1.xml"
 				var value1 = value.DecimalProp;
-#line (71, 13) - (71, 75) 71 "Page1.xml"
+#line (72, 13) - (72, 75) 72 "Page1.xml"
 				var value2 = value.IntProp;
-#line (50, 13) - (50, 39) 50 "Page1.xml"
+#line (51, 13) - (51, 39) 51 "Page1.xml"
 				_targetRoot.textBlock6.Text = value1.ToString();
-#line (52, 20) - (52, 50) 52 "Page1.xml"
+#line (53, 20) - (53, 50) 53 "Page1.xml"
 				_targetRoot.textBlock7.Text = (value1 + 1).ToString();
-#line (71, 13) - (71, 75) 71 "Page1.xml"
+#line (72, 13) - (72, 75) 72 "Page1.xml"
 				global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value2);
-#line (75, 13) - (75, 42) 75 "Page1.xml"
+#line (77, 13) - (77, 42) 77 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value2);
 #line default
 				Update0_ModifyViewModel(value.ModifyViewModel);
@@ -391,6 +396,7 @@ namespace WPFTest.Views
 				Update0_ArrayProp(value.ArrayProp);
 				Update0_OrderInput(value.OrderInput);
 				Update0_TaskProp(value.TaskProp);
+				Update0_FocusedField(value.FocusedField);
 			}
 
 			private void Update1(global::WPFTest.ViewModels.Page1ModifyViewModel value)
@@ -409,9 +415,9 @@ namespace WPFTest.Views
 
 			private void Update0_BooleanProp(global::System.Boolean value)
 			{
-#line (48, 13) - (48, 67) 48 "Page1.xml"
+#line (49, 13) - (49, 67) 49 "Page1.xml"
 				_targetRoot.header1.Visibility = (value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
-#line (51, 13) - (51, 101) 51 "Page1.xml"
+#line (52, 13) - (52, 101) 52 "Page1.xml"
 				_targetRoot.textBlock6.Visibility = ((global::System.Windows.Visibility)_targetRoot.TrueToVisibleConverter.Convert(value, typeof(global::System.Windows.Visibility), null, null));
 #line default
 			}
@@ -419,11 +425,11 @@ namespace WPFTest.Views
 			private void Update0_DecimalProp(global::System.Decimal value)
 			{
 				var dataRoot = _dataRoot;
-#line (50, 13) - (50, 39) 50 "Page1.xml"
+#line (51, 13) - (51, 39) 51 "Page1.xml"
 				_targetRoot.textBlock6.Text = value.ToString();
-#line (52, 20) - (52, 50) 52 "Page1.xml"
+#line (53, 20) - (53, 50) 53 "Page1.xml"
 				_targetRoot.textBlock7.Text = (value + 1).ToString();
-#line (54, 20) - (54, 97) 54 "Page1.xml"
+#line (55, 20) - (55, 97) 55 "Page1.xml"
 				_targetRoot.textBlock8.Text = (((global::System.Int32)value) + dataRoot.IntProp + dataRoot.ModifyViewModel?.IntInput)?.ToString();
 #line default
 			}
@@ -448,18 +454,18 @@ namespace WPFTest.Views
 			private void Update0_IntProp(global::System.Int32 value)
 			{
 				var dataRoot = _dataRoot;
-#line (54, 20) - (54, 97) 54 "Page1.xml"
+#line (55, 20) - (55, 97) 55 "Page1.xml"
 				_targetRoot.textBlock8.Text = (((global::System.Int32)dataRoot.DecimalProp) + value + dataRoot.ModifyViewModel?.IntInput)?.ToString();
-#line (71, 13) - (71, 75) 71 "Page1.xml"
+#line (72, 13) - (72, 75) 72 "Page1.xml"
 				global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value);
-#line (75, 13) - (75, 42) 75 "Page1.xml"
+#line (77, 13) - (77, 42) 77 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value);
 #line default
 			}
 
 			private void Update0_ModifyViewModel(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
-#line (72, 13) - (72, 86) 72 "Page1.xml"
+#line (73, 13) - (73, 86) 73 "Page1.xml"
 				var value1 = value?.ModifyTextViewModel;
 #line default
 				Update1(value);
@@ -471,7 +477,7 @@ namespace WPFTest.Views
 			private void Update0_BoolInput(global::System.Boolean value)
 			{
 				var dataRoot = _dataRoot;
-#line (55, 19) - (55, 154) 55 "Page1.xml"
+#line (56, 19) - (56, 154) 56 "Page1.xml"
 				var value1 = ((global::System.Nullable<global::System.Boolean>)_targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
 #line default
 				if (!object.Equals(_targetRoot.checkBox1.IsChecked, value1))
@@ -492,9 +498,9 @@ namespace WPFTest.Views
 			private void Update0_ArrayProp(global::System.Int32[] value)
 			{
 				var dataRoot = _dataRoot;
-#line (55, 19) - (55, 154) 55 "Page1.xml"
+#line (56, 19) - (56, 154) 56 "Page1.xml"
 				var value1 = value.Length > 0;
-#line (55, 19) - (55, 154) 55 "Page1.xml"
+#line (56, 19) - (56, 154) 56 "Page1.xml"
 				var value2 = ((global::System.Nullable<global::System.Boolean>)_targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
 #line default
 				if (!object.Equals(_targetRoot.checkBox1.IsChecked, value2))
@@ -509,7 +515,7 @@ namespace WPFTest.Views
 						_settingBinding6 = false;
 					}
 				}
-#line (60, 13) - (60, 56) 60 "Page1.xml"
+#line (61, 13) - (61, 56) 61 "Page1.xml"
 				_targetRoot.listView.SetVisible(value1);
 #line default
 			}
@@ -522,16 +528,16 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (63, 20) - (63, 71) 63 "Page1.xml"
+#line (64, 20) - (64, 71) 64 "Page1.xml"
 						var task = value;
 #line default
 						if (task.IsCompleted != true)
 						{
-#line (63, 20) - (63, 71) 63 "Page1.xml"
+#line (64, 20) - (64, 71) 64 "Page1.xml"
 							_targetRoot.textBlock11.Text = "Loading...";
 #line default
 						}
-#line (63, 20) - (63, 71) 63 "Page1.xml"
+#line (64, 20) - (64, 71) 64 "Page1.xml"
 						var result = await task;
 #line default
 						if (!cancellationToken.IsCancellationRequested)
@@ -546,10 +552,17 @@ namespace WPFTest.Views
 #line default
 			}
 
+			private void Update0_FocusedField(global::UI.FocusState<global::WPFTest.ViewModels.Page1ViewModel.Field> value)
+			{
+#line (75, 10) - (75, 117) 75 "Page1.xml"
+				global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
+#line default
+			}
+
 			private void Update1_IntInput(global::System.Int32 value)
 			{
 				var dataRoot = _dataRoot;
-#line (54, 20) - (54, 97) 54 "Page1.xml"
+#line (55, 20) - (55, 97) 55 "Page1.xml"
 				_targetRoot.textBlock8.Text = (((global::System.Int32)dataRoot.DecimalProp) + dataRoot.IntProp + value)?.ToString();
 #line default
 			}
@@ -557,9 +570,9 @@ namespace WPFTest.Views
 			private void Update1_Input1(global::System.String value)
 			{
 				var dataRoot = _dataRoot;
-#line (61, 20) - (61, 78) 61 "Page1.xml"
+#line (62, 20) - (62, 78) 62 "Page1.xml"
 				_targetRoot.textBlock9.Text = dataRoot.ModifyViewModel is var v0 && v0 != null ? v0.Input1 : "abc";
-#line (62, 20) - (62, 80) 62 "Page1.xml"
+#line (63, 20) - (63, 80) 63 "Page1.xml"
 				_targetRoot.textBlock10.Text = value ?? "aaa";
 				if (!object.Equals(_targetRoot.textBox2.Text, value))
 				{
@@ -580,14 +593,14 @@ namespace WPFTest.Views
 			{
 				if (!object.Equals(_targetRoot.checkBox2.IsChecked, value))
 				{
-					_settingBinding20 = true;
+					_settingBinding21 = true;
 					try
 					{
 						_targetRoot.checkBox2.IsChecked = value;
 					}
 					finally
 					{
-						_settingBinding20 = false;
+						_settingBinding21 = false;
 					}
 				}
 #line default
@@ -601,12 +614,12 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (78, 15) - (78, 88) 78 "Page1.xml"
+#line (80, 15) - (80, 88) 80 "Page1.xml"
 						var task = value;
 #line default
 						if (task?.IsCompleted != true)
 						{
-#line (78, 15) - (78, 88) 78 "Page1.xml"
+#line (80, 15) - (80, 88) 80 "Page1.xml"
 							_targetRoot.textBlock13.Text = "Loading...";
 #line default
 							if (task == null)
@@ -614,7 +627,7 @@ namespace WPFTest.Views
 								return;
 							}
 						}
-#line (78, 15) - (78, 88) 78 "Page1.xml"
+#line (80, 15) - (80, 88) 80 "Page1.xml"
 						var result = await task;
 #line default
 						if (!cancellationToken.IsCancellationRequested)
@@ -648,7 +661,7 @@ namespace WPFTest.Views
 
 			private void Update2_BoolInput(global::System.Nullable<global::System.Boolean> value)
 			{
-#line (73, 18) - (73, 91) 73 "Page1.xml"
+#line (74, 18) - (74, 91) 74 "Page1.xml"
 				var value1 = value?.ToString();
 #line default
 				if (!object.Equals(_targetRoot.textBox4.Text, value1))
@@ -666,15 +679,15 @@ namespace WPFTest.Views
 #line default
 			}
 
-			private void OnTargetChanged0(object sender, global::System.EventArgs e)
+			private void OnTargetChanged0(global::System.Object p0, global::System.Windows.RoutedEventArgs p1)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding4)
+				if (!_settingBinding19)
 				{
 					try
 					{
-#line (53, 18) - (53, 56) 53 "Page1.xml"
-						dataRoot.OrderInput = _targetRoot.textBox1.Text;
+#line (75, 10) - (75, 117) 75 "Page1.xml"
+						dataRoot.FocusedField[WPFTest.ViewModels.Page1ViewModel.Field.Field1] = global::UI.FocusManager.GetFocused(_targetRoot.textBox4);
 #line default
 					}
 					catch
@@ -686,12 +699,12 @@ namespace WPFTest.Views
 			private void OnTargetChanged1(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding6)
+				if (!_settingBinding4)
 				{
 					try
 					{
-#line (55, 19) - (55, 154) 55 "Page1.xml"
-						dataRoot.BoolInput = (global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
+#line (54, 18) - (54, 56) 54 "Page1.xml"
+						dataRoot.OrderInput = _targetRoot.textBox1.Text;
 #line default
 					}
 					catch
@@ -703,19 +716,13 @@ namespace WPFTest.Views
 			private void OnTargetChanged2(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding15)
+				if (!_settingBinding6)
 				{
 					try
 					{
-#line (69, 18) - (69, 68) 69 "Page1.xml"
-						var value = dataRoot.ModifyViewModel;
+#line (56, 19) - (56, 154) 56 "Page1.xml"
+						dataRoot.BoolInput = (global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
 #line default
-						if (value != null)
-						{
-#line (69, 18) - (69, 68) 69 "Page1.xml"
-							value.Input1 = _targetRoot.textBox2.Text;
-#line default
-						}
 					}
 					catch
 					{
@@ -726,13 +733,19 @@ namespace WPFTest.Views
 			private void OnTargetChanged3(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding16)
+				if (!_settingBinding15)
 				{
 					try
 					{
-#line (71, 13) - (71, 75) 71 "Page1.xml"
-						dataRoot.IntProp = global::WPFTest.TestExtensions.GetMyProperty(_targetRoot.textBox3);
+#line (70, 18) - (70, 68) 70 "Page1.xml"
+						var value = dataRoot.ModifyViewModel;
 #line default
+						if (value != null)
+						{
+#line (70, 18) - (70, 68) 70 "Page1.xml"
+							value.Input1 = _targetRoot.textBox2.Text;
+#line default
+						}
 					}
 					catch
 					{
@@ -743,19 +756,13 @@ namespace WPFTest.Views
 			private void OnTargetChanged4(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding17)
+				if (!_settingBinding16)
 				{
 					try
 					{
-#line (72, 13) - (72, 86) 72 "Page1.xml"
-						var value = dataRoot.ModifyViewModel?.ModifyTextViewModel;
+#line (72, 13) - (72, 75) 72 "Page1.xml"
+						dataRoot.IntProp = global::WPFTest.TestExtensions.GetMyProperty(_targetRoot.textBox3);
 #line default
-						if (value != null)
-						{
-#line (72, 13) - (72, 86) 72 "Page1.xml"
-							value.TextInput = _targetRoot.textBox3.Text;
-#line default
-						}
 					}
 					catch
 					{
@@ -766,17 +773,17 @@ namespace WPFTest.Views
 			private void OnTargetChanged5(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding18)
+				if (!_settingBinding17)
 				{
 					try
 					{
-#line (73, 18) - (73, 91) 73 "Page1.xml"
+#line (73, 13) - (73, 86) 73 "Page1.xml"
 						var value = dataRoot.ModifyViewModel?.ModifyTextViewModel;
 #line default
 						if (value != null)
 						{
-#line (73, 18) - (73, 91) 73 "Page1.xml"
-							value.BoolInput = _targetRoot.textBox4.Text is var t18 && string.IsNullOrEmpty(t18) ? null : (global::System.Nullable<global::System.Boolean>)global::System.Convert.ChangeType(t18, typeof(global::System.Boolean), null);
+#line (73, 13) - (73, 86) 73 "Page1.xml"
+							value.TextInput = _targetRoot.textBox3.Text;
 #line default
 						}
 					}
@@ -789,16 +796,39 @@ namespace WPFTest.Views
 			private void OnTargetChanged6(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding20)
+				if (!_settingBinding18)
 				{
 					try
 					{
-#line (77, 13) - (77, 71) 77 "Page1.xml"
+#line (74, 18) - (74, 91) 74 "Page1.xml"
+						var value = dataRoot.ModifyViewModel?.ModifyTextViewModel;
+#line default
+						if (value != null)
+						{
+#line (74, 18) - (74, 91) 74 "Page1.xml"
+							value.BoolInput = _targetRoot.textBox4.Text is var t18 && string.IsNullOrEmpty(t18) ? null : (global::System.Nullable<global::System.Boolean>)global::System.Convert.ChangeType(t18, typeof(global::System.Boolean), null);
+#line default
+						}
+					}
+					catch
+					{
+					}
+				}
+			}
+
+			private void OnTargetChanged7(object sender, global::System.EventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				if (!_settingBinding21)
+				{
+					try
+					{
+#line (79, 13) - (79, 71) 79 "Page1.xml"
 						var value = dataRoot.ModifyViewModel;
 #line default
 						if (value != null)
 						{
-#line (77, 13) - (77, 71) 77 "Page1.xml"
+#line (79, 13) - (79, 71) 79 "Page1.xml"
 							value.BoolInput = _targetRoot.checkBox2.IsChecked ?? default;
 #line default
 						}
@@ -908,6 +938,9 @@ namespace WPFTest.Views
 							break;
 						case "TaskProp":
 							bindings.Update0_TaskProp(typedSender.TaskProp);
+							break;
+						case "FocusedField":
+							bindings.Update0_FocusedField(typedSender.FocusedField);
 							break;
 					}
 				}
@@ -1052,7 +1085,7 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
-#line (24, 28) - (24, 58) 24 "Page1.xml"
+#line (25, 28) - (25, 58) 25 "Page1.xml"
 				var value1 = dataRoot.Model;
 #line default
 				Update0_BooleanProp(dataRoot.BooleanProp);
@@ -1062,18 +1095,18 @@ namespace WPFTest.Views
 
 			private void Update0_BooleanProp(global::System.Boolean value)
 			{
-#line (26, 21) - (26, 47) 26 "Page1.xml"
+#line (27, 21) - (27, 47) 27 "Page1.xml"
 				_targetRoot.textBlock2.Text = value.ToString();
-#line (27, 21) - (27, 84) 27 "Page1.xml"
+#line (28, 21) - (28, 84) 28 "Page1.xml"
 				_targetRoot.textBlock2.Visibility = WPFTest.Views.XamlUtils.TrueToVisible(value);
-#line (28, 28) - (28, 111) 28 "Page1.xml"
+#line (29, 28) - (29, 111) 29 "Page1.xml"
 				_targetRoot.textBlock3.IsEnabled = ((global::System.Boolean)_targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Boolean), null, null));
 #line default
 			}
 
 			private void Update1_SByteProp(global::System.SByte value)
 			{
-#line (24, 28) - (24, 58) 24 "Page1.xml"
+#line (25, 28) - (25, 58) 25 "Page1.xml"
 				_targetRoot.textBlock1.Text = value.ToString();
 #line default
 			}
@@ -1239,7 +1272,7 @@ namespace WPFTest.Views
 
 			private void Update0_Title(global::System.String value)
 			{
-#line (36, 24) - (36, 44) 36 "Page1.xml"
+#line (37, 24) - (37, 44) 37 "Page1.xml"
 				_targetRoot.textBlock4.Text = value;
 #line default
 			}

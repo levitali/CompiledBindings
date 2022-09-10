@@ -23,7 +23,7 @@ public class ExpressionTests
 		expression = "(ListProp.Count - NullIntProp).ToString() ?? '-'";
 		expectedCode = "(dataRoot.ListProp?.Count - dataRoot.NullIntProp)?.ToString() ?? \"-\"";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out IList<XamlNamespace> dummyNamespaces, out int dummyPos);
-		Assert.AreEqual(result.CSharpCode, expectedCode);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		var expression2 = "(RefProp.NullStructProp + RefProp.StructProp).TestMethod()";
 		var expectedCode2 = "(dataRoot.RefProp?.NullStructProp + dataRoot.RefProp?.StructProp)?.TestMethod()";

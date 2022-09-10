@@ -129,8 +129,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 						if (parseResult.GenerateCode)
 						{
-							parseResult.Validate(file);
-
 							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 

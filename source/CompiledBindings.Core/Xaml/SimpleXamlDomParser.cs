@@ -186,6 +186,12 @@ public class SimpleXamlDomParser : XamlDomParser
 								var bind = prop.Value.BindValue;
 								if (bind != null)
 								{
+									if (bind.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+										bind.TargetChangedEvents.Count == 0 &&
+										bind.DependencyProperty == null)
+									{
+										throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceTrigger property.", file, bind.Property.XamlNode);
+									}
 									if (bind.DataTypeSet)
 									{
 										BindingScope? scope;
@@ -339,10 +345,5 @@ public class SimpleXamlDom : XamlDomBase
 	public IEnumerable<XamlObjectProperty> EnumerateAllProperties()
 	{
 		return EnumerateAllObjects().SelectMany(o => o.Properties);
-	}
-
-	public void Validate(string file)
-	{
-		BindingScopes.ForEach(bs => bs.BindingsData?.Validate(file));
 	}
 }
