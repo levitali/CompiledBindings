@@ -74,6 +74,8 @@ public class XamlCodeGenerator
 			isAsync = !taskType.IsAssignableFrom(property.MemberType);
 		}
 
+		bool isTwoWayBinding = property.Value.BindValue?.Mode == BindingMode.TwoWay;
+
 		if (property.TargetEvent != null)
 		{
 			if (expression != null)
@@ -124,6 +126,15 @@ $@"{LineDirective(property.XamlNode)}
 		}
 		else if (property.TargetMethod != null)
 		{
+			var a2 = a;
+			if (isTwoWayBinding)
+			{
+				output.AppendLine(
+$@"{a}			_settingBinding{property.Value.BindValue!.Index} = true;
+{a}			try
+{a}			{{");
+				a2 += '\t';
+			}
 			if (property.IsAttached)
 			{
 				output.AppendLine(
@@ -131,7 +142,7 @@ $@"{LineDirective(property.XamlNode)}");
 				if (property.TargetMethod.Definition.IsStatic)
 				{
 					output.AppendLine(
-$@"{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
+$@"{a2}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullName()}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
 				}
 				else
 				{
@@ -141,18 +152,27 @@ $@"{a}			global::{property.TargetMethod.Definition.DeclaringType.GetCSharpFullNa
 						attachRoot += '.';
 					}
 					output.AppendLine(
-$@"{a}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
+$@"{a2}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Definition.Name}({setExpr}, {value});");
 				}
 			}
 			else
 			{
-				GenerateSet(true, ref localFuncIndex);
+				GenerateSet(true, ref localFuncIndex, a2);
+			}
+			if (isTwoWayBinding)
+			{
+				output.AppendLine(
+$@"{a}			}}
+{a}			finally
+{a}			{{
+{a}				_settingBinding{property.Value.BindValue!.Index} = false;
+{a}			}}");
 			}
 		}
 		// For two-way bindings set value only if the current value of the target is different.
 		// For example, if it's a TextBox (EditText etc), than
 		// setting the text causes moving cursor at first (or last, dependent on platform) position.
-		else if (property.Value.BindValue?.Mode == BindingMode.TwoWay)
+		else if (isTwoWayBinding)
 		{
 			string varName;
 			if (expression is not VariableExpression)
@@ -170,7 +190,7 @@ $@"{LineDirective(property.XamlNode)}
 			output.AppendLine(
 $@"{a}			if (!object.Equals({setExpr}, {varName}))
 {a}			{{
-{a}				_settingBinding{property.Value.BindValue.Index} = true;
+{a}				_settingBinding{property.Value.BindValue!.Index} = true;
 {a}				try
 {a}				{{
 {a}					{setExpr} = {varName};
@@ -183,10 +203,10 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 		}
 		else
 		{
-			GenerateSet(false, ref localFuncIndex);
+			GenerateSet(false, ref localFuncIndex, a);
 		}
 
-		void GenerateSet(bool isMethodCall, ref int localFuncIndex)
+		void GenerateSet(bool isMethodCall, ref int localFuncIndex, string? a)
 		{
 			if (isAsync)
 			{

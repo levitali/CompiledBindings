@@ -386,8 +386,16 @@ namespace WPFTest.Views
 				_targetRoot.textBlock6.Text = value1.ToString();
 #line (53, 20) - (53, 50) 53 "Page1.xml"
 				_targetRoot.textBlock7.Text = (value1 + 1).ToString();
+				_settingBinding16 = true;
+				try
+				{
 #line (72, 13) - (72, 75) 72 "Page1.xml"
-				global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value2);
+					global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value2);
+				}
+				finally
+				{
+					_settingBinding16 = false;
+				}
 #line (77, 13) - (77, 42) 77 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value2);
 #line default
@@ -456,8 +464,16 @@ namespace WPFTest.Views
 				var dataRoot = _dataRoot;
 #line (55, 20) - (55, 97) 55 "Page1.xml"
 				_targetRoot.textBlock8.Text = (((global::System.Int32)dataRoot.DecimalProp) + value + dataRoot.ModifyViewModel?.IntInput)?.ToString();
+				_settingBinding16 = true;
+				try
+				{
 #line (72, 13) - (72, 75) 72 "Page1.xml"
-				global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value);
+					global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value);
+				}
+				finally
+				{
+					_settingBinding16 = false;
+				}
 #line (77, 13) - (77, 42) 77 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value);
 #line default
@@ -554,8 +570,16 @@ namespace WPFTest.Views
 
 			private void Update0_FocusedField(global::UI.FocusState<global::WPFTest.ViewModels.Page1ViewModel.Field> value)
 			{
+				_settingBinding19 = true;
+				try
+				{
 #line (75, 10) - (75, 117) 75 "Page1.xml"
-				global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
+					global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
+				}
+				finally
+				{
+					_settingBinding19 = false;
+				}
 #line default
 			}
 

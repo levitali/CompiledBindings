@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.0;net35;net40</TargetFrameworks>
-        <Product>CompiledBindings</Product>
-        <Company>levitali</Company>
-        <Version>1.0.12</Version>
-        <UseWPF>true</UseWPF>
-        <LangVersion>latest</LangVersion>
-        <OutputPath>..\..\..\bin\wpf\lib</OutputPath>
-        <NoWarn>1701;1702;netsdk1138</NoWarn>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>netcoreapp3.0;net35;net40</TargetFrameworks>
+		<Product>CompiledBindings</Product>
+		<Company>levitali</Company>
+		<Version>1.0.12</Version>
+		<UseWPF>true</UseWPF>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<OutputPath>..\..\..\bin\wpf\lib</OutputPath>
+		<NoWarn>1701;1702;netsdk1138</NoWarn>
+	</PropertyGroup>
 
 </Project>
