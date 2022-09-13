@@ -573,7 +573,7 @@ namespace WPFTest.Views
 				_settingBinding19 = true;
 				try
 				{
-#line (75, 10) - (75, 117) 75 "Page1.xml"
+#line (75, 10) - (75, 104) 75 "Page1.xml"
 					global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
 				}
 				finally
@@ -710,7 +710,7 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (75, 10) - (75, 117) 75 "Page1.xml"
+#line (75, 10) - (75, 104) 75 "Page1.xml"
 						dataRoot.FocusedField[WPFTest.ViewModels.Page1ViewModel.Field.Field1] = global::UI.FocusManager.GetFocused(_targetRoot.textBox4);
 #line default
 					}

@@ -207,6 +207,7 @@ public static class BindingParser
 						}
 						targetChangedEvents.Add(targetChangedEvent);
 					}
+					mode ??= BindingMode.TwoWay;
 				}
 			}
 			else
