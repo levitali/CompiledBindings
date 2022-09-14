@@ -2,7 +2,7 @@
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlDomBase xamlDom, XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, bool throwIfWithoutDataType, ref int localVarIndex)
+	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, HashSet<string> includeNamespaces, bool throwIfWithoutDataType, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value?.TrimEnd();
@@ -118,16 +118,16 @@ public static class BindingParser
 				}
 				else
 				{
-					IList<XamlNamespace> includeNamespaces;
+					IList<XamlNamespace> includeNamespaces2;
 					try
 					{
-						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces, out pos1);
+						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1);
 					}
 					catch (ParseException ex)
 					{
 						throw new ParseException(ex.Message, currentPos + ex.Position, ex.Length);
 					}
-					includeNamespaces.ForEach(ns => xamlDom.AddNamespace(ns.ClrNamespace!));
+					includeNamespaces.UnionWith(includeNamespaces2.Select(n => n.ClrNamespace!));
 				}
 				if (name == "Path")
 				{

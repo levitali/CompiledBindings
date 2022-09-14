@@ -3,14 +3,6 @@
 public class XamlDomBase
 {
 	public HashSet<string> IncludeNamespaces { get; } = new HashSet<string>();
-
-	public void AddNamespace(string ns)
-	{
-		if (!IncludeNamespaces.Contains(ns))
-		{
-			IncludeNamespaces.Add(ns);
-		}
-	}
 }
 
 public class XamlObject
