@@ -23,6 +23,8 @@ public class BindExtension : IMarkupExtension
 
 	public bool IsItemsSource { get; set; }
 
+	public object? UpdateSourceTrigger { get; set; }
+
 	public object? ProvideValue(IServiceProvider serviceProvider)
 	{
 		return null;
