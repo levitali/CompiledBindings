@@ -19,14 +19,14 @@ namespace WPFTest.Views
 			button2.Click += (p1, p2) => this.OnClick2();
 #line default
 
-			Bindings.Initialize(this);
+			Bindings_.Initialize(this);
 		}
 
 		private void DeinitializeAfterDestructor()
 		{
-			if (Bindings != null)
+			if (Bindings_ != null)
 			{
-				Bindings.Cleanup();
+				Bindings_.Cleanup();
 			}
 		}
 

@@ -51,7 +51,7 @@ namespace WPFTest.Views
 			global::WPFTest.TestExtensions.SetMyProperty(checkBox2, 6);
 #line default
 
-			Bindings.Initialize(this);
+			Bindings_.Initialize(this);
 			this.DataContextChanged += this_DataContextChanged;
 			if (this.DataContext is global::WPFTest.ViewModels.Page1ViewModel dataRoot1)
 			{
@@ -62,9 +62,9 @@ namespace WPFTest.Views
 		~Page1()
 		{
 			_generatedCodeDisposed.Cancel();
-			if (Bindings != null)
+			if (Bindings_ != null)
 			{
-				Bindings.Cleanup();
+				Bindings_.Cleanup();
 			}
 			if (Bindings_this != null)
 			{

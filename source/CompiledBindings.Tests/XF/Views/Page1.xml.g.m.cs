@@ -50,7 +50,7 @@ namespace XFTest.Views
 			button1.Clicked += (p1, p2) => this.Save();
 #line default
 
-			Bindings.Initialize(this);
+			Bindings_.Initialize(this);
 			this.BindingContextChanged += this_BindingContextChanged;
 			if (this.BindingContext is global::XFTest.ViewModels.Page1ViewModel dataRoot1)
 			{
@@ -60,9 +60,9 @@ namespace XFTest.Views
 
 		~Page1()
 		{
-			if (Bindings != null)
+			if (Bindings_ != null)
 			{
-				Bindings.Cleanup();
+				Bindings_.Cleanup();
 			}
 			if (Bindings_this != null)
 			{

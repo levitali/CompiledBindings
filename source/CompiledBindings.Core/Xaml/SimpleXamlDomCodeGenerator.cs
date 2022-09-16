@@ -95,6 +95,8 @@ $@"	}}");
 		return output.ToString();
 	}
 
+	protected virtual string IGeneratedDataTemplateFullName => "CompiledBindings.IGeneratedDataTemplate";
+
 	private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult, bool isDataTemplate)
 	{
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
@@ -185,7 +187,11 @@ $@"			_generatedCodeDisposed.Cancel();");
 
 			foreach (var bs in parseResult.BindingScopes)
 			{
-				var viewName = bs.DataType == null ? null : "_" + (bs.ViewName ?? "this");
+				var viewName = "_";
+				if (bs.DataType != null)
+				{
+					viewName += bs.ViewName ?? "this";
+				}
 				output.AppendLine(
 $@"			if (Bindings{viewName} != null)
 			{{
@@ -266,7 +272,7 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFull
 			if (bs.DataType == null)
 			{
 				output.AppendLine(
-$@"			Bindings.Initialize(this);");
+$@"			Bindings_.Initialize(this);");
 			}
 			else
 			{
@@ -304,7 +310,7 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 
 		output.AppendLine(
 $@"
-	class {dataTemplateClassName} : global::CompiledBindings.IGeneratedDataTemplate
+	class {dataTemplateClassName} : global::{IGeneratedDataTemplateFullName}
 	{{");
 
 		GenerateVariablesDeclarations(output, parseResult, false);
