@@ -79,12 +79,12 @@ $@"		CancellationTokenSource _generatedCodeDisposed = new CancellationTokenSourc
 		{
 			GenerateInitializeMethod(output, parseResult);
 		}
-		GenerateBindings(output, parseResult, parseResult.TargetType.Type.Namespace, parseResult.TargetType.Type.Name);
+		GenerateBindings(output, parseResult, parseResult.TargetType.Type.Name);
 
 		output.AppendLine(
 $@"	}}");
 
-		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Type.Namespace, parseResult.TargetType.Type.Name);
+		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Type.Name);
 
 		if (parseResult.TargetType.Type.Namespace != null)
 		{
@@ -281,24 +281,24 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 		}
 	}
 
-	private void GenerateBindings(StringBuilder output, SimpleXamlDom parseResult, string? ns, string className)
+	private void GenerateBindings(StringBuilder output, SimpleXamlDom parseResult, string className)
 	{
 		foreach (var bs in parseResult.BindingScopes)
 		{
 			output.AppendLine();
-			_bindingsCodeGenerator.GenerateBindingsClass(output, bs.BindingsData!, ns, className, nameSuffix: bs.DataType == null ? null : "_" + (bs.ViewName ?? "this"));
+			_bindingsCodeGenerator.GenerateBindingsClass(output, bs.BindingsData!, className, nameSuffix: bs.DataType == null ? null : "_" + (bs.ViewName ?? "this"));
 		}
 	}
 
-	private void GenerateDataTemplates(StringBuilder output, SimpleXamlDom parseResult, string? ns, string classBaseName)
+	private void GenerateDataTemplates(StringBuilder output, SimpleXamlDom parseResult, string classBaseName)
 	{
 		for (int i = 0; i < parseResult.DataTemplates.Count; i++)
 		{
-			GenerateDataTemplateClass(output, parseResult.DataTemplates[i], ns, classBaseName + "_DataTemplate" + i);
+			GenerateDataTemplateClass(output, parseResult.DataTemplates[i], classBaseName + "_DataTemplate" + i);
 		}
 	}
 
-	private void GenerateDataTemplateClass(StringBuilder output, SimpleXamlDom parseResult, string? ns, string dataTemplateClassName)
+	private void GenerateDataTemplateClass(StringBuilder output, SimpleXamlDom parseResult, string dataTemplateClassName)
 	{
 		parseResult.BindingScopes.Where(bs => bs.ViewName == null).ForEach(bs => bs.ViewName = "rootElement");
 
@@ -349,7 +349,7 @@ $@"		}}");
 
 		GenerateBindingContextChangedHandlers(output, parseResult);
 
-		GenerateBindings(output, parseResult, ns, dataTemplateClassName);
+		GenerateBindings(output, parseResult, dataTemplateClassName);
 
 		output.AppendLine(
 $@"	}}");

@@ -6,41 +6,21 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 	{
 	}
 
-	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetNamespace, string targetClassName, string? declaringType = null, string? nameSuffix = null, bool @interface = false, bool generateCodeAttr = false)
+	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetClassName, string? nameSuffix = null)
 	{
-		bool isDiffDataRoot = targetClassName != bindingsData.DataType.Type.Name || targetNamespace != bindingsData.DataType.Type.Namespace;
+		bool isDiffDataRoot = bindingsData.DataType.Type.FullName != bindingsData.TargetType?.Type.FullName;
 		var rootGroup = bindingsData.NotifySources.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
 		#region Class Begin
 
-		if (@interface)
-		{
-			output.AppendLine(
-$@"		void InitializeBeforeConstructor{nameSuffix}()
-		{{
-			Bindings{nameSuffix} = new {targetClassName}_Bindings{nameSuffix}();
-		}}
-");
-		}
-		else
-		{
-			output.AppendLine(
+		output.AppendLine(
 $@"		{targetClassName}_Bindings{nameSuffix} Bindings{nameSuffix} = new {targetClassName}_Bindings{nameSuffix}();
 ");
-		}
-
-		output.Append(
-$@"		class {targetClassName}_Bindings{nameSuffix}");
-
-		if (@interface)
-		{
-			output.Append($@" : I{targetClassName}_Bindings{nameSuffix}");
-		}
 
 		output.AppendLine(
-$@"
+$@"		class {targetClassName}_Bindings{nameSuffix}
 		{{");
 
 		#endregion
