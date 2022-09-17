@@ -100,7 +100,7 @@ public static class TypeInfoUtils
 
 	public static bool IsAssignableFrom(this TypeInfo baseType, TypeInfo type)
 	{
-		return baseType.Type.IsAssignableFrom(type.Type);
+		return baseType.Reference.IsAssignableFrom(type.Reference);
 	}
 
 	public static bool IsAssignableFrom(this TypeReference baseType, TypeReference type)

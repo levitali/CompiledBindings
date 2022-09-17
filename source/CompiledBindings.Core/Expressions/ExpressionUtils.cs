@@ -28,7 +28,7 @@ public static class ExpressionUtils
 			var type = expression.Type;
 			if (!type.IsNullable && expression.IsNullable)
 			{
-				if (type.Type.IsValueType)
+				if (type.Reference.IsValueType)
 				{
 					type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
 				}

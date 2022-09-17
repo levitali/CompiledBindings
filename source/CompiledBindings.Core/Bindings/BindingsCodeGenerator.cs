@@ -8,7 +8,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 
 	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetClassName, string? nameSuffix = null)
 	{
-		bool isDiffDataRoot = bindingsData.DataType.Type.FullName != bindingsData.TargetType?.Type.FullName;
+		bool isDiffDataRoot = bindingsData.DataType.Reference.FullName != bindingsData.TargetType?.Reference.FullName;
 		var rootGroup = bindingsData.NotifySources.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
@@ -33,7 +33,7 @@ $@"			{targetClassName} _targetRoot;");
 		if (isDiffDataRoot)
 		{
 			output.AppendLine(
-$@"			global::{bindingsData.DataType.Type.GetCSharpFullName()} _dataRoot;");
+$@"			global::{bindingsData.DataType.Reference.GetCSharpFullName()} _dataRoot;");
 		}
 
 		if (bindingsData.NotifySources.Count > 0)
@@ -46,7 +46,7 @@ $@"			{targetClassName}_BindingsTrackings{nameSuffix} _bindingsTrackings;");
 		foreach (var binding in bindingsData.Bindings.Where(b => b.Property.TargetEvent != null))
 		{
 			output.AppendLine(
-$@"			global::{binding.Property.TargetEvent!.EventType.Type.GetCSharpFullName()} _eventHandler{binding.Index};");
+$@"			global::{binding.Property.TargetEvent!.EventType.Reference.GetCSharpFullName()} _eventHandler{binding.Index};");
 		}
 
 		// Generate flags for two-way bindings
@@ -76,7 +76,7 @@ $@"			CancellationTokenSource _generatedCodeDisposed;");
 		{
 			output.AppendLine(
 $@"
-			public void Initialize({targetClassName} targetRoot, global::{bindingsData.DataType.Type.GetCSharpFullName()} dataRoot)
+			public void Initialize({targetClassName} targetRoot, global::{bindingsData.DataType.Reference.GetCSharpFullName()} dataRoot)
 			{{
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;");
@@ -235,7 +235,7 @@ $@"					{targetExpr} -= _eventHandler{binding.Index};
 $@"					_bindingsTrackings.Cleanup();");
 		}
 
-		if (isDiffDataRoot && bindingsData.DataType.Type.IsNullable())
+		if (isDiffDataRoot && bindingsData.DataType.Reference.IsNullable())
 		{
 			output.AppendLine(
 $@"					_dataRoot = null;");
@@ -292,7 +292,7 @@ $@"			}}");
 			if (ev.Events != null)
 			{
 				output.AppendLine(
-$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Events[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Type.GetCSharpFullName()} p{i}"))})");
+$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Events[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Reference.GetCSharpFullName()} p{i}"))})");
 			}
 			else if (first.DependencyProperty != null)
 			{
@@ -362,7 +362,7 @@ $@"				global::System.WeakReference _bindingsWeakRef;");
 			foreach (var group in bindingsData.NotifySources)
 			{
 				output.AppendLine(
-$@"				global::{group.Expression.Type.Type.GetCSharpFullName()} _propertyChangeSource{group.Index};");
+$@"				global::{group.Expression.Type.Reference.GetCSharpFullName()} _propertyChangeSource{group.Index};");
 			}
 
 			GenerateTrackingsExtraFieldDeclarations(output, bindingsData);
@@ -407,7 +407,7 @@ $@"				}}");
 				string cacheVar = "_propertyChangeSource" + notifySource.Index;
 				output.AppendLine(
 $@"
-				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Type.GetCSharpFullName()} value)
+				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()} value)
 				{{
 					if ({cacheVar} != null && !object.ReferenceEquals({cacheVar}, value))
 					{{");
@@ -443,7 +443,7 @@ $@"					var bindings = TryGetBindings();
 						return;
 					}}
 
-					var typedSender = (global::{notifySource.Expression.Type.Type.GetCSharpFullName()})sender;");
+					var typedSender = (global::{notifySource.Expression.Type.Reference.GetCSharpFullName()})sender;");
 
 					if (notifySource.Properties.Count > 1)
 					{
@@ -495,7 +495,7 @@ $@"					var bindings = TryGetBindings();
 						return;
 					}}
 
-					var typedSender = (global::{notifySource.Expression.Type.Type.GetCSharpFullName()})sender;");
+					var typedSender = (global::{notifySource.Expression.Type.Reference.GetCSharpFullName()})sender;");
 
 						output = output.AppendLine(
 $@"					bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
@@ -550,7 +550,7 @@ $@"		}}");
 		{
 			output.AppendLine();
 			output.AppendLine(
-$@"			private void {name}(global::{parameterType.Type.GetCSharpFullName()} value)
+$@"			private void {name}(global::{parameterType.Reference.GetCSharpFullName()} value)
 			{{");
 			GenerateUpdateMethodBody(updateMethod);
 			output.AppendLine(
@@ -665,12 +665,12 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			}
 			if (bind.Converter != null)
 			{
-				string sourceTypeFullName = sourceType.Type.GetCSharpFullName();
+				string sourceTypeFullName = sourceType.Reference.GetCSharpFullName();
 				string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
 				string parameter = bind.ConverterParameter?.CSharpCode ?? "null";
 				setExpr = GenerateConvertBackCall(bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
 			}
-			else if (sourceType.Type.FullName == "System.String" && bind.Property.MemberType.Type.FullName != "System.String")
+			else if (sourceType.Reference.FullName == "System.String" && bind.Property.MemberType.Reference.FullName != "System.String")
 			{
 				if (bind.Property.MemberType.IsNullable)
 				{
@@ -680,8 +680,8 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 			}
 			else if (!sourceType.IsAssignableFrom(bind.Property.MemberType))
 			{
-				var sourceType2 = sourceType.Type;
-				var targetType = bind.Property.MemberType.Type;
+				var sourceType2 = sourceType.Reference;
+				var targetType = bind.Property.MemberType.Reference;
 				if (targetType.FullName == "System.Object")
 				{
 					setExpr = $"(global::{sourceType2.GetCSharpFullName()}){setExpr}";
@@ -697,15 +697,15 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 						sourceType2 = sourceType2.GetGenericArguments()[0];
 					}
 
-					if (bind.Property.MemberType.Type.IsNullable())
+					if (bind.Property.MemberType.Reference.IsNullable())
 					{
-						var checkNull = bind.Property.MemberType.Type.FullName == "System.String" ? $"string.IsNullOrEmpty(t{bind.Index})" : $"t{bind.Index} == null";
-						var @default = sourceType.Type.IsNullable() ? "null" : "default";
-						setExpr = $"{setExpr} is var t{bind.Index} && {checkNull} ? {@default} : (global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType(t{bind.Index}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
+						var checkNull = bind.Property.MemberType.Reference.FullName == "System.String" ? $"string.IsNullOrEmpty(t{bind.Index})" : $"t{bind.Index} == null";
+						var @default = sourceType.Reference.IsNullable() ? "null" : "default";
+						setExpr = $"{setExpr} is var t{bind.Index} && {checkNull} ? {@default} : (global::{sourceType.Reference.GetCSharpFullName()})global::System.Convert.ChangeType(t{bind.Index}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
 					}
 					else
 					{
-						setExpr = $"(global::{sourceType.Type.GetCSharpFullName()})global::System.Convert.ChangeType({setExpr}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
+						setExpr = $"(global::{sourceType.Reference.GetCSharpFullName()})global::System.Convert.ChangeType({setExpr}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
 					}
 				}
 			}

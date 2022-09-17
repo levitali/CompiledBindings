@@ -326,7 +326,7 @@ public class ExpressionParser
 			bool CheckAssignable()
 			{
 				return prmType.IsAssignableFrom(args[i].Type) ||
-					(args[i] is ConstantExpression ce && ce.Value is string && prmType.Type.FullName == "System.Char");
+					(args[i] is ConstantExpression ce && ce.Value is string && prmType.Reference.FullName == "System.Char");
 			}
 		}
 
@@ -362,7 +362,7 @@ public class ExpressionParser
 		var delegateType = TypeInfo.GetTypeThrow(typeof(MulticastDelegate));
 		if (!delegateType.IsAssignableFrom(expr.Type))
 		{
-			throw new ParseException($"The type '{expr.Type.Type.Name}' is not a MulticastDelegate.", errorPos);
+			throw new ParseException($"The type '{expr.Type.Reference.Name}' is not a MulticastDelegate.", errorPos);
 		}
 
 		var method = expr.Type.Methods.Single(m => m.Definition.Name == "Invoke");
@@ -371,7 +371,7 @@ public class ExpressionParser
 		var args = ParseArgumentList(argumentTypes);
 		if (method.Parameters.Count < args.Length)
 		{
-			throw new ParseException($"Delegate '{expr.Type.Type.Name}' does not take {args.Length} arguments.", errorPos);
+			throw new ParseException($"Delegate '{expr.Type.Reference.Name}' does not take {args.Length} arguments.", errorPos);
 		}
 
 		CorrectCharParameters(method, args, false, errorPos);
@@ -392,7 +392,7 @@ public class ExpressionParser
 				{
 					throw new InvalidProgramException();
 				}
-				if (!pi.ParameterType.Type.IsArray)
+				if (!pi.ParameterType.Reference.IsArray)
 				{
 					throw new InvalidProgramException();
 				}
@@ -432,19 +432,19 @@ public class ExpressionParser
 					var prm = method.Parameters[prmIndex];
 					if (prm.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
 					{
-						if (!prm.ParameterType.Type.IsArray)
+						if (!prm.ParameterType.Reference.IsArray)
 						{
 							throw new InvalidProgramException();
 						}
 
-						isParamsChar = prm.ParameterType.Type.GetElementType().FullName == "System.Char";
+						isParamsChar = prm.ParameterType.Reference.GetElementType().FullName == "System.Char";
 						if (isParamsChar == false)
 						{
 							return;
 						}
 					}
 				}
-				if (isParamsChar == true || method.Parameters[prmIndex].ParameterType.Type.FullName == "System.Char")
+				if (isParamsChar == true || method.Parameters[prmIndex].ParameterType.Reference.FullName == "System.Char")
 				{
 					string value = (string)((ConstantExpression)arg).Value!;
 					if (value.Length != 1)
@@ -488,7 +488,7 @@ public class ExpressionParser
 		var method = typeExpr.Type.Constructors.FirstOrDefault(c => CheckMethodApplicable(c, args, false));
 		if (method == null)
 		{
-			throw new ParseException($"No applicable constructor exists in type '{typeExpr.Type.Type.FullName}'", errorPos);
+			throw new ParseException($"No applicable constructor exists in type '{typeExpr.Type.Reference.FullName}'", errorPos);
 		}
 
 		CorrectCharParameters(method, args, false, errorPos);
@@ -784,7 +784,7 @@ public class ExpressionParser
 		NextToken();
 
 		var type = instance.Type;
-		if (type.Type.IsValueNullable())
+		if (type.Reference.IsValueNullable())
 		{
 			type = type.GetGenericArguments()![0];
 		}
@@ -840,7 +840,7 @@ public class ExpressionParser
 					{
 						if (!enumerator.MoveNext())
 						{
-							throw new ParseException($"No applicable method '{id}' exists in type '{type.Type.FullName}'", errorPos, id.Length);
+							throw new ParseException($"No applicable method '{id}' exists in type '{type.Reference.FullName}'", errorPos, id.Length);
 						}
 						(method, ns) = enumerator.Current;
 					}
@@ -870,12 +870,12 @@ public class ExpressionParser
 						}
 					}
 
-					if (instance == _root && _expectedType?.Type.Name == id)
+					if (instance == _root && _expectedType?.Reference.Name == id)
 					{
 						return new TypeExpression(_expectedType);
 					}
 
-					if (type.Type.FullName.StartsWith("System.ValueTuple"))
+					if (type.Reference.FullName.StartsWith("System.ValueTuple"))
 					{
 						var attrs = instance switch
 						{
@@ -908,7 +908,7 @@ public class ExpressionParser
 						return ParseTypeExpression(id, errorPos);
 					}
 
-					throw new ParseException($"No property, field or method '{id}' exists in type '{type.Type.FullName}'", errorPos, id.Length);
+					throw new ParseException($"No property, field or method '{id}' exists in type '{type.Reference.FullName}'", errorPos, id.Length);
 				}
 			}
 		}
@@ -975,7 +975,7 @@ Label_CreateMemberExpression:
 
 		TypeInfo expressionType;
 		IList<TypeInfo> argumentTypes;
-		if (expr.Type.Type.IsArray)
+		if (expr.Type.Reference.IsArray)
 		{
 			expressionType = expr.Type.GetElementType()!;
 			argumentTypes = new[] { TypeInfo.GetTypeThrow(typeof(int)) };
@@ -985,7 +985,7 @@ Label_CreateMemberExpression:
 			var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
 			if (prop == null)
 			{
-				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Type.FullName}'", errorPos);
+				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Reference.FullName}'", errorPos);
 			}
 			expressionType = prop.PropertyType;
 			var method = expr.Type.Methods.Single(m => m.Definition == prop.Definition.GetMethod);
@@ -1285,7 +1285,7 @@ Label_CreateMemberExpression:
 	{
 		if (expression is MemberExpression me && me.Member is MethodInfo)
 		{
-			throw new ParseException($"'{me.Expression.Type.Type.FullName}.{me.Member.Definition.Name}()' is a method, which is not valid in the given context.");
+			throw new ParseException($"'{me.Expression.Type.Reference.FullName}.{me.Member.Definition.Name}()' is a method, which is not valid in the given context.");
 		}
 	}
 
@@ -1307,7 +1307,7 @@ Label_CreateMemberExpression:
 
 	private static TypeInfo GetNullableUnderlyingType(TypeInfo type)
 	{
-		if (type.Type.IsValueNullable())
+		if (type.Reference.IsValueNullable())
 		{
 			type = type.GetGenericArguments()![0];
 		}

@@ -213,18 +213,18 @@ public class XamlDomParser
 				var setPropertyMethod = attachPropertyOwnerType.Methods.FirstOrDefault(m => m.Definition.Name == setMethodName);
 				if (setPropertyMethod == null)
 				{
-					throw new GeneratorException($"Invalid attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. Missing method {setMethodName}.", CurrentFile, xamlNode);
+					throw new GeneratorException($"Invalid attached property {attachPropertyOwnerType.Reference.FullName}.{attachedPropertyName}. Missing method {setMethodName}.", CurrentFile, xamlNode);
 				}
 
 				var parameters = setPropertyMethod.Parameters;
 				if (parameters.Count != 2)
 				{
-					throw new GeneratorException($"Invalid set method for attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName}. The {setMethodName} method must have two parameters.", CurrentFile, xamlNode);
+					throw new GeneratorException($"Invalid set method for attached property {attachPropertyOwnerType.Reference.FullName}.{attachedPropertyName}. The {setMethodName} method must have two parameters.", CurrentFile, xamlNode);
 				}
 
 				if (!parameters[0].ParameterType.IsAssignableFrom(obj.Type))
 				{
-					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Type.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Type.FullName}.", CurrentFile, xamlNode);
+					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Reference.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
 				}
 
 				objProp.MemberName = attachedPropertyName!;
@@ -265,12 +265,12 @@ public class XamlDomParser
 							}
 							if (method == null)
 							{
-								throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Type.FullName}.", CurrentFile, xamlNode);
+								throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
 							}
 						}
 						else if (method.Parameters.Count != 1)
 						{
-							throw new GeneratorException($"Cannot bind to method {obj.Type.Type.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
+							throw new GeneratorException($"Cannot bind to method {obj.Type.Reference.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
 						}
 
 						objProp.TargetMethod = method;
@@ -354,16 +354,16 @@ public class XamlDomParser
 
 						dpName += "Property";
 						var typeInfo = TypeInfo.GetTypeThrow(type.FullName);
-						var dependencyPropertyType = DependencyPropertyType.Type.FullName;
+						var dependencyPropertyType = DependencyPropertyType.Reference.FullName;
 
 						IMemberInfo dp = typeInfo.Fields.FirstOrDefault(f =>
 							f.Definition.Name == dpName &&
 							f.Definition.IsStatic &&
-							f.FieldType.Type.FullName == dependencyPropertyType);
+							f.FieldType.Reference.FullName == dependencyPropertyType);
 						dp ??= typeInfo.Properties.FirstOrDefault(p =>
 								p.Definition.Name == dpName &&
 								p.Definition.IsStatic() &&
-								p.PropertyType.Type.FullName == dependencyPropertyType);
+								p.PropertyType.Reference.FullName == dependencyPropertyType);
 						if (dp != null)
 						{
 							value.BindValue.DependencyProperty = dp;
@@ -416,7 +416,7 @@ public class XamlDomParser
 	{
 		if (expression is not (ConstantExpression or DefaultExpression) &&
 			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
-			prop.MemberType?.Type.FullName == "System.String" && expression.Type.Type.FullName != "System.String")
+			prop.MemberType?.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
 		{
 			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
 			if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
@@ -428,7 +428,7 @@ public class XamlDomParser
 		if (expression.IsNullable && prop.MemberType?.IsNullable == false)
 		{
 			Expression defaultExpr;
-			if (prop.MemberType.Type.FullName == "System.String")
+			if (prop.MemberType.Reference.FullName == "System.String")
 			{
 				defaultExpr = new ConstantExpression("");
 			}

@@ -147,7 +147,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							if (parseResult.DataTemplates.Count > 0)
 							{
 								var compiledBindingsNs = "clr-namespace:CompiledBindings";
-								var localNs = "clr-namespace:" + parseResult.TargetType!.Type.Namespace;
+								var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
 
 								EnsureNamespaceDeclared(compiledBindingsNs);
 								EnsureNamespaceDeclared(localNs);
@@ -185,7 +185,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 									rootElement.Add(
 										new XElement(mbui + "DataTemplateBindings.Bindings",
-											new XElement(local + $"{parseResult.TargetType.Type.Name}_DataTemplate{i}",
+											new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
 												staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
 								}
 							}
@@ -424,7 +424,7 @@ $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifySource.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Type.GetCSharpFullName()}))
+								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
 							.AddValueChanged({cacheVar}, {methodName});");
 	}
 
@@ -433,7 +433,7 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifySource.Expression.Type.Type.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Type.GetCSharpFullName()}))
+								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
 							.RemoveValueChanged({cacheVar}, {methodName});");
 	}
 }

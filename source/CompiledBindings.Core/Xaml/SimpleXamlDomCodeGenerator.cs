@@ -38,10 +38,10 @@ public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
 		_asyncFunctions = parseResult.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
 
-		if (parseResult.TargetType!.Type.Namespace != null)
+		if (parseResult.TargetType!.Reference.Namespace != null)
 		{
 			output.AppendLine(
-$@"namespace {parseResult.TargetType.Type.Namespace}
+$@"namespace {parseResult.TargetType.Reference.Namespace}
 {{");
 		}
 
@@ -67,7 +67,7 @@ $@"#nullable disable");
 		output.AppendLine(
 $@"
 	[System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
-	partial class {parseResult.TargetType.Type.Name}
+	partial class {parseResult.TargetType.Reference.Name}
 	{{");
 		if (_asyncFunctions)
 		{
@@ -79,14 +79,14 @@ $@"		CancellationTokenSource _generatedCodeDisposed = new CancellationTokenSourc
 		{
 			GenerateInitializeMethod(output, parseResult);
 		}
-		GenerateBindings(output, parseResult, parseResult.TargetType.Type.Name);
+		GenerateBindings(output, parseResult, parseResult.TargetType.Reference.Name);
 
 		output.AppendLine(
 $@"	}}");
 
-		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Type.Name);
+		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Reference.Name);
 
-		if (parseResult.TargetType.Type.Namespace != null)
+		if (parseResult.TargetType.Reference.Namespace != null)
 		{
 			output.AppendLine(
 "}");
@@ -105,12 +105,12 @@ $@"	}}");
 			if (isDataTemplate)
 			{
 				output.AppendLine(
-$@"		public global::{type.Type.GetCSharpFullName()} {name} {{ get; set; }}");
+$@"		public global::{type.Reference.GetCSharpFullName()} {name} {{ get; set; }}");
 			}
 			else
 			{
 				output.AppendLine(
-$@"		global::{type.Type.GetCSharpFullName()} {name};");
+$@"		global::{type.Reference.GetCSharpFullName()} {name};");
 			}
 		}
 	}
@@ -123,7 +123,7 @@ $@"		global::{type.Type.GetCSharpFullName()} {name};");
 			foreach (var (name, type) in resources)
 			{
 				output.AppendLine(
-$@"			{name} = (global::{type.Type.GetCSharpFullName()})({CreateGetResourceCode(name)});");
+$@"			{name} = (global::{type.Reference.GetCSharpFullName()})({CreateGetResourceCode(name)});");
 			}
 
 			output.AppendLine();
@@ -175,7 +175,7 @@ $@"		private void DeinitializeAfterDestructor()");
 			else
 			{
 				output.AppendLine(
-$@"		~{parseResult.TargetType!.Type.Name}()");
+$@"		~{parseResult.TargetType!.Reference.Name}()");
 			}
 			output.AppendLine(
 $@"		{{");
@@ -209,7 +209,7 @@ $@"		}}");
 		foreach (var bs in parseResult.BindingScopes.Where(b => b.DataType != null))
 		{
 			var viewName = bs.ViewName ?? "this";
-			var prm = bs.DataType!.Type.FullName == parseResult.TargetType?.Type.FullName ? null : $", dataRoot";
+			var prm = bs.DataType!.Reference.FullName == parseResult.TargetType?.Reference.FullName ? null : $", dataRoot";
 
 			output.AppendLine(
 $@"
@@ -221,7 +221,7 @@ $@"
 			if (bs.DataType != null)
 			{
 				output.AppendLine(
-$@"			if (((global::{_bindableObject})sender).{_bindingContextStart}Context is global::{bs.DataType.Type.GetCSharpFullName()} dataRoot)
+$@"			if (((global::{_bindableObject})sender).{_bindingContextStart}Context is global::{bs.DataType.Reference.GetCSharpFullName()} dataRoot)
 			{{");
 				a = "\t";
 			}
@@ -252,7 +252,7 @@ $@"		}}");
 			foreach (var obj in objects.Where(o => o.Name != null))
 			{
 				output.AppendLine(
-$@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Type.GetCSharpFullName(), rootElement, obj.Name)};");
+$@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCSharpFullName(), rootElement, obj.Name)};");
 			}
 			output.AppendLine();
 		}
@@ -276,10 +276,10 @@ $@"			Bindings_.Initialize(this);");
 			}
 			else
 			{
-				var prm = bs.DataType.Type.FullName == parseResult.TargetType?.Type.FullName ? null : $", dataRoot" + i;
+				var prm = bs.DataType.Reference.FullName == parseResult.TargetType?.Reference.FullName ? null : $", dataRoot" + i;
 				output.AppendLine(
 $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingContextStart}ContextChanged;
-			if ({viewName}.{_bindingContextStart}Context is global::{bs.DataType.Type.GetCSharpFullName()} dataRoot{i})
+			if ({viewName}.{_bindingContextStart}Context is global::{bs.DataType.Reference.GetCSharpFullName()} dataRoot{i})
 			{{
 				Bindings_{viewName}.Initialize(this{prm});
 			}}");
@@ -371,7 +371,7 @@ $@"	}}");
 		foreach (var obj in objects.Where(o => o.Name != null))
 		{
 			output.AppendLine(
-$@"		private global::{obj.Type.Type.GetCSharpFullName()} {obj.Name};");
+$@"		private global::{obj.Type.Reference.GetCSharpFullName()} {obj.Name};");
 		}
 	}
 }

@@ -102,7 +102,7 @@ public static class BindingParser
 					};
 					resources.Add((resourceName, resourceType));
 
-					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType.Type), resourceType);
+					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType.Reference), resourceType);
 					expr = new VariableExpression(targetType, "_targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(resourceType, false));
 
@@ -203,7 +203,7 @@ public static class BindingParser
 						var targetChangedEvent = prop.Object.Type.Events.FirstOrDefault(e => e.Definition.Name == eventName);
 						if (targetChangedEvent == null)
 						{
-							throw new ParseException($"The type {prop.Object.Type.Type.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
+							throw new ParseException($"The type {prop.Object.Type.Reference.FullName} does not have event {value}.", currentPos + match.Groups[2].Index);
 						}
 						targetChangedEvents.Add(targetChangedEvent);
 					}
@@ -262,7 +262,7 @@ public static class BindingParser
 				converterParameter ?? Expression.NullExpression,
 				Expression.NullExpression
 			});
-			if (prop.MemberType.Type.FullName != "System.Object")
+			if (prop.MemberType.Reference.FullName != "System.Object")
 			{
 				sourceExpression = new CastExpression(sourceExpression, prop.MemberType, false);
 			}
@@ -557,8 +557,8 @@ public static class BindingParser
 				.Select(p =>
 				{
 					var expr = replace(p.Expression);
-					if (p.Property.PropertyType.Type.IsValueType &&
-						!p.Property.PropertyType.Type.IsValueNullable() &&
+					if (p.Property.PropertyType.Reference.IsValueType &&
+						!p.Property.PropertyType.Reference.IsValueNullable() &&
 						expr.IsNullable)
 					{
 						expr = new CoalesceExpression(expr, Expression.DefaultExpression);

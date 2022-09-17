@@ -42,7 +42,7 @@ public class SimpleXamlDomParser : XamlDomParser
 		ProcessRoot(result, xdoc.Root, null);
 
 		result.HasDestructor = result.TargetType.Methods.Any(m =>
-			m.Definition.DeclaringType == result.TargetType.Type &&
+			m.Definition.DeclaringType == result.TargetType.Reference &&
 			m.Definition.Name == "Finalize" && m.Definition.IsVirtual && m.Definition.IsFamily && m.Definition.IsHideBySig);
 
 		return result;
@@ -140,7 +140,7 @@ public class SimpleXamlDomParser : XamlDomParser
 					{
 						throw new GeneratorException(ex.Message, file, dataTypeAttr, dataTypeAttr.Value.Length);
 					}
-					if (currentBindingScope.DataType?.Type.FullName != dataType?.Type.FullName)
+					if (currentBindingScope.DataType?.Reference.FullName != dataType?.Reference.FullName)
 					{
 						DataType = dataType ?? result.TargetType;
 						BindingScope bs;

@@ -97,9 +97,9 @@ public class DefaultExpression : Expression
 	protected override string GetCSharpCode()
 	{
 		string str = "default";
-		if (Type.Type.FullName != "System.Object")
+		if (Type.Reference.FullName != "System.Object")
 		{
-			str += "(global::" + Type.Type.GetCSharpFullName() + ")";
+			str += "(global::" + Type.Reference.GetCSharpFullName() + ")";
 		}
 
 		return str;
@@ -262,9 +262,9 @@ public class BinaryExpression : Expression
 				return TypeInfo.GetTypeThrow("System.Boolean");
 		}
 		var type = left.Type;
-		if ((type.Type.IsValueType && left.IsNullable) || right.IsNullable)
+		if ((type.Reference.IsValueType && left.IsNullable) || right.IsNullable)
 		{
-			if (!type.Type.IsNullable())
+			if (!type.Reference.IsNullable())
 			{
 				type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
 			}
@@ -414,7 +414,7 @@ public class TypeExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return Type.Type.GetCSharpFullName();
+		return Type.Reference.GetCSharpFullName();
 	}
 
 	public override bool IsNullable => false;
@@ -434,8 +434,8 @@ public class CastExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		string str = $"global::{Type.Type.GetCSharpFullName()}";
-		if (_checkNull && !Type.Type.IsNullable() && Expression.IsNullable)
+		string str = $"global::{Type.Reference.GetCSharpFullName()}";
+		if (_checkNull && !Type.Reference.IsNullable() && Expression.IsNullable)
 		{
 			str += "?";
 		}

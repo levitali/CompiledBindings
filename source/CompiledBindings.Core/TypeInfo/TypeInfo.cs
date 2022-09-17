@@ -15,7 +15,7 @@ public class TypeInfo
 
 	public TypeInfo(TypeInfo typeInfo, bool canBeNullable)
 	{
-		Type = typeInfo.Type;
+		Reference = typeInfo.Reference;
 		_properties = typeInfo._properties;
 		_fields = typeInfo._fields;
 		_methods = typeInfo._methods;
@@ -26,18 +26,18 @@ public class TypeInfo
 		_canBeNullable = canBeNullable;
 	}
 
-	private TypeInfo(TypeReference type)
+	private TypeInfo(TypeReference typeReference)
 	{
-		Type = type;
-		_nullableContext = GetNullableContext(type);
-		_nullabileFlags = GetNullableFlags(type);
+		Reference = typeReference;
+		_nullableContext = GetNullableContext(typeReference);
+		_nullabileFlags = GetNullableFlags(typeReference);
 		var b = _nullabileFlags?[0] ?? _nullableContext;
 		_canBeNullable = b is null or 0 ? null : b == 2;
 	}
 
-	private TypeInfo(TypeReference type, bool? isNullable, byte[]? nullabileFlags, byte? nullableContext)
+	private TypeInfo(TypeReference typeReference, bool? isNullable, byte[]? nullabileFlags, byte? nullableContext)
 	{
-		Type = type;
+		Reference = typeReference;
 		_nullableContext = nullableContext;
 		_nullabileFlags = nullabileFlags;
 
@@ -54,9 +54,9 @@ public class TypeInfo
 
 	public static Dictionary<string, HashSet<string>> NotNullableProperties { get; } = new Dictionary<string, HashSet<string>>();
 
-	public TypeReference Type { get; }
+	public TypeReference Reference { get; }
 
-	public bool IsNullable => Type.IsValueNullable() || (_canBeNullable != false && !Type.IsValueType);
+	public bool IsNullable => Reference.IsValueNullable() || (_canBeNullable != false && !Reference.IsValueType);
 
 	public IList<PropertyInfo> Properties => _properties ??=
 		EnumerateTypeAndSubTypes()
@@ -85,7 +85,7 @@ public class TypeInfo
 			.ToList();
 
 	public IList<MethodInfo> Constructors => _constructors ??=
-		Type.ResolveEx()!.GetConstructors()
+		Reference.ResolveEx()!.GetConstructors()
 			.Select(m => new MethodInfo(
 				m,
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
@@ -100,7 +100,7 @@ public class TypeInfo
 
 	public TypeInfo? GetElementType()
 	{
-		var elementType = Type.GetElementType();
+		var elementType = Reference.GetElementType();
 		if (elementType == null)
 		{
 			return null;
@@ -110,7 +110,7 @@ public class TypeInfo
 
 	public IList<TypeInfo>? GetGenericArguments()
 	{
-		var genericArguments = Type.GetGenericArguments();
+		var genericArguments = Reference.GetGenericArguments();
 		if (genericArguments == null)
 		{
 			return null;
@@ -123,13 +123,13 @@ public class TypeInfo
 
 	public TypeInfo? GetItemType()
 	{
-		if (Type.IsArray)
+		if (Reference.IsArray)
 		{
 			return GetElementType();
 		}
 		else
 		{
-			var enumerableType = Type.GetAllInterfaces().FirstOrDefault(i => i.GetElementType().FullName == "System.Collections.Generic.IEnumerable`1");
+			var enumerableType = Reference.GetAllInterfaces().FirstOrDefault(i => i.GetElementType().FullName == "System.Collections.Generic.IEnumerable`1");
 			if (enumerableType != null)
 			{
 				var itemType = enumerableType.GetGenericArguments()[0];
@@ -141,7 +141,7 @@ public class TypeInfo
 
 	public static TypeInfo? GetType(string typeName, bool ignoreCase = false)
 	{
-		if (_typeCache.TryGetValue(typeName, out var type) && (!ignoreCase || type.Type.FullName == typeName))
+		if (_typeCache.TryGetValue(typeName, out var type) && (!ignoreCase || type.Reference.FullName == typeName))
 		{
 			return type;
 		}
@@ -182,7 +182,7 @@ public class TypeInfo
 					m.Name == name &&
 					m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute") &&
 					m.Parameters.Count > 0 &&
-					m.Parameters[0].ParameterType.IsAssignableFrom(type.Type)))
+					m.Parameters[0].ParameterType.IsAssignableFrom(type.Reference)))
 				{
 					var typeInfo = GetTypeThrow(refTyp.FullName);
 					yield return typeInfo.Methods.First(m => m.Definition == method);
@@ -193,21 +193,21 @@ public class TypeInfo
 
 	public TypeInfo MakeGenericInstanceType(params TypeInfo[] arguments)
 	{
-		var typeRef = Type.MakeGenericInstanceType(arguments.Select(a => a.Type).ToArray());
+		var typeRef = Reference.MakeGenericInstanceType(arguments.Select(a => a.Reference).ToArray());
 		var typeInfo = new TypeInfo(typeRef, null, _nullabileFlags, _nullableContext);
 		return typeInfo;
 	}
 
 	public override string ToString()
 	{
-		return Type.ToString();
+		return Reference.ToString();
 	}
 
 	internal TypeInfo GetTypeSumElement(TypeReference type, TypeDefinition declaringType, bool? isNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
 	{
 		if (type.IsGenericParameter)
 		{
-			var type2 = Type;
+			var type2 = Reference;
 			do
 			{
 				var td = type2.ResolveEx() ?? type2.GetElementType().ResolveEx();
@@ -270,10 +270,10 @@ Label_Break1:
 
 	private IEnumerable<TypeReference> EnumerateTypeAndSubTypes()
 	{
-		var type = Type;
+		var type = Reference;
 		if (type.IsArray)
 		{
-			return EnumerableExtensions.AsEnumerable(GetTypeThrow(typeof(Array)).Type);
+			return EnumerableExtensions.AsEnumerable(GetTypeThrow(typeof(Array)).Reference);
 		}
 
 		if (type.IsGenericInstance)
@@ -394,7 +394,7 @@ public class EventInfo : IMemberInfo
 
 	public TypeInfo EventType { get; }
 
-	public string Signature => string.Join(",", GetEventHandlerParameterTypes().Select(t => t.Type.FullName));
+	public string Signature => string.Join(",", GetEventHandlerParameterTypes().Select(t => t.Reference.FullName));
 
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => EventType;
