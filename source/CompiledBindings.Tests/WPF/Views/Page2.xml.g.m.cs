@@ -1,6 +1,5 @@
 namespace WPFTest.Views
 {
-	using System.Threading;
 #nullable disable
 
 	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
@@ -36,12 +35,12 @@ namespace WPFTest.Views
 		{
 			Page2 _targetRoot;
 			global::System.Windows.RoutedEventHandler _eventHandler2;
-			CancellationTokenSource _generatedCodeDisposed;
+			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page2 dataRoot)
 			{
 				_targetRoot = dataRoot;
-				_generatedCodeDisposed = new CancellationTokenSource();
+				_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
 
 				Update();
 
@@ -70,7 +69,7 @@ namespace WPFTest.Views
 				_targetRoot.textBlock1.Text = dataRoot.Prop1;
 #line default
 				Set0(_generatedCodeDisposed.Token);
-				async void Set0(CancellationToken cancellationToken)
+				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
 					{

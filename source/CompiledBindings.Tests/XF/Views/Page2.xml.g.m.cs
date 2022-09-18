@@ -1,6 +1,5 @@
 namespace XFTest.Views
 {
-	using System.Threading;
 	using XFTest.Extensions;
 
 #nullable disable
@@ -291,7 +290,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -327,7 +326,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -342,7 +341,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged2(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -357,7 +356,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged3(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged3(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -372,7 +371,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged4(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged4(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)

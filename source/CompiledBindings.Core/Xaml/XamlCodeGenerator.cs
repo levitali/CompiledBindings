@@ -213,7 +213,7 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 				output.AppendLine(
 $@"#line default
 {a}			Set{localFuncIndex}(_generatedCodeDisposed.Token);
-{a}			async void Set{localFuncIndex++}(CancellationToken cancellationToken)
+{a}			async void Set{localFuncIndex++}(global::System.Threading.CancellationToken cancellationToken)
 {a}			{{
 {a}				try
 {a}				{{");

@@ -1,6 +1,5 @@
 namespace XFTest.Views
 {
-	using System.Threading;
 #nullable disable
 
 	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
@@ -170,7 +169,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -194,7 +193,7 @@ namespace XFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)

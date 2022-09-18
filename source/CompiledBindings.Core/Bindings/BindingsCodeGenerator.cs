@@ -13,11 +13,15 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
-		#region Class Begin
+		#region Bindings Variable
 
 		output.AppendLine(
 $@"		{targetClassName}_Bindings{nameSuffix} Bindings{nameSuffix} = new {targetClassName}_Bindings{nameSuffix}();
 ");
+
+		#endregion
+
+		#region Class Begin
 
 		output.AppendLine(
 $@"		class {targetClassName}_Bindings{nameSuffix}
@@ -62,7 +66,7 @@ $@"			bool _settingBinding{bind.Index};");
 		if (asyncFunctions)
 		{
 			output.AppendLine(
-$@"			CancellationTokenSource _generatedCodeDisposed;");
+$@"			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;");
 		}
 
 		GenerateBindingsExtraFieldDeclarations(output, bindingsData);
@@ -71,7 +75,7 @@ $@"			CancellationTokenSource _generatedCodeDisposed;");
 
 		#region Initialize Method
 
-		// Create Initialize method
+		// Start Initialize method
 		if (isDiffDataRoot)
 		{
 			output.AppendLine(
@@ -93,7 +97,7 @@ $@"
 		if (asyncFunctions)
 		{
 			output.AppendLine(
-$@"				_generatedCodeDisposed = new CancellationTokenSource();");
+$@"				_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
 		}
 
 		if (bindingsData.NotifySources.Count > 0)
@@ -171,15 +175,13 @@ $@"			}}");
 
 		#region Cleanup Method
 
-		// Generate Cleanup method
 		output.AppendLine(
 $@"
 			public void Cleanup()
-			{{");
-
-		output.AppendLine(
-$@"				if (_targetRoot != null)
+			{{
+				if (_targetRoot != null)
 				{{");
+		
 		if (asyncFunctions)
 		{
 			output.AppendLine(
@@ -250,7 +252,6 @@ $@"					_targetRoot = null;
 
 		#region Update Method
 
-		// Generate Update method
 		output.AppendLine(
 $@"
 			public void Update()
@@ -434,7 +435,7 @@ $@"					}}
 				{
 					output.AppendLine(
 $@"
-				private void OnPropertyChanged{notifySource.Index}(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged{notifySource.Index}(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{{");
 					output.AppendLine(
 $@"					var bindings = TryGetBindings();

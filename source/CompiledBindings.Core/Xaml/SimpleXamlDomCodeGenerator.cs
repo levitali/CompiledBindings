@@ -45,9 +45,6 @@ $@"namespace {parseResult.TargetType.Reference.Namespace}
 {{");
 		}
 
-		output.AppendLine(
-$@"	using System.Threading;");
-
 		if (parseResult.IncludeNamespaces.Count > 0)
 		{
 			foreach (string ns in parseResult.IncludeNamespaces)

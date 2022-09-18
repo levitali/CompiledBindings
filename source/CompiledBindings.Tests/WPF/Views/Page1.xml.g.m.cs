@@ -1,6 +1,5 @@
 namespace WPFTest.Views
 {
-	using System.Threading;
 	using WPFTest.Views;
 
 #nullable disable
@@ -29,7 +28,7 @@ namespace WPFTest.Views
 			Title = value1.Title;
 #line default
 			Set0(_generatedCodeDisposed.Token);
-			async void Set0(CancellationToken cancellationToken)
+			async void Set0(global::System.Threading.CancellationToken cancellationToken)
 			{
 				try
 				{
@@ -179,7 +178,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -239,13 +238,13 @@ namespace WPFTest.Views
 			bool _settingBinding18;
 			bool _settingBinding19;
 			bool _settingBinding21;
-			CancellationTokenSource _generatedCodeDisposed;
+			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
-				_generatedCodeDisposed = new CancellationTokenSource();
+				_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
 				_bindingsTrackings = new Page1_BindingsTrackings_this(this);
 
 				Update();
@@ -356,7 +355,7 @@ namespace WPFTest.Views
 				_targetRoot.textBlock12.Text = dataRoot.Calculate(new WPFTest.ViewModels.ParamClass("text"));
 #line default
 				Set0(_generatedCodeDisposed.Token);
-				async void Set0(CancellationToken cancellationToken)
+				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
 					{
@@ -540,7 +539,7 @@ namespace WPFTest.Views
 			{
 #line default
 				Set0(_generatedCodeDisposed.Token);
-				async void Set0(CancellationToken cancellationToken)
+				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
 					{
@@ -634,7 +633,7 @@ namespace WPFTest.Views
 			{
 #line default
 				Set0(_generatedCodeDisposed.Token);
-				async void Set0(CancellationToken cancellationToken)
+				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
 					{
@@ -924,7 +923,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -969,7 +968,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -999,7 +998,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged2(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -1180,7 +1179,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -1195,7 +1194,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged1(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -1330,7 +1329,7 @@ namespace WPFTest.Views
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)

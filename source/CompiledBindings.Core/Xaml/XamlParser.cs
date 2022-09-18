@@ -165,7 +165,7 @@ public class XamlNamespace
 		{
 			return match.Groups[match.Groups.Count - 1].Value.Trim();
 		}
-		else if ((match = _clrNamespaceRegex.Match(nsName)).Success)
+		if ((match = _clrNamespaceRegex.Match(nsName)).Success)
 		{
 			return match.Groups[1].Value.Trim();
 		}

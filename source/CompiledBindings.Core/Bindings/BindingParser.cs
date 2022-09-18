@@ -690,8 +690,8 @@ public class Bind
 
 	public Expression? SourceExpression { get; set; }
 
-	public IMemberInfo? DependencyProperty;
-	public int Index;
+	public IMemberInfo? DependencyProperty { get; set; }
+	public int Index { get; set; }
 }
 
 public enum BindingMode
