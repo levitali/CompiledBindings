@@ -289,7 +289,12 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 		foreach (var bs in parseResult.BindingScopes)
 		{
 			output.AppendLine();
-			_bindingsCodeGenerator.GenerateBindingsClass(output, bs.BindingsData!, className, nameSuffix: bs.DataType == null ? null : "_" + (bs.ViewName ?? "this"));
+			var nameSuffix = "_";
+			if (bs.DataType != null)
+			{
+				nameSuffix += bs.ViewName ?? "this";
+			}
+			_bindingsCodeGenerator.GenerateBindingsClass(output, bs.BindingsData!, className, nameSuffix: nameSuffix);
 		}
 	}
 

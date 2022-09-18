@@ -29,9 +29,9 @@ namespace WPFTest.Views
 			}
 		}
 
-		Page2_Bindings Bindings = new Page2_Bindings();
+		Page2_Bindings_ Bindings_ = new Page2_Bindings_();
 
-		class Page2_Bindings
+		class Page2_Bindings_
 		{
 			Page2 _targetRoot;
 			global::System.Windows.RoutedEventHandler _eventHandler2;

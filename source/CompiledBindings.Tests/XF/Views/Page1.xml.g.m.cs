@@ -78,17 +78,17 @@ namespace XFTest.Views
 			}
 		}
 
-		Page1_Bindings Bindings = new Page1_Bindings();
+		Page1_Bindings_ Bindings_ = new Page1_Bindings_();
 
-		class Page1_Bindings
+		class Page1_Bindings_
 		{
 			Page1 _targetRoot;
-			Page1_BindingsTrackings _bindingsTrackings;
+			Page1_BindingsTrackings_ _bindingsTrackings;
 
 			public void Initialize(Page1 dataRoot)
 			{
 				_targetRoot = dataRoot;
-				_bindingsTrackings = new Page1_BindingsTrackings(this);
+				_bindingsTrackings = new Page1_BindingsTrackings_(this);
 
 				Update();
 			}
@@ -125,13 +125,13 @@ namespace XFTest.Views
 				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
 			}
 
-			class Page1_BindingsTrackings
+			class Page1_BindingsTrackings_
 			{
 				global::System.WeakReference _bindingsWeakRef;
 				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
 				global::Xamarin.Forms.CollectionView _propertyChangeSource1;
 
-				public Page1_BindingsTrackings(Page1_Bindings bindings)
+				public Page1_BindingsTrackings_(Page1_Bindings_ bindings)
 				{
 					_bindingsWeakRef = new global::System.WeakReference(bindings);
 				}
@@ -200,12 +200,12 @@ namespace XFTest.Views
 					}
 				}
 
-				Page1_Bindings TryGetBindings()
+				Page1_Bindings_ TryGetBindings()
 				{
-					Page1_Bindings bindings = null;
+					Page1_Bindings_ bindings = null;
 					if (_bindingsWeakRef != null)
 					{
-						bindings = (Page1_Bindings)_bindingsWeakRef.Target;
+						bindings = (Page1_Bindings_)_bindingsWeakRef.Target;
 						if (bindings == null)
 						{
 							_bindingsWeakRef = null;
