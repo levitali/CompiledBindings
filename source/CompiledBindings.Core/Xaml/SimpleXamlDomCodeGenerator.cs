@@ -69,7 +69,7 @@ $@"
 		if (_asyncFunctions)
 		{
 			output.AppendLine(
-$@"		CancellationTokenSource _generatedCodeDisposed = new CancellationTokenSource();");
+$@"		global::System.Threading.CancellationTokenSource _generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
 		}
 
 		if (parseResult.GenerateInitializeMethod)

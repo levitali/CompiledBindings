@@ -7,7 +7,7 @@ namespace WPFTest.Views
 	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page1
 	{
-		CancellationTokenSource _generatedCodeDisposed = new CancellationTokenSource();
+		global::System.Threading.CancellationTokenSource _generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
 		global::System.Windows.Data.IValueConverter TrueToVisibleConverter;
 		global::System.Windows.Data.IValueConverter InverseBooleanConverter;
 		private bool _generatedCodeInitialized;
