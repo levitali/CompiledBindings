@@ -306,6 +306,7 @@ public class XamlDomParser
 				xamlDom.IncludeNamespaces.UnionWith(includeNamespaces.Select(ns => ns.ClrNamespace!));
 				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 				CorrectMethod(objProp, value.StaticValue.Type);
+				obj.GenerateMember = true;
 			}
 			catch (ParseException ex)
 			{

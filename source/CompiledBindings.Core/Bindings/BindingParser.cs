@@ -394,27 +394,19 @@ public static class BindingParser
 				iNotifyPropertyChangedType.IsAssignableFrom(notifySource.SourceExpression.Type))
 			{
 				var bindings = notifySource.Properties.SelectMany(_ => _.Bindings).Distinct().ToList();
-				var value = new VariableExpression(notifySource.SourceExpression.Type, "value");
-				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, e => e.CloneReplace(notifySource.SourceExpression, value));
+				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, notifySource.SourceExpression);
 			}
 
 			foreach (var prop in notifySource.Properties)
 			{
-				var type = prop.Property.PropertyType;
-				if (!type.IsNullable && prop.Expression.IsNullable)
-				{
-					type = new TypeInfo(type, true);
-				}
-				var expr = new VariableExpression(type, "value");
-
-				prop.UpdateMethod = CreateUpdateMethodData(prop.SetBindings, prop.DependentNotifySources, null, e => e.CloneReplace(prop.Expression, expr));
+				prop.UpdateMethod = CreateUpdateMethodData(prop.SetBindings, prop.DependentNotifySources, null, prop.Expression);
 			}
 		}
 
 		var binds1 = binds
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.ToList();
-		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, e => e);
+		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, null);
 
 		var twoWayBinds = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
@@ -465,8 +457,19 @@ public static class BindingParser
 			return expr;
 		}
 
-		UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Func<Expression, Expression> replace)
+		UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Expression? replacedExpression)
 		{
+			Expression? valueExpression = null;
+			if (replacedExpression != null)
+			{
+				var type = replacedExpression.Type;
+				if (!type.IsNullable && replacedExpression.IsNullable)
+				{
+					type = new TypeInfo(type, true);
+				}
+				valueExpression = new VariableExpression(type, "value");
+			}
+
 			var notifySources1 = (notifySources ?? Enumerable.Empty<NotifySource>()).ToList();
 
 			//Get the notify sources, for which UpdateXX methods are generated
@@ -534,8 +537,8 @@ public static class BindingParser
 			var props1 = bindings
 				.Select(b =>
 				{
-					var expr = b.SourceExpression!;
-					var expr2 = replace(expr);
+					var expr = b.SourceExpression!;					
+					var expr2 = Replace(expr);
 					if (expr.EnumerateTree().OfType<FallbackExpression>().Any() &&
 					    !expr2.EnumerateTree().OfType<FallbackExpression>().Any() && 
 						!taskType.IsAssignableFrom(expr.Type))
@@ -550,13 +553,13 @@ public static class BindingParser
 				.ToList();
 
 			var props2 = updateNotifySources
-				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
+				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, Replace(g.Expression)))
 				.ToList();
 
 			var props3 = updateMethodNotifyProps
 				.Select(p =>
 				{
-					var expr = replace(p.Expression);
+					var expr = Replace(p.Expression);
 					if (p.Property.PropertyType.Reference.IsValueType &&
 						!p.Property.PropertyType.Reference.IsValueNullable() &&
 						expr.IsNullable)
@@ -568,7 +571,7 @@ public static class BindingParser
 				.ToList();
 
 			var props4 = notifySources1
-				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
+				.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, Replace(g.Expression)))
 				.ToList();
 
 			var props5 = props1.Concat(props2).Concat(props3).Concat(props4).ToList();
@@ -603,6 +606,15 @@ public static class BindingParser
 				Expressions = updateExpressions,
 				SetEventHandlers = notifySources1,
 			};
+
+			Expression Replace(Expression expr)
+			{
+				if (replacedExpression != null)
+				{
+					expr = expr.CloneReplace(replacedExpression, valueExpression!);
+				}
+				return expr;
+			}
 		}
 	}
 

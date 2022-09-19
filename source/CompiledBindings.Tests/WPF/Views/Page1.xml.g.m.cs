@@ -416,8 +416,8 @@ namespace WPFTest.Views
 
 			private void Update2(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
 			{
-				Update2_TextInput(value.TextInput);
-				Update2_BoolInput(value.BoolInput);
+				Update2_TextInput(value?.TextInput);
+				Update2_BoolInput(value?.BoolInput);
 			}
 
 			private void Update0_BooleanProp(global::System.Boolean value)
