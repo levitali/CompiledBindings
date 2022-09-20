@@ -141,12 +141,17 @@ If you use {x:Bind} to set the ItemsSource property of a collection control (Lis
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
 - **FallbackValue** Specifies a value to display when the source or path cannot be resolved.
 - **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
+- **UpdateSourceTrigger** Specifies an event, or a list of events separated by | symbol, to use for updating the binding's source.
 
 The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {x:Static} markup extension.
 
 ### Observing changes
 
 If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
+
+### Nullability checking
+
+You can use expressions, which or parts of which can return nulls. The bindings code generator determes which expressions can be null, and generates corresponding handling of them. But note! For null reference types, which are decleared as not-nullable, no nullibility checking is generated.
 
 ### Binding to asynchronous (returning Task&lt;T&gt;) properties and functions.
 
