@@ -324,7 +324,9 @@ public class XamlDomParser
 					.Select(e => e.Attribute(xDefaultBindMode))
 					.FirstOrDefault(a => a != null);
 				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
+				
 				value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, xamlDom.IncludeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex);
+
 				if (value.BindValue.SourceExpression != null)
 				{
 					if (value.BindValue.Converter == null)
@@ -333,6 +335,7 @@ public class XamlDomParser
 					}
 					CorrectMethod(objProp, value.BindValue.SourceExpression.Type);
 				}
+				
 				obj.GenerateMember = true;
 
 				if (DependencyPropertyType != null)
@@ -369,6 +372,15 @@ public class XamlDomParser
 						{
 							value.BindValue.DependencyProperty = dp;
 						}
+					}
+				}
+
+				if (value.BindValue!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource && value.BindValue.TargetChangedEvents.Count == 0)
+				{
+					ResolveTargetChangeEventCore(value.BindValue);
+					if (value.BindValue.TargetChangedEvents.Count == 0 && value.BindValue.DependencyProperty == null)
+					{
+						throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceTrigger property.", CurrentFile, objProp.XamlNode);
 					}
 				}
 			}
@@ -465,5 +477,14 @@ public class XamlDomParser
 			.Concat(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName, type)
 											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))
 			.FirstOrDefault(m => m.Parameters[m.Parameters.Count == 1 ? 0 : 1].ParameterType.IsAssignableFrom(targetType));
+	}
+
+	protected virtual void ResolveTargetChangeEventCore(Bind binding)
+	{
+		var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+		if (iNotifyPropChanged.IsAssignableFrom(binding.Property.Object.Type))
+		{
+			binding.TargetChangedEvents.Add(iNotifyPropChanged.Events[0]);
+		}
 	}
 }

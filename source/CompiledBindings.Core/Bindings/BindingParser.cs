@@ -100,9 +100,9 @@ public static class BindingParser
 						"FallbackValue" or "TargetNullValue" => prop.MemberType,
 						_ => TypeInfo.GetTypeThrow(typeof(object))
 					};
-					resources.Add((resourceName, resourceType));
+					resources.Add((resourceName, resourceType!));
 
-					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType.Reference), resourceType);
+					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType!.Reference), resourceType);
 					expr = new VariableExpression(targetType, "_targetRoot");
 					expr = new MemberExpression(expr, resourceField, new TypeInfo(resourceType, false));
 
@@ -238,23 +238,11 @@ public static class BindingParser
 			throw new ParseException("IsItemsSource cannot be used for OneWayToSource bindings.");
 		}
 
-		if ((mode is BindingMode.TwoWay or BindingMode.OneWayToSource) && targetChangedEvents.Count == 0)
-		{
-			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
-			if (iNotifyPropChanged.IsAssignableFrom(prop.Object.Type))
-			{
-				targetChangedEvents.Add(iNotifyPropChanged.Events.First());
-			}
-		}
-		// Note! It is not checked now whether an event is set for a not explicit two way binding.
-		// The platform generator can add default events for some controls.
-		// Whether an event is set, is checked in code generator.
-
 		var sourceExpression = expression;
 
 		if (sourceExpression != null && converter != null)
 		{
-			var convertMethod = xamlDomParser.ConverterType.Methods.First(m => m.Definition.Name == "Convert");
+			var convertMethod = xamlDomParser.ConverterType!.Methods.First(m => m.Definition.Name == "Convert");
 			sourceExpression = new CallExpression(converter, convertMethod, new Expression[]
 			{
 				sourceExpression,
