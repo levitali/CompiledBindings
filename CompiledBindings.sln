@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XFTest", "source\XF\XFTest\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XFTest.UWP", "source\XF\XFTest.UWP\XFTest.UWP.csproj", "{5E3F18A4-F508-4B73-80C1-80F15B9EA491}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompiledBindings.Tests", "source\CompiledBindings.Tests\CompiledBindings.Tests.csproj", "{E0BD5531-4CAF-43D9-BFF2-DC1EA7F58B21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings.Tests", "source\CompiledBindings.Tests\CompiledBindings.Tests.csproj", "{E0BD5531-4CAF-43D9-BFF2-DC1EA7F58B21}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{C85EC57B-1420-4BDA-B2DC-3F1312235ADA}"
 EndProject

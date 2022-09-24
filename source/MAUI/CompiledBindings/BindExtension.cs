@@ -13,7 +13,7 @@ public class BindExtension : IMarkupExtension
 
 	public string? BindBack { get; set; }
 
-	public object? Converter { get; set; }
+	public IValueConverter? Converter { get; set; }
 
 	public object? ConverterParameter { get; set; }
 
@@ -23,7 +23,7 @@ public class BindExtension : IMarkupExtension
 
 	public bool IsItemsSource { get; set; }
 
-	public object? UpdateSourceTrigger { get; set; }
+	public string? UpdateSourceEventNames { get; set; }
 
 	public object? ProvideValue(IServiceProvider serviceProvider)
 	{

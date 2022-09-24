@@ -63,7 +63,7 @@ $@"#nullable disable");
 
 		output.AppendLine(
 $@"
-	[System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
+	[global::System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
 	partial class {parseResult.TargetType.Reference.Name}
 	{{");
 		if (_asyncFunctions)

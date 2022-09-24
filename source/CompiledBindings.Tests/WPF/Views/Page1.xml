@@ -72,7 +72,7 @@
             local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"
             Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
         <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}"
-								 ui:FocusManager.Focused="{x:Bind FocusedField[Field1], UpdateSourceTrigger=GotFocus|LostFocus}"/>
+								 ui:FocusManager.Focused="{x:Bind FocusedField[Field1], UpdateSourceEventNames=GotFocus|LostFocus}"/>
         <CheckBox
             Grid.Column="{x:Bind IntProp}"
             local:TestExtensions.MyProperty="{x:Set 6}"

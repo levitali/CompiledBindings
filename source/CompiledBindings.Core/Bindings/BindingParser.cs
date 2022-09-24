@@ -155,7 +155,7 @@ public static class BindingParser
 					converterParameter = expr;
 				}
 			}
-			else if (name is "Mode" or "UpdateSourceTrigger" or "DataType" or "IsItemsSource")
+			else if (name is "Mode" or "UpdateSourceEventNames" or "DataType" or "IsItemsSource")
 			{
 				int pos2 = str.IndexOf(',');
 				if (pos2 == -1)
@@ -287,7 +287,7 @@ public static class BindingParser
 			FallbackValue = fallbackValue,
 			Mode = mode ?? defaultBindMode,
 			IsItemsSource = isItemsSource,
-			TargetChangedEvents = targetChangedEvents,
+			UpdateSourceEvents = targetChangedEvents,
 			Resources = resources,
 			SourceExpression = sourceExpression,
 		};
@@ -399,8 +399,8 @@ public static class BindingParser
 		var twoWayBinds = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
 		var twoWayEventHandlers1 = twoWayBinds
-			.Where(b => b.TargetChangedEvents.Count > 0)
-			.SelectMany(b => b.TargetChangedEvents.Select(e => (bind: b, evnt: e)))
+			.Where(b => b.UpdateSourceEvents.Count > 0)
+			.SelectMany(b => b.UpdateSourceEvents.Select(e => (bind: b, evnt: e)))
 			.GroupBy(e => (e.bind.Property.Object, e.evnt.Signature))
 			.Select(g => new TwoWayEventData
 			{
@@ -409,7 +409,7 @@ public static class BindingParser
 			});
 
 		var twoWayEventHandlers2 = twoWayBinds
-			.Where(b => b.TargetChangedEvents.Count == 0 && b.DependencyProperty != null)
+			.Where(b => b.UpdateSourceEvents.Count == 0 && b.DependencyProperty != null)
 			.GroupBy(b => (b.Property.Object, b.DependencyProperty))
 			.Select(g => new TwoWayEventData
 			{
@@ -685,7 +685,7 @@ public class Bind
 	public Expression? FallbackValue { get; init; }
 	public TypeInfo? DataType { get; init; }
 	public bool DataTypeSet { get; init; }
-	public List<EventInfo> TargetChangedEvents { get; init; }
+	public List<EventInfo> UpdateSourceEvents { get; init; }
 	public List<(string name, TypeInfo type)> Resources { get; init; }
 
 	public Expression? SourceExpression { get; set; }

@@ -341,7 +341,7 @@ public class XamlDomParser
 				if (DependencyPropertyType != null)
 				{
 					if (value.BindValue?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-						value.BindValue.TargetChangedEvents.Count == 0)
+						value.BindValue.UpdateSourceEvents.Count == 0)
 					{
 						string dpName;
 						TypeDefinition type;
@@ -375,12 +375,13 @@ public class XamlDomParser
 					}
 				}
 
-				if (value.BindValue!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource && value.BindValue.TargetChangedEvents.Count == 0)
+				if (value.BindValue!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+					value.BindValue.UpdateSourceEvents.Count == 0 && value.BindValue.DependencyProperty == null)
 				{
 					ResolveTargetChangeEventCore(value.BindValue);
-					if (value.BindValue.TargetChangedEvents.Count == 0 && value.BindValue.DependencyProperty == null)
+					if (value.BindValue.UpdateSourceEvents.Count == 0)
 					{
-						throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceTrigger property.", CurrentFile, objProp.XamlNode);
+						throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceEventNames property.", CurrentFile, objProp.XamlNode);
 					}
 				}
 			}
@@ -481,10 +482,13 @@ public class XamlDomParser
 
 	protected virtual void ResolveTargetChangeEventCore(Bind binding)
 	{
-		var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
-		if (iNotifyPropChanged.IsAssignableFrom(binding.Property.Object.Type))
+		if (binding.UpdateSourceEvents.Count == 0)
 		{
-			binding.TargetChangedEvents.Add(iNotifyPropChanged.Events[0]);
+			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+			if (iNotifyPropChanged.IsAssignableFrom(binding.Property.Object.Type))
+			{
+				binding.UpdateSourceEvents.Add(iNotifyPropChanged.Events[0]);
+			}
 		}
 	}
 }
