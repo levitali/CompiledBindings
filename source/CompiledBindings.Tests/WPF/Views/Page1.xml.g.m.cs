@@ -4,7 +4,7 @@ namespace WPFTest.Views
 
 #nullable disable
 
-	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
+	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page1
 	{
 		global::System.Threading.CancellationTokenSource _generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
@@ -572,7 +572,7 @@ namespace WPFTest.Views
 				_settingBinding19 = true;
 				try
 				{
-#line (75, 10) - (75, 104) 75 "Page1.xml"
+#line (75, 10) - (75, 107) 75 "Page1.xml"
 					global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
 				}
 				finally
@@ -709,7 +709,7 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (75, 10) - (75, 104) 75 "Page1.xml"
+#line (75, 10) - (75, 107) 75 "Page1.xml"
 						dataRoot.FocusedField[WPFTest.ViewModels.Page1ViewModel.Field.Field1] = global::UI.FocusManager.GetFocused(_targetRoot.textBox4);
 #line default
 					}

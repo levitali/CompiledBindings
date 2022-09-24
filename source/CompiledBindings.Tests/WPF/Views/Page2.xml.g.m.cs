@@ -2,7 +2,7 @@ namespace WPFTest.Views
 {
 #nullable disable
 
-	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
+	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page2
 	{
 		private bool _generatedCodeInitialized;

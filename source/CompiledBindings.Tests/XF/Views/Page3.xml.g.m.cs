@@ -2,7 +2,7 @@ namespace XFTest.Views
 {
 #nullable disable
 
-	[System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
+	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page3
 	{
 		private global::Xamarin.Forms.Label label1;
