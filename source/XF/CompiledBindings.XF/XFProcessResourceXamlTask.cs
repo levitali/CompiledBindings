@@ -116,6 +116,7 @@ public class XFProcessResourceXamlTask : Task
 								string? compiledBindingsNsPrefix = null, classNsPrefix = null;
 
 								var usedNames = new HashSet<string>(xdoc.Descendants().Select(e => e.Attribute(xamlDomParser.xName)).Where(a => a != null).Select(a => a.Value).Distinct());
+								var elementNames = new Dictionary<XElement, string>();
 								foreach (var xelement in xdoc.Descendants())
 								{
 									var xname = xelement.Attribute(xamlDomParser.xName);
@@ -127,11 +128,14 @@ public class XFProcessResourceXamlTask : Task
 										{
 											var name = XamlDomParser.GenerateName(xelement, usedNames);
 											InsertAtEnd(xelement, $" x:Name=\"{name}\"");
+
+											elementNames.Add(xelement, name);
 										}
 									}
 									else
 									{
 										usedNames.Add(xname.Value);
+										elementNames.Add(xelement, xname.Value);
 									}
 								}
 
@@ -187,7 +191,6 @@ public class XFProcessResourceXamlTask : Task
 								}
 
 								// Replace/Remove attributes with CompiledBindings namespace
-								int bindingIndex = 0;
 								foreach (var attr in mAttrs.Concat(mxAttrs))
 								{
 									var lineInfo = (IXmlLineInfo)attr;
@@ -199,30 +202,36 @@ public class XFProcessResourceXamlTask : Task
 									Debug.Assert(end > start);
 									var length = end - start;
 
-									var markupExtensionFullName = $"{classNs}.{className}_Binding{bindingIndex}Extension";
-									if (assemblyTypes.Contains(markupExtensionFullName))
+									if (elementNames.TryGetValue(attr.Parent, out string name))
 									{
-										// Replace the attribute with markup extension
-
-										if (classNsPrefix == null)
+										var markupExtensionName = $"{className}_{name}_{attr.Name.LocalName}";
+										var markupExtensionFullName = $"{classNs}.{markupExtensionName}";
+										if (assemblyTypes.Contains(markupExtensionFullName))
 										{
-											classNsPrefix = SearchNsPrefix(classNs);
+											// Replace the attribute with markup extension
+
+											if (classNsPrefix == null)
+											{
+												classNsPrefix = SearchNsPrefix(classNs);
+											}
+
+											int nameEnd = textLine.Text.IndexOf('=', start);
+											string attrCont = textLine.Text.Substring(start, nameEnd - start + 1);
+											attrCont += $"\"{{{classNsPrefix}:{markupExtensionName}}}\"";
+											textLine.Text = textLine.Text.Substring(0, start) + attrCont + textLine.Text.Substring(end);
+
+											textLine.RemovedTextOffset += length - attrCont.Length;
+
+											continue;
 										}
-
-										int nameEnd = textLine.Text.IndexOf('=', start);
-										string attrCont = textLine.Text.Substring(start, nameEnd - start + 1);
-										attrCont += $"\"{{{classNsPrefix}:{className}_Binding{bindingIndex}Extension}}\"";
-										textLine.Text = textLine.Text.Substring(0, start) + attrCont + textLine.Text.Substring(end);
-
-										bindingIndex++;
 									}
-									else
-									{
-										// Remove the attribute
-										
-										textLine.Text = textLine.Text.Remove(start, length);
-										textLine.RemovedTextOffset += length;
-									}
+
+									// Remove the attribute
+
+									textLine.Text = textLine.Text.Remove(start, length);
+									textLine.RemovedTextOffset += length;
+
+									attr.Remove();
 								}
 							}
 

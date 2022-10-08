@@ -305,20 +305,19 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 		return $@"this.Resources.ContainsKey(""{resourceName}"") == true ? this.Resources[""{resourceName}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resourceName}""]";
 	}
 
-	protected override void GenerateAdditionalClassCode(StringBuilder output, SimpleXamlDom parseResult, string classBaseName)
+	protected override void GenerateAdditionalClassCode(StringBuilder output, SimpleXamlDom parseResult, string className)
 	{
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
-		int index = 0;
 		foreach (var bind in parseResult.EnumerateAllProperties().Select(p => p.Value.BindingValue!).Where(v => v != null))
 		{
 			output.AppendLine();
 			output.AppendLine(
-$@"	class {classBaseName}_Binding{index++}Extension : global::{_platformConstants.BaseClrNamespace}.Xaml.IMarkupExtension
+$@"	class {className}_{bind.Property.Object.Name}_{bind.Property.MemberName} : global::{_platformConstants.BaseClrNamespace}.Xaml.IMarkupExtension
 	{{");
 
 			output.AppendLine(
-$@"		static global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.DataType!.Reference.GetCSharpFullName()}, global::{bind.Expression!.Type.Reference.GetCSharpFullName()}>(");
+$@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.DataType!.Reference.GetCSharpFullName()}, global::{bind.Expression!.Type.Reference.GetCSharpFullName()}>(");
 
 			output.AppendLine(
 $@"			dataRoot => (

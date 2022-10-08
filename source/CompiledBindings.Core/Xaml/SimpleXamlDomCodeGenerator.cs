@@ -365,6 +365,8 @@ $@"		}}");
 
 		GenerateBindings(output, parseResult, dataTemplateClassName);
 
+		GenerateAdditionalClassCode(output, parseResult, dataTemplateClassName);
+
 		output.AppendLine(
 $@"	}}");
 	}

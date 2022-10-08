@@ -240,9 +240,9 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3_Binding0Extension : global::Xamarin.Forms.Xaml.IMarkupExtension
+	class Page3_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
 	{
-		static global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
+		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
 			dataRoot => (
 #line (21, 13) - (21, 83) 21 "Page3.xml"
 				dataRoot?.Description,

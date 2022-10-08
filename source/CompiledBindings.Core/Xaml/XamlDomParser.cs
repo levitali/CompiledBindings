@@ -318,8 +318,8 @@ public class XamlDomParser
 			{
 				bool isPropertyTypeBinding = BindingType.IsAssignableFrom(propType);
 
-					var defaultBindModeAttr =
-					EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
+				var defaultBindModeAttr =
+				EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
 					.Cast<XElement>()
 					.Select(e => e.Attribute(xDefaultBindMode))
 					.FirstOrDefault(a => a != null);
@@ -352,7 +352,7 @@ public class XamlDomParser
 					}
 					CorrectMethod(objProp, bind.SourceExpression.Type);
 				}
-				
+
 				if (DependencyPropertyType != null)
 				{
 					if (bind?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
@@ -400,9 +400,8 @@ public class XamlDomParser
 					}
 				}
 
-				obj.GenerateMember = true;
-
 				value.BindValue = bind;
+				obj.GenerateMember = true;
 			}
 			catch (ParseException ex)
 			{
@@ -424,8 +423,8 @@ public class XamlDomParser
 				throw new GeneratorException($"Expression type must be a method.", CurrentFile, xamlNode);
 			}
 		}
-	
-	Label_Return:
+
+Label_Return:
 		return value;
 
 		void HandleParseException(ParseException ex)
