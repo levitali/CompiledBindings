@@ -54,7 +54,7 @@ public abstract class Expression
 		return expression;
 	}
 
-	protected static Expression StripParenExpression(Expression expression)
+	public static Expression StripParenExpression(Expression expression)
 	{
 		while (expression is ParenExpression pe)
 		{

@@ -13,11 +13,13 @@
     x:Class="XFTest.Views.Page3"
     x:DataType="viewModels:Page3ViewModel">
 
-	<Grid>
-		<Label IsVisible="{x:Bind Entity ne null and IsLoading}"/>
-		<!--<Label IsVisible="{x:Bind Entity.SByteProp ne 3 and IsLoading}"/>-->
-		<Label Text="{x:Bind Entity.SByteProp}"/>
-		<Label Text="{x:Bind Entity.UShortProp}"/>
-	</Grid>
+    <Grid>
+        <Label IsVisible="{x:Bind Entity ne null and IsLoading}" />
+        <Label Text="{x:Bind Entity.SByteProp}" />
+        <Label Text="{x:Bind Entity.UShortProp}" />
+        <Picker
+            ItemDisplayBinding="{x:Bind Description, DataType=viewModels:PickItem}"
+            ItemsSource="{x:Bind PickedItems}" />
+    </Grid>
 
 </Page>

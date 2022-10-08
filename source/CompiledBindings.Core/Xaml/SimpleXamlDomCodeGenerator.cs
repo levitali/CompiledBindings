@@ -83,6 +83,8 @@ $@"	}}");
 
 		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Reference.Name);
 
+		GenerateAdditionalClassCode(output, parseResult, parseResult.TargetType.Reference.Name);
+
 		if (parseResult.TargetType.Reference.Namespace != null)
 		{
 			output.AppendLine(
@@ -90,6 +92,10 @@ $@"	}}");
 		}
 
 		return output.ToString();
+	}
+
+	protected virtual void GenerateAdditionalClassCode(StringBuilder output, SimpleXamlDom parseResult, string className)
+	{
 	}
 
 	protected virtual string IGeneratedDataTemplateFullName => "CompiledBindings.IGeneratedDataTemplate";

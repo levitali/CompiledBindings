@@ -1,8 +1,9 @@
 ﻿<Application
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="global using:XFTest"
     xmlns:vm="clr-namespace:XFTest.ViewModels"
+    xmlns:systemCollections="global using:System.Collections"
+    xmlns:local="global using:XFTest"
     x:Class="XFTest.App">
     
     <Application.Resources>

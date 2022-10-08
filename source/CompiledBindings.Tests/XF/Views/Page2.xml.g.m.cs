@@ -174,7 +174,7 @@ namespace XFTest.Views
 
 			private void Update2_Prop1(global::System.String value)
 			{
-#line (22, 10) - (22, 54) 22 "Page2.xml"
+#line (22, 16) - (22, 60) 22 "Page2.xml"
 				_targetRoot.label2.Text = value;
 #line default
 			}

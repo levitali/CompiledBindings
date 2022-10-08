@@ -2,7 +2,7 @@
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, HashSet<string> includeNamespaces, bool throwIfWithoutDataType, ref int localVarIndex)
+	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, HashSet<string> includeNamespaces, bool throwIfWithoutDataType, ref int localVarIndex, bool isSourceTypeNullable)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value?.TrimEnd();
@@ -38,7 +38,7 @@ public static class BindingParser
 				typeExpr = typeExpr.Substring(0, pos);
 			}
 			var type = xamlDomParser.FindType(typeExpr, (XAttribute)prop.XamlNode.Element);
-			dataType = type == null ? null : new TypeInfo(type, false);
+			dataType = type == null ? null : new TypeInfo(type, isSourceTypeNullable);
 			dataTypeSet = true;
 
 			sourceType = dataType ?? targetType;
@@ -46,6 +46,11 @@ public static class BindingParser
 		else if (throwIfWithoutDataType)
 		{
 			throw new ParseException(Res.NoDataType);
+		}
+		// Ensure the source type is nullabe
+		else if (isSourceTypeNullable)
+		{
+			sourceType = new TypeInfo(sourceType, true);
 		}
 
 		int currentPos = 0, pos1 = 0;
@@ -304,50 +309,7 @@ public static class BindingParser
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
 
 		// Go through all expressions in bindings and find notifiable properties, grouped by notifiable source
-		var notifySources = binds
-			.Where(b => b.Property.TargetEvent == null &&
-						b.SourceExpression != null &&
-						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
-			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
-			.Where(e => CheckPropertyNotifiable(e.expr))
-			.GroupBy(e => e.expr.Expression.CSharpCode)
-			.OrderBy(g => g.Key)
-			.Select((g, i) =>
-			{
-				var expr1 = g.First().expr.Expression;
-				var d = new NotifySource
-				{
-					Expression = expr1,
-					SourceExpression = expr1,
-					Index = i,
-				};
-				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
-				{
-					var expr2 = g2.First().expr;
-					var bindings = g2.Select(e => e.bind).Distinct().ToList();
-					return new NotifyProperty
-					{
-						Parent = d,
-						Property = (PropertyInfo)expr2.Member,
-						Expression = expr2,
-						SourceExpression = expr2,
-						Bindings = new ReadOnlyCollection<Bind>(bindings),
-						SetBindings = bindings.ToList(), // Make copy
-					};
-				})
-				.ToList();
-				return d;
-			})
-			.ToList();
-
-		bool CheckPropertyNotifiable(MemberExpression expr)
-		{
-			return expr.Member is PropertyInfo pi &&
-				   !pi.Definition.IsStatic() &&
-				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
-				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
-				   !pi.IsReadOnly;
-		}
+		var notifySources = GetNotifySources(binds, iNotifyPropertyChangedType, dependencyObjectType);
 
 		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
 		{
@@ -525,10 +487,10 @@ public static class BindingParser
 			var props1 = bindings
 				.Select(b =>
 				{
-					var expr = b.SourceExpression!;					
+					var expr = b.SourceExpression!;
 					var expr2 = Replace(expr);
 					if (expr.EnumerateTree().OfType<FallbackExpression>().Any() &&
-					    !expr2.EnumerateTree().OfType<FallbackExpression>().Any() && 
+						!expr2.EnumerateTree().OfType<FallbackExpression>().Any() &&
 						!taskType.IsAssignableFrom(expr.Type))
 					{
 						// The replaced expression is not FallbackExpression any more.
@@ -604,6 +566,57 @@ public static class BindingParser
 				return expr;
 			}
 		}
+	}
+
+	public static List<NotifySource> GetNotifySources(IList<Bind> binds, TypeInfo iNotifyPropertyChangedType, TypeInfo? dependencyObjectType)
+	{
+		var notifySources = binds
+			.Where(b => b.Property.TargetEvent == null &&
+						b.SourceExpression != null &&
+						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
+			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
+			.Where(e => CheckPropertyNotifiable(e.expr))
+			.GroupBy(e => e.expr.Expression.CSharpCode)
+			.OrderBy(g => g.Key)
+			.Select((g, i) =>
+			{
+				var expr1 = g.First().expr.Expression;
+				var d = new NotifySource
+				{
+					Expression = expr1,
+					SourceExpression = expr1,
+					Index = i,
+				};
+				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
+				{
+					var expr2 = g2.First().expr;
+					var bindings = g2.Select(e => e.bind).Distinct().ToList();
+					return new NotifyProperty
+					{
+						Parent = d,
+						Property = (PropertyInfo)expr2.Member,
+						Expression = expr2,
+						SourceExpression = expr2,
+						Bindings = new ReadOnlyCollection<Bind>(bindings),
+						SetBindings = bindings.ToList(), // Make copy
+					};
+				})
+				.ToList();
+				return d;
+			})
+			.ToList();
+
+		bool CheckPropertyNotifiable(MemberExpression expr)
+		{
+			var res = expr.Member is PropertyInfo pi &&
+				   !pi.Definition.IsStatic() &&
+				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
+				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
+				   !pi.IsReadOnly;
+			return res;
+		}
+
+		return notifySources;
 	}
 
 	private static class Res

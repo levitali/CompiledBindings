@@ -68,6 +68,8 @@ namespace Xamarin.Forms
 
 	public class Picker : VisualElement
 	{
+		public IList ItemsSource { get; set; }
+		public BindingBase ItemDisplayBinding { get; set; }
 		public object SelectedItem { get; set; }
 	}
 

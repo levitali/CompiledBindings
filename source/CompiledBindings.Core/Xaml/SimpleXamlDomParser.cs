@@ -218,7 +218,15 @@ public class SimpleXamlDomParser : XamlDomParser
 										elementType = bind.Expression!.Type.GetItemType();
 										if (elementType == null)
 										{
-											throw new ParseException(Res.ElementTypeCannotBeInferred);
+											var expr = Expression.StripParenExpression(bind.Expression);
+											if (expr is CastExpression cast)
+											{
+												elementType = cast.Expression.Type.GetItemType();
+											}
+											if (elementType == null)
+											{
+												throw new ParseException(Res.ElementTypeCannotBeInferred);
+											}
 										}
 									}
 								}
@@ -329,7 +337,8 @@ public class SimpleXamlDom : XamlDomBase
 
 	public bool GenerateCode =>
 		GenerateInitializeMethod ||
-		DataTemplates.Any(t => t.GenerateCode);
+		DataTemplates.Any(t => t.GenerateCode) ||
+		EnumerateAllProperties().Any(p => p.Value.BindingValue != null);
 
 	public IEnumerable<XamlObject> EnumerateAllObjects()
 	{

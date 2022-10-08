@@ -45,5 +45,9 @@
             Text="Test set focus"
             Clicked="TestSetFocus_Click" />
 
+        <Picker
+            ItemDisplayBinding="{x:Bind Description, DataType=vm:PickItem}"
+            ItemsSource="{x:Bind (systemCollections:IList)PickedItems}" />
+
     </StackLayout>
 </ContentPage>

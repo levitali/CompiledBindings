@@ -71,6 +71,9 @@ public class XamlObjectValue
 	public Bind? BindValue { get; set; }
 	public string? CSharpValue { get; set; }
 
+	// x:Bind used to set property of the standard Binding type
+	public Bind? BindingValue { get; set; }
+
 	public override string ToString()
 	{
 		if (StaticValue != null)

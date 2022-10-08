@@ -18,8 +18,9 @@ public static class TypeInfoUtils
 			AssemblyResolver = new AssemblyResolver(),
 			ReadSymbols = true
 		};
-		var assembly = AssemblyDefinition.ReadAssembly(file, prm);
 		_assemblies ??= new List<AssemblyDefinition>();
+		
+		var assembly = AssemblyDefinition.ReadAssembly(file, prm);
 
 		_assemblies.Add(assembly);
 		_allTypes = null;

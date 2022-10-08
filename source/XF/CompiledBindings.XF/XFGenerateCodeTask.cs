@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -273,6 +275,11 @@ public class XFXamlDomParser : SimpleXamlDomParser
 
 		return (true, null);
 	}
+
+	protected override bool CanSetBindingTypeProperty()
+	{
+		return true;
+	}
 }
 
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator
@@ -296,6 +303,73 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	protected override string CreateGetResourceCode(string resourceName)
 	{
 		return $@"this.Resources.ContainsKey(""{resourceName}"") == true ? this.Resources[""{resourceName}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resourceName}""]";
+	}
+
+	protected override void GenerateAdditionalClassCode(StringBuilder output, SimpleXamlDom parseResult, string classBaseName)
+	{
+		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+
+		int index = 0;
+		foreach (var bind in parseResult.EnumerateAllProperties().Select(p => p.Value.BindingValue!).Where(v => v != null))
+		{
+			output.AppendLine();
+			output.AppendLine(
+$@"	class {classBaseName}_Binding{index++}Extension : global::{_platformConstants.BaseClrNamespace}.Xaml.IMarkupExtension
+	{{");
+
+			output.AppendLine(
+$@"		static global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.DataType!.Reference.GetCSharpFullName()}, global::{bind.Expression!.Type.Reference.GetCSharpFullName()}>(");
+
+			output.AppendLine(
+$@"			dataRoot => (
+{LineDirective(bind.Property.XamlNode)}
+				{bind.SourceExpression!.CSharpCode},
+#line default
+				true),");
+
+			output.AppendLine(
+$@"			null,");
+
+			var notifySources = BindingParser.GetNotifySources(new[] { bind }, iNotifyPropertyChangedType, null);
+			if (notifySources.Count > 0)
+			{
+				output.AppendLine(
+$@"			new[]
+			{{");
+
+				foreach (var source in notifySources)
+				{
+					foreach (var prop in source.Properties)
+					{
+						output.AppendLine(
+$@"				new global::System.Tuple<global::System.Func<global::{bind.DataType!.Reference.GetCSharpFullName()}, object>, string>(dataRoot =>
+{LineDirective(bind.Property.XamlNode)}
+					{source.SourceExpression},
+#line default
+					""{prop.Property.Definition.Name}""),");
+					}
+				}
+
+				output.Append(
+	$@"			}}");
+			}
+			else
+			{
+				output.Append(
+$@"			null");
+			}
+			output.AppendLine(");");
+
+			output.AppendLine();
+			output.AppendLine(
+$@"		public object ProvideValue(global::System.IServiceProvider serviceProvider)
+		{{
+			return _binding;
+		}}");
+
+			output.AppendLine(
+$@"	}}");
+		}
 	}
 }
 

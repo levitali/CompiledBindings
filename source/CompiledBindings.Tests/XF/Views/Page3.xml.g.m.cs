@@ -8,6 +8,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Label label1;
 		private global::Xamarin.Forms.Label label2;
 		private global::Xamarin.Forms.Label label3;
+		private global::Xamarin.Forms.Picker picker1;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -20,6 +21,7 @@ namespace XFTest.Views
 			label1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label1");
 			label2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label2");
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label3");
+			picker1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(this, "picker1");
 
 
 			this.BindingContextChanged += this_BindingContextChanged;
@@ -78,6 +80,9 @@ namespace XFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
+#line (22, 13) - (22, 46) 22 "Page3.xml"
+				_targetRoot.picker1.ItemsSource = dataRoot.PickedItems;
+#line default
 				Update0(dataRoot);
 			}
 
@@ -95,7 +100,7 @@ namespace XFTest.Views
 			private void Update0_Entity(global::XFTest.ViewModels.EntityModel value)
 			{
 				var dataRoot = _dataRoot;
-#line (17, 10) - (17, 58) 17 "Page3.xml"
+#line (17, 16) - (17, 64) 17 "Page3.xml"
 				_targetRoot.label1.IsVisible = value != null && dataRoot.IsLoading;
 #line default
 				Update1(value);
@@ -105,21 +110,21 @@ namespace XFTest.Views
 			private void Update0_IsLoading(global::System.Boolean value)
 			{
 				var dataRoot = _dataRoot;
-#line (17, 10) - (17, 58) 17 "Page3.xml"
+#line (17, 16) - (17, 64) 17 "Page3.xml"
 				_targetRoot.label1.IsVisible = dataRoot.Entity != null && value;
 #line default
 			}
 
 			private void Update1_SByteProp(global::System.SByte value)
 			{
-#line (19, 10) - (19, 41) 19 "Page3.xml"
+#line (18, 16) - (18, 47) 18 "Page3.xml"
 				_targetRoot.label2.Text = value.ToString();
 #line default
 			}
 
 			private void Update1_UShortProp(global::System.UInt16 value)
 			{
-#line (20, 10) - (20, 42) 20 "Page3.xml"
+#line (19, 16) - (19, 48) 19 "Page3.xml"
 				_targetRoot.label3.Text = value.ToString();
 #line default
 			}
@@ -232,6 +237,30 @@ namespace XFTest.Views
 					return bindings;
 				}
 			}
+		}
+	}
+
+	class Page3_Binding0Extension : global::Xamarin.Forms.Xaml.IMarkupExtension
+	{
+		static global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
+			dataRoot => (
+#line (21, 13) - (21, 83) 21 "Page3.xml"
+				dataRoot?.Description,
+#line default
+				true),
+			null,
+			new[]
+			{
+				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.PickItem, object>, string>(dataRoot =>
+#line (21, 13) - (21, 83) 21 "Page3.xml"
+					dataRoot,
+#line default
+					"Description"),
+			});
+
+		public object ProvideValue(global::System.IServiceProvider serviceProvider)
+		{
+			return _binding;
 		}
 	}
 }

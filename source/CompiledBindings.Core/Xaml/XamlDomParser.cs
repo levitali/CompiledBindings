@@ -300,7 +300,6 @@ public class XamlDomParser
 		{
 			try
 			{
-				CheckPropertyTypeNotBinding();
 				var staticNode = xamlNode.Children[0];
 				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
 				xamlDom.IncludeNamespaces.UnionWith(includeNamespaces.Select(ns => ns.ClrNamespace!));
@@ -317,31 +316,47 @@ public class XamlDomParser
 		{
 			try
 			{
-				CheckPropertyTypeNotBinding();
-				var defaultBindModeAttr =
+				bool isPropertyTypeBinding = BindingType.IsAssignableFrom(propType);
+
+					var defaultBindModeAttr =
 					EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
 					.Cast<XElement>()
 					.Select(e => e.Attribute(xDefaultBindMode))
 					.FirstOrDefault(a => a != null);
 				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
-				
-				value.BindValue = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, xamlDom.IncludeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex);
 
-				if (value.BindValue.SourceExpression != null)
+				var bind = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, xamlDom.IncludeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex, isPropertyTypeBinding);
+
+				if (isPropertyTypeBinding)
 				{
-					if (value.BindValue.Converter == null)
+					if (CanSetBindingTypeProperty())
 					{
-						value.BindValue.SourceExpression = CorrectSourceExpression(value.BindValue.SourceExpression, objProp);
+						if (bind.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
+						{
+							throw new GeneratorException($"TwoWay or OneWayToSource x:Binds are not supported if the property type is a standard Binding.", CurrentFile, xamlNode);
+						}
+
+						value.BindingValue = bind;
+						goto Label_Return;
 					}
-					CorrectMethod(objProp, value.BindValue.SourceExpression.Type);
+
+					throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
+
+				}
+
+				if (bind.SourceExpression != null)
+				{
+					if (bind.Converter == null)
+					{
+						bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp);
+					}
+					CorrectMethod(objProp, bind.SourceExpression.Type);
 				}
 				
-				obj.GenerateMember = true;
-
 				if (DependencyPropertyType != null)
 				{
-					if (value.BindValue?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-						value.BindValue.UpdateSourceEvents.Count == 0)
+					if (bind?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+						bind.UpdateSourceEvents.Count == 0)
 					{
 						string dpName;
 						TypeDefinition type;
@@ -370,20 +385,24 @@ public class XamlDomParser
 								p.PropertyType.Reference.FullName == dependencyPropertyType);
 						if (dp != null)
 						{
-							value.BindValue.DependencyProperty = dp;
+							bind.DependencyProperty = dp;
 						}
 					}
 				}
 
-				if (value.BindValue!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-					value.BindValue.UpdateSourceEvents.Count == 0 && value.BindValue.DependencyProperty == null)
+				if (bind!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+					bind.UpdateSourceEvents.Count == 0 && bind.DependencyProperty == null)
 				{
-					ResolveTargetChangeEventCore(value.BindValue);
-					if (value.BindValue.UpdateSourceEvents.Count == 0)
+					ResolveTargetChangeEventCore(bind);
+					if (bind.UpdateSourceEvents.Count == 0)
 					{
 						throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceEventNames property.", CurrentFile, objProp.XamlNode);
 					}
 				}
+
+				obj.GenerateMember = true;
+
+				value.BindValue = bind;
 			}
 			catch (ParseException ex)
 			{
@@ -405,16 +424,9 @@ public class XamlDomParser
 				throw new GeneratorException($"Expression type must be a method.", CurrentFile, xamlNode);
 			}
 		}
-
+	
+	Label_Return:
 		return value;
-
-		void CheckPropertyTypeNotBinding()
-		{
-			if (BindingType.IsAssignableFrom(propType))
-			{
-				throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
-			}
-		}
 
 		void HandleParseException(ParseException ex)
 		{
@@ -424,6 +436,11 @@ public class XamlDomParser
 					ex.Position;
 			throw new ParseException(ex.Message, offset, ex.Length);
 		}
+	}
+
+	protected virtual bool CanSetBindingTypeProperty()
+	{
+		return false;
 	}
 
 	private static Expression CorrectSourceExpression(Expression expression, XamlObjectProperty prop)
