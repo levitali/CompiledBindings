@@ -2,7 +2,7 @@
 
 public static class BindingParser
 {
-	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, HashSet<string> includeNamespaces, bool throwIfWithoutDataType, ref int localVarIndex, bool isSourceTypeNullable)
+	public static Bind Parse(XamlObjectProperty prop, TypeInfo sourceType, TypeInfo targetType, string dataRootName, BindingMode defaultBindMode, XamlDomParser xamlDomParser, HashSet<string> includeNamespaces, bool throwIfWithoutDataType, ref int localVarIndex)
 	{
 		var xBind = prop.XamlNode.Children[0];
 		var str = xBind.Value?.TrimEnd();
@@ -38,7 +38,7 @@ public static class BindingParser
 				typeExpr = typeExpr.Substring(0, pos);
 			}
 			var type = xamlDomParser.FindType(typeExpr, (XAttribute)prop.XamlNode.Element);
-			dataType = type == null ? null : new TypeInfo(type, isSourceTypeNullable);
+			dataType = type == null ? null : new TypeInfo(type, false);
 			dataTypeSet = true;
 
 			sourceType = dataType ?? targetType;
@@ -46,11 +46,6 @@ public static class BindingParser
 		else if (throwIfWithoutDataType)
 		{
 			throw new ParseException(Res.NoDataType);
-		}
-		// Ensure the source type is nullabe
-		else if (isSourceTypeNullable)
-		{
-			sourceType = new TypeInfo(sourceType, true);
 		}
 
 		int currentPos = 0, pos1 = 0;

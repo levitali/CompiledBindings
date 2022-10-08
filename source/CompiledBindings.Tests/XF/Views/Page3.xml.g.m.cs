@@ -243,9 +243,9 @@ namespace XFTest.Views
 	class Page3_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
-			dataRoot => (
+			dataRoot => dataRoot == null ? (default, false) : (
 #line (21, 13) - (21, 83) 21 "Page3.xml"
-				dataRoot?.Description,
+				dataRoot.Description,
 #line default
 				true),
 			null,

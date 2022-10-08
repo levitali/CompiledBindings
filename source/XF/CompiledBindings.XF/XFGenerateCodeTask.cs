@@ -276,10 +276,7 @@ public class XFXamlDomParser : SimpleXamlDomParser
 		return (true, null);
 	}
 
-	protected override bool CanSetBindingTypeProperty()
-	{
-		return true;
-	}
+	protected override bool CanSetBindingTypeProperty => true;
 }
 
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator
@@ -315,12 +312,18 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 			output.AppendLine(
 $@"	class {className}_{bind.Property.Object.Name}_{bind.Property.MemberName} : global::{_platformConstants.BaseClrNamespace}.Xaml.IMarkupExtension
 	{{");
+			var resultType = bind.Expression!.Type.Reference.GetCSharpFullName();
+			if (bind.Expression!.Type.Reference.IsValueType && bind.Expression.IsNullable)
+			{
+				resultType += '?';
+			}
 
 			output.AppendLine(
-$@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.DataType!.Reference.GetCSharpFullName()}, global::{bind.Expression!.Type.Reference.GetCSharpFullName()}>(");
+$@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.DataType!.Reference.GetCSharpFullName()}, global::{resultType}>(");
 
+			var checkNull = bind.DataType.Reference.IsValueType ? null : "dataRoot == null ? (default, false) : ";
 			output.AppendLine(
-$@"			dataRoot => (
+$@"			dataRoot => {checkNull}(
 {LineDirective(bind.Property.XamlNode)}
 				{bind.SourceExpression!.CSharpCode},
 #line default

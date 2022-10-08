@@ -303,7 +303,7 @@ public class XamlDomParser
 				var staticNode = xamlNode.Children[0];
 				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
 				xamlDom.IncludeNamespaces.UnionWith(includeNamespaces.Select(ns => ns.ClrNamespace!));
-				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
+				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp.MemberType);
 				CorrectMethod(objProp, value.StaticValue.Type);
 				obj.GenerateMember = true;
 			}
@@ -317,6 +317,10 @@ public class XamlDomParser
 			try
 			{
 				bool isPropertyTypeBinding = BindingType.IsAssignableFrom(propType);
+				if (isPropertyTypeBinding && !CanSetBindingTypeProperty)
+				{
+					throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
+				}
 
 				var defaultBindModeAttr =
 				EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
@@ -325,83 +329,78 @@ public class XamlDomParser
 					.FirstOrDefault(a => a != null);
 				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
 
-				var bind = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, xamlDom.IncludeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex, isPropertyTypeBinding);
+				var bind = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, xamlDom.IncludeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex);
 
 				if (isPropertyTypeBinding)
 				{
-					if (CanSetBindingTypeProperty())
+					if (bind.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
 					{
-						if (bind.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
-						{
-							throw new GeneratorException($"TwoWay or OneWayToSource x:Binds are not supported if the property type is a standard Binding.", CurrentFile, xamlNode);
-						}
-
-						value.BindingValue = bind;
-						goto Label_Return;
+						throw new GeneratorException($"TwoWay or OneWayToSource x:Binds are not supported if the property type is a standard Binding.", CurrentFile, xamlNode);
 					}
 
-					throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);
-
+					value.BindingValue = bind;
 				}
-
-				if (bind.SourceExpression != null)
+				else
 				{
-					if (bind.Converter == null)
+					if (bind.SourceExpression != null)
 					{
-						bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp);
+						if (bind.Converter == null)
+						{
+							bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp.MemberType);
+						}
+						CorrectMethod(objProp, bind.SourceExpression.Type);
 					}
-					CorrectMethod(objProp, bind.SourceExpression.Type);
-				}
 
-				if (DependencyPropertyType != null)
-				{
-					if (bind?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-						bind.UpdateSourceEvents.Count == 0)
+					if (DependencyPropertyType != null)
 					{
-						string dpName;
-						TypeDefinition type;
-						if (objProp.IsAttached)
+						if (bind?.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+							bind.UpdateSourceEvents.Count == 0)
 						{
-							dpName = objProp.TargetMethod!.Definition.Name.Substring("Set".Length);
-							type = objProp.TargetMethod.Definition.DeclaringType;
-						}
-						else
-						{
-							dpName = objProp.TargetProperty!.Definition.Name;
-							type = objProp.TargetProperty.Definition.DeclaringType;
-						}
+							string dpName;
+							TypeDefinition type;
+							if (objProp.IsAttached)
+							{
+								dpName = objProp.TargetMethod!.Definition.Name.Substring("Set".Length);
+								type = objProp.TargetMethod.Definition.DeclaringType;
+							}
+							else
+							{
+								dpName = objProp.TargetProperty!.Definition.Name;
+								type = objProp.TargetProperty.Definition.DeclaringType;
+							}
 
-						dpName += "Property";
-						var typeInfo = TypeInfo.GetTypeThrow(type.FullName);
-						var dependencyPropertyType = DependencyPropertyType.Reference.FullName;
+							dpName += "Property";
+							var typeInfo = TypeInfo.GetTypeThrow(type.FullName);
+							var dependencyPropertyType = DependencyPropertyType.Reference.FullName;
 
-						IMemberInfo dp = typeInfo.Fields.FirstOrDefault(f =>
-							f.Definition.Name == dpName &&
-							f.Definition.IsStatic &&
-							f.FieldType.Reference.FullName == dependencyPropertyType);
-						dp ??= typeInfo.Properties.FirstOrDefault(p =>
-								p.Definition.Name == dpName &&
-								p.Definition.IsStatic() &&
-								p.PropertyType.Reference.FullName == dependencyPropertyType);
-						if (dp != null)
-						{
-							bind.DependencyProperty = dp;
+							IMemberInfo dp = typeInfo.Fields.FirstOrDefault(f =>
+								f.Definition.Name == dpName &&
+								f.Definition.IsStatic &&
+								f.FieldType.Reference.FullName == dependencyPropertyType);
+							dp ??= typeInfo.Properties.FirstOrDefault(p =>
+									p.Definition.Name == dpName &&
+									p.Definition.IsStatic() &&
+									p.PropertyType.Reference.FullName == dependencyPropertyType);
+							if (dp != null)
+							{
+								bind.DependencyProperty = dp;
+							}
 						}
 					}
-				}
 
-				if (bind!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-					bind.UpdateSourceEvents.Count == 0 && bind.DependencyProperty == null)
-				{
-					ResolveTargetChangeEventCore(bind);
-					if (bind.UpdateSourceEvents.Count == 0)
+					if (bind!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
+						bind.UpdateSourceEvents.Count == 0 && bind.DependencyProperty == null)
 					{
-						throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceEventNames property.", CurrentFile, objProp.XamlNode);
+						ResolveTargetChangeEventCore(bind);
+						if (bind.UpdateSourceEvents.Count == 0)
+						{
+							throw new GeneratorException($"Target change event cannot be determined. Set the event explicitly by setting the UpdateSourceEventNames property.", CurrentFile, objProp.XamlNode);
+						}
 					}
-				}
 
-				value.BindValue = bind;
-				obj.GenerateMember = true;
+					value.BindValue = bind;
+					obj.GenerateMember = true;
+				}
 			}
 			catch (ParseException ex)
 			{
@@ -424,7 +423,6 @@ public class XamlDomParser
 			}
 		}
 
-Label_Return:
 		return value;
 
 		void HandleParseException(ParseException ex)
@@ -437,16 +435,13 @@ Label_Return:
 		}
 	}
 
-	protected virtual bool CanSetBindingTypeProperty()
-	{
-		return false;
-	}
+	protected virtual bool CanSetBindingTypeProperty => false;
 
-	private static Expression CorrectSourceExpression(Expression expression, XamlObjectProperty prop)
+	private static Expression CorrectSourceExpression(Expression expression, TypeInfo? targetType)
 	{
 		if (expression is not (ConstantExpression or DefaultExpression) &&
 			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
-			prop.MemberType?.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
+			targetType?.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
 		{
 			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
 			if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
@@ -455,10 +450,10 @@ Label_Return:
 			}
 			expression = new CallExpression(expression, method, Array.Empty<Expression>());
 		}
-		if (expression.IsNullable && prop.MemberType?.IsNullable == false)
+		if (expression.IsNullable && targetType?.IsNullable == false)
 		{
 			Expression defaultExpr;
-			if (prop.MemberType.Reference.FullName == "System.String")
+			if (targetType.Reference.FullName == "System.String")
 			{
 				defaultExpr = new ConstantExpression("");
 			}
