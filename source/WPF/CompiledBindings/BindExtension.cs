@@ -70,7 +70,7 @@ public class BindExtension : MarkupExtension
 
 	public bool IsItemsSource { get; set; }
 
-	public object? UpdateSourceTrigger { get; set; }
+	public object? UpdateSourceEventNames { get; set; }
 
 	public override object? ProvideValue(IServiceProvider serviceProvider)
 	{
