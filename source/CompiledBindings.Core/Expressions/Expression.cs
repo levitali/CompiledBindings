@@ -642,6 +642,8 @@ public class FallbackExpression : Expression
 
 	public Expression NullableExpression => (Expression)Expression.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().First(e => e.Expression.IsNullable).Expression;
 
+	public override bool IsNullable => Fallback.IsNullable;
+
 	public override IEnumerable<Expression> Enumerate()
 	{
 		yield return Expression;

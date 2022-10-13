@@ -67,7 +67,7 @@
         <Button
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
-        <TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
+        <TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" IsReadOnly="{x:Bind not ModifyViewModel.CanChangeInput1, FallbackValue=false}" />
         <TextBox
             local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"
             Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />

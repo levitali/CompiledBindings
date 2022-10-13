@@ -233,11 +233,11 @@ namespace WPFTest.Views
 			bool _settingBinding4;
 			bool _settingBinding6;
 			bool _settingBinding15;
-			bool _settingBinding16;
 			bool _settingBinding17;
 			bool _settingBinding18;
 			bool _settingBinding19;
-			bool _settingBinding21;
+			bool _settingBinding20;
+			bool _settingBinding22;
 			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
@@ -385,7 +385,7 @@ namespace WPFTest.Views
 				_targetRoot.textBlock6.Text = value1.ToString();
 #line (53, 20) - (53, 50) 53 "Page1.xml"
 				_targetRoot.textBlock7.Text = (value1 + 1).ToString();
-				_settingBinding16 = true;
+				_settingBinding17 = true;
 				try
 				{
 #line (72, 13) - (72, 75) 72 "Page1.xml"
@@ -393,7 +393,7 @@ namespace WPFTest.Views
 				}
 				finally
 				{
-					_settingBinding16 = false;
+					_settingBinding17 = false;
 				}
 #line (77, 13) - (77, 42) 77 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value2);
@@ -410,6 +410,7 @@ namespace WPFTest.Views
 			{
 				Update1_Input1(value?.Input1);
 				Update1_IntInput(value?.IntInput ?? default);
+				Update1_CanChangeInput1(value?.CanChangeInput1 ?? default);
 				Update1_BoolInput(value?.BoolInput ?? default);
 				Update1_ModifyTaskProp(value?.ModifyTaskProp);
 			}
@@ -463,7 +464,7 @@ namespace WPFTest.Views
 				var dataRoot = _dataRoot;
 #line (55, 20) - (55, 97) 55 "Page1.xml"
 				_targetRoot.textBlock8.Text = (((global::System.Int32)dataRoot.DecimalProp) + value + dataRoot.ModifyViewModel?.IntInput)?.ToString();
-				_settingBinding16 = true;
+				_settingBinding17 = true;
 				try
 				{
 #line (72, 13) - (72, 75) 72 "Page1.xml"
@@ -471,7 +472,7 @@ namespace WPFTest.Views
 				}
 				finally
 				{
-					_settingBinding16 = false;
+					_settingBinding17 = false;
 				}
 #line (77, 13) - (77, 42) 77 "Page1.xml"
 				global::System.Windows.Controls.Grid.SetColumn(_targetRoot.checkBox2, value);
@@ -569,7 +570,7 @@ namespace WPFTest.Views
 
 			private void Update0_FocusedField(global::UI.FocusState<global::WPFTest.ViewModels.Page1ViewModel.Field> value)
 			{
-				_settingBinding19 = true;
+				_settingBinding20 = true;
 				try
 				{
 #line (75, 10) - (75, 107) 75 "Page1.xml"
@@ -577,7 +578,7 @@ namespace WPFTest.Views
 				}
 				finally
 				{
-					_settingBinding19 = false;
+					_settingBinding20 = false;
 				}
 #line default
 			}
@@ -612,18 +613,26 @@ namespace WPFTest.Views
 #line default
 			}
 
+			private void Update1_CanChangeInput1(global::System.Boolean value)
+			{
+				var dataRoot = _dataRoot;
+#line (70, 70) - (70, 147) 70 "Page1.xml"
+				_targetRoot.textBox2.IsReadOnly = dataRoot.ModifyViewModel is var v1 && v1 != null ? !v1.CanChangeInput1 : false;
+#line default
+			}
+
 			private void Update1_BoolInput(global::System.Boolean value)
 			{
 				if (!object.Equals(_targetRoot.checkBox2.IsChecked, value))
 				{
-					_settingBinding21 = true;
+					_settingBinding22 = true;
 					try
 					{
 						_targetRoot.checkBox2.IsChecked = value;
 					}
 					finally
 					{
-						_settingBinding21 = false;
+						_settingBinding22 = false;
 					}
 				}
 #line default
@@ -669,14 +678,14 @@ namespace WPFTest.Views
 			{
 				if (!object.Equals(_targetRoot.textBox3.Text, value))
 				{
-					_settingBinding17 = true;
+					_settingBinding18 = true;
 					try
 					{
 						_targetRoot.textBox3.Text = value;
 					}
 					finally
 					{
-						_settingBinding17 = false;
+						_settingBinding18 = false;
 					}
 				}
 #line default
@@ -689,14 +698,14 @@ namespace WPFTest.Views
 #line default
 				if (!object.Equals(_targetRoot.textBox4.Text, value1))
 				{
-					_settingBinding18 = true;
+					_settingBinding19 = true;
 					try
 					{
 						_targetRoot.textBox4.Text = value1;
 					}
 					finally
 					{
-						_settingBinding18 = false;
+						_settingBinding19 = false;
 					}
 				}
 #line default
@@ -705,7 +714,7 @@ namespace WPFTest.Views
 			private void OnTargetChanged0(global::System.Object p0, global::System.Windows.RoutedEventArgs p1)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding19)
+				if (!_settingBinding20)
 				{
 					try
 					{
@@ -779,7 +788,7 @@ namespace WPFTest.Views
 			private void OnTargetChanged4(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding16)
+				if (!_settingBinding17)
 				{
 					try
 					{
@@ -796,7 +805,7 @@ namespace WPFTest.Views
 			private void OnTargetChanged5(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding17)
+				if (!_settingBinding18)
 				{
 					try
 					{
@@ -819,7 +828,7 @@ namespace WPFTest.Views
 			private void OnTargetChanged6(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding18)
+				if (!_settingBinding19)
 				{
 					try
 					{
@@ -829,7 +838,7 @@ namespace WPFTest.Views
 						if (value != null)
 						{
 #line (74, 18) - (74, 91) 74 "Page1.xml"
-							value.BoolInput = _targetRoot.textBox4.Text is var t18 && string.IsNullOrEmpty(t18) ? null : (global::System.Nullable<global::System.Boolean>)global::System.Convert.ChangeType(t18, typeof(global::System.Boolean), null);
+							value.BoolInput = _targetRoot.textBox4.Text is var t19 && string.IsNullOrEmpty(t19) ? null : (global::System.Nullable<global::System.Boolean>)global::System.Convert.ChangeType(t19, typeof(global::System.Boolean), null);
 #line default
 						}
 					}
@@ -842,7 +851,7 @@ namespace WPFTest.Views
 			private void OnTargetChanged7(object sender, global::System.EventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				if (!_settingBinding21)
+				if (!_settingBinding22)
 				{
 					try
 					{
@@ -988,6 +997,9 @@ namespace WPFTest.Views
 							break;
 						case "Input1":
 							bindings.Update1_Input1(typedSender.Input1);
+							break;
+						case "CanChangeInput1":
+							bindings.Update1_CanChangeInput1(typedSender.CanChangeInput1);
 							break;
 						case "BoolInput":
 							bindings.Update1_BoolInput(typedSender.BoolInput);

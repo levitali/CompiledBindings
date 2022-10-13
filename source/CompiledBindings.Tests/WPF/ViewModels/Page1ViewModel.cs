@@ -61,6 +61,8 @@ public class Page1ModifyViewModel : INotifyPropertyChanged
 
 	public int IntInput { get; set; }
 
+	public bool CanChangeInput1 { get; private set; }
+
 	public Task<string> ModifyTaskProp => Task.FromResult(string.Empty);
 
 	public Page1ModifyTextViewModel ModifyTextViewModel { get; } = new Page1ModifyTextViewModel();
