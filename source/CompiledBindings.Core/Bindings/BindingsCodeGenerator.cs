@@ -551,7 +551,7 @@ $@"		}}");
 		{
 			output.AppendLine();
 			output.AppendLine(
-$@"			private void {name}(global::{parameterType.Reference.GetCSharpFullName()} value)
+$@"			private void {name}({string.Join(", ", updateMethod.Parameters.Select(p => $"global::{p.Type.Reference.GetCSharpFullName()} {p.Name}"))})
 			{{");
 			GenerateUpdateMethodBody(updateMethod);
 			output.AppendLine(

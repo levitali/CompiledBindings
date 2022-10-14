@@ -409,9 +409,9 @@ namespace WPFTest.Views
 			private void Update1(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
 				Update1_Input1(value?.Input1);
-				Update1_IntInput(value?.IntInput ?? default);
-				Update1_CanChangeInput1(value?.CanChangeInput1 ?? default);
-				Update1_BoolInput(value?.BoolInput ?? default);
+				Update1_IntInput(value?.IntInput);
+				Update1_CanChangeInput1(value?.CanChangeInput1);
+				Update1_BoolInput(value?.BoolInput);
 				Update1_ModifyTaskProp(value?.ModifyTaskProp);
 			}
 
@@ -494,7 +494,7 @@ namespace WPFTest.Views
 			{
 				var dataRoot = _dataRoot;
 #line (56, 19) - (56, 154) 56 "Page1.xml"
-				var value1 = ((global::System.Nullable<global::System.Boolean>)_targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Nullable<global::System.Boolean>), dataRoot.ArrayProp.Length > 0, null));
+				var value1 = ((global::System.Boolean?)_targetRoot.InverseBooleanConverter.Convert(value, typeof(global::System.Boolean?), dataRoot.ArrayProp.Length > 0, null));
 #line default
 				if (!object.Equals(_targetRoot.checkBox1.IsChecked, value1))
 				{
@@ -517,7 +517,7 @@ namespace WPFTest.Views
 #line (56, 19) - (56, 154) 56 "Page1.xml"
 				var value1 = value.Length > 0;
 #line (56, 19) - (56, 154) 56 "Page1.xml"
-				var value2 = ((global::System.Nullable<global::System.Boolean>)_targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Nullable<global::System.Boolean>), value1, null));
+				var value2 = ((global::System.Boolean?)_targetRoot.InverseBooleanConverter.Convert(dataRoot.BoolInput, typeof(global::System.Boolean?), value1, null));
 #line default
 				if (!object.Equals(_targetRoot.checkBox1.IsChecked, value2))
 				{
@@ -583,7 +583,7 @@ namespace WPFTest.Views
 #line default
 			}
 
-			private void Update1_IntInput(global::System.Int32 value)
+			private void Update1_IntInput(global::System.Int32? value)
 			{
 				var dataRoot = _dataRoot;
 #line (55, 20) - (55, 97) 55 "Page1.xml"
@@ -613,7 +613,7 @@ namespace WPFTest.Views
 #line default
 			}
 
-			private void Update1_CanChangeInput1(global::System.Boolean value)
+			private void Update1_CanChangeInput1(global::System.Boolean? value)
 			{
 				var dataRoot = _dataRoot;
 #line (70, 70) - (70, 147) 70 "Page1.xml"
@@ -621,7 +621,7 @@ namespace WPFTest.Views
 #line default
 			}
 
-			private void Update1_BoolInput(global::System.Boolean value)
+			private void Update1_BoolInput(global::System.Boolean? value)
 			{
 				if (!object.Equals(_targetRoot.checkBox2.IsChecked, value))
 				{
@@ -691,7 +691,7 @@ namespace WPFTest.Views
 #line default
 			}
 
-			private void Update2_BoolInput(global::System.Nullable<global::System.Boolean> value)
+			private void Update2_BoolInput(global::System.Boolean? value)
 			{
 #line (74, 18) - (74, 91) 74 "Page1.xml"
 				var value1 = value?.ToString();
@@ -838,7 +838,7 @@ namespace WPFTest.Views
 						if (value != null)
 						{
 #line (74, 18) - (74, 91) 74 "Page1.xml"
-							value.BoolInput = _targetRoot.textBox4.Text is var t19 && string.IsNullOrEmpty(t19) ? null : (global::System.Nullable<global::System.Boolean>)global::System.Convert.ChangeType(t19, typeof(global::System.Boolean), null);
+							value.BoolInput = _targetRoot.textBox4.Text is var t19 && string.IsNullOrEmpty(t19) ? null : (global::System.Boolean?)global::System.Convert.ChangeType(t19, typeof(global::System.Boolean), null);
 #line default
 						}
 					}

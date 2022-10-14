@@ -93,8 +93,8 @@ namespace XFTest.Views
 
 			private void Update1(global::XFTest.ViewModels.EntityModel value)
 			{
-				Update1_SByteProp(value?.SByteProp ?? default);
-				Update1_UShortProp(value?.UShortProp ?? default);
+				Update1_SByteProp(value?.SByteProp);
+				Update1_UShortProp(value?.UShortProp);
 			}
 
 			private void Update0_Entity(global::XFTest.ViewModels.EntityModel value)
@@ -115,17 +115,17 @@ namespace XFTest.Views
 #line default
 			}
 
-			private void Update1_SByteProp(global::System.SByte value)
+			private void Update1_SByteProp(global::System.SByte? value)
 			{
 #line (18, 16) - (18, 47) 18 "Page3.xml"
-				_targetRoot.label2.Text = value.ToString();
+				_targetRoot.label2.Text = value?.ToString();
 #line default
 			}
 
-			private void Update1_UShortProp(global::System.UInt16 value)
+			private void Update1_UShortProp(global::System.UInt16? value)
 			{
 #line (19, 16) - (19, 48) 19 "Page3.xml"
-				_targetRoot.label3.Text = value.ToString();
+				_targetRoot.label3.Text = value?.ToString();
 #line default
 			}
 

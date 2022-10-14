@@ -109,10 +109,10 @@ namespace XFTest.Views
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.list);
 			}
 
-			private void Update0_BooleanProp(global::System.Boolean value)
+			private void Update0_BooleanProp(global::System.Boolean? value)
 			{
 #line (70, 13) - (70, 92) 70 "Page1.xml"
-				_targetRoot.button1.IsEnabled = value;
+				_targetRoot.button1.IsEnabled = value ?? default;
 #line default
 			}
 
@@ -121,7 +121,7 @@ namespace XFTest.Views
 #line (70, 13) - (70, 92) 70 "Page1.xml"
 				var value1 = (((global::XFTest.ViewModels.EntityViewModel)value));
 #line default
-				Update0_BooleanProp(value1?.BooleanProp ?? default);
+				Update0_BooleanProp(value1?.BooleanProp);
 				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
 			}
 
@@ -340,7 +340,7 @@ namespace XFTest.Views
 #line default
 			}
 
-			private void Update0_NullableIntProp(global::System.Nullable<global::System.Int32> value)
+			private void Update0_NullableIntProp(global::System.Int32? value)
 			{
 #line (45, 16) - (45, 51) 45 "Page1.xml"
 				_targetRoot.label8.Text = (value ?? 0).ToString();
@@ -449,7 +449,7 @@ namespace XFTest.Views
 							try
 							{
 #line (52, 16) - (52, 59) 52 "Page1.xml"
-								dataRoot.NullableIntProp = _targetRoot.entry2.Text is var t9 && string.IsNullOrEmpty(t9) ? null : (global::System.Nullable<global::System.Int32>)global::System.Convert.ChangeType(t9, typeof(global::System.Int32), null);
+								dataRoot.NullableIntProp = _targetRoot.entry2.Text is var t9 && string.IsNullOrEmpty(t9) ? null : (global::System.Int32?)global::System.Convert.ChangeType(t9, typeof(global::System.Int32), null);
 #line default
 							}
 							catch
@@ -665,7 +665,7 @@ namespace XFTest.Views
 				var value1 = dataRoot.Model;
 #line default
 				Update0_BooleanProp(dataRoot.BooleanProp);
-				Update1_SByteProp(value1?.SByteProp ?? default);
+				Update1_SByteProp(value1?.SByteProp);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
@@ -676,10 +676,10 @@ namespace XFTest.Views
 #line default
 			}
 
-			private void Update1_SByteProp(global::System.SByte value)
+			private void Update1_SByteProp(global::System.SByte? value)
 			{
 #line (20, 24) - (20, 54) 20 "Page1.xml"
-				_targetRoot.label1.Text = value.ToString();
+				_targetRoot.label1.Text = value?.ToString();
 #line default
 			}
 
@@ -986,14 +986,14 @@ namespace XFTest.Views
 
 			private void Update0(global::XFTest.ViewModels.EntityViewModel value)
 			{
-				Update0_DecimalProp(value?.DecimalProp ?? default);
+				Update0_DecimalProp(value?.DecimalProp);
 				Update0_StringProp(value?.StringProp);
 			}
 
-			private void Update0_DecimalProp(global::System.Decimal value)
+			private void Update0_DecimalProp(global::System.Decimal? value)
 			{
 #line (62, 32) - (62, 58) 62 "Page1.xml"
-				_targetRoot.label11.Text = value.ToString();
+				_targetRoot.label11.Text = value?.ToString();
 #line default
 			}
 

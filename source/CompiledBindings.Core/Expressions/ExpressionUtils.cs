@@ -25,18 +25,7 @@ public static class ExpressionUtils
 			}
 
 			var (pr, expression) = group.First();
-			var type = expression.Type;
-			if (!type.IsNullable && expression.IsNullable)
-			{
-				if (type.Reference.IsValueType)
-				{
-					type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
-				}
-				else
-				{
-					type = new TypeInfo(type, true);
-				}
-			}
+			var type = GetExpressionType(expression);
 
 			var localVar = new LocalVariable("value" + localVarIndex++, expression, pr.Property.XamlNode);
 			var localVarExpr = new VariableExpression(type, localVar.Name);
@@ -69,6 +58,23 @@ public static class ExpressionUtils
 		};
 
 		return updateMethod;
+	}
+
+	public static TypeInfo GetExpressionType(Expression expression)
+	{
+		var type = expression.Type;
+		if (!type.IsNullable && expression.IsNullable)
+		{
+			if (type.Reference.IsValueType)
+			{
+				type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
+			}
+			else
+			{
+				type = new TypeInfo(type, true);
+			}
+		}
+		return type;
 	}
 
 	private class ExpressionComparer : IComparer<Expression>

@@ -404,15 +404,14 @@ public static class BindingParser
 
 		UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Expression? replacedExpression)
 		{
-			Expression? valueExpression = null;
+			List<VariableExpression> parameters = new();
+
+			VariableExpression? valueExpression = null;
 			if (replacedExpression != null)
 			{
-				var type = replacedExpression.Type;
-				if (!type.IsNullable && replacedExpression.IsNullable)
-				{
-					type = new TypeInfo(type, true);
-				}
+				var type = ExpressionUtils.GetExpressionType(replacedExpression);
 				valueExpression = new VariableExpression(type, "value");
+				parameters.Add(valueExpression);
 			}
 
 			var notifySources1 = (notifySources ?? Enumerable.Empty<NotifySource>()).ToList();
@@ -505,12 +504,6 @@ public static class BindingParser
 				.Select(p =>
 				{
 					var expr = Replace(p.Expression);
-					if (p.Property.PropertyType.Reference.IsValueType &&
-						!p.Property.PropertyType.Reference.IsValueNullable() &&
-						expr.IsNullable)
-					{
-						expr = new CoalesceExpression(expr, Expression.DefaultExpression);
-					}
 					return new PropertySetExpression(p.Bindings[0].Property, expr);
 				})
 				.ToList();
@@ -546,6 +539,7 @@ public static class BindingParser
 
 			return new UpdateMethodData
 			{
+				Parameters = parameters,
 				UpdateNotifySources = updateNotifySources,
 				UpdateNotifyProperties = updateMethodNotifyProps,
 				Expressions = updateExpressions,
@@ -668,6 +662,7 @@ public class NotifyProperty
 
 public class UpdateMethodData
 {
+	public List<VariableExpression> Parameters { get; init; }
 	public ExpressionGroup Expressions { get; init; }
 	public List<NotifySource> UpdateNotifySources { get; init; }
 	public List<NotifyProperty> UpdateNotifyProperties { get; init; }
