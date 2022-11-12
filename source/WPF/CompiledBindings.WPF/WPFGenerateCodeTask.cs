@@ -14,38 +14,38 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 {
 	private CancellationTokenSource? _cancellationTokenSource;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	[Required]
-	public string LangVersion { get; set; }
+	public required string LangVersion { get; init; }
 
 	[Required]
-	public string MSBuildVersion { get; set; }
+	public required string MSBuildVersion { get; init; }
 
 	[Required]
-	public ITaskItem[] ReferenceAssemblies { get; set; }
+	public required ITaskItem[] ReferenceAssemblies { get; init; }
 
 	[Required]
-	public string LocalAssembly { get; set; }
+	public required string LocalAssembly { get; init; }
 
 	[Required]
-	public string ProjectPath { get; set; }
+	public required string ProjectPath { get; init; }
 
 	[Required]
-	public string IntermediateOutputPath { get; set; }
-
-	public ITaskItem ApplicationDefinition { get; set; }
+	public required string IntermediateOutputPath { get; init; }
 
 	[Required]
-	public ITaskItem[] Pages { get; set; }
+	public required ITaskItem ApplicationDefinition { get; init; }
+
+	[Required]
+	public required ITaskItem[] Pages { get; init; }
 
 	[Output]
-	public ITaskItem NewApplicationDefinition { get; set; }
+	public ITaskItem NewApplicationDefinition { get; private set; } = null!;
 
 	[Output]
-	public ITaskItem[] NewPages { get; set; }
+	public ITaskItem[] NewPages { get; private set; } = null!;
 
 	[Output]
-	public ITaskItem[] GeneratedCodeFiles { get; private set; }
+	public ITaskItem[] GeneratedCodeFiles { get; private set; } = null!;
 
 	public bool AttachDebugger { get; set; }
 

@@ -11,8 +11,6 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
 namespace CompiledBindings;
 
 public class XFProcessResourceXamlTask : Task
@@ -29,10 +27,10 @@ public class XFProcessResourceXamlTask : Task
 	}
 
 	[Required]
-	public ITaskItem[] ReferenceAssemblies { get; set; }
+	public required ITaskItem[] ReferenceAssemblies { get; init; }
 
 	[Required]
-	public string Assembly { get; set; }
+	public required string Assembly { get; init; }
 
 	public bool AttachDebugger { get; set; }
 
@@ -352,7 +350,7 @@ public class XFProcessResourceXamlTask : Task
 
 	private class TextLine
 	{
-		public string Text;
+		public required string Text;
 		public int RemovedTextOffset;
 	}
 }

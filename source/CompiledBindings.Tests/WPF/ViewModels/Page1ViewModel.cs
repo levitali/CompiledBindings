@@ -1,9 +1,7 @@
 ﻿using System.Windows.Media;
 using UI;
-using static XFTest.ViewModels.Page1ViewModel;
 
 namespace WPFTest.ViewModels;
-
 
 #pragma warning disable 0067
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.

@@ -1,6 +1,4 @@
-﻿#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public class XamlDomParser
 {
@@ -21,7 +19,9 @@ public class XamlDomParser
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public XamlDomParser(
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 		XNamespace defaultNamespace,
 		XNamespace xNamespace,
 		Func<string, IEnumerable<string>> getClrNsFromXmlNs,

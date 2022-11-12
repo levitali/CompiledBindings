@@ -31,15 +31,13 @@ public class XamlObject
 
 public class XamlObjectProperty
 {
+	public required XamlNode XamlNode { get; init; }
+	public required XamlObject Object { get; init; }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public XamlNode XamlNode { get; set; }
-	public XamlObject Object { get; set; }
 	public string MemberName { get; set; }
 	public XamlObjectValue Value { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-	public bool IsAttached;
-
+	public bool IsAttached { get; set; }
 	public PropertyInfo? TargetProperty { get; set; }
 	public MethodInfo? TargetMethod { get; set; }
 	public EventInfo? TargetEvent { get; set; }

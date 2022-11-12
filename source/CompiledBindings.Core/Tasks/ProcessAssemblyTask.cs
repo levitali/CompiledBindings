@@ -1,16 +1,14 @@
-﻿#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 {
 	[Required]
-	public ITaskItem[] ReferenceAssemblies { get; set; }
+	public required ITaskItem[] ReferenceAssemblies { get; init; }
 
 	[Required]
-	public string TargetAssembly { get; set; }
+	public required string TargetAssembly { get; init; }
 
-	public bool AttachDebugger { get; set; }
+	public required bool AttachDebugger { get; init; }
 
 	public override bool Execute()
 	{

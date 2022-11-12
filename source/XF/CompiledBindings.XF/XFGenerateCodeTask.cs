@@ -9,8 +9,6 @@ using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
 namespace CompiledBindings;
 
 public class XFGenerateCodeTask : Task, ICancelableTask
@@ -28,30 +26,30 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	}
 
 	[Required]
-	public string LangVersion { get; set; }
+	public required string LangVersion { get; init; }
 
 	[Required]
-	public string MSBuildVersion { get; set; }
+	public required string MSBuildVersion { get; init; }
 
 	[Required]
-	public ITaskItem[] ReferenceAssemblies { get; set; }
+	public required ITaskItem[] ReferenceAssemblies { get; init; }
 
 	[Required]
-	public string LocalAssembly { get; set; }
+	public required string LocalAssembly { get; init; }
 
 	[Required]
-	public string ProjectPath { get; set; }
+	public required string ProjectPath { get; init; }
 
 	[Required]
-	public string IntermediateOutputPath { get; set; }
+	public required string IntermediateOutputPath { get; init; }
 
 	[Required]
-	public ITaskItem[] XamlFiles { get; set; }
+	public required ITaskItem[] XamlFiles { get; init; }
 
 	[Output]
-	public ITaskItem[] GeneratedCodeFiles { get; private set; }
+	public ITaskItem[] GeneratedCodeFiles { get; private set; } = null!;
 
-	public bool AttachDebugger { get; set; }
+	public bool AttachDebugger { get; init; }
 
 	public override bool Execute()
 	{

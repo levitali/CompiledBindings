@@ -34,8 +34,9 @@ public class SimpleXamlDomParser : XamlDomParser
 		UsedNames = new HashSet<string>(xdoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
 
 		TargetType = DataType = GetRootType(xdoc.Root);
-		var result = new SimpleXamlDom(xdoc.Root)
+		var result = new SimpleXamlDom
 		{
+			RootElement = xdoc.Root,
 			TargetType = TargetType
 		};
 
@@ -259,7 +260,10 @@ public class SimpleXamlDomParser : XamlDomParser
 				{
 					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
 					{
-						var dataTemplate = new SimpleXamlDom(child);
+						var dataTemplate = new SimpleXamlDom
+						{
+							RootElement	= child,
+						};
 						int index = result.DataTemplates.Count;
 						ProcessRoot(dataTemplate, child, elementType);
 						if (dataTemplate.BindingScopes.Count > 0 || !dataTemplate.UpdateMethod!.IsEmpty)
@@ -313,20 +317,15 @@ public class SimpleXamlDomParser : XamlDomParser
 
 public class SimpleXamlDom : XamlDomBase
 {
+	public required XElement RootElement { get; init; }
+	public TypeInfo? TargetType { get; init; }
+	public List<BindingScope> BindingScopes { get; } = new();
+	public List<XamlObject>? XamlObjects { get; set; }
+	public bool HasDestructor { get; set; }
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public SimpleXamlDom(XElement rootElement)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	{
-		RootElement = rootElement;
-	}
-
-	public XElement RootElement { get; }
-	public TypeInfo? TargetType;
-	public List<BindingScope> BindingScopes = new();
-	public List<XamlObject>? XamlObjects;
-	public bool HasDestructor;
-
 	public ExpressionGroup UpdateMethod;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
 	public List<SimpleXamlDom> DataTemplates = new();
 

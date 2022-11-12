@@ -133,10 +133,8 @@ public class LocalVariable
 
 public class ExpressionGroup
 {
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public List<LocalVariable> LocalVariables { get; init; }
-	public IReadOnlyList<PropertySetExpression> SetExpressions { get; init; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	public required List<LocalVariable> LocalVariables { get; init; }
+	public required IReadOnlyList<PropertySetExpression> SetExpressions { get; init; }
 
 	public List<XamlObjectProperty>? SetProperties { get; init; }
 

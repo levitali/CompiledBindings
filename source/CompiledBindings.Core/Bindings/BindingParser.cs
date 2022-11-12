@@ -319,7 +319,6 @@ public static class BindingParser
 						.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources))
 						.Any(d => d.Index == notifPropData2.Index))
 					{
-						notifPropData2.Parent = prop;
 						var notifPropData2Clone = notifPropData2.Clone();
 						prop.DependentNotifySources.Add(notifPropData2Clone);
 					}
@@ -616,24 +615,23 @@ public static class BindingParser
 	}
 }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
 public class BindingsData
 {
-	public TypeInfo? TargetType { get; init; }
-	public TypeInfo DataType { get; init; }
-	public IList<Bind> Bindings { get; init; }
-	public List<NotifySource> NotifySources { get; init; }
-	public List<TwoWayEventData> TwoWayEvents { get; init; }
-	public UpdateMethodData UpdateMethod { get; init; }
+	public required TypeInfo? TargetType { get; init; }
+	public required TypeInfo DataType { get; init; }
+	public required IList<Bind> Bindings { get; init; }
+	public required List<NotifySource> NotifySources { get; init; }
+	public required List<TwoWayEventData> TwoWayEvents { get; init; }
+	public required UpdateMethodData UpdateMethod { get; init; }
 };
 
 public class NotifySource
 {
-	public NotifyProperty Parent { get; set; }
-	public Expression Expression { get; init; }
-	public Expression SourceExpression { get; set; }
+	public required Expression Expression { get; init; }
+	public required Expression SourceExpression { get; set; }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public List<NotifyProperty> Properties { get; set; }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public UpdateMethodData? UpdateMethod { get; set; }
 	public int Index { get; init; }
 
@@ -645,12 +643,12 @@ public class NotifySource
 
 public class NotifyProperty
 {
-	public NotifySource Parent { get; init; }
-	public PropertyInfo Property { get; init; }
-	public Expression Expression { get; init; }
-	public Expression SourceExpression { get; set; }
-	public ReadOnlyCollection<Bind> Bindings { get; init; }
-	public List<Bind> SetBindings { get; init; }
+	public required NotifySource Parent { get; init; }
+	public required PropertyInfo Property { get; init; }
+	public required Expression Expression { get; init; }
+	public required Expression SourceExpression { get; set; }
+	public required ReadOnlyCollection<Bind> Bindings { get; init; }
+	public required List<Bind> SetBindings { get; init; }
 	public List<NotifySource> DependentNotifySources { get; } = new();
 	public UpdateMethodData? UpdateMethod { get; set; }
 
@@ -662,23 +660,22 @@ public class NotifyProperty
 
 public class UpdateMethodData
 {
-	public List<VariableExpression> Parameters { get; init; }
-	public ExpressionGroup Expressions { get; init; }
-	public List<NotifySource> UpdateNotifySources { get; init; }
-	public List<NotifyProperty> UpdateNotifyProperties { get; init; }
-	public List<NotifySource> SetEventHandlers { get; init; }
-}
-
+	public required List<VariableExpression> Parameters { get; init; }
+	public required ExpressionGroup Expressions { get; init; }
+	public required List<NotifySource> UpdateNotifySources { get; init; }
+	public required List<NotifyProperty> UpdateNotifyProperties { get; init; }
+	public required List<NotifySource> SetEventHandlers { get; init; }
+} 
 public class TwoWayEventData
 {
-	public List<Bind> Bindings { get; init; }
+	public required List<Bind> Bindings { get; init; }
 	public List<EventInfo>? Events { get; init; }
 	public int Index { get; set; }
 };
 
 public class Bind
 {
-	public XamlObjectProperty Property { get; init; }
+	public required XamlObjectProperty Property { get; init; }
 	public Expression? Expression { get; init; }
 	public Expression? BindBackExpression { get; init; }
 	public BindingMode Mode { get; init; }
@@ -688,8 +685,8 @@ public class Bind
 	public Expression? FallbackValue { get; init; }
 	public TypeInfo? DataType { get; init; }
 	public bool DataTypeSet { get; init; }
-	public List<EventInfo> UpdateSourceEvents { get; init; }
-	public List<(string name, TypeInfo type)> Resources { get; init; }
+	public required List<EventInfo> UpdateSourceEvents { get; init; }
+	public required List<(string name, TypeInfo type)> Resources { get; init; }
 
 	public Expression? SourceExpression { get; set; }
 
