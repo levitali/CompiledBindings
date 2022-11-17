@@ -132,11 +132,10 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 
+							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
+
 							bool dataTemplates = parseResult.DataTemplates.Count > 0;
 							generateDataTemplateBindings |= dataTemplates;
-
-							var checksum = Crc32.GetCrc32(file);
-							code = $"//checksum {checksum} {dataTemplates}{Environment.NewLine}{code}";
 
 							var dirInfo = new DirectoryInfo(targetDir);
 							dirInfo.Create();

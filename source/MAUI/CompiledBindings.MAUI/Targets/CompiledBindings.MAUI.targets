@@ -46,7 +46,7 @@
              NoLogo="$(NoLogo)"
              NoStandardLib="$(NoCompilerStandardLib)"
              NoWin32Manifest="$(NoWin32Manifest)"
-			 Nullable="$(Nullable)"
+			       Nullable="$(Nullable)"
              Optimize="$(Optimize)"
              OutputAssembly="$(IntermediateOutputPath)intermediate\$(AssemblyName)$(TargetExt)"
              PdbFile="$(PdbFile)"
@@ -81,12 +81,12 @@
             <Output TaskParameter="Include" ItemName="XamlFiles" />
         </CreateItem>
         <MauiGenerateCodeTask XamlFiles="@(XamlFiles)"
-							  ReferenceAssemblies="@(ReferencePath)"
-							  LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
-							  IntermediateOutputPath="$(IntermediateOutputPath)"
-							  ProjectPath="$(MSBuildProjectDirectory)"
-							  LangVersion="$(LangVersion)"
-							  MSBuildVersion="$(MSBuildVersion)">
+							                ReferenceAssemblies="@(ReferencePath)"
+							                LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
+							                IntermediateOutputPath="$(IntermediateOutputPath)"
+							                ProjectPath="$(MSBuildProjectDirectory)"
+							                LangVersion="$(LangVersion)"
+							                MSBuildVersion="$(MSBuildVersion)">
             <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
             <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
         </MauiGenerateCodeTask>

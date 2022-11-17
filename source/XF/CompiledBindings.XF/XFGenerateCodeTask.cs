@@ -124,6 +124,8 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion, _platformConstants);
 							string code = codeGenerator.GenerateCode(parseResult);
 
+							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
+
 							bool dataTemplates = parseResult.DataTemplates.Count > 0;
 							generateDataTemplateBindings |= dataTemplates;
 
