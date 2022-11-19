@@ -57,18 +57,6 @@ namespace XFTest.Views
 			}
 		}
 
-		~Page1()
-		{
-			if (Bindings_ != null)
-			{
-				Bindings_.Cleanup();
-			}
-			if (Bindings_this != null)
-			{
-				Bindings_this.Cleanup();
-			}
-		}
-
 		private void this_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_this.Cleanup();

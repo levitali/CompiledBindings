@@ -159,52 +159,7 @@ $@"		private bool _generatedCodeInitialized;
 		output.AppendLine(
 $@"		}}");
 
-		GenerateDestructorMethod(output, parseResult, "this");
-
 		GenerateBindingContextChangedHandlers(output, parseResult);
-	}
-
-	private void GenerateDestructorMethod(StringBuilder output, SimpleXamlDom parseResult, string rootElement)
-	{
-		if (parseResult.BindingScopes.Count > 0)
-		{
-			output.AppendLine();
-
-			if (parseResult.HasDestructor)
-			{
-				output.AppendLine(
-$@"		private void DeinitializeAfterDestructor()");
-			}
-			else
-			{
-				output.AppendLine(
-$@"		~{parseResult.TargetType!.Reference.Name}()");
-			}
-			output.AppendLine(
-$@"		{{");
-			if (_asyncFunctions)
-			{
-				output.AppendLine(
-$@"			_generatedCodeDisposed.Cancel();");
-			}
-
-			foreach (var bs in parseResult.BindingScopes)
-			{
-				var viewName = "_";
-				if (bs.DataType != null)
-				{
-					viewName += bs.ViewName ?? "this";
-				}
-				output.AppendLine(
-$@"			if (Bindings{viewName} != null)
-			{{
-				Bindings{viewName}.Cleanup();
-			}}");
-			}
-
-			output.AppendLine(
-$@"		}}");
-		}
 	}
 
 	private void GenerateBindingContextChangedHandlers(StringBuilder output, SimpleXamlDom parseResult)

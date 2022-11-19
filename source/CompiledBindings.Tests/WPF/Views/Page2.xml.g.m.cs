@@ -21,14 +21,6 @@ namespace WPFTest.Views
 			Bindings_.Initialize(this);
 		}
 
-		private void DeinitializeAfterDestructor()
-		{
-			if (Bindings_ != null)
-			{
-				Bindings_.Cleanup();
-			}
-		}
-
 		Page2_Bindings_ Bindings_ = new Page2_Bindings_();
 
 		class Page2_Bindings_

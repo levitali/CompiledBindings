@@ -31,14 +31,6 @@ namespace XFTest.Views
 			}
 		}
 
-		~Page3()
-		{
-			if (Bindings_this != null)
-			{
-				Bindings_this.Cleanup();
-			}
-		}
-
 		private void this_BindingContextChanged(object sender, global::System.EventArgs e)
 		{
 			Bindings_this.Cleanup();

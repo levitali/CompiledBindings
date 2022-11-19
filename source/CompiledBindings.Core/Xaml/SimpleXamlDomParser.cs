@@ -42,10 +42,6 @@ public class SimpleXamlDomParser : XamlDomParser
 
 		ProcessRoot(result, xdoc.Root, null);
 
-		result.HasDestructor = result.TargetType.Methods.Any(m =>
-			m.Definition.DeclaringType == result.TargetType.Reference &&
-			m.Definition.Name == "Finalize" && m.Definition.IsVirtual && m.Definition.IsFamily && m.Definition.IsHideBySig);
-
 		return result;
 
 		void ProcessRoot(SimpleXamlDom rootResult, XElement xroot, TypeInfo? dataType)
@@ -321,7 +317,6 @@ public class SimpleXamlDom : XamlDomBase
 	public TypeInfo? TargetType { get; init; }
 	public List<BindingScope> BindingScopes { get; } = new();
 	public List<XamlObject>? XamlObjects { get; set; }
-	public bool HasDestructor { get; set; }
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public ExpressionGroup UpdateMethod;

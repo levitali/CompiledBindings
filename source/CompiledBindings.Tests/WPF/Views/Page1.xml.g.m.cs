@@ -58,19 +58,6 @@ namespace WPFTest.Views
 			}
 		}
 
-		~Page1()
-		{
-			_generatedCodeDisposed.Cancel();
-			if (Bindings_ != null)
-			{
-				Bindings_.Cleanup();
-			}
-			if (Bindings_this != null)
-			{
-				Bindings_this.Cleanup();
-			}
-		}
-
 		private void this_DataContextChanged(object sender, global::System.Windows.DependencyPropertyChangedEventArgs e)
 		{
 			Bindings_this.Cleanup();
