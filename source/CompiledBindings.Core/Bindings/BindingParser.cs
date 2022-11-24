@@ -666,6 +666,7 @@ public class UpdateMethodData
 	public required List<NotifyProperty> UpdateNotifyProperties { get; init; }
 	public required List<NotifySource> SetEventHandlers { get; init; }
 } 
+
 public class TwoWayEventData
 {
 	public required List<Bind> Bindings { get; init; }

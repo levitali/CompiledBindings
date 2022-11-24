@@ -867,12 +867,12 @@ public class ExpressionParser
 							{
 								return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp, staticFieldOrProp.MemberType);
 							}
-						}
-					}
 
-					if (instance == _root && _expectedType?.Reference.Name == id)
-					{
-						return new TypeExpression(_expectedType);
+							if (_expectedType.Reference.Name == id)
+							{
+								return new TypeExpression(_expectedType);
+							}
+						}
 					}
 
 					if (type.Reference.FullName.StartsWith("System.ValueTuple"))
