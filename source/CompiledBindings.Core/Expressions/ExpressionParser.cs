@@ -51,7 +51,7 @@ public class ExpressionParser
 		return res;
 	}
 
-	// ?:, ??, as operators
+	// ?:, ??, as, is operators
 	private Expression ParseExpression()
 	{
 		var expr = ParseLogicalOr();
@@ -67,6 +67,10 @@ public class ExpressionParser
 		else if (TokenIdentifierIs("as"))
 		{
 			return ParseAsExpression(expr);
+		}
+		else if (TokenIdentifierIs("is"))
+		{
+			return ParseIsExpression(expr);
 		}
 		return expr;
 	}
@@ -124,60 +128,56 @@ public class ExpressionParser
 		return left;
 	}
 
+	private bool IsCompasionToken()
+	{
+		return _token.id is TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
+			 or TokenId.GreaterThan or TokenId.GreaterThanEqual or TokenId.LessThan or TokenId.LessThanEqual ||
+			ReplaceTokenIdentifier("gt", TokenId.GreaterThan) || ReplaceTokenIdentifier("ge", TokenId.GreaterThanEqual) ||
+			ReplaceTokenIdentifier("lt", TokenId.LessThan) || ReplaceTokenIdentifier("le", TokenId.LessThanEqual) ||
+			ReplaceTokenIdentifier("eq", TokenId.DoubleEqual) || ReplaceTokenIdentifier("ne", TokenId.ExclamationEqual);
+	}
+
+	private string GetComparisonOperand(TokenId id)
+	{
+		return id switch
+		{
+			TokenId.ExclamationEqual or TokenId.LessGreater => "!=",
+			TokenId.GreaterThan => ">",
+			TokenId.GreaterThanEqual => ">=",
+			TokenId.LessThan => "<",
+			TokenId.LessThanEqual => "<=",
+			_ => "==",
+		};
+	}
+
 	// =, ==, !=, <>, >, >=, <, <= operators
 	private Expression ParseComparison()
 	{
 		var left = ParseAdditive();
-		while (_token.id is TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
-			 or TokenId.GreaterThan or TokenId.GreaterThanEqual or TokenId.LessThan or TokenId.LessThanEqual ||
-			ReplaceTokenIdentifier("gt", TokenId.GreaterThan) || ReplaceTokenIdentifier("ge", TokenId.GreaterThanEqual) ||
-			ReplaceTokenIdentifier("lt", TokenId.LessThan) || ReplaceTokenIdentifier("le", TokenId.LessThanEqual) ||
-			ReplaceTokenIdentifier("eq", TokenId.DoubleEqual) || ReplaceTokenIdentifier("ne", TokenId.ExclamationEqual))
+		while (IsCompasionToken())
 		{
 			var savedExpectedType = _expectedType;
 			_expectedType = GetNullableUnderlyingType(left.Type);
 			ValidateNotMethodAccess(left);
-			var op = _token;
+			var op = _token.id;
 			NextToken();
 			var right = ParseAdditive();
 			ValidateNotMethodAccess(right);
 			_expectedType = savedExpectedType;
-
-			switch (op.id)
-			{
-				case TokenId.DoubleEqual:
-					left = new BinaryExpression(left, right, "==");
-					break;
-				case TokenId.ExclamationEqual:
-				case TokenId.LessGreater:
-					left = new BinaryExpression(left, right, "!=");
-					break;
-				case TokenId.GreaterThan:
-					left = new BinaryExpression(left, right, ">");
-					break;
-				case TokenId.GreaterThanEqual:
-					left = new BinaryExpression(left, right, ">=");
-					break;
-				case TokenId.LessThan:
-					left = new BinaryExpression(left, right, "<");
-					break;
-				case TokenId.LessThanEqual:
-					left = new BinaryExpression(left, right, "<=");
-					break;
-			}
+			left = new BinaryExpression(left, right, GetComparisonOperand(op));
 		}
 		return left;
+	}
 
-		bool ReplaceTokenIdentifier(string identiferId, TokenId tokenId)
+	private bool ReplaceTokenIdentifier(string identiferId, TokenId tokenId)
+	{
+		if (!TokenIdentifierIs(identiferId))
 		{
-			if (!TokenIdentifierIs(identiferId))
-			{
-				return false;
-			}
-
-			_token.id = tokenId;
-			return true;
+			return false;
 		}
+
+		_token.id = tokenId;
+		return true;
 	}
 
 	// +, -, & operators
@@ -775,6 +775,94 @@ public class ExpressionParser
 		var typeExpr = ParseTypeExpression(prefix, errorPos);
 
 		return new AsExpression(expression, typeExpr);
+	}
+
+	private Expression ParseIsExpression(Expression expression)
+	{
+		var savedExpectedType = _expectedType;
+		_expectedType = expression.Type;
+		
+		var result = Parse1();
+
+		_expectedType = savedExpectedType;
+		return result;
+
+		Expression Parse1()
+		{
+			NextToken();
+
+			Expression result = null!;
+			string? logicalOperand = null;
+
+			while (true)
+			{
+				var expr = Parse2();
+
+				if (result == null)
+				{
+					result = expr;
+				}
+				else
+				{
+					result = new BinaryExpression(result, expr, logicalOperand!);
+				}
+
+				if (_token.id != TokenId.DoubleAmphersand &&
+					 !ReplaceTokenIdentifier("and", TokenId.DoubleAmphersand) &&
+					 _token.id != TokenId.DoubleBar &&
+					 !ReplaceTokenIdentifier("or", TokenId.DoubleBar))
+				{
+					break;
+				}
+
+				logicalOperand = _token.id == TokenId.DoubleAmphersand ? "&&" : "||";
+				NextToken();
+			}
+
+			return result;
+		}
+
+		Expression Parse2()
+		{
+			if (_token.id == TokenId.OpenParen)
+			{
+				var expr = Parse1();
+				ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
+				NextToken();
+				return new ParenExpression(expr);
+			}
+
+			if (_token.id == TokenId.Exclamation || TokenIdentifierIs("not"))
+			{
+				NextToken();
+				var expr = Parse2();
+
+				if (expr is BinaryExpression be && be.Operand == "==")
+				{
+					return new BinaryExpression(be.Left, be.Right, "!=");
+				}
+				if (expr is not ParenExpression)
+				{
+					expr = new ParenExpression(expr);
+				}
+				return new UnaryExpression(expr, "!");
+			}
+
+			TokenId op;
+			if (IsCompasionToken())
+			{
+				op = _token.id;
+				NextToken();
+			}
+			else
+			{
+				op = TokenId.DoubleEqual;
+			}
+
+			var right = ParseComparison();
+
+			return new BinaryExpression(expression, right, GetComparisonOperand(op));
+		}
 	}
 
 	private Expression ParseMemberAccess(Expression instance)

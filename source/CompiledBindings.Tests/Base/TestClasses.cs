@@ -4,6 +4,10 @@ namespace CompiledBindings.Tests;
 
 public class Class1
 {
+	public TestMode Mode => TestMode.Mode3;
+
+	public int IntProp { get; set; }
+
 	public Class2? RefProp { get; set; }
 
 	public string[] ArrayProp { get; set; } = new string[0];
@@ -54,6 +58,13 @@ public struct Struct1
 
 public class BindingsTargetClass
 {
+}
+
+public enum TestMode
+{
+	Mode1,
+	Mode2,
+	Mode3,
 }
 
 #nullable disable

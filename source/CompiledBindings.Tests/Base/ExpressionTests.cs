@@ -60,4 +60,54 @@ public class ExpressionTests
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
+
+	[Test]
+	public void TestIsExpression()
+	{
+		TypeInfoUtils.LoadReferences(new string[]
+		{
+			typeof(string).Assembly.Location,
+			Assembly.GetExecutingAssembly().Location
+		});
+
+		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
+		var stringType = TypeInfo.GetTypeThrow(typeof(string));
+		var intType = TypeInfo.GetTypeThrow(typeof(int));
+
+		var ns = new[] { new XamlNamespace("local", "using:CompiledBindings.Tests") };
+
+		string expression, expectedCode;
+		Expression result;
+
+		expression = "IntProp is 0 or 1";
+		expectedCode = "dataRoot.IntProp == 0 || dataRoot.IntProp == 1";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "IntProp is > 0 and < 10";
+		expectedCode = "dataRoot.IntProp > 0 && dataRoot.IntProp < 10";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "IntProp is not 0 and < 10";
+		expectedCode = "dataRoot.IntProp != 0 && dataRoot.IntProp < 10";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "IntProp is not (0 or 10)";
+		expectedCode = "!(dataRoot.IntProp == 0 || dataRoot.IntProp == 10)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+		
+
+		expression = "IntProp is >= 0 and not NullIntProp";
+		expectedCode = "dataRoot.IntProp >= 0 && dataRoot.IntProp != dataRoot.NullIntProp";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));		
+
+		expression = "(Mode is Mode1 or Mode2) and RefProp.DecimalProp != 4";
+		expectedCode = "(dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode1 || dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode2) && dataRoot.RefProp?.DecimalProp != 4";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 }
