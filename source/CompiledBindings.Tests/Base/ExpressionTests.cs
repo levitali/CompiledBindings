@@ -59,6 +59,11 @@ public class ExpressionTests
 		expectedCode = "dataRoot.NullDateTimeProp?.ToString(\"g\")";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "$'{IntProp,2} {RefProp.DecimalProp:0.###}'";
+		expectedCode = "$\"{dataRoot.IntProp,2} {dataRoot.RefProp?.DecimalProp:0.###}\"";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 
 	[Test]

@@ -554,8 +554,8 @@ public class ExpressionParser
 			expressions.Add(expression);
 			_parsingInterpolatedString = false;
 
-			// If the current token is colon, there is a format part
-			if (_token.id == TokenId.Colon)
+			// If the current token is comma or colon, there is an alignment and/or format part
+			if (_token.id == TokenId.Comma || _token.id == TokenId.Colon)
 			{
 				// Find the closing }
 				pos = _text.IndexOf('}', _textPos);
@@ -570,7 +570,7 @@ public class ExpressionParser
 					throw new ParseException(Res.CloseBracketExpected, pos2);
 				}
 				// Add the format part
-				format += ":" + _text.Substring(_textPos, pos - _textPos);
+				format += (_token.id == TokenId.Comma ? "," : ":") + _text.Substring(_textPos, pos - _textPos);
 				_textPos = pos;
 			}
 			else if (_token.id != TokenId.End || _ch != '}')
