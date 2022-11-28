@@ -848,8 +848,10 @@ public class ExpressionParser
 				return new UnaryExpression(expr, "!");
 			}
 
+			var errPos = _token.pos;
+			bool isComparisonToken;
 			TokenId op;
-			if (IsCompasionToken())
+			if (isComparisonToken = IsCompasionToken())
 			{
 				op = _token.id;
 				NextToken();
@@ -860,6 +862,14 @@ public class ExpressionParser
 			}
 
 			var right = ParseComparison();
+			if (right is TypeExpression te)
+			{
+				if (isComparisonToken)
+				{
+					throw new ParseException("Comparison operator cannot be used for type checking.", errPos);
+				}
+				return new IsExpression(expression, te);
+			}
 
 			return new BinaryExpression(expression, right, GetComparisonOperand(op));
 		}

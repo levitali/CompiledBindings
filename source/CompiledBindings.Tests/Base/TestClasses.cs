@@ -4,6 +4,8 @@ namespace CompiledBindings.Tests;
 
 public class Class1
 {
+	public object? ObjProp { get; set; }
+
 	public TestMode Mode => TestMode.Mode3;
 
 	public int IntProp { get; set; }

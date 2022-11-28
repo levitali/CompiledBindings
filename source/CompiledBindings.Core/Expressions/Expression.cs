@@ -765,6 +765,38 @@ public class AsExpression : Expression
 	public override bool IsNullable => true;
 }
 
+public class IsExpression : Expression
+{
+	public IsExpression(Expression expression, TypeExpression type) : base(TypeInfo.GetTypeThrow(typeof(bool)))
+	{
+		Expression = expression;
+		IsType = type;
+	}
+
+	public Expression Expression { get; private set; }
+
+	public TypeExpression IsType { get; }
+
+	protected override string GetCSharpCode()
+	{
+		return $"{Expression} is global::{IsType}";
+	}
+
+	public override IEnumerable<Expression> Enumerate()
+	{
+		yield return Expression;
+	}
+
+	protected override Expression CloneReplaceCore(Expression current, Expression replace)
+	{
+		var clone = (IsExpression)base.CloneReplaceCore(current, replace);
+		clone.Expression = Expression.CloneReplace(current, replace);
+		return clone;
+	}
+
+	public override bool IsNullable => false;
+}
+
 public interface IAccessExpression
 {
 	Expression Expression { get; }
