@@ -32,7 +32,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 	[Required]
 	public required string IntermediateOutputPath { get; init; }
 
-	[Required]
 	public required ITaskItem ApplicationDefinition { get; init; }
 
 	[Required]
