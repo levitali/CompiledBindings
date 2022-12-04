@@ -92,7 +92,7 @@ IntProp1 is 0 or 1
 In the example above the IntProp1 is compared whether it is equal to 0 or 1. If you need to do other comparisons, like greater, lower, you use the comparison operator before the right expressions. For example:
 
 ```xaml
-IntProp1 is >= 0 and <= 10
+IntProp1 is ge 0 and le 10
  ```
  
 The "eq" operator is still valid. The following two expressions are the same
@@ -111,7 +111,7 @@ IntProp1 is ne 0 or not 10
 The is-operator is like the is matching operator in C# with the difference, that on the right side you can have any expression, not only constants. For example you can compare the IntProp1 with other properties
 
 ```xaml
-IntProp1 is >= 0 and <= (IntProp2 + 1)
+IntProp1 is gt 0 and le (IntProp2 + 1)
 ```
  
 The right expression of the is operator continues untill there are "and" or "or" operators. If you need to do some other compares after the is-operator, you have to include the whole is-operator expression in parens. For example, if you have the following expression:
