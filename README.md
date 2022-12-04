@@ -75,6 +75,78 @@ In the example, if the SelectedItem is not a Movie, empty text is set.
 <Label Text="{x:Bind $'Decimal value: {DecimalProp:0.###}, Boolean value: {BooleanProp}, String value: {StringProp.TrimStart('0')}'}" />
  ```
  
+ - **is operator**. 
+
+The is-operator can be used, if you have an expression and you need to compare it with many other expressions. It allows to avoid repeating the compared expression. For example, you have this expression:
+ 
+```xaml
+IntProp1 eq 0 or IntProp1 eq 1
+ ```
+ 
+With is-operator you can have the IntProp1 expression only once:
+
+```xaml
+IntProp1 is 0 or 1
+ ```
+ 
+In the example above the IntProp1 is compared whether it is equal to 0 or 1. If you need to do other comparisons, like greater, lower, you use the comparison operator before the right expressions. For example:
+
+```xaml
+IntProp1 is >= 0 and <= 10
+ ```
+ 
+The "eq" operator is still valid. The following two expressions are the same
+
+```xaml
+IntProp1 is eq 0 or eq 10
+IntProp1 is 0 or 10
+ ```
+
+To compare whether the left expression is not equal, you can use either "ne" or the "not" keywords:
+
+```xaml
+IntProp1 is ne 0 or not 10
+``` 
+
+The is-operator is like the is matching operator in C# with the difference, that on the right side you can have any expression, not only constants. For example you can compare the IntProp1 with other properties
+
+```xaml
+IntProp1 is >= 0 and <= (IntProp2 + 1)
+```
+ 
+The right expression of the is operator continues untill there are "and" or "or" operators. If you need to do some other compares after the is-operator, you have to include the whole is-operator expression in parens. For example, if you have the following expression:
+
+```xaml
+IntProp1 is 0 or 1 and IntProp2 eq 3
+```
+
+the parser consinders the "IntProp2" as bellonging to the is-operator. So the following C# expression will be generated:
+
+```C#
+(IntProp1 == 0 || IntProp1 == 1 && IntProp1 == IntProp2) == 3
+```
+
+which is of course not valid. If you have this:
+
+```xaml
+(IntProp1 is 0 or 1) and IntProp2 eq 3
+```
+
+the following correct C# expression will be generated:
+
+```C#
+(IntProp1 == 0 || IntProp1 == 1) && IntProp2 == 3
+```
+
+Like in C#, the is-operator also supports checking whether the left expression is of a given type. For example:
+
+```xaml
+ObjProp is system:String or not system:Int32
+```
+
+ 
+**Contants**
+  
 You can use following **constants** in the expression:
 - numbers with or wihout decimal seperator (point). For example 2.3
 - true, false
