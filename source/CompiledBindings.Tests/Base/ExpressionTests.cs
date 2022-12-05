@@ -119,6 +119,11 @@ public class ExpressionTests
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
+		expression = "ListProp.Count is not > 0";
+		expectedCode = "!(dataRoot.ListProp?.Count > 0)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
 		expression = "ObjProp is system:String or not system:Int32";
 		expectedCode = "dataRoot.ObjProp is global::System.String || !(dataRoot.ObjProp is global::System.Int32)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out var _, out var _);
