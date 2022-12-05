@@ -102,11 +102,19 @@ IntProp1 is eq 0 or eq 10
 IntProp1 is 0 or 10
  ```
 
+The "not" keyword can be used before comparison operator to negate the expression:
+
+```xaml
+ListProp.Count is not > 0
+``` 
+
 To compare whether the left expression is not equal, you can use either "ne" or the "not" keywords:
 
 ```xaml
 IntProp1 is ne 0 or not 10
-``` 
+```
+
+
 
 The is-operator is like the is matching operator in C# with the difference, that on the right side you can have any expression, not only constants. For example you can compare the IntProp1 with other properties
 
