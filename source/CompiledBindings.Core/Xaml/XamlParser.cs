@@ -2,6 +2,8 @@
 
 public class XamlParser
 {
+	private static readonly Regex _typeNameRegex = new(@"^(?:(\w+):)?(\w+)$");
+
 	public static XamlNode ParseAttribute(string file, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
 		var node = new XamlNode(file, attribute, attribute.Name);
@@ -61,15 +63,15 @@ public class XamlParser
 		XNamespace ns;
 
 		string prefix, className;
-		var parts = value.Split(':');
-		if (parts.Length > 2)
+		var match = _typeNameRegex.Match(value);
+		if (!match.Success)
 		{
 			throw new ParseException($"Wrong syntax.");
 		}
-		else if (parts.Length == 2)
+		if (match.Groups.Count == 3)
 		{
-			prefix = parts[0];
-			className = parts[1];
+			prefix = match.Groups[1].Value;
+			className = match.Groups[2].Value;
 
 			var nsAttr = EnumerableExtensions
 				.SelectSequence(xobject, e => e.Parent, xobject is XElement)
@@ -92,7 +94,7 @@ public class XamlParser
 		}
 		else
 		{
-			className = parts[0];
+			className = match.Groups[1].Value;
 
 			var nsAttr = EnumerableExtensions
 				.SelectSequence(xobject, e => e.Parent, xobject is XElement)
