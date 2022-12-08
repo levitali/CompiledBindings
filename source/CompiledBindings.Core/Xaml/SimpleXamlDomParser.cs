@@ -107,6 +107,11 @@ public class SimpleXamlDomParser : XamlDomParser
 					dataTypeAttr = null;
 				}
 
+				if (dataTypeAttr != null && !IsDataContextSupported(TargetType))
+				{
+					throw new GeneratorException("The root type does not support setting data type. The data source can only be the page or user control itself.", CurrentFile, dataTypeAttr);
+				}
+
 				string? viewName = null;
 				bool nameExplicitlySet = false;
 				if (xelement != xroot &&
@@ -303,6 +308,8 @@ public class SimpleXamlDomParser : XamlDomParser
 		}
 		return (true, null);
 	}
+
+	public virtual bool IsDataContextSupported(TypeInfo type) => true;
 
 	private static class Res
 	{
