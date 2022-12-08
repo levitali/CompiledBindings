@@ -24,6 +24,9 @@
 /source/MAUI/MauiTest/bin
 /source/MAUI/MauiTest/obj
 /source/MAUI/CombiledBindings/obj
+/source/WinUI/CompiledBindings/obj
+/source/WinUI/CompiledBindings/obj
+/source/WinUI/CompiledBindings.WPF/obj
 /source/WinUI/CompiledBindings.WinUI/obj
 /source/WinUI/WinUITest/bin
 /source/WinUI/WinUITest/obj

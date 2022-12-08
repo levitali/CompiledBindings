@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221109.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.2.221116.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.755" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
@@ -39,6 +39,9 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="Views\MainPage.xaml">
@@ -70,8 +73,7 @@
 			<LocalAssemblyGenerated>true</LocalAssemblyGenerated>
 		</PropertyGroup>
 
-		<WinUIGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)"
-													 AttachDebugger="true">
+		<WinUIGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" AttachDebugger="true">
 			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
 			<Output ItemName="NewPages" TaskParameter="NewPages" />
