@@ -600,10 +600,12 @@ public static class BindingParser
 
 		bool CheckPropertyNotifiable(MemberExpression expr)
 		{
+			var type = expr.Expression.Type;
 			var res = expr.Member is PropertyInfo pi &&
 				   !pi.Definition.IsStatic() &&
-				   (iNotifyPropertyChangedType.IsAssignableFrom(expr.Expression.Type) ||
-				   (dependencyObjectType?.IsAssignableFrom(expr.Expression.Type) == true && expr.Expression.Type.Fields.Any(f => f.Definition.Name == pi.Definition.Name + "Property"))) &&
+				   (iNotifyPropertyChangedType.IsAssignableFrom(type) ||
+				   (dependencyObjectType?.IsAssignableFrom(type) == true && 
+						type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == pi.Definition.Name + "Property"))) &&
 				   !pi.IsReadOnly;
 			return res;
 		}
