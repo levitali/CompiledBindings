@@ -295,8 +295,14 @@ public class XamlDomParser
 	{
 		var value = new XamlObjectValue();
 
+		bool isCompiledBindingsNs = 
+			xamlNode.Children.Count == 1 &&
+			XamlNamespace.GetClrNamespace(xamlNode.Children[0].Name.NamespaceName) == "CompiledBindings.Markup";
+
 		var propType = objProp.MemberType;
-		if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xSet)
+		if (xamlNode.Children.Count == 1 && 
+			(xamlNode.Children[0].Name == xSet ||
+				isCompiledBindingsNs && xamlNode.Children[0].Name.LocalName is "Set" or "SetExtension"))
 		{
 			try
 			{
@@ -312,7 +318,9 @@ public class XamlDomParser
 				HandleParseException(ex);
 			}
 		}
-		else if (xamlNode.Children.Count == 1 && xamlNode.Children[0].Name == xBind)
+		else if (xamlNode.Children.Count == 1 && 
+			(xamlNode.Children[0].Name == xBind ||
+				(isCompiledBindingsNs && xamlNode.Children[0].Name.LocalName is "Bind" or "BindExtension")))
 		{
 			try
 			{

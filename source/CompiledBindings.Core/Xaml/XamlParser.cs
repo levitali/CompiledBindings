@@ -62,17 +62,15 @@ public class XamlParser
 	{
 		XNamespace ns;
 
-		string prefix, className;
 		var match = _typeNameRegex.Match(value);
 		if (!match.Success)
 		{
 			throw new ParseException($"Wrong syntax.");
 		}
-		if (match.Groups.Count == 3)
+		var prefix = match.Groups[1].Value;
+		var className = match.Groups[2].Value;
+		if (!string.IsNullOrEmpty(prefix))
 		{
-			prefix = match.Groups[1].Value;
-			className = match.Groups[2].Value;
-
 			var nsAttr = EnumerableExtensions
 				.SelectSequence(xobject, e => e.Parent, xobject is XElement)
 				.Cast<XElement>()
@@ -94,8 +92,6 @@ public class XamlParser
 		}
 		else
 		{
-			className = match.Groups[1].Value;
-
 			var nsAttr = EnumerableExtensions
 				.SelectSequence(xobject, e => e.Parent, xobject is XElement)
 				.Cast<XElement>()

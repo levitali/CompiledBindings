@@ -88,7 +88,7 @@ public class XFProcessResourceXamlTask : Task
 					var xclass = xdoc.Root.Attribute(xamlDomParser.xClass);
 					if (xclass != null)
 					{
-						var mAttrs = xdoc.Descendants().SelectMany(e => e.Attributes()).Where(a => xamlDomParser.IsMemExtension(a)).ToList();
+						var mAttrs = xdoc.Descendants().SelectMany(e => e.Attributes()).Where(a => xamlDomParser.IsMemExtension(a) != null).ToList();
 						var mxAttrs = xdoc.Descendants().SelectMany(e => e.Attributes()).Where(a => a.Name.Namespace == SimpleXamlDomParser.mxNamespace).ToList();
 						if (mAttrs.Count > 0 || mxAttrs.Count > 0)
 						{
@@ -121,7 +121,7 @@ public class XFProcessResourceXamlTask : Task
 									if (xname == null)
 									{
 										if (xelement != xdoc.Root &&
-											(xelement.Attributes().Any(a => xamlDomParser.IsMemExtension(a)) ||
+											(xelement.Attributes().Any(a => xamlDomParser.IsMemExtension(a) != null) ||
 											 (xelement.Attribute(xamlDomParser.xDataType) != null && xelement.Name != xamlDomParser.DataTemplate)))
 										{
 											var name = XamlDomParser.GenerateName(xelement, usedNames);
@@ -140,7 +140,7 @@ public class XFProcessResourceXamlTask : Task
 								// Process DataTemplates
 								var dataTemplates = xdoc.Descendants(xamlDomParser.DataTemplate)
 									.Where(e => e.Descendants().SelectMany(e =>
-										e.Attributes()).Any(a => xamlDomParser.IsMemExtension(a)))
+										e.Attributes()).Any(a => xamlDomParser.IsMemExtension(a) != null))
 									.ToList();
 								if (dataTemplates.Count > 0)
 								{
@@ -161,7 +161,7 @@ public class XFProcessResourceXamlTask : Task
 										var memExtensions = dataTemplate.Descendants()
 											.SelectMany(e => e.Attributes())
 											.Where(a =>
-												xamlDomParser.IsMemExtension(a) &&
+												xamlDomParser.IsMemExtension(a) != null &&
 												EnumerableExtensions.SelectSequence(a.Parent, e => e.Parent, true).First(e => e.Name == xamlDomParser.DataTemplate) == dataTemplate)
 											.ToList();
 										if (memExtensions.Count == 0)

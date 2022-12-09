@@ -86,7 +86,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
 
-				var attrs = xelement.Attributes().Where(a => IsMemExtension(a)).ToList();
+				var attrs = xelement.Attributes().Where(a => IsMemExtension(a) != null).ToList();
 				if (attrs.Count > 0)
 				{
 					if (isDataTemplateElement)
@@ -102,7 +102,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				var dataTypeAttr = xelement.Attribute(xDataType) ?? xelement.Attribute(mxDataType) ?? xelement.Attribute(DataTypeAttr);
 				if (dataTypeAttr != null &&
 					!xelement.DescendantsAndSelf().SelectMany(e => e.Attributes()).Any(a =>
-						IsMemExtension(a) && a.Value.StartsWith("{x:Bind ")))
+						IsMemExtension(a) == ExtenstionType.Bind))
 				{
 					dataTypeAttr = null;
 				}
@@ -287,17 +287,37 @@ public class SimpleXamlDomParser : XamlDomParser
 		}
 	}
 
-	public virtual bool IsMemExtension(XAttribute a)
+	public virtual ExtenstionType? IsMemExtension(XAttribute a)
 	{
 		var ns = a.Name.Namespace.NamespaceName;
 		if (ns.EndsWith("/"))
 		{
 			ns = ns.Substring(0, ns.Length - 1);
 		}
-		return ns == mNamespace.NamespaceName ||
+		bool isSet = false;
+		if (ns == mNamespace.NamespaceName ||
 			   a.Value.StartsWith("[x:Bind ") ||
-			   a.Value.StartsWith("{x:Set ") ||
-			   a.Value.StartsWith("[x:Set ");
+			   (isSet = a.Value.StartsWith("{x:Set ")) ||
+			   (isSet = a.Value.StartsWith("[x:Set ")))
+		{
+			return isSet ? ExtenstionType.Set : ExtenstionType.Bind;
+		}
+		var xamlNode = XamlParser.ParseAttribute(CurrentFile, a, KnownNamespaces);
+		if (xamlNode.Children.Count == 1)
+		{
+			var c = xamlNode.Children[0].Name;
+			var clrNs = XamlNamespace.GetClrNamespace(c.NamespaceName);
+			if (clrNs == "CompiledBindings.Markup")
+			{
+				return c.LocalName switch
+				{
+					"Bind" or "BindExtension" => ExtenstionType.Bind,
+					"Set" or "SetExtension" => ExtenstionType.Set,
+					_ => null
+				};
+			}
+		}
+		return null;
 	}
 
 	public virtual (bool isSupported, string? controlName) IsElementSupported(XName elementName)
@@ -316,6 +336,12 @@ public class SimpleXamlDomParser : XamlDomParser
 		public const string IsItemsSourceAlreadySet = "IsItemsSource is already set in some other x:Bind of this element.";
 		public const string ElementTypeCannotBeInferred = "Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.";
 	}
+}
+
+public enum ExtenstionType
+{
+	Bind,
+	Set
 }
 
 public class SimpleXamlDom : XamlDomBase

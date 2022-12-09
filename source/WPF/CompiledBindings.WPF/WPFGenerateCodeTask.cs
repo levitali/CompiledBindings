@@ -339,9 +339,9 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 	{
 	}
 
-	public override bool IsMemExtension(XAttribute a)
+	public override ExtenstionType? IsMemExtension(XAttribute a)
 	{
-		return base.IsMemExtension(a) || a.Value.StartsWith("{x:Bind ");
+		return base.IsMemExtension(a) ?? (a.Value.StartsWith("{x:Bind ") ? ExtenstionType.Bind : null);
 	}
 
 	public override (bool isSupported, string? controlName) IsElementSupported(XName elementName)
