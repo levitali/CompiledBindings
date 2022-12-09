@@ -176,8 +176,8 @@ public class WinUIGenerateCodeTask : Task
 										.Distinct();
 									rootElement.Add(
 										new XElement(compiledBindings + "DataTemplateBindings.Bindings",
-											new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}"),
-												staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}"))));
+											new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
+												staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
 								}
 							}
 
