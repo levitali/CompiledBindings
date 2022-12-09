@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CompiledBindings.WPF" Version="1.0.14" />
+    <PackageReference Include="CompiledBindings.WPF" Version="1.0.15" />
   </ItemGroup>
 
 </Project>

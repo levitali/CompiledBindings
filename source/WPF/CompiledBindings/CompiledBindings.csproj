@@ -4,7 +4,7 @@
 		<TargetFrameworks>netcoreapp3.0;net35;net40</TargetFrameworks>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.14</Version>
+		<Version>1.0.15</Version>
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
