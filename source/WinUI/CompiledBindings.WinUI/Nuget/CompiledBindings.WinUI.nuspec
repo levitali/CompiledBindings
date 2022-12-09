@@ -11,6 +11,11 @@
 		<license type="expression">MIT</license>
 		<licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
 		<projectUrl>https://github.com/levitali/CompiledBindings</projectUrl>
+		<dependencies>
+			<group targetFramework="net6.0-windows10.0.19041">
+				<dependency id="Microsoft.WindowsAppSDK" version="1.2.221109.1" />
+			</group>
+		</dependencies>
 	</metadata>
 	<files>
 		<file src="..\Targets\CompiledBindings.WinUI.targets" target="build" />

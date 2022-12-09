@@ -1,9 +1,9 @@
 ﻿<Page
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:c="using:CompiledBindings.Markup"
     xmlns:local="clr-namespace:XFTest"
     xmlns:m="http://compiledbindings.com"
-		xmlns:b="using:CompiledBindings.Markup"
     xmlns:system="using:System"
     xmlns:ui="using:UI"
     xmlns:viewModels="using:XFTest.ViewModels"
@@ -18,8 +18,8 @@
             x:Key="test1Template"
             x:DataType="viewModels:EntityViewModel">
             <Grid>
-                <Label Text="{b:Bind Model.SByteProp}" />
-                <Label Text="{b:BindExtension BooleanProp}" />
+                <Label Text="{c:Bind Model.SByteProp}" />
+                <Label Text="{c:BindExtension BooleanProp}" />
             </Grid>
         </DataTemplate>
 
