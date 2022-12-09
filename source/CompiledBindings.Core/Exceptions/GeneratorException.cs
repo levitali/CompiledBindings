@@ -54,13 +54,13 @@ public class GeneratorException : Exception
 
 	public string? File { get; set; }
 
-	public int LineNumber { get; private set; }
+	public int LineNumber { get; }
 
-	public int ColumnNumber { get; private set; }
+	public int ColumnNumber { get; }
 
-	public int EndLineNumber { get; private set; }
+	public int EndLineNumber { get; }
 
-	public int EndColumnNumber { get; private set; }
+	public int EndColumnNumber { get; }
 }
 
 public class LineInfo
