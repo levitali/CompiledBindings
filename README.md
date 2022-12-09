@@ -221,7 +221,7 @@ If you use {x:Bind} to set the ItemsSource property of a collection control (Lis
 - **BindBack** Specifies a expression to use for the reverse direction of a two-way binding. If the property is set, the Mode is automatically set two TwoWay.
 - **FallbackValue** Specifies a value to display when the source or path cannot be resolved.
 - **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
-- **UpdateSourceTrigger** Specifies an event, or a list of events separated by | symbol, to use for updating the binding's source.
+- **UpdateSourceEventNames** Specifies an event, or a list of events separated by | symbol, to use for updating the binding's source.
 
 The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {x:Static} markup extension.
 
