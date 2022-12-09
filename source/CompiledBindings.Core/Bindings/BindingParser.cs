@@ -218,13 +218,17 @@ public static class BindingParser
 
 		if (expression == null)
 		{
-			if (mode != BindingMode.OneWayToSource)
-			{
-				throw new ParseException("Missing expression.");
-			}
 			if (bindBackExpression == null)
 			{
 				throw new ParseException("Missing Path or BindBack expression.");
+			}
+			if (mode == null)
+			{
+				mode = BindingMode.OneWayToSource;
+			}
+			else if (mode != BindingMode.OneWayToSource)
+			{
+				throw new ParseException("Missing expression.");
 			}
 		}
 

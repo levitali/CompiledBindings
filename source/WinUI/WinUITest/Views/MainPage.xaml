@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mx="http://compiledbindings.com/x"
     xmlns:viewModels="using:WinUITest.ViewModels"
+    xmlns:converters="using:WinUITest.Converters"
     mc:Ignorable="d mx"
     x:Class="WinUITest.Views.MainPage"
     mx:DataType="viewModels:MainViewModel"
@@ -13,6 +14,9 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
+
+        <converters:TestConverter x:Key="testConverter"/>
+
         <DataTemplate
             x:Key="testTemplate"
             x:DataType="viewModels:EntityViewModel">
@@ -30,7 +34,7 @@
             <TextBlock Text="{c:Bind Class1.Prop2}" />
             <TextBlock Text="{c:Bind Class1.Prop2}" />
 
-            <TextBox Text="{c:Bind StringInput, Mode=TwoWay}" />
+            <TextBox Text="{c:Bind StringInput, Mode=TwoWay, Converter={StaticResource testConverter}}" />
             <TextBox Text="{c:Bind InputProp1, Mode=TwoWay}" />
 
             <ListView

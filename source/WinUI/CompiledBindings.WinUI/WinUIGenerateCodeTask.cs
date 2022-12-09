@@ -343,7 +343,7 @@ $@"namespace CompiledBindings.WinUI
 
 		protected override string CreateGetResourceCode(string resourceName)
 		{
-			return $@"this.Resources.TryGetValue(""{resourceName}"", out var r) ? r : global::Application.Current.Resources[""{resourceName}""]";
+			return $@"this.Resources.TryGetValue(""{resourceName}"", out var r) ? r : global::Microsoft.UI.Xaml.Application.Current.Resources[""{resourceName}""]";
 		}
 	}
 
