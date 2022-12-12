@@ -9,7 +9,6 @@ public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	private readonly string _findByNameFormat;
 	private readonly bool _generateVariableDeclarations;
 	private readonly bool _generateVariableInitialization;
-	private bool _asyncFunctions;
 
 	public SimpleXamlDomCodeGenerator(BindingsCodeGenerator bindingsCodeGenerator,
 									  string bindingContextStart,
@@ -35,10 +34,7 @@ public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	{
 		var output = new StringBuilder();
 
-		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		_asyncFunctions = parseResult.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
-
-		if (parseResult.TargetType!.Reference.Namespace != null)
+		if (parseResult.TargetType.Reference.Namespace != null)
 		{
 			output.AppendLine(
 $@"namespace {parseResult.TargetType.Reference.Namespace}
@@ -66,24 +62,22 @@ $@"
 	[global::System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
 	partial class {parseResult.TargetType.Reference.Name}
 	{{");
-		if (_asyncFunctions)
+		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+		var asyncFunctions = parseResult.GeneratedClass.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
+		if (asyncFunctions)
 		{
 			output.AppendLine(
 $@"		global::System.Threading.CancellationTokenSource _generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
 		}
 
-		if (parseResult.GenerateInitializeMethod)
-		{
-			GenerateInitializeMethod(output, parseResult);
-		}
-		GenerateBindings(output, parseResult, parseResult.TargetType.Reference.Name);
+		GenerateInitializeMethod(output, parseResult);
+		GenerateBindings(output, parseResult.GeneratedClass, parseResult.TargetType.Reference.Name);
 
 		output.AppendLine(
 $@"	}}");
 
 		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Reference.Name);
-
-		GenerateAdditionalClassCode(output, parseResult, parseResult.TargetType.Reference.Name);
+		GenerateAdditionalClassCode(output, parseResult.GeneratedClass, parseResult.TargetType.Reference.Name);
 
 		if (parseResult.TargetType.Reference.Namespace != null)
 		{
@@ -94,13 +88,13 @@ $@"	}}");
 		return output.ToString();
 	}
 
-	protected virtual void GenerateAdditionalClassCode(StringBuilder output, SimpleXamlDom parseResult, string className)
+	protected virtual void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)
 	{
 	}
 
 	protected virtual string IGeneratedDataTemplateFullName => "CompiledBindings.IGeneratedDataTemplate";
 
-	private void GenerateResourceDeclarations(StringBuilder output, SimpleXamlDom parseResult, bool isDataTemplate)
+	private void GenerateResourceDeclarations(StringBuilder output, GeneratedClass parseResult, bool isDataTemplate)
 	{
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
 		foreach (var (name, type) in resources)
@@ -118,7 +112,7 @@ $@"		global::{type.Reference.GetCSharpFullName()} {name};");
 		}
 	}
 
-	private void GenerateInitializeResources(StringBuilder output, SimpleXamlDom parseResult)
+	private void GenerateInitializeResources(StringBuilder output, GeneratedClass parseResult)
 	{
 		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
 		if (resources.Count > 0)
@@ -139,9 +133,9 @@ $@"			{name} = (global::{type.Reference.GetCSharpFullName()})({CreateGetResource
 	{
 		if (_generateVariableDeclarations)
 		{
-			GenerateVariablesDeclarations(output, parseResult, true);
+			GenerateVariablesDeclarations(output, parseResult.GeneratedClass, true);
 		}
-		GenerateResourceDeclarations(output, parseResult, false);
+		GenerateResourceDeclarations(output, parseResult.GeneratedClass, false);
 
 		output.AppendLine(
 $@"		private bool _generatedCodeInitialized;
@@ -154,20 +148,20 @@ $@"		private bool _generatedCodeInitialized;
 			_generatedCodeInitialized = true;
 ");
 
-		GenerateInitializeMethodBody(output, parseResult, "this", false);
+		GenerateInitializeMethodBody(output, parseResult.GeneratedClass, "this", false, parseResult.TargetType);
 
 		output.AppendLine(
 $@"		}}");
 
-		GenerateBindingContextChangedHandlers(output, parseResult);
+		GenerateBindingContextChangedHandlers(output, parseResult.GeneratedClass, parseResult.TargetType);
 	}
 
-	private void GenerateBindingContextChangedHandlers(StringBuilder output, SimpleXamlDom parseResult)
+	private void GenerateBindingContextChangedHandlers(StringBuilder output, GeneratedClass parseResult, TypeInfo? targetType)
 	{
 		foreach (var bs in parseResult.BindingScopes.Where(b => b.DataType != null))
 		{
 			var viewName = bs.ViewName ?? "this";
-			var prm = bs.DataType!.Reference.FullName == parseResult.TargetType?.Reference.FullName ? null : $", dataRoot";
+			var prm = bs.DataType!.Reference.FullName == targetType?.Reference.FullName ? null : $", dataRoot";
 
 			output.AppendLine(
 $@"
@@ -197,7 +191,7 @@ $@"		}}");
 
 	}
 
-	private void GenerateInitializeMethodBody(StringBuilder output, SimpleXamlDom parseResult, string rootElement, bool isDataTemplate)
+	private void GenerateInitializeMethodBody(StringBuilder output, GeneratedClass parseResult, string rootElement, bool isDataTemplate, TypeInfo? targetType)
 	{
 		if (isDataTemplate || _generateVariableInitialization)
 		{
@@ -234,7 +228,7 @@ $@"			Bindings_.Initialize(this);");
 			}
 			else
 			{
-				var prm = bs.DataType.Reference.FullName == parseResult.TargetType?.Reference.FullName ? null : $", dataRoot" + i;
+				var prm = bs.DataType.Reference.FullName == targetType?.Reference.FullName ? null : $", dataRoot" + i;
 				output.AppendLine(
 $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingContextStart}ContextChanged;
 			if ({viewName}.{_bindingContextStart}Context is global::{bs.DataType.Reference.GetCSharpFullName()} dataRoot{i})
@@ -245,7 +239,7 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 		}
 	}
 
-	private void GenerateBindings(StringBuilder output, SimpleXamlDom parseResult, string className)
+	private void GenerateBindings(StringBuilder output, GeneratedClass parseResult, string className)
 	{
 		foreach (var bs in parseResult.BindingScopes)
 		{
@@ -267,7 +261,7 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 		}
 	}
 
-	private void GenerateDataTemplateClass(StringBuilder output, SimpleXamlDom parseResult, string dataTemplateClassName)
+	private void GenerateDataTemplateClass(StringBuilder output, GeneratedClass parseResult, string dataTemplateClassName)
 	{
 		parseResult.BindingScopes.Where(bs => bs.ViewName == null).ForEach(bs => bs.ViewName = "rootElement");
 
@@ -277,6 +271,15 @@ $@"
 	{{");
 
 		GenerateVariablesDeclarations(output, parseResult, false);
+
+		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+		var asyncFunctions = parseResult.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
+		if (asyncFunctions)
+		{
+			output.AppendLine(
+$@"		private global::System.Threading.CancellationTokenSource _generatedCodeDisposed;");
+		}
+
 		GenerateResourceDeclarations(output, parseResult, true);
 
 		// Initialize method
@@ -284,8 +287,13 @@ $@"
 $@"
 		public void Initialize(global::{_bindableObject} rootElement)
 		{{");
+		if (asyncFunctions)
+		{
+			output.AppendLine(
+$@"			_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
+		}
 
-		GenerateInitializeMethodBody(output, parseResult, "rootElement", true);
+		GenerateInitializeMethodBody(output, parseResult, "rootElement", true, null);
 
 		output.AppendLine(
 $@"		}}");
@@ -295,6 +303,11 @@ $@"		}}");
 		output.AppendLine(
 $@"		public void Cleanup(global::{_bindableObject} rootElement)
 		{{");
+		if (asyncFunctions)
+		{
+			output.AppendLine(
+$@"			_generatedCodeDisposed.Cancel();");
+		}
 
 		foreach (var bs in parseResult.BindingScopes)
 		{
@@ -316,7 +329,7 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged -= {viewName}_{_bindingCon
 $@"		}}");
 
 
-		GenerateBindingContextChangedHandlers(output, parseResult);
+		GenerateBindingContextChangedHandlers(output, parseResult, null);
 
 		GenerateBindings(output, parseResult, dataTemplateClassName);
 
@@ -326,7 +339,7 @@ $@"		}}");
 $@"	}}");
 	}
 
-	private void GenerateVariablesDeclarations(StringBuilder output, SimpleXamlDom parseResult, bool notExplicitlySet)
+	private void GenerateVariablesDeclarations(StringBuilder output, GeneratedClass parseResult, bool notExplicitlySet)
 	{
 		IEnumerable<XamlObject> objects = parseResult.XamlObjects!;
 		if (notExplicitlySet)

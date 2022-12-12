@@ -2,7 +2,7 @@
 
 public class XamlDomBase
 {
-	public HashSet<string> IncludeNamespaces { get; } = new HashSet<string>();
+	public required HashSet<string> IncludeNamespaces { get; init; }
 }
 
 public class XamlObject
@@ -33,14 +33,14 @@ public class XamlObjectProperty
 {
 	public required XamlNode XamlNode { get; init; }
 	public required XamlObject Object { get; init; }
+	public required bool IsAttached { get; init; }
+	public required PropertyInfo? TargetProperty { get; init; }
+	public required MethodInfo? TargetMethod { get; set; }
+	public required EventInfo? TargetEvent { get; init; }
+	public required string MemberName { get; init; }
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public string MemberName { get; set; }
 	public XamlObjectValue Value { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public bool IsAttached { get; set; }
-	public PropertyInfo? TargetProperty { get; set; }
-	public MethodInfo? TargetMethod { get; set; }
-	public EventInfo? TargetEvent { get; set; }
 
 	public TypeInfo MemberType => TargetMethod?.Parameters.Last().ParameterType ?? TargetProperty?.PropertyType ?? TargetEvent!.EventType;
 

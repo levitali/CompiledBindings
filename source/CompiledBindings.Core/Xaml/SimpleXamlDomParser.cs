@@ -34,21 +34,25 @@ public class SimpleXamlDomParser : XamlDomParser
 		UsedNames = new HashSet<string>(xdoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
 
 		TargetType = DataType = GetRootType(xdoc.Root);
-		var result = new SimpleXamlDom
+
+		var includeNamespaces = new HashSet<string>();
+		var dataTemplates = new List<GeneratedClass>();
+
+		var generationRoot = ProcessRoot(xdoc.Root, null, TargetType);
+
+		return new SimpleXamlDom
 		{
-			RootElement = xdoc.Root,
-			TargetType = TargetType
+			TargetType = TargetType,
+			GeneratedClass = generationRoot,
+			IncludeNamespaces = includeNamespaces,
+			DataTemplates = dataTemplates,
 		};
 
-		ProcessRoot(result, xdoc.Root, null);
-
-		return result;
-
-		void ProcessRoot(SimpleXamlDom rootResult, XElement xroot, TypeInfo? dataType)
+		GeneratedClass ProcessRoot(XElement xroot, TypeInfo? dataType, TypeInfo? targetType)
 		{
 			var rootBindingScope = new BindingScope { DataType = dataType };
-			rootResult.BindingScopes.Add(rootBindingScope);
-			rootResult.XamlObjects = new List<XamlObject>();
+			var bindingScopes = new List<BindingScope> { rootBindingScope };
+			var xamlObjects = new List<XamlObject>();
 
 			var savedDataType = DataType;
 			if (dataType != null)
@@ -62,22 +66,30 @@ public class SimpleXamlDomParser : XamlDomParser
 				obj.IsRoot = true;
 			}
 
-			for (int i = rootResult.BindingScopes.Count - 1; i >= 0; i--)
+			for (int i = bindingScopes.Count - 1; i >= 0; i--)
 			{
-				if (rootResult.BindingScopes[i].Bindings.Count == 0)
+				if (bindingScopes[i].Bindings.Count == 0)
 				{
-					rootResult.BindingScopes.RemoveAt(i);
+					bindingScopes.RemoveAt(i);
 				}
 				else
 				{
-					var s = rootResult.BindingScopes[i];
-					s.BindingsData = BindingParser.CreateBindingsData(s.Bindings, rootResult.TargetType, s.DataType ?? rootResult.TargetType!, DependencyObjectType);
+					var s = bindingScopes[i];
+					s.BindingsData = BindingParser.CreateBindingsData(s.Bindings, targetType, s.DataType ?? targetType!, DependencyObjectType);
 				}
 			}
 
-			rootResult.UpdateMethod = ExpressionUtils.GroupExpressions(rootResult.XamlObjects);
+			var updateMethod = ExpressionUtils.GroupExpressions(xamlObjects);
 
-			DataType = savedDataType;
+			DataType = savedDataType!;
+
+			return new GeneratedClass
+			{
+				RootElement = xroot,
+				UpdateMethod = updateMethod,
+				BindingScopes = bindingScopes,
+				XamlObjects = xamlObjects,
+			};
 
 			XamlObject? ProcessElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType, bool isSupportedParent, string? parentDescription)
 			{
@@ -144,9 +156,9 @@ public class SimpleXamlDomParser : XamlDomParser
 					}
 					if (currentBindingScope.DataType?.Reference.FullName != dataType?.Reference.FullName)
 					{
-						DataType = dataType ?? result.TargetType;
+						DataType = dataType ?? targetType!;
 						BindingScope bs;
-						if (dataType == null && (bs = result.BindingScopes.FirstOrDefault(s => s.DataType == null)) != null)
+						if (dataType == null && (bs = bindingScopes.FirstOrDefault(s => s.DataType == null)) != null)
 						{
 							currentBindingScope = bs;
 						}
@@ -157,7 +169,7 @@ public class SimpleXamlDomParser : XamlDomParser
 								DataType = dataType,
 								ViewName = viewName
 							};
-							rootResult.BindingScopes.Add(currentBindingScope);
+							bindingScopes.Add(currentBindingScope);
 						}
 					}
 				}
@@ -167,13 +179,13 @@ public class SimpleXamlDomParser : XamlDomParser
 				if (attrs.Count > 0 ||
 					(dataTypeAttr != null && !isDataTemplateElement && xelement != xdoc.Root))
 				{
-					var type = xelement == xdoc.Root ? result.TargetType : FindType(xelement);
+					var type = xelement == xdoc.Root ? targetType! : FindType(xelement);
 					obj = new XamlObject(new XamlNode(CurrentLineFile, xelement, xelement.Name), type)
 					{
 						Name = viewName,
 						NameExplicitlySet = nameExplicitlySet
 					};
-					rootResult.XamlObjects.Add(obj);
+					xamlObjects.Add(obj);
 
 					if (attrs.Count > 0)
 					{
@@ -182,7 +194,7 @@ public class SimpleXamlDomParser : XamlDomParser
 							try
 							{
 								var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-								var prop = GetObjectProperty(result, obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null);
+								var prop = GetObjectProperty(obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null, includeNamespaces);
 								obj.Properties.Add(prop);
 
 								var bind = prop.Value.BindValue;
@@ -193,7 +205,7 @@ public class SimpleXamlDomParser : XamlDomParser
 										BindingScope? scope;
 										if (bind.DataType == null)
 										{
-											scope = rootResult.BindingScopes.FirstOrDefault(s => s.DataType == null);
+											scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
 											if (scope != null)
 											{
 												scope.Bindings.Add(bind);
@@ -205,7 +217,7 @@ public class SimpleXamlDomParser : XamlDomParser
 											DataType = bind.DataType,
 											ViewName = viewName
 										};
-										rootResult.BindingScopes.Add(scope);
+										bindingScopes.Add(scope);
 									}
 									else
 									{
@@ -261,15 +273,11 @@ public class SimpleXamlDomParser : XamlDomParser
 				{
 					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
 					{
-						var dataTemplate = new SimpleXamlDom
+						int index = dataTemplates.Count;
+						var dataTemplate = ProcessRoot(child, elementType, null);
+						if (dataTemplate.GenerateCode)
 						{
-							RootElement	= child,
-						};
-						int index = result.DataTemplates.Count;
-						ProcessRoot(dataTemplate, child, elementType);
-						if (dataTemplate.BindingScopes.Count > 0 || !dataTemplate.UpdateMethod!.IsEmpty)
-						{
-							result.DataTemplates.Insert(index, dataTemplate);
+							dataTemplates.Insert(index, dataTemplate);
 						}
 					}
 					else
@@ -344,36 +352,40 @@ public enum ExtenstionType
 	Set
 }
 
-public class SimpleXamlDom : XamlDomBase
+public class GeneratedClass
 {
 	public required XElement RootElement { get; init; }
-	public TypeInfo? TargetType { get; init; }
-	public List<BindingScope> BindingScopes { get; } = new();
-	public List<XamlObject>? XamlObjects { get; set; }
+	public required List<BindingScope> BindingScopes { get; init; }
+	public required List<XamlObject> XamlObjects { get; init; }
+	public required ExpressionGroup UpdateMethod { get; init; }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public ExpressionGroup UpdateMethod;
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
-	public List<SimpleXamlDom> DataTemplates = new();
-
-	public bool GenerateInitializeMethod =>
-		BindingScopes.Count > 0 ||
-		UpdateMethod.SetExpressions.Count > 0 ||
-		UpdateMethod.SetProperties?.Count > 0;
+	public IEnumerable<XamlObjectProperty> EnumerateAllProperties()
+	{
+		return XamlObjects.SelectMany(o => o.Properties);
+	}
 
 	public bool GenerateCode =>
-		GenerateInitializeMethod ||
-		DataTemplates.Any(t => t.GenerateCode) ||
-		EnumerateAllProperties().Any(p => p.Value.BindingValue != null);
+		BindingScopes.Count > 0 ||
+		!UpdateMethod.IsEmpty;
+}
+
+public class SimpleXamlDom : XamlDomBase
+{
+	public required TypeInfo TargetType { get; init; }
+
+	public required GeneratedClass GeneratedClass { get; init; }
+
+	public required List<GeneratedClass> DataTemplates { get; init; }
+
+	public bool GenerateCode =>	GeneratedClass.GenerateCode || DataTemplates.Any(t => t.GenerateCode);
 
 	public IEnumerable<XamlObject> EnumerateAllObjects()
 	{
-		return EnumerableExtensions.SelectTree(this, p => p.DataTemplates, true).SelectMany(p => p.XamlObjects);
+		return GeneratedClass.XamlObjects.Concat(DataTemplates.SelectMany(_ => _.XamlObjects));
 	}
 
 	public IEnumerable<XamlObjectProperty> EnumerateAllProperties()
 	{
-		return EnumerateAllObjects().SelectMany(o => o.Properties);
+		return GeneratedClass.EnumerateAllProperties().Concat(DataTemplates.SelectMany(_ => _.EnumerateAllProperties()));
 	}
 }

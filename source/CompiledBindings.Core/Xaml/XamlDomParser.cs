@@ -135,9 +135,9 @@ public class XamlDomParser
 		return namespaces;
 	}
 
-	public XamlObjectProperty GetObjectProperty(XamlDomBase xamlDom, XamlObject obj, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode, bool throwIfBindWithoutDataType, HashSet<string> includeNamespaces)
 	{
-		return GetObjectProperty(xamlDom, obj, xamlNode.Name.LocalName, xamlNode, throwIfBindWithoutDataType);
+		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, throwIfBindWithoutDataType, includeNamespaces);
 	}
 
 	public static string GenerateName(XElement element, HashSet<string> usedNames)
@@ -184,16 +184,10 @@ public class XamlDomParser
 		throw new GeneratorException($"The type {className} was not found.", CurrentFile, xobject);
 	}
 
-	private XamlObjectProperty GetObjectProperty(XamlDomBase xamlDom, XamlObject obj, string memberName, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode, bool throwIfBindWithoutDataType, HashSet<string> includeNamespaces)
 	{
 		try
 		{
-			var objProp = new XamlObjectProperty
-			{
-				Object = obj,
-				XamlNode = xamlNode,
-			};
-
 			XName? attachedClassName = null;
 			string? attachedPropertyName = null;
 
@@ -204,6 +198,11 @@ public class XamlDomParser
 				attachedClassName = (xamlNode.Name.Namespace is var n && n == XNamespace.None ? DefaultNamespace : n) + typeName;
 				attachedPropertyName = memberName.Substring(index + 1);
 			}
+
+			PropertyInfo? targetProperty = null;
+			EventInfo? targetEvent = null;
+			MethodInfo? targetMethod = null;
+			bool isAttached = false;
 
 			if (attachedClassName != null)
 			{
@@ -227,25 +226,24 @@ public class XamlDomParser
 					throw new GeneratorException($"The attached property {attachPropertyOwnerType.Reference.FullName}.{attachedPropertyName} cannot be used for objects of type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
 				}
 
-				objProp.MemberName = attachedPropertyName!;
-				objProp.TargetMethod = setPropertyMethod;
-				objProp.IsAttached = true;
+				memberName = attachedPropertyName!;
+				targetMethod = setPropertyMethod;
+				isAttached = true;
 			}
 			else
 			{
-				objProp.MemberName = memberName;
 				var typeInfo = obj.Type;
 				var pi = typeInfo.Properties.FirstOrDefault(p => p.Definition.Name == memberName);
 				if (pi != null)
 				{
-					objProp.TargetProperty = pi;
+					targetProperty = pi;
 				}
 				else
 				{
 					var @event = obj.Type.Events.FirstOrDefault(e => e.Definition.Name == memberName);
 					if (@event != null)
 					{
-						objProp.TargetEvent = @event;
+						targetEvent = @event;
 					}
 					else
 					{
@@ -259,7 +257,7 @@ public class XamlDomParser
 										.FirstOrDefault(m => m.Parameters.Count == 2 && m.Parameters[0].ParameterType.IsAssignableFrom(obj.Type));
 								if (method != null)
 								{
-									xamlDom.IncludeNamespaces.Add(clrNs);
+									includeNamespaces.Add(clrNs);
 									break;
 								}
 							}
@@ -273,12 +271,23 @@ public class XamlDomParser
 							throw new GeneratorException($"Cannot bind to method {obj.Type.Reference.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
 						}
 
-						objProp.TargetMethod = method;
+						targetMethod = method;
 					}
 				}
 			}
 
-			objProp.Value = GetObjectValue(xamlDom, obj, objProp, xamlNode, throwIfBindWithoutDataType);
+			var objProp = new XamlObjectProperty
+			{
+				Object = obj,
+				XamlNode = xamlNode,
+				MemberName = memberName,
+				TargetProperty = targetProperty,
+				TargetMethod = targetMethod,
+				TargetEvent = targetEvent,
+				IsAttached = isAttached,
+			};
+
+			objProp.Value = GetObjectValue(obj, objProp, xamlNode, throwIfBindWithoutDataType, includeNamespaces);
 			return objProp;
 		}
 		catch (ParseException ex)
@@ -291,24 +300,24 @@ public class XamlDomParser
 		}
 	}
 
-	private XamlObjectValue GetObjectValue(XamlDomBase xamlDom, XamlObject obj, XamlObjectProperty objProp, XamlNode xamlNode, bool throwIfBindWithoutDataType)
+	private XamlObjectValue GetObjectValue(XamlObject obj, XamlObjectProperty objProp, XamlNode xamlNode, bool throwIfBindWithoutDataType, HashSet<string> includeNamespaces)
 	{
 		var value = new XamlObjectValue();
 
-		bool isCompiledBindingsNs = 
+		bool isCompiledBindingsNs =
 			xamlNode.Children.Count == 1 &&
 			XamlNamespace.GetClrNamespace(xamlNode.Children[0].Name.NamespaceName) == "CompiledBindings.Markup";
 
 		var propType = objProp.MemberType;
-		if (xamlNode.Children.Count == 1 && 
+		if (xamlNode.Children.Count == 1 &&
 			(xamlNode.Children[0].Name == xSet ||
 				isCompiledBindingsNs && xamlNode.Children[0].Name.LocalName is "Set" or "SetExtension"))
 		{
 			try
 			{
 				var staticNode = xamlNode.Children[0];
-				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces, out var dummy);
-				xamlDom.IncludeNamespaces.UnionWith(includeNamespaces.Select(ns => ns.ClrNamespace!));
+				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces2, out var dummy);
+				includeNamespaces.UnionWith(includeNamespaces2.Select(ns => ns.ClrNamespace!));
 				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp.MemberType);
 				CorrectMethod(objProp, value.StaticValue.Type);
 				obj.GenerateMember = true;
@@ -318,7 +327,7 @@ public class XamlDomParser
 				HandleParseException(ex);
 			}
 		}
-		else if (xamlNode.Children.Count == 1 && 
+		else if (xamlNode.Children.Count == 1 &&
 			(xamlNode.Children[0].Name == xBind ||
 				(isCompiledBindingsNs && xamlNode.Children[0].Name.LocalName is "Bind" or "BindExtension")))
 		{
@@ -337,7 +346,7 @@ public class XamlDomParser
 					.FirstOrDefault(a => a != null);
 				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
 
-				var bind = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, xamlDom.IncludeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex);
+				var bind = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, includeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex);
 
 				if (isPropertyTypeBinding)
 				{

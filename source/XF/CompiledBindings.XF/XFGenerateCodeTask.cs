@@ -302,7 +302,7 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 		return $@"this.Resources.ContainsKey(""{resourceName}"") == true ? this.Resources[""{resourceName}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resourceName}""]";
 	}
 
-	protected override void GenerateAdditionalClassCode(StringBuilder output, SimpleXamlDom parseResult, string className)
+	protected override void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)
 	{
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 

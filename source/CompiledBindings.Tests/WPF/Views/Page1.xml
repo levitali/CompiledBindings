@@ -6,9 +6,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mx="http://compiledbindings.com/x"
     xmlns:system="using:System"
+    xmlns:ui="using:UI"
     xmlns:viewModels="using:WPFTest.ViewModels"
     xmlns:views="clr-namespace:WPFTest.Views"
-		xmlns:ui="using:UI"
     mc:Ignorable="d mx"
     x:Class="WPFTest.Views.Page1"
     mx:DataType="viewModels:Page1ViewModel"
@@ -27,6 +27,7 @@
                     Text="{x:Bind BooleanProp}"
                     Visibility="{x:Bind views:XamlUtils.TrueToVisible(BooleanProp)}" />
                 <TextBlock IsEnabled="{x:Bind BooleanProp, Converter={StaticResource InverseBooleanConverter}}" />
+                <Image Source="{x:Set local:Utils.LoadImageAsync()}" />
             </Grid>
         </DataTemplate>
 
@@ -67,17 +68,20 @@
         <Button
             IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
-        <TextBox Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" IsReadOnly="{x:Bind not ModifyViewModel.CanChangeInput1, FallbackValue=false}" />
+        <TextBox
+            IsReadOnly="{x:Bind not ModifyViewModel.CanChangeInput1, FallbackValue=false}"
+            Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
         <TextBox
             local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"
             Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
-        <TextBox Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}"
-								 ui:FocusManager.Focused="{x:Bind FocusedField[Field1], UpdateSourceEventNames=GotFocus|LostFocus}"/>
+        <TextBox
+            ui:FocusManager.Focused="{x:Bind FocusedField[Field1], UpdateSourceEventNames=GotFocus|LostFocus}"
+            Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}" />
         <CheckBox
             Grid.Column="{x:Bind IntProp}"
             local:TestExtensions.MyProperty="{x:Set 6}"
             IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}" />
-			<TextBlock Text="{x:Bind ModifyViewModel.ModifyTaskProp, FallbackValue='Loading...'}" />
-		</StackPanel>
+        <TextBlock Text="{x:Bind ModifyViewModel.ModifyTaskProp, FallbackValue='Loading...'}" />
+    </StackPanel>
 
 </Page>
