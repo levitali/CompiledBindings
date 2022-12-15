@@ -118,7 +118,11 @@ public class WinUIGenerateCodeTask : Task
 							lineFile = targetRelativePath;
 						}
 
-						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc);
+						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc, (line, startColumn, endColumn, message) => Log.LogError(null, null, null, file, line, startColumn, line, endColumn, message));
+						if (parseResult == null)
+						{
+							return false;
+						}
 
 						if (parseResult.GenerateCode)
 						{

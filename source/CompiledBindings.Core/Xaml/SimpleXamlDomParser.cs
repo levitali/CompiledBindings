@@ -26,8 +26,10 @@ public class SimpleXamlDomParser : XamlDomParser
 		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
 	}
 
-	public SimpleXamlDom Parse(string file, string lineFile, XDocument xdoc)
+	public SimpleXamlDom? Parse(string file, string lineFile, XDocument xdoc, Action<int, int, int, string> log)
 	{
+		bool errors = false;
+
 		CurrentFile = file;
 		CurrentLineFile = lineFile;
 
@@ -40,7 +42,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 		var generationRoot = ProcessRoot(xdoc.Root, null, TargetType);
 
-		return new SimpleXamlDom
+		return errors ? null : new SimpleXamlDom
 		{
 			TargetType = TargetType,
 			GeneratedClass = generationRoot,
@@ -187,84 +189,79 @@ public class SimpleXamlDomParser : XamlDomParser
 					};
 					xamlObjects.Add(obj);
 
-					if (attrs.Count > 0)
+					foreach (var attr in attrs)
 					{
-						foreach (var attr in attrs)
+						try
 						{
-							try
-							{
-								var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-								var prop = GetObjectProperty(obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null, includeNamespaces);
-								obj.Properties.Add(prop);
+							var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
+							var prop = GetObjectProperty(obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null, includeNamespaces);
+							obj.Properties.Add(prop);
 
-								var bind = prop.Value.BindValue;
-								if (bind != null)
+							var bind = prop.Value.BindValue;
+							if (bind != null)
+							{
+								if (bind.DataTypeSet)
 								{
-									if (bind.DataTypeSet)
+									BindingScope? scope;
+									if (bind.DataType == null)
 									{
-										BindingScope? scope;
-										if (bind.DataType == null)
+										scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
+										if (scope != null)
 										{
-											scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
-											if (scope != null)
-											{
-												scope.Bindings.Add(bind);
-												continue;
-											}
+											scope.Bindings.Add(bind);
+											continue;
 										}
-										scope = new BindingScope
-										{
-											DataType = bind.DataType,
-											ViewName = viewName
-										};
-										bindingScopes.Add(scope);
 									}
-									else
+									scope = new BindingScope
 									{
-										currentBindingScope.Bindings.Add(bind);
+										DataType = bind.DataType,
+										ViewName = viewName
+									};
+									bindingScopes.Add(scope);
+								}
+								else
+								{
+									currentBindingScope.Bindings.Add(bind);
+								}
+								if (bind.IsItemsSource)
+								{
+									if (elementType != null)
+									{
+										throw new ParseException(Res.IsItemsSourceAlreadySet);
 									}
-									if (bind.IsItemsSource)
+									elementType = bind.Expression!.Type.GetItemType();
+									if (elementType == null)
 									{
-										if (elementType != null)
+										var expr = Expression.StripParenExpression(bind.Expression);
+										if (expr is CastExpression cast)
 										{
-											throw new ParseException(Res.IsItemsSourceAlreadySet);
+											elementType = cast.Expression.Type.GetItemType();
 										}
-										elementType = bind.Expression!.Type.GetItemType();
 										if (elementType == null)
 										{
-											var expr = Expression.StripParenExpression(bind.Expression);
-											if (expr is CastExpression cast)
-											{
-												elementType = cast.Expression.Type.GetItemType();
-											}
-											if (elementType == null)
-											{
-												throw new ParseException(Res.ElementTypeCannotBeInferred);
-											}
+											throw new ParseException(Res.ElementTypeCannotBeInferred);
 										}
 									}
 								}
 							}
-							catch (GeneratorException ex)
+						}
+						catch (GeneratorException ex)
+						{
+							log(ex.LineNumber, ex.ColumnNumber, ex.EndColumnNumber, ex.Message);
+							errors |= true;
+						}
+						catch (ParseException ex)
+						{
+							int lineNumber = 0, columnNumber = attr.Name.LocalName.Length + 1 + ex.Position;
+							if (attr is IXmlLineInfo li)
 							{
-								ex.File = file;
-								throw;
+								lineNumber = li.LineNumber;
+								columnNumber += li.LinePosition;
 							}
-							catch (ParseException ex)
-							{
-								var lineInfo = new LineInfo
-								{
-									File = file,
-									ColumnNumber = attr.Name.LocalName.Length + 1 + ex.Position
-								};
-								if (attr is IXmlLineInfo li)
-								{
-									lineInfo.LineNumber = li.LineNumber;
-									lineInfo.ColumnNumber += li.LinePosition;
-								}
-								lineInfo.EndColumnNumber = lineInfo.ColumnNumber + ex.Length;
-								throw new GeneratorException(ex.Message, lineInfo);
-							}
+							int endColumnNumber = columnNumber + ex.Length;
+
+							log(lineNumber, columnNumber, endColumnNumber, ex.Message);
+							errors |= true;
 						}
 					}
 				}
@@ -377,7 +374,7 @@ public class SimpleXamlDom : XamlDomBase
 
 	public required List<GeneratedClass> DataTemplates { get; init; }
 
-	public bool GenerateCode =>	GeneratedClass.GenerateCode || DataTemplates.Any(t => t.GenerateCode);
+	public bool GenerateCode => GeneratedClass.GenerateCode || DataTemplates.Any(t => t.GenerateCode);
 
 	public IEnumerable<XamlObject> EnumerateAllObjects()
 	{
