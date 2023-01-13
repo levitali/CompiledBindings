@@ -130,8 +130,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
 
-							bool dataTemplates = parseResult.DataTemplates.Count > 0;
-							generateDataTemplateBindings |= dataTemplates;
+							generateDataTemplateBindings |= parseResult.DataTemplates.Count > 0;
 
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var dirInfo = new DirectoryInfo(targetDir);
@@ -357,7 +356,7 @@ $@"				new global::System.Tuple<global::System.Func<global::{bind.DataType!.Refe
 				}
 
 				output.Append(
-	$@"			}}");
+$@"			}}");
 			}
 			else
 			{

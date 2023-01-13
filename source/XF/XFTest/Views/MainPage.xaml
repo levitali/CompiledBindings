@@ -20,6 +20,12 @@
                     Text="{x:Bind BooleanProp}" />
             </StackLayout>
         </DataTemplate>
+
+        <DataTemplate
+            x:Key="test2Template"
+            x:DataType="vm:EntityViewModel">
+            <Picker ItemDisplayBinding="{x:Bind DecimalProp, DataType=vm:EntityViewModel}" />
+        </DataTemplate>
     </Page.Resources>
 
     <StackLayout>

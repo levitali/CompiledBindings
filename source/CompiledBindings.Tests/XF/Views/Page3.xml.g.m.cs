@@ -8,7 +8,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Label label1;
 		private global::Xamarin.Forms.Label label2;
 		private global::Xamarin.Forms.Label label3;
-		private global::Xamarin.Forms.Picker picker1;
+		private global::Xamarin.Forms.Picker picker2;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -21,7 +21,7 @@ namespace XFTest.Views
 			label1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label1");
 			label2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label2");
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label3");
-			picker1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(this, "picker1");
+			picker2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(this, "picker2");
 
 
 			this.BindingContextChanged += this_BindingContextChanged;
@@ -72,8 +72,8 @@ namespace XFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
-#line (22, 13) - (22, 46) 22 "Page3.xml"
-				_targetRoot.picker1.ItemsSource = dataRoot.PickedItems;
+#line (30, 13) - (30, 46) 30 "Page3.xml"
+				_targetRoot.picker2.ItemsSource = dataRoot.PickedItems;
 #line default
 				Update0(dataRoot);
 			}
@@ -92,7 +92,7 @@ namespace XFTest.Views
 			private void Update0_Entity(global::XFTest.ViewModels.EntityModel value)
 			{
 				var dataRoot = _dataRoot;
-#line (17, 16) - (17, 64) 17 "Page3.xml"
+#line (25, 16) - (25, 64) 25 "Page3.xml"
 				_targetRoot.label1.IsVisible = value != null && dataRoot.IsLoading;
 #line default
 				Update1(value);
@@ -102,21 +102,21 @@ namespace XFTest.Views
 			private void Update0_IsLoading(global::System.Boolean value)
 			{
 				var dataRoot = _dataRoot;
-#line (17, 16) - (17, 64) 17 "Page3.xml"
+#line (25, 16) - (25, 64) 25 "Page3.xml"
 				_targetRoot.label1.IsVisible = dataRoot.Entity != null && value;
 #line default
 			}
 
 			private void Update1_SByteProp(global::System.SByte? value)
 			{
-#line (18, 16) - (18, 47) 18 "Page3.xml"
+#line (26, 16) - (26, 47) 26 "Page3.xml"
 				_targetRoot.label2.Text = value?.ToString();
 #line default
 			}
 
 			private void Update1_UShortProp(global::System.UInt16? value)
 			{
-#line (19, 16) - (19, 48) 19 "Page3.xml"
+#line (27, 16) - (27, 48) 27 "Page3.xml"
 				_targetRoot.label3.Text = value?.ToString();
 #line default
 			}
@@ -232,11 +232,35 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
+	class Page3_DataTemplate0_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
+	{
+		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.EntityModel, global::System.SByte>(
+			dataRoot => dataRoot == null ? (default, false) : (
+#line (20, 21) - (20, 92) 20 "Page3.xml"
+				dataRoot.SByteProp,
+#line default
+				true),
+			null,
+			new[]
+			{
+				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.EntityModel, object>, string>(dataRoot =>
+#line (20, 21) - (20, 92) 20 "Page3.xml"
+					dataRoot,
+#line default
+					"SByteProp"),
+			});
+
+		public object ProvideValue(global::System.IServiceProvider serviceProvider)
+		{
+			return _binding;
+		}
+	}
+
+	class Page3_picker2_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
 			dataRoot => dataRoot == null ? (default, false) : (
-#line (21, 13) - (21, 83) 21 "Page3.xml"
+#line (29, 13) - (29, 83) 29 "Page3.xml"
 				dataRoot.Description,
 #line default
 				true),
@@ -244,7 +268,7 @@ namespace XFTest.Views
 			new[]
 			{
 				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.PickItem, object>, string>(dataRoot =>
-#line (21, 13) - (21, 83) 21 "Page3.xml"
+#line (29, 13) - (29, 83) 29 "Page3.xml"
 					dataRoot,
 #line default
 					"Description"),

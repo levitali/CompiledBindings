@@ -137,8 +137,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
 
-							bool dataTemplates = parseResult.DataTemplates.Count > 0;
-							generateDataTemplateBindings |= dataTemplates;
+							generateDataTemplateBindings |= parseResult.DataTemplates.Count > 0;
 
 							var dirInfo = new DirectoryInfo(targetDir);
 							dirInfo.Create();

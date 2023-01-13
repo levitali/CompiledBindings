@@ -13,6 +13,14 @@
     x:Class="XFTest.Views.Page3"
     x:DataType="viewModels:Page3ViewModel">
 
+    <Page.Resources>
+        <DataTemplate
+            x:Key="test1Template"
+            x:DataType="viewModels:EntityViewModel">
+            <Picker ItemDisplayBinding="{x:Bind SByteProp, DataType=viewModels:EntityModel}" />
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
         <Label IsVisible="{x:Bind Entity ne null and IsLoading}" />
         <Label Text="{x:Bind Entity.SByteProp}" />
