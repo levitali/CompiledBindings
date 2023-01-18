@@ -566,17 +566,19 @@ public static class BindingParser
 			.Where(b => b.Property.TargetEvent == null &&
 						b.SourceExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
-			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e)))
-			.Where(e => CheckPropertyNotifiable(e.expr))
+			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e, notif: CheckPropertyNotifiable(e))))
+			.Where(e => e.notif != false)
 			.GroupBy(e => e.expr.Expression.CSharpCode)
 			.OrderBy(g => g.Key)
 			.Select((g, i) =>
 			{
-				var expr1 = g.First().expr.Expression;
+				var f = g.First();
+				var expr1 = f.expr.Expression;
 				var d = new NotifySource
 				{
 					Expression = expr1,
 					SourceExpression = expr1,
+					CheckINotifyPropertyChanged = f.notif == null,
 					Index = i,
 				};
 				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
@@ -598,8 +600,12 @@ public static class BindingParser
 			})
 			.ToList();
 
-		bool CheckPropertyNotifiable(MemberExpression expr)
+		bool? CheckPropertyNotifiable(MemberExpression expr)
 		{
+			if (expr.IsNotifiable == false)
+			{
+				return false;
+			}
 			var type = expr.Expression.Type;
 			var res = expr.Member is PropertyInfo pi &&
 				   !pi.Definition.IsStatic() &&
@@ -607,7 +613,11 @@ public static class BindingParser
 				   (dependencyObjectType?.IsAssignableFrom(type) == true && 
 						type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == pi.Definition.Name + "Property"))) &&
 				   !pi.IsReadOnly;
-			return res;
+			if (res)
+				return true;
+			if (expr.IsNotifiable == true)
+				return null;
+			return false;
 		}
 
 		return notifySources;
@@ -639,6 +649,7 @@ public class NotifySource
 	public List<NotifyProperty> Properties { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public UpdateMethodData? UpdateMethod { get; set; }
+	public bool CheckINotifyPropertyChanged { get; init; }
 	public int Index { get; init; }
 
 	public NotifySource Clone()

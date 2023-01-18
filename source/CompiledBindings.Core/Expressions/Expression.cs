@@ -127,15 +127,18 @@ public class VariableExpression : Expression
 
 public class MemberExpression : Expression, IAccessExpression
 {
-	public MemberExpression(Expression expression, IMemberInfo member, TypeInfo type) : base(type)
+	public MemberExpression(Expression expression, IMemberInfo member, TypeInfo type, bool? isNotifiable = null) : base(type)
 	{
 		Expression = expression;
 		Member = member;
+		IsNotifiable = isNotifiable;
 	}
 
 	public Expression Expression { get; private set; }
 
 	public IMemberInfo Member { get; }
+
+	public bool? IsNotifiable { get; }
 
 	protected override string GetCSharpCode()
 	{
@@ -191,7 +194,7 @@ public class UnaryExpression : Expression
 	{
 		yield return Expression;
 	}
-	
+
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
 		var clone = (UnaryExpression)base.CloneReplaceCore(current, replace);

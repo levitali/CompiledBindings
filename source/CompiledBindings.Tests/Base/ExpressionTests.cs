@@ -25,7 +25,7 @@ public class ExpressionTests
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out IList<XamlNamespace> dummyNamespaces, out int dummyPos);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
-		var expression2 = "(RefProp.NullStructProp + RefProp.StructProp).TestMethod()";
+		var expression2 = @"(RefProp/.NullStructProp + RefProp\.StructProp).TestMethod()";
 		var expectedCode2 = "(dataRoot.RefProp?.NullStructProp + dataRoot.RefProp?.StructProp)?.TestMethod()";
 		var res2 = ExpressionParser.Parse(class1Type, "dataRoot", expression2, intType, true, new XamlNamespace[0], out dummyNamespaces, out dummyPos);
 		Assert.That(res2.CSharpCode.Equals(expectedCode2));

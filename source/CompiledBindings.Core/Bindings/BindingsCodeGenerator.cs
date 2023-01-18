@@ -417,9 +417,23 @@ $@"
 $@"						{cacheVar} = null;
 					}}
 					if ({cacheVar} == null && value != null)
-					{{
-						{cacheVar} = value;");
-				GenerateSetPropertyChangedEventHandler(notifySource, cacheVar, "\t");
+					{{");
+				string? a = null;
+				if (notifySource.CheckINotifyPropertyChanged)
+				{
+					output.AppendLine(
+$@"						if (value is INotifyPropertyChanged)
+						{{");
+					a = "\t";
+				}
+				output.AppendLine(
+$@"{a}						{cacheVar} = value;");
+				GenerateSetPropertyChangedEventHandler(notifySource, cacheVar, a + "\t");
+				if (notifySource.CheckINotifyPropertyChanged)
+				{
+					output.AppendLine(
+$@"						}}");
+				}
 				output.AppendLine(
 $@"					}}
 				}}");
@@ -431,7 +445,7 @@ $@"					}}
 
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type))
+				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
 $@"
@@ -596,7 +610,7 @@ $@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.Sou
 
 		void GenerateSetPropertyChangedEventHandler(NotifySource notifySource, string cacheVar, string? a)
 		{
-			if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type))
+			if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
 			{
 				output.AppendLine(
 $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged += OnPropertyChanged{notifySource.Index};");
@@ -612,7 +626,7 @@ $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyCh
 
 		void GenerateUnsetPropertyChangedEventHandler(NotifySource notifySource, string cacheVar, string? a)
 		{
-			if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type))
+			if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
 			{
 				output.AppendLine(
 $@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged -= OnPropertyChanged{notifySource.Index};");

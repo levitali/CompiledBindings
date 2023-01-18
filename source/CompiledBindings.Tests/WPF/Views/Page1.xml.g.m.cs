@@ -1,5 +1,6 @@
 namespace WPFTest.Views
 {
+	using System.ComponentModel;
 	using WPFTest.Views;
 
 #nullable disable
@@ -94,31 +95,39 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _targetRoot;
-				Update0_DecimalProp(dataRoot._viewModel.DecimalProp);
-				Update1_SelectedItem(dataRoot.listView.SelectedItem);
-				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
-				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.listView);
-			}
-
-			private void Update0_DecimalProp(global::System.Decimal value)
-			{
-#line (46, 13) - (46, 52) 46 "Page1.xml"
-				_targetRoot.textBlock5.Text = value.ToString();
+#line (46, 13) - (46, 53) 46 "Page1.xml"
+				_targetRoot.textBlock5.Text = dataRoot._viewModel.DecimalProp.ToString();
 #line default
+				Update0_SelectedItems(dataRoot.listView.SelectedItems);
+				Update0_SelectedItem(dataRoot.listView.SelectedItem);
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot.listView);
 			}
 
-			private void Update1_SelectedItem(global::System.Object value)
+			private void Update0_SelectedItem(global::System.Object value)
 			{
 #line (69, 13) - (69, 81) 69 "Page1.xml"
 				_targetRoot.button1.IsEnabled = value != null;
 #line default
 			}
 
+			private void Update0_SelectedItems(global::System.Collections.IList value)
+			{
+				Update1_Count(value?.Count);
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
+			}
+
+			private void Update1_Count(global::System.Int32? value)
+			{
+#line (84, 7) - (84, 80) 84 "Page1.xml"
+				_targetRoot.checkBox2.IsEnabled = value > 0;
+#line default
+			}
+
 			class Page1_BindingsTrackings_
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::WPFTest.ViewModels.Page1ViewModel _propertyChangeSource0;
-				global::System.Windows.Controls.ListView _propertyChangeSource1;
+				global::System.Windows.Controls.ListView _propertyChangeSource0;
+				global::System.Collections.IList _propertyChangeSource1;
 
 				public Page1_BindingsTrackings_(Page1_Bindings_ bindings)
 				{
@@ -131,56 +140,52 @@ namespace WPFTest.Views
 					SetPropertyChangedEventHandler1(null);
 				}
 
-				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.Page1ViewModel value)
+				public void SetPropertyChangedEventHandler0(global::System.Windows.Controls.ListView value)
 				{
 					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
 					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
+							.RemoveValueChanged(_propertyChangeSource0, OnPropertyChanged0_SelectedItem);
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.SelectedItemsProperty, typeof(global::System.Windows.Controls.ListView))
+							.RemoveValueChanged(_propertyChangeSource0, OnPropertyChanged0_SelectedItems);
 						_propertyChangeSource0 = null;
 					}
 					if (_propertyChangeSource0 == null && value != null)
 					{
 						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
-				}
-
-				public void SetPropertyChangedEventHandler1(global::System.Windows.Controls.ListView value)
-				{
-					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
-					{
 						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
 								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
-							.RemoveValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
+							.AddValueChanged(_propertyChangeSource0, OnPropertyChanged0_SelectedItem);
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.SelectedItemsProperty, typeof(global::System.Windows.Controls.ListView))
+							.AddValueChanged(_propertyChangeSource0, OnPropertyChanged0_SelectedItems);
+					}
+				}
+
+				public void SetPropertyChangedEventHandler1(global::System.Collections.IList value)
+				{
+					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
+					{
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
 						_propertyChangeSource1 = null;
 					}
 					if (_propertyChangeSource1 == null && value != null)
 					{
-						_propertyChangeSource1 = value;
-						global::System.ComponentModel.DependencyPropertyDescriptor
-							.FromProperty(
-								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
-							.AddValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
+						if (value is INotifyPropertyChanged)
+						{
+							_propertyChangeSource1 = value;
+							((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged += OnPropertyChanged1;
+						}
 					}
 				}
 
-				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
-				{
-					var bindings = TryGetBindings();
-					if (bindings == null)
-					{
-						return;
-					}
-
-					var typedSender = (global::WPFTest.ViewModels.Page1ViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "DecimalProp")
-					{
-						bindings.Update0_DecimalProp(typedSender.DecimalProp);
-					}
-				}
-
-				private void OnPropertyChanged1_SelectedItem(object sender, global::System.EventArgs e)
+				private void OnPropertyChanged0_SelectedItem(object sender, global::System.EventArgs e)
 				{
 					var bindings = TryGetBindings();
 					if (bindings == null)
@@ -189,7 +194,34 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::System.Windows.Controls.ListView)sender;
-					bindings.Update1_SelectedItem(typedSender.SelectedItem);
+					bindings.Update0_SelectedItem(typedSender.SelectedItem);
+				}
+
+				private void OnPropertyChanged0_SelectedItems(object sender, global::System.EventArgs e)
+				{
+					var bindings = TryGetBindings();
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::System.Windows.Controls.ListView)sender;
+					bindings.Update0_SelectedItems(typedSender.SelectedItems);
+				}
+
+				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
+				{
+					var bindings = TryGetBindings();
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::System.Collections.IList)sender;
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "Count")
+					{
+						bindings.Update1_Count(typedSender.Count);
+					}
 				}
 
 				Page1_Bindings_ TryGetBindings()
@@ -633,12 +665,12 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (84, 20) - (84, 93) 84 "Page1.xml"
+#line (85, 20) - (85, 93) 85 "Page1.xml"
 						var task = value;
 #line default
 						if (task?.IsCompleted != true)
 						{
-#line (84, 20) - (84, 93) 84 "Page1.xml"
+#line (85, 20) - (85, 93) 85 "Page1.xml"
 							_targetRoot.textBlock13.Text = "Loading...";
 #line default
 							if (task == null)
@@ -646,7 +678,7 @@ namespace WPFTest.Views
 								return;
 							}
 						}
-#line (84, 20) - (84, 93) 84 "Page1.xml"
+#line (85, 20) - (85, 93) 85 "Page1.xml"
 						var result = await task;
 #line default
 						if (!cancellationToken.IsCancellationRequested)

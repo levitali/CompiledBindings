@@ -263,11 +263,12 @@ public class ExpressionParser
 		var expr = ParsePrimaryStart();
 		while (true)
 		{
-			if (_token.id == TokenId.Dot)
+			if (_token.id is TokenId.Dot or TokenId.SlashDot or TokenId.BackslashDot)
 			{
+				bool? isNotifiable = _token.id switch { TokenId.BackslashDot => true, TokenId.SlashDot => false, _ => null };
 				ValidateNotMethodAccess(expr);
 				NextToken();
-				expr = ParseMemberAccess(expr);
+				expr = ParseMemberAccess(expr, isNotifiable);
 			}
 			else if (_token.id == TokenId.OpenBracket)
 			{
@@ -875,7 +876,7 @@ public class ExpressionParser
 		}
 	}
 
-	private Expression ParseMemberAccess(Expression instance)
+	private Expression ParseMemberAccess(Expression instance, bool? isNotifiable = null)
 	{
 		int errorPos = _token.pos;
 		string id = GetIdentifier();
@@ -1011,7 +1012,7 @@ public class ExpressionParser
 			}
 		}
 Label_CreateMemberExpression:
-		return new MemberExpression(instance, member, memberType);
+		return new MemberExpression(instance, member, memberType, isNotifiable);
 	}
 
 	private TypeExpression ParseTypeExpression(string prefix, int errorPos)
@@ -1183,8 +1184,25 @@ Label_CreateMemberExpression:
 				break;
 			case '/':
 				NextChar();
-				t = TokenId.Slash;
+				if (_ch == '.')
+				{
+					NextChar();
+					t = TokenId.SlashDot;
+				}
+				else
+				{
+					t = TokenId.Slash;
+				}
 				break;
+			case '\\':
+				NextChar();
+				if (_ch == '.')
+				{
+					NextChar();
+					t = TokenId.BackslashDot;
+					break;
+				}
+				goto default;
 			case ':':
 				NextChar();
 				t = TokenId.Colon;
@@ -1473,6 +1491,8 @@ Label_CreateMemberExpression:
 		GreaterThanEqual,
 		DoubleBar,
 		InterpolatedString,
+		SlashDot,
+		BackslashDot
 	}
 }
 
