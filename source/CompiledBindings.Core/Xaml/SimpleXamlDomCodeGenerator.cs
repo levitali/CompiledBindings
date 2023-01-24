@@ -57,27 +57,30 @@ $@"	using {ns};");
 $@"#nullable disable");
 		}
 
-		output.AppendLine(
+		if (parseResult.GeneratedClass.GenerateClass)
+		{
+			output.AppendLine(
 $@"
 	[global::System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
 	partial class {parseResult.TargetType.Reference.Name}
 	{{");
-		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		var asyncFunctions = parseResult.GeneratedClass.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
-		if (asyncFunctions)
-		{
-			output.AppendLine(
+			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			var asyncFunctions = parseResult.GeneratedClass.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
+			if (asyncFunctions)
+			{
+				output.AppendLine(
 $@"		global::System.Threading.CancellationTokenSource _generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
+			}
+
+			GenerateInitializeMethod(output, parseResult);
+			GenerateBindings(output, parseResult.GeneratedClass, parseResult.TargetType.Reference.Name);
+
+			output.AppendLine(
+$@"	}}");
 		}
 
-		GenerateInitializeMethod(output, parseResult);
-		GenerateBindings(output, parseResult.GeneratedClass, parseResult.TargetType.Reference.Name);
-
-		output.AppendLine(
-$@"	}}");
-
-		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Reference.Name);
 		GenerateAdditionalClassCode(output, parseResult.GeneratedClass, parseResult.TargetType.Reference.Name);
+		GenerateDataTemplates(output, parseResult, parseResult.TargetType.Reference.Name);
 
 		if (parseResult.TargetType.Reference.Namespace != null)
 		{
@@ -265,78 +268,80 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 	{
 		parseResult.BindingScopes.Where(bs => bs.ViewName == null).ForEach(bs => bs.ViewName = "rootElement");
 
-		output.AppendLine(
+		if (parseResult.GenerateClass)
+		{
+			output.AppendLine(
 $@"
 	class {dataTemplateClassName} : global::{IGeneratedDataTemplateFullName}
 	{{");
 
-		GenerateVariablesDeclarations(output, parseResult, false);
+			GenerateVariablesDeclarations(output, parseResult, false);
 
-		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		var asyncFunctions = parseResult.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
-		if (asyncFunctions)
-		{
-			output.AppendLine(
+			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			var asyncFunctions = parseResult.UpdateMethod.SetExpressions.Any(e => taskType.IsAssignableFrom(e.Expression.Type));
+			if (asyncFunctions)
+			{
+				output.AppendLine(
 $@"		private global::System.Threading.CancellationTokenSource _generatedCodeDisposed;");
-		}
+			}
 
-		GenerateResourceDeclarations(output, parseResult, true);
+			GenerateResourceDeclarations(output, parseResult, true);
 
-		// Initialize method
-		output.AppendLine(
+			// Initialize method
+			output.AppendLine(
 $@"
 		public void Initialize(global::{_bindableObject} rootElement)
 		{{");
-		if (asyncFunctions)
-		{
-			output.AppendLine(
+			if (asyncFunctions)
+			{
+				output.AppendLine(
 $@"			_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
-		}
+			}
 
-		GenerateInitializeMethodBody(output, parseResult, "rootElement", true, null);
+			GenerateInitializeMethodBody(output, parseResult, "rootElement", true, null);
 
-		output.AppendLine(
+			output.AppendLine(
 $@"		}}");
 
-		// Cleanup method
-		output.AppendLine();
-		output.AppendLine(
+			// Cleanup method
+			output.AppendLine();
+			output.AppendLine(
 $@"		public void Cleanup(global::{_bindableObject} rootElement)
 		{{");
-		if (asyncFunctions)
-		{
-			output.AppendLine(
+			if (asyncFunctions)
+			{
+				output.AppendLine(
 $@"			_generatedCodeDisposed.Cancel();");
-		}
-
-		foreach (var bs in parseResult.BindingScopes)
-		{
-			if (bs.DataType == null)
-			{
-				output.AppendLine(
-$@"			Bindings.Cleanup();");
 			}
-			else
+
+			foreach (var bs in parseResult.BindingScopes)
 			{
-				var viewName = bs.ViewName ?? "rootElement";
-				output.AppendLine(
+				if (bs.DataType == null)
+				{
+					output.AppendLine(
+$@"			Bindings.Cleanup();");
+				}
+				else
+				{
+					var viewName = bs.ViewName ?? "rootElement";
+					output.AppendLine(
 $@"			{viewName}.{_bindingContextStart}ContextChanged -= {viewName}_{_bindingContextStart}ContextChanged;
 			Bindings_{viewName}.Cleanup();");
+				}
 			}
-		}
 
-		output.AppendLine(
+			output.AppendLine(
 $@"		}}");
 
 
-		GenerateBindingContextChangedHandlers(output, parseResult, null);
+			GenerateBindingContextChangedHandlers(output, parseResult, null);
+			GenerateBindings(output, parseResult, dataTemplateClassName);
 
-		GenerateBindings(output, parseResult, dataTemplateClassName);
+			output.AppendLine(
+$@"	}}");
+		}
 
 		GenerateAdditionalClassCode(output, parseResult, dataTemplateClassName);
-
-		output.AppendLine(
-$@"	}}");
 	}
 
 	private void GenerateVariablesDeclarations(StringBuilder output, GeneratedClass parseResult, bool notExplicitlySet)

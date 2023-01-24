@@ -145,7 +145,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							File.WriteAllText(sourceCodeTargetPath, code);
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
-							if (parseResult.DataTemplates.Count > 0)
+							if (parseResult.DataTemplates.Any(dt => dt.GenerateClass))
 							{
 								var compiledBindingsNs = "clr-namespace:CompiledBindings";
 								var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
@@ -177,17 +177,20 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 								for (int i = 0; i < parseResult.DataTemplates.Count; i++)
 								{
 									var dataTemplate = parseResult.DataTemplates[i];
-									var rootElement = dataTemplate.RootElement.Elements().First();
-									var staticResources = dataTemplate.EnumerateAllProperties()
-										.Select(p => p.Value.BindValue?.Resources)
-										.Where(r => r != null)
-										.SelectMany(r => r.Select(r => r.name))
-										.Distinct();
+									if (dataTemplate.GenerateClass)
+									{
+										var rootElement = dataTemplate.RootElement.Elements().First();
+										var staticResources = dataTemplate.EnumerateAllProperties()
+											.Select(p => p.Value.BindValue?.Resources)
+											.Where(r => r != null)
+											.SelectMany(r => r.Select(r => r.name))
+											.Distinct();
 
-									rootElement.Add(
-										new XElement(mbui + "DataTemplateBindings.Bindings",
-											new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
-												staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
+										rootElement.Add(
+											new XElement(mbui + "DataTemplateBindings.Bindings",
+												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
+													staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
+									}
 								}
 							}
 
@@ -389,7 +392,6 @@ public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 {
 	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
 	{
-
 	}
 
 	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)

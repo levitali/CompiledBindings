@@ -764,7 +764,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page1_DataTemplate1 : global::CompiledBindings.IGeneratedDataTemplate
+	class Page1_DataTemplate2 : global::CompiledBindings.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Label label3;
 		private global::Xamarin.Forms.Label label4;
@@ -773,146 +773,6 @@ namespace XFTest.Views
 		{
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label3");
 			label4 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label4");
-
-
-			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
-			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
-			{
-				Bindings_rootElement.Initialize(this, dataRoot0);
-			}
-		}
-
-		public void Cleanup(global::Xamarin.Forms.Element rootElement)
-		{
-			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
-			Bindings_rootElement.Cleanup();
-		}
-
-		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
-		{
-			Bindings_rootElement.Cleanup();
-			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot)
-			{
-				Bindings_rootElement.Initialize(this, dataRoot);
-			}
-		}
-
-		Page1_DataTemplate1_Bindings_rootElement Bindings_rootElement = new Page1_DataTemplate1_Bindings_rootElement();
-
-		class Page1_DataTemplate1_Bindings_rootElement
-		{
-			Page1_DataTemplate1 _targetRoot;
-			global::XFTest.ViewModels.EntityViewModel _dataRoot;
-			Page1_DataTemplate1_BindingsTrackings_rootElement _bindingsTrackings;
-
-			public void Initialize(Page1_DataTemplate1 targetRoot, global::XFTest.ViewModels.EntityViewModel dataRoot)
-			{
-				_targetRoot = targetRoot;
-				_dataRoot = dataRoot;
-				_bindingsTrackings = new Page1_DataTemplate1_BindingsTrackings_rootElement(this);
-
-				Update();
-
-				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
-			}
-
-			public void Cleanup()
-			{
-				if (_targetRoot != null)
-				{
-					_bindingsTrackings.Cleanup();
-					_dataRoot = null;
-					_targetRoot = null;
-				}
-			}
-
-			public void Update()
-			{
-				var dataRoot = _dataRoot;
-#line (32, 36) - (32, 100) 32 "Page1.xml"
-				_targetRoot.label4.Text = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel)?.ExtraProp;
-#line default
-				Update0_BooleanProp(dataRoot.BooleanProp);
-			}
-
-			private void Update0_BooleanProp(global::System.Boolean value)
-			{
-#line (31, 36) - (31, 62) 31 "Page1.xml"
-				_targetRoot.label3.Text = value.ToString();
-#line default
-			}
-
-			class Page1_DataTemplate1_BindingsTrackings_rootElement
-			{
-				global::System.WeakReference _bindingsWeakRef;
-				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
-
-				public Page1_DataTemplate1_BindingsTrackings_rootElement(Page1_DataTemplate1_Bindings_rootElement bindings)
-				{
-					_bindingsWeakRef = new global::System.WeakReference(bindings);
-				}
-
-				public void Cleanup()
-				{
-					SetPropertyChangedEventHandler0(null);
-				}
-
-				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
-				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
-				}
-
-				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
-				{
-					var bindings = TryGetBindings();
-					if (bindings == null)
-					{
-						return;
-					}
-
-					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
-					{
-						bindings.Update0_BooleanProp(typedSender.BooleanProp);
-					}
-				}
-
-				Page1_DataTemplate1_Bindings_rootElement TryGetBindings()
-				{
-					Page1_DataTemplate1_Bindings_rootElement bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page1_DataTemplate1_Bindings_rootElement)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
-				}
-			}
-		}
-	}
-
-	class Page1_DataTemplate2 : global::CompiledBindings.IGeneratedDataTemplate
-	{
-		private global::Xamarin.Forms.Label label11;
-		private global::Xamarin.Forms.Label label12;
-
-		public void Initialize(global::Xamarin.Forms.Element rootElement)
-		{
-			label11 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label11");
-			label12 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label12");
 
 
 			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
@@ -969,6 +829,146 @@ namespace XFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
+#line (32, 36) - (32, 100) 32 "Page1.xml"
+				_targetRoot.label4.Text = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel)?.ExtraProp;
+#line default
+				Update0_BooleanProp(dataRoot.BooleanProp);
+			}
+
+			private void Update0_BooleanProp(global::System.Boolean value)
+			{
+#line (31, 36) - (31, 62) 31 "Page1.xml"
+				_targetRoot.label3.Text = value.ToString();
+#line default
+			}
+
+			class Page1_DataTemplate2_BindingsTrackings_rootElement
+			{
+				global::System.WeakReference _bindingsWeakRef;
+				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
+
+				public Page1_DataTemplate2_BindingsTrackings_rootElement(Page1_DataTemplate2_Bindings_rootElement bindings)
+				{
+					_bindingsWeakRef = new global::System.WeakReference(bindings);
+				}
+
+				public void Cleanup()
+				{
+					SetPropertyChangedEventHandler0(null);
+				}
+
+				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
+				{
+					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
+					{
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
+						_propertyChangeSource0 = null;
+					}
+					if (_propertyChangeSource0 == null && value != null)
+					{
+						_propertyChangeSource0 = value;
+						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
+					}
+				}
+
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
+				{
+					var bindings = TryGetBindings();
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
+					{
+						bindings.Update0_BooleanProp(typedSender.BooleanProp);
+					}
+				}
+
+				Page1_DataTemplate2_Bindings_rootElement TryGetBindings()
+				{
+					Page1_DataTemplate2_Bindings_rootElement bindings = null;
+					if (_bindingsWeakRef != null)
+					{
+						bindings = (Page1_DataTemplate2_Bindings_rootElement)_bindingsWeakRef.Target;
+						if (bindings == null)
+						{
+							_bindingsWeakRef = null;
+							Cleanup();
+						}
+					}
+					return bindings;
+				}
+			}
+		}
+	}
+
+	class Page1_DataTemplate3 : global::CompiledBindings.IGeneratedDataTemplate
+	{
+		private global::Xamarin.Forms.Label label11;
+		private global::Xamarin.Forms.Label label12;
+
+		public void Initialize(global::Xamarin.Forms.Element rootElement)
+		{
+			label11 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label11");
+			label12 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label12");
+
+
+			rootElement.BindingContextChanged += rootElement_BindingContextChanged;
+			if (rootElement.BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot0)
+			{
+				Bindings_rootElement.Initialize(this, dataRoot0);
+			}
+		}
+
+		public void Cleanup(global::Xamarin.Forms.Element rootElement)
+		{
+			rootElement.BindingContextChanged -= rootElement_BindingContextChanged;
+			Bindings_rootElement.Cleanup();
+		}
+
+		private void rootElement_BindingContextChanged(object sender, global::System.EventArgs e)
+		{
+			Bindings_rootElement.Cleanup();
+			if (((global::Xamarin.Forms.Element)sender).BindingContext is global::XFTest.ViewModels.EntityViewModel dataRoot)
+			{
+				Bindings_rootElement.Initialize(this, dataRoot);
+			}
+		}
+
+		Page1_DataTemplate3_Bindings_rootElement Bindings_rootElement = new Page1_DataTemplate3_Bindings_rootElement();
+
+		class Page1_DataTemplate3_Bindings_rootElement
+		{
+			Page1_DataTemplate3 _targetRoot;
+			global::XFTest.ViewModels.EntityViewModel _dataRoot;
+			Page1_DataTemplate3_BindingsTrackings_rootElement _bindingsTrackings;
+
+			public void Initialize(Page1_DataTemplate3 targetRoot, global::XFTest.ViewModels.EntityViewModel dataRoot)
+			{
+				_targetRoot = targetRoot;
+				_dataRoot = dataRoot;
+				_bindingsTrackings = new Page1_DataTemplate3_BindingsTrackings_rootElement(this);
+
+				Update();
+
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
+			}
+
+			public void Cleanup()
+			{
+				if (_targetRoot != null)
+				{
+					_bindingsTrackings.Cleanup();
+					_dataRoot = null;
+					_targetRoot = null;
+				}
+			}
+
+			public void Update()
+			{
+				var dataRoot = _dataRoot;
 				Update0(dataRoot);
 			}
 
@@ -992,12 +992,12 @@ namespace XFTest.Views
 #line default
 			}
 
-			class Page1_DataTemplate2_BindingsTrackings_rootElement
+			class Page1_DataTemplate3_BindingsTrackings_rootElement
 			{
 				global::System.WeakReference _bindingsWeakRef;
 				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
 
-				public Page1_DataTemplate2_BindingsTrackings_rootElement(Page1_DataTemplate2_Bindings_rootElement bindings)
+				public Page1_DataTemplate3_BindingsTrackings_rootElement(Page1_DataTemplate3_Bindings_rootElement bindings)
 				{
 					_bindingsWeakRef = new global::System.WeakReference(bindings);
 				}
@@ -1045,12 +1045,12 @@ namespace XFTest.Views
 					}
 				}
 
-				Page1_DataTemplate2_Bindings_rootElement TryGetBindings()
+				Page1_DataTemplate3_Bindings_rootElement TryGetBindings()
 				{
-					Page1_DataTemplate2_Bindings_rootElement bindings = null;
+					Page1_DataTemplate3_Bindings_rootElement bindings = null;
 					if (_bindingsWeakRef != null)
 					{
-						bindings = (Page1_DataTemplate2_Bindings_rootElement)_bindingsWeakRef.Target;
+						bindings = (Page1_DataTemplate3_Bindings_rootElement)_bindingsWeakRef.Target;
 						if (bindings == null)
 						{
 							_bindingsWeakRef = null;

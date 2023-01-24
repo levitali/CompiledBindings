@@ -309,7 +309,7 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	{
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 
-		foreach (var bind in parseResult.EnumerateAllProperties().Select(p => p.Value.BindingValue!).Where(v => v != null))
+		foreach (var bind in parseResult.EnumerateBindings())
 		{
 			output.AppendLine();
 			output.AppendLine(

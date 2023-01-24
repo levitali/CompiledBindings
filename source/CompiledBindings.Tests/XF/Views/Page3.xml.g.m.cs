@@ -232,30 +232,6 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3_DataTemplate0_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
-	{
-		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.EntityModel, global::System.SByte>(
-			dataRoot => dataRoot == null ? (default, false) : (
-#line (20, 21) - (20, 92) 20 "Page3.xml"
-				dataRoot.SByteProp,
-#line default
-				true),
-			null,
-			new[]
-			{
-				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.EntityModel, object>, string>(dataRoot =>
-#line (20, 21) - (20, 92) 20 "Page3.xml"
-					dataRoot,
-#line default
-					"SByteProp"),
-			});
-
-		public object ProvideValue(global::System.IServiceProvider serviceProvider)
-		{
-			return _binding;
-		}
-	}
-
 	class Page3_picker2_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
@@ -272,6 +248,30 @@ namespace XFTest.Views
 					dataRoot,
 #line default
 					"Description"),
+			});
+
+		public object ProvideValue(global::System.IServiceProvider serviceProvider)
+		{
+			return _binding;
+		}
+	}
+
+	class Page3_DataTemplate0_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
+	{
+		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.EntityModel, global::System.SByte>(
+			dataRoot => dataRoot == null ? (default, false) : (
+#line (20, 21) - (20, 92) 20 "Page3.xml"
+				dataRoot.SByteProp,
+#line default
+				true),
+			null,
+			new[]
+			{
+				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.EntityModel, object>, string>(dataRoot =>
+#line (20, 21) - (20, 92) 20 "Page3.xml"
+					dataRoot,
+#line default
+					"SByteProp"),
 			});
 
 		public object ProvideValue(global::System.IServiceProvider serviceProvider)

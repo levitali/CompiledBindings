@@ -138,54 +138,44 @@ public class XFProcessResourceXamlTask : Task
 								}
 
 								// Process DataTemplates
-								var dataTemplates = xdoc.Descendants(xamlDomParser.DataTemplate)
-									.Where(e => e.Descendants().SelectMany(e =>
-										e.Attributes()).Any(a => xamlDomParser.IsMemExtension(a) != null))
-									.ToList();
-								if (dataTemplates.Count > 0)
+								var dataTemplates = xdoc.Descendants(xamlDomParser.DataTemplate).ToList();
+								for (int i = 0; i < dataTemplates.Count; i++) 
 								{
-									string rootName;
-									var xNameAttr = xdoc.Root.Attribute(xamlDomParser.xName);
-									if (xNameAttr != null)
+									var dataTemplate = dataTemplates[i];
+									var memExtensions = dataTemplate.Descendants()
+										.SelectMany(e => e.Attributes())
+										.Where(a =>
+											xamlDomParser.IsMemExtension(a) != null &&
+											a.Parent.Ancestors(xamlDomParser.DataTemplate).First() == dataTemplate)
+										.ToList();
+									if (memExtensions.Count == 0)
 									{
-										rootName = xNameAttr.Value;
+										continue;
 									}
-									else
+
+									var dateTemplateClassName = $"{className}_DataTemplate{i}";
+									var dateTemplateFullClassName = $"{classNs}.{dateTemplateClassName}";
+									if (!assemblyTypes.Contains(dateTemplateFullClassName))
 									{
-										rootName = XamlDomParser.GenerateName(xdoc.Root, usedNames);
-										InsertAtEnd(xdoc.Root, $@" x:Name=""{rootName}""");
+										continue;
 									}
-									int dataTemplateIndex = 0;
-									foreach (var dataTemplate in dataTemplates)
+
+									if (compiledBindingsNsPrefix == null)
 									{
-										var memExtensions = dataTemplate.Descendants()
-											.SelectMany(e => e.Attributes())
-											.Where(a =>
-												xamlDomParser.IsMemExtension(a) != null &&
-												EnumerableExtensions.SelectSequence(a.Parent, e => e.Parent, true).First(e => e.Name == xamlDomParser.DataTemplate) == dataTemplate)
-											.ToList();
-										if (memExtensions.Count == 0)
-										{
-											continue;
-										}
-
-										if (compiledBindingsNsPrefix == null)
-										{
-											compiledBindingsNsPrefix = SearchNsPrefix("CompiledBindings");
-											classNsPrefix = SearchNsPrefix(classNs);
-										}
-
-										var regex = new Regex(@"{StaticResource\s+(\w+)}");
-
-										var staticResources = memExtensions
-											.SelectMany(a => regex.Matches(a.Value).Cast<Match>())
-											.Select(m => m.Groups[1].Value)
-											.Distinct();
-										var propInitializers = string.Join(", ", staticResources.Select(r => $"{r}={{StaticResource {r}}}"));
-
-										var rootElement = dataTemplate.Elements().First();
-										InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{className}_DataTemplate{dataTemplateIndex++} {propInitializers}}}\"");
+										compiledBindingsNsPrefix = SearchNsPrefix("CompiledBindings");
+										classNsPrefix = SearchNsPrefix(classNs);
 									}
+
+									var regex = new Regex(@"{StaticResource\s+(\w+)}");
+
+									var staticResources = memExtensions
+										.SelectMany(a => regex.Matches(a.Value).Cast<Match>())
+										.Select(m => m.Groups[1].Value)
+										.Distinct();
+									var propInitializers = string.Join(", ", staticResources.Select(r => $"{r}={{StaticResource {r}}}"));
+
+									var rootElement = dataTemplate.Elements().First();
+									InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{dateTemplateClassName} {propInitializers}}}\"");
 								}
 
 								// Replace/Remove attributes with CompiledBindings namespace
@@ -202,7 +192,14 @@ public class XFProcessResourceXamlTask : Task
 
 									if (elementNames.TryGetValue(attr.Parent, out string name))
 									{
-										var markupExtensionName = $"{className}_{name}_{attr.Name.LocalName}";
+										var markupExtensionName = className;
+										var dataTemplate = attr.Parent.Ancestors(xamlDomParser.DataTemplate).FirstOrDefault();
+										if (dataTemplate != null)
+										{
+											int index = dataTemplates.IndexOf(dataTemplate);
+											markupExtensionName += $"_DataTemplate{index}";
+										}
+										markupExtensionName += $"_{name}_{attr.Name.LocalName}";
 										var markupExtensionFullName = $"{classNs}.{markupExtensionName}";
 										if (assemblyTypes.Contains(markupExtensionFullName))
 										{

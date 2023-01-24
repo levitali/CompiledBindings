@@ -81,7 +81,7 @@
             Grid.Column="{x:Bind IntProp}"
             local:TestExtensions.MyProperty="{x:Set 6}"
             IsChecked="{x:Bind ModifyViewModel.BoolInput, Mode=TwoWay}"
-						IsEnabled="{x:Bind listView.SelectedItems\.Count gt 0, DataType={x:Null}}"/>
+						IsEnabled="{x:Bind listView/.SelectedItems\.Count gt 0, DataType={x:Null}}"/>
         <TextBlock Text="{x:Bind ModifyViewModel.ModifyTaskProp, FallbackValue='Loading...'}" />
     </StackPanel>
 

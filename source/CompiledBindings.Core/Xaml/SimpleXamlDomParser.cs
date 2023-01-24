@@ -272,10 +272,7 @@ public class SimpleXamlDomParser : XamlDomParser
 					{
 						int index = dataTemplates.Count;
 						var dataTemplate = ProcessRoot(child, elementType, null);
-						if (dataTemplate.GenerateCode)
-						{
 							dataTemplates.Insert(index, dataTemplate);
-						}
 					}
 					else
 					{
@@ -361,9 +358,14 @@ public class GeneratedClass
 		return XamlObjects.SelectMany(o => o.Properties);
 	}
 
-	public bool GenerateCode =>
-		BindingScopes.Count > 0 ||
-		!UpdateMethod.IsEmpty;
+	public IEnumerable<Bind> EnumerateBindings()
+	{
+		return EnumerateAllProperties().Select(p => p.Value.BindingValue!).Where(b => b != null);
+	}
+
+	public bool GenerateClass => BindingScopes.Count > 0 || !UpdateMethod.IsEmpty;
+
+	public bool GenerateCode => GenerateClass || EnumerateBindings().Any();
 }
 
 public class SimpleXamlDom : XamlDomBase
