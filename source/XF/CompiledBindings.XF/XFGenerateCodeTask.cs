@@ -118,12 +118,8 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 						}
 
 						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc, (line, startColumn, endColumn, message) => Log.LogError(null, null, null, file, line, startColumn, line, endColumn, message));
-						if (parseResult == null)
-						{
-							return false;
-						}
 
-						if (parseResult.GenerateCode)
+						if (parseResult?.GenerateCode == true)
 						{
 							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion, _platformConstants);
 							string code = codeGenerator.GenerateCode(parseResult);

@@ -194,7 +194,7 @@ public class SimpleXamlDomParser : XamlDomParser
 						try
 						{
 							var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-							var prop = GetObjectProperty(obj, xamlNode, xroot != xdoc.Root && currentBindingScope.DataType == null, includeNamespaces);
+							var prop = GetObjectProperty(obj, xamlNode, includeNamespaces, xroot != xdoc.Root && currentBindingScope.DataType == null);
 							obj.Properties.Add(prop);
 
 							var bind = prop.Value.BindValue;
@@ -324,7 +324,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 	public virtual (bool isSupported, string? controlName) IsElementSupported(XName elementName)
 	{
-		if (elementName == VisualStatesGroups)
+		if (elementName == VisualStateGroups)
 		{
 			return (false, "VisualStateManager");
 		}

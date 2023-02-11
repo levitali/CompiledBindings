@@ -6,7 +6,7 @@ public class XamlDomParser
 
 	public readonly XName DataTemplate;
 	public readonly XName Style;
-	public readonly XName VisualStatesGroups;
+	public readonly XName VisualStateGroups;
 
 	public readonly XName xBind;
 	public readonly XName xDefaultBindMode;
@@ -39,7 +39,7 @@ public class XamlDomParser
 
 		Style = DefaultNamespace + "Style";
 		DataTemplate = DefaultNamespace + "DataTemplate";
-		VisualStatesGroups = DefaultNamespace + "VisualStateManager.VisualStateGroups";
+		VisualStateGroups = DefaultNamespace + "VisualStateManager.VisualStateGroups";
 
 		this.xNamespace = xNamespace;
 		xClass = xNamespace + "Class";
@@ -135,9 +135,9 @@ public class XamlDomParser
 		return namespaces;
 	}
 
-	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode, bool throwIfBindWithoutDataType, HashSet<string> includeNamespaces)
+	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode, HashSet<string> includeNamespaces, bool throwIfBindWithoutDataType)
 	{
-		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, throwIfBindWithoutDataType, includeNamespaces);
+		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, includeNamespaces, throwIfBindWithoutDataType);
 	}
 
 	public static string GenerateName(XElement element, HashSet<string> usedNames)
@@ -184,7 +184,7 @@ public class XamlDomParser
 		throw new GeneratorException($"The type {className} was not found.", CurrentFile, xobject);
 	}
 
-	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode, bool throwIfBindWithoutDataType, HashSet<string> includeNamespaces)
+	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode, HashSet<string> includeNamespaces, bool throwIfBindWithoutDataType)
 	{
 		try
 		{
