@@ -69,6 +69,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
 			bool generateDataTemplateBindings = false;
+			bool result = true;
 
 			var allXaml = Pages.ToList();
 			if (ApplicationDefinition != null)
@@ -125,8 +126,11 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						}
 
 						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc, (line, startColumn, endColumn, message) => Log.LogError(null, null, null, file, line, startColumn, line, endColumn, message));
-
-						if (parseResult?.GenerateCode == true)
+						if (parseResult == null)
+						{
+							result = false;
+						}
+						else if (parseResult.GenerateCode == true)
 						{
 							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
@@ -248,7 +252,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				File.Delete(lrefFile);
 			}
 
-			return true;
+			return result;
 		}
 		catch (GeneratorException ex)
 		{

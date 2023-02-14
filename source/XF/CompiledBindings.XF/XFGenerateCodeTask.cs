@@ -69,6 +69,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 			var generatedCodeFiles = new List<TaskItem>();
 			bool generateDataTemplateBindings = false;
+			bool result = true;
 
 			var xamlFiles = XamlFiles
 				.Distinct(f => f.GetMetadata("FullPath"))
@@ -118,8 +119,11 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 						}
 
 						var parseResult = xamlDomParser.Parse(file, lineFile, xdoc, (line, startColumn, endColumn, message) => Log.LogError(null, null, null, file, line, startColumn, line, endColumn, message));
-
-						if (parseResult?.GenerateCode == true)
+						if (parseResult == null)
+						{
+							result = false;
+						}
+						else if (parseResult.GenerateCode == true)
 						{
 							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion, _platformConstants);
 							string code = codeGenerator.GenerateCode(parseResult);
@@ -155,7 +159,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 			GeneratedCodeFiles = generatedCodeFiles.ToArray();
 
-			return true;
+			return result;
 		}
 		catch (GeneratorException ex)
 		{

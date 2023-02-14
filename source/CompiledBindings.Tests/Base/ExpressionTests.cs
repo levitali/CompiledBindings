@@ -1,16 +1,24 @@
 ﻿namespace CompiledBindings.Tests;
 
-public class ExpressionTests
+public class ExpressionTests : IDisposable
 {
-	[Test]
-	public void TestExpressions()
+	public ExpressionTests()
 	{
 		TypeInfoUtils.LoadReferences(new string[]
 		{
 			typeof(string).Assembly.Location,
 			Assembly.GetExecutingAssembly().Location
 		});
+	}
 
+	public void Dispose()
+	{
+		TypeInfoUtils.Cleanup();
+	}
+
+	[Test]
+	public void TestExpressions()
+	{
 		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
 		var stringType = TypeInfo.GetTypeThrow(typeof(string));
 		var intType = TypeInfo.GetTypeThrow(typeof(int));
@@ -69,17 +77,11 @@ public class ExpressionTests
 	[Test]
 	public void TestIsExpression()
 	{
-		TypeInfoUtils.LoadReferences(new string[]
-		{
-			typeof(string).Assembly.Location,
-			Assembly.GetExecutingAssembly().Location
-		});
-
 		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
 		var stringType = TypeInfo.GetTypeThrow(typeof(string));
 		var intType = TypeInfo.GetTypeThrow(typeof(int));
 
-		var ns = new[] 	
+		var ns = new[]
 		{
 			new XamlNamespace("system", "using:System"),
 			new XamlNamespace("local", "using:CompiledBindings.Tests")
@@ -107,12 +109,12 @@ public class ExpressionTests
 		expectedCode = "!(dataRoot.IntProp == 0 || dataRoot.IntProp == 10)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
-		
+
 
 		expression = "IntProp is ge 0 and not NullIntProp";
 		expectedCode = "dataRoot.IntProp >= 0 && dataRoot.IntProp != dataRoot.NullIntProp";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
-		Assert.That(result.CSharpCode.Equals(expectedCode));		
+		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "(Mode is Mode1 or Mode2) and RefProp.DecimalProp ne 4";
 		expectedCode = "(dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode1 || dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode2) && dataRoot.RefProp?.DecimalProp != 4";
@@ -127,6 +129,38 @@ public class ExpressionTests
 		expression = "ObjProp is system:String or not system:Int32";
 		expectedCode = "dataRoot.ObjProp is global::System.String || !(dataRoot.ObjProp is global::System.Int32)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
+
+	[Test]
+	public void ExpectedTypeAsMember()
+	{
+		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
+		var stringType = TypeInfo.GetTypeThrow(typeof(string));
+		var intType = TypeInfo.GetTypeThrow(typeof(int));
+
+		var ns = new[]
+		{
+			new XamlNamespace("system", "using:System"),
+			new XamlNamespace("local", "using:CompiledBindings.Tests")
+		};
+
+		string expression, expectedCode;
+		Expression result;
+
+		expression = "Mode eq Mode3";
+		expectedCode = "dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode3";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "Mode eq this.Mode3";
+		expectedCode = "dataRoot.Mode == dataRoot.Mode3";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "Check(TestMode)";
+		expectedCode = "dataRoot.Check(dataRoot.TestMode)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, new XamlNamespace[0], out var _, out var _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 }

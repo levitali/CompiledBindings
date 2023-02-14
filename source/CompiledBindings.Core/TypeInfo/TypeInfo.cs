@@ -64,14 +64,15 @@ public class TypeInfo
 			.Select(p =>
 			{
 				var knownNotNull = NotNullableProperties.TryGetValue(p.DeclaringType.FullName, out var props) && props.Contains(p.Name);
-				return new PropertyInfo(p, GetTypeSumElement(p.PropertyType, p.DeclaringType, knownNotNull ? false : null, p.CustomAttributes));
+				var attributesHierarchy = ((p.GetMethod ?? p.SetMethod)?.CustomAttributes ?? Enumerable.Empty<CustomAttribute>()).Concat(p.CustomAttributes);
+				return new PropertyInfo(p, GetTypeSubElement(p.PropertyType, p.DeclaringType, knownNotNull ? false : null, attributesHierarchy));
 			})
 			.ToList();
 
 	public IList<FieldInfo> Fields => _fields ??=
 		EnumerateTypeAndSubTypes()
 			.SelectMany(t => t.GetFields())
-			.Select(f => new FieldInfo(f, GetTypeSumElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes)))
+			.Select(f => new FieldInfo(f, GetTypeSubElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes)))
 			.ToList();
 
 	public IList<MethodInfo> Methods => _methods ??=
@@ -80,22 +81,22 @@ public class TypeInfo
 			.Where(m => !m.IsConstructor)
 			.Select(m => new MethodInfo(
 				m,
-				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
-				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
+				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSubElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
+				GetTypeSubElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 			.ToList();
 
 	public IList<MethodInfo> Constructors => _constructors ??=
 		Reference.ResolveEx()!.GetConstructors()
 			.Select(m => new MethodInfo(
 				m,
-				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSumElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
-				GetTypeSumElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
+				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSubElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
+				GetTypeSubElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 			.ToList();
 
 	public IList<EventInfo> Events => _events ??=
 		EnumerateTypeAndSubTypes()
 			.SelectMany(t => t.GetEvents())
-			.Select(e => new EventInfo(e, GetTypeSumElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
+			.Select(e => new EventInfo(e, GetTypeSubElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 			.ToList();
 
 	public TypeInfo? GetElementType()
@@ -203,7 +204,7 @@ public class TypeInfo
 		return Reference.ToString();
 	}
 
-	internal TypeInfo GetTypeSumElement(TypeReference type, TypeDefinition declaringType, bool? isNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
+	internal TypeInfo GetTypeSubElement(TypeReference type, TypeDefinition declaringType, bool? isNullable, params IEnumerable<CustomAttribute>[] attributesHierarchy)
 	{
 		if (type.IsGenericParameter)
 		{
@@ -316,7 +317,7 @@ Label_Break1:
 
 	private bool? GetIsNullableSubElement(int index)
 	{
-		var b = _nullabileFlags?.Skip(index).FirstOrDefault() ?? _nullableContext;
+		var b = _nullabileFlags?.Length > index ? _nullabileFlags[index] : _nullableContext;
 		return b is null or 0 ? null : b == 2;
 	}
 }

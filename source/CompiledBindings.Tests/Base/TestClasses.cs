@@ -6,7 +6,15 @@ public class Class1
 {
 	public object? ObjProp { get; set; }
 
-	public TestMode Mode => TestMode.Mode3;
+	public TestMode Mode => CompiledBindings.Tests.TestMode.Mode3;
+
+	public string? Mode3 { get; set; }
+
+	public bool TestMode => false;
+
+	public void Check(bool mode)
+	{
+	}
 
 	public int IntProp { get; set; }
 

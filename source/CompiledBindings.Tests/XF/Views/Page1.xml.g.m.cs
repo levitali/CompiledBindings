@@ -974,14 +974,14 @@ namespace XFTest.Views
 
 			private void Update0(global::XFTest.ViewModels.EntityViewModel value)
 			{
-				Update0_DecimalProp(value?.DecimalProp);
-				Update0_StringProp(value?.StringProp);
+				Update0_DecimalProp(value.DecimalProp);
+				Update0_StringProp(value.StringProp);
 			}
 
-			private void Update0_DecimalProp(global::System.Decimal? value)
+			private void Update0_DecimalProp(global::System.Decimal value)
 			{
 #line (63, 32) - (63, 58) 63 "Page1.xml"
-				_targetRoot.label11.Text = value?.ToString();
+				_targetRoot.label11.Text = value.ToString();
 #line default
 			}
 

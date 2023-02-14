@@ -760,7 +760,7 @@ public class ExpressionParser
 			return ParseTypeofExpression();
 		}
 
-		return ParseMemberAccess(_root);
+		return ParseMemberAccess(null, null);
 	}
 
 	private Expression ParseAsExpression(Expression expression)
@@ -782,7 +782,7 @@ public class ExpressionParser
 	{
 		var savedExpectedType = _expectedType;
 		_expectedType = expression.Type;
-		
+
 		var result = Parse1();
 
 		_expectedType = savedExpectedType;
@@ -876,13 +876,31 @@ public class ExpressionParser
 		}
 	}
 
-	private Expression ParseMemberAccess(Expression instance, bool? isNotifiable = null)
+	private Expression ParseMemberAccess(Expression? instance, bool? isNotifiable)
 	{
 		int errorPos = _token.pos;
 		string id = GetIdentifier();
 		NextToken();
 
-		var type = instance.Type;
+		if (instance == null)
+		{
+			if (_expectedType != null)
+			{
+				var staticFieldOrProp =
+					_expectedType.Fields.Where(f => f.Definition.IsStatic).Cast<IMemberInfo>()
+					.Concat(
+						_expectedType.Properties.Where(p => p.Definition.IsStatic()))
+					.FirstOrDefault(m => m.Definition.Name == id);
+				if (staticFieldOrProp != null)
+				{
+					return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp, staticFieldOrProp.MemberType);
+				}
+			}
+		}
+
+		var inst = instance ?? _root;
+
+		var type = inst.Type;
 		if (type.Reference.IsValueNullable())
 		{
 			type = type.GetGenericArguments()![0];
@@ -933,7 +951,7 @@ public class ExpressionParser
 					CorrectCharParameters(method, args, ns != null, errorPos);
 					CorrectNotNullableParameters(method, args);
 
-					return new CallExpression(instance, method, args);
+					return new CallExpression(inst, method, args);
 
 					void GetNextMethod()
 					{
@@ -953,30 +971,9 @@ public class ExpressionParser
 				}
 				else
 				{
-					if (instance == _root)
-					{
-						if (_expectedType != null)
-						{
-							var staticFieldOrProp =
-								_expectedType.Fields.Where(f => f.Definition.IsStatic).Cast<IMemberInfo>()
-								.Concat(
-									_expectedType.Properties.Where(p => p.Definition.IsStatic()))
-								.FirstOrDefault(m => m.Definition.Name == id);
-							if (staticFieldOrProp != null)
-							{
-								return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp, staticFieldOrProp.MemberType);
-							}
-
-							if (_expectedType.Reference.Name == id)
-							{
-								return new TypeExpression(_expectedType);
-							}
-						}
-					}
-
 					if (type.Reference.FullName.StartsWith("System.ValueTuple"))
 					{
-						var attrs = instance switch
+						var attrs = inst switch
 						{
 							MemberExpression me => me.Member.Definition.CustomAttributes,
 							CallExpression ce => ce.Method.Definition.MethodReturnType.CustomAttributes,
@@ -1002,9 +999,16 @@ public class ExpressionParser
 						}
 					}
 
-					if (_token.id == TokenId.Colon && instance == _root)
+					if (instance == null)
 					{
-						return ParseTypeExpression(id, errorPos);
+						if (_token.id == TokenId.Colon)
+						{
+							return ParseTypeExpression(id, errorPos);
+						}
+						if (_expectedType?.Reference.Name == id)
+						{
+							return new TypeExpression(_expectedType);
+						}
 					}
 
 					throw new ParseException($"No property, field or method '{id}' exists in type '{type.Reference.FullName}'", errorPos, id.Length);
@@ -1012,7 +1016,7 @@ public class ExpressionParser
 			}
 		}
 Label_CreateMemberExpression:
-		return new MemberExpression(instance, member, memberType, isNotifiable);
+		return new MemberExpression(inst, member, memberType, isNotifiable);
 	}
 
 	private TypeExpression ParseTypeExpression(string prefix, int errorPos)
