@@ -12,6 +12,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 		var rootGroup = bindingsData.NotifySources.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
 
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+		bool isLineDirective = false;
 
 		#region Bindings Variable
 
@@ -118,10 +119,9 @@ $@"
 			output.AppendLine();
 			foreach (var binding in eventBindings)
 			{
-				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", ref dummyLocalVar, ref dummyLocalFunc, "\t");
+				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", ref dummyLocalVar, ref dummyLocalFunc, ref isLineDirective, "\t");
 			}
-			output.AppendLine(
-$@"#line default");
+			ResetLineDirective(output, ref isLineDirective);
 		}
 
 		// Generate setting PropertyChanged event handler for data root
@@ -587,7 +587,7 @@ $@"			}}");
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 			}
 
-			GenerateSetExpressions(output, updateMethod.Expressions, targetRootVariable: "_targetRoot", a: "\t");
+			GenerateSetExpressions(output, updateMethod.Expressions, ref isLineDirective, targetRootVariable: "_targetRoot", a: "\t");
 
 			foreach (var notifSource in updateMethod.UpdateNotifySources)
 			{
@@ -740,9 +740,9 @@ $@"{a2}				try
 			{
 				var memberExpr2 = expr.CloneReplace(ae.Expression, new VariableExpression(new TypeInfo(ae.Expression.Type, false), "value"));
 				output.AppendLine(
-$@"{LineDirective(bind.Property.XamlNode)}
+$@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 {a2}					var value = {ae!.Expression};
-#line default
+{ResetLineDirective(ref isLineDirective)}
 {a2}					if (value != null)
 {a2}					{{");
 				GenerateSetSource(memberExpr2.CSharpCode, a2 + '\t');
@@ -769,16 +769,16 @@ $@"{a}				}}");
 				if (me?.Member is MethodInfo)
 				{
 					output.AppendLine(
-$@"{LineDirective(bind.Property.XamlNode)}
+$@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 {a}					{expression}({setExpr});
-#line default");
+{ResetLineDirective(ref isLineDirective)}");
 				}
 				else
 				{
 					output.AppendLine(
-$@"{LineDirective(bind.Property.XamlNode)}
+$@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 {a}					{expression} = {setExpr};
-#line default");
+{ResetLineDirective(ref isLineDirective)}");
 				}
 			}
 		}

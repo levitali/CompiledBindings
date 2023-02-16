@@ -217,7 +217,10 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCShar
 			GenerateInitializeResources(output, parseResult);
 		}
 
-		_bindingsCodeGenerator.GenerateSetExpressions(output, parseResult.UpdateMethod);
+		bool isLineDirective = false;
+		_bindingsCodeGenerator.GenerateSetExpressions(output, parseResult.UpdateMethod, ref isLineDirective);
+		ResetLineDirective(output, ref isLineDirective);
+		
 		output.AppendLine();
 
 		for (int i = 0; i < parseResult.BindingScopes.Count; i++)

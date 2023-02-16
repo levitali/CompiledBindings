@@ -40,7 +40,6 @@ namespace WPFTest.Views
 				_eventHandler2 = dataRoot.OnClick1;
 #line default
 				_targetRoot.button1.Click += _eventHandler2;
-#line default
 			}
 
 			public void Cleanup()
@@ -77,7 +76,6 @@ namespace WPFTest.Views
 					{
 					}
 				}
-#line default
 			}
 		}
 	}

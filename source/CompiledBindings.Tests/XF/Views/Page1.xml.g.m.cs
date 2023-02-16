@@ -275,14 +275,15 @@ namespace XFTest.Views
 					_settingBinding10 = true;
 					try
 					{
+#line (54, 22) - (54, 68) 54 "Page1.xml"
 						_targetRoot.pickerEx1.SelectedItem = value2;
+#line default
 					}
 					finally
 					{
 						_settingBinding10 = false;
 					}
 				}
-#line default
 				Update0_BooleanProp(value.BooleanProp);
 				Update0_NullableIntProp(value.NullableIntProp);
 				Update0_FocusedField(value.FocusedField);
@@ -316,7 +317,9 @@ namespace XFTest.Views
 					_settingBinding7 = true;
 					try
 					{
+#line (51, 13) - (51, 58) 51 "Page1.xml"
 						_targetRoot.entry1.Text = value1;
+#line default
 					}
 					finally
 					{
@@ -340,7 +343,9 @@ namespace XFTest.Views
 					_settingBinding9 = true;
 					try
 					{
+#line (53, 16) - (53, 59) 53 "Page1.xml"
 						_targetRoot.entry2.Text = value1;
+#line default
 					}
 					finally
 					{
@@ -367,7 +372,9 @@ namespace XFTest.Views
 					_settingBinding10 = true;
 					try
 					{
+#line (54, 22) - (54, 68) 54 "Page1.xml"
 						_targetRoot.pickerEx1.SelectedItem = value;
+#line default
 					}
 					finally
 					{

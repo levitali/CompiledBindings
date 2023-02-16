@@ -28,7 +28,7 @@ public class XamlCodeGenerator
 
 	public bool LangNullables { get; }
 
-	public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, ref int localVarIndex, ref int localFuncIndex, string? a)
+	public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, ref int localVarIndex, ref int localFuncIndex, ref bool isLineDirective, string? a)
 	{
 		var memberExpr = targetRootVariable;
 		if (property.Object.Name != null && !property.Object.IsRoot)
@@ -105,22 +105,22 @@ public class XamlCodeGenerator
 				if (property.Value.BindValue != null)
 				{
 					output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}			_eventHandler{property.Value.BindValue.Index} = {value};
-#line default
+{ResetLineDirective(ref isLineDirective)}
 {a}			{setExpr} += _eventHandler{property.Value.BindValue.Index};");
 				}
 				else
 				{
 					output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}			{setExpr} += {value};");
 				}
 			}
 			else
 			{
 				output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}			{setExpr} += {value};");
 			}
 		}
@@ -129,6 +129,7 @@ $@"{LineDirective(property.XamlNode)}
 			var a2 = a;
 			if (isTwoWayBinding)
 			{
+				ResetLineDirective(output, ref isLineDirective);
 				output.AppendLine(
 $@"{a}			_settingBinding{property.Value.BindValue!.Index} = true;
 {a}			try
@@ -138,7 +139,7 @@ $@"{a}			_settingBinding{property.Value.BindValue!.Index} = true;
 			if (property.IsAttached)
 			{
 				output.AppendLine(
-$@"{LineDirective(property.XamlNode)}");
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}");
 				if (property.TargetMethod.Definition.IsStatic)
 				{
 					output.AppendLine(
@@ -157,10 +158,11 @@ $@"{a2}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Defi
 			}
 			else
 			{
-				GenerateSet(true, ref localFuncIndex, a2);
+				GenerateSet(true, ref localFuncIndex, ref isLineDirective, a2);
 			}
 			if (isTwoWayBinding)
 			{
+				ResetLineDirective(output, ref isLineDirective);
 				output.AppendLine(
 $@"{a}			}}
 {a}			finally
@@ -179,9 +181,9 @@ $@"{a}			}}
 			{
 				varName = "value" + localVarIndex++;
 				output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}			var {varName} = {value};
-#line default");
+{ResetLineDirective(ref isLineDirective)}");
 			}
 			else
 			{
@@ -193,7 +195,9 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 {a}				_settingBinding{property.Value.BindValue!.Index} = true;
 {a}				try
 {a}				{{
+{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}					{setExpr} = {varName};
+{ResetLineDirective(ref isLineDirective)}
 {a}				}}
 {a}				finally
 {a}				{{
@@ -203,16 +207,16 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 		}
 		else
 		{
-			GenerateSet(false, ref localFuncIndex, a);
+			GenerateSet(false, ref localFuncIndex, ref isLineDirective, a);
 		}
 
-		void GenerateSet(bool isMethodCall, ref int localFuncIndex, string? a)
+		void GenerateSet(bool isMethodCall, ref int localFuncIndex, ref bool isLineDirective, string? a)
 		{
 			if (isAsync)
 			{
+				ResetLineDirective(output, ref isLineDirective);
 				output.AppendLine(
-$@"#line default
-{a}			Set{localFuncIndex}(_generatedCodeDisposed.Token);
+$@"{a}			Set{localFuncIndex}(_generatedCodeDisposed.Token);
 {a}			async void Set{localFuncIndex++}(global::System.Threading.CancellationToken cancellationToken)
 {a}			{{
 {a}				try
@@ -221,9 +225,10 @@ $@"#line default
 				if (fallbackValue != null)
 				{
 					output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}					var task = {value};
-#line default");
+{ResetLineDirective(ref isLineDirective)}");
+
 					var taskVar = "task";
 					var isTaskNullable = expression!.IsNullable;
 					if (isTaskNullable)
@@ -233,9 +238,9 @@ $@"{LineDirective(property.XamlNode)}
 					output.AppendLine(
 $@"{a}					if ({taskVar}.IsCompleted != true)
 {a}					{{
-{LineDirective(property.XamlNode)}
+{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}						{setExpr}{(isMethodCall ? $"({fallbackValue})" : $" = {fallbackValue}")};
-#line default");
+{ResetLineDirective(ref isLineDirective)}");
 					if (isTaskNullable)
 					{
 						output.AppendLine(
@@ -249,9 +254,9 @@ $@"{a}					}}");
 					value = "task";
 				}
 				output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}					var result = await {value};
-#line default
+{ResetLineDirective(ref isLineDirective)}
 {a}					if (!cancellationToken.IsCancellationRequested)
 {a}					{{
 {a}						{setExpr}{(isMethodCall ? "(result)" : " = result")};
@@ -265,13 +270,13 @@ $@"{LineDirective(property.XamlNode)}
 			else
 			{
 				output.AppendLine(
-$@"{LineDirective(property.XamlNode)}
+$@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}			{setExpr}{(isMethodCall ? $"({value})" : $" = {value}")};");
 			}
 		}
 	}
 
-	public void GenerateSetExpressions(StringBuilder output, ExpressionGroup expressionGroup, string? targetRootVariable = null, string? a = null)
+	public void GenerateSetExpressions(StringBuilder output, ExpressionGroup expressionGroup, ref bool isLineDirective, string? targetRootVariable = null, string? a = null)
 	{
 		int localVarIndex = expressionGroup.LocalVariables.Count + 1;
 		int localFuncIndex = 0;
@@ -280,7 +285,7 @@ $@"{LineDirective(property.XamlNode)}
 		{
 			foreach (var prop in expressionGroup.SetProperties)
 			{
-				GenerateSetValue(output, prop, null, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
+				GenerateSetValue(output, prop, null, targetRootVariable, ref localVarIndex, ref localFuncIndex, ref isLineDirective, a);
 			}
 		}
 
@@ -289,21 +294,21 @@ $@"{LineDirective(property.XamlNode)}
 			foreach (var variable in expressionGroup.LocalVariables)
 			{
 				output.AppendLine(
-$@"{LineDirective(variable.XamlNode)}
+$@"{LineDirective(variable.XamlNode, ref isLineDirective)}
 {a}			var {variable.Name} = {variable.Expression};");
 			}
 
 			foreach (var prop in expressionGroup.SetExpressions)
 			{
-				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, ref localVarIndex, ref localFuncIndex, a);
+				GenerateSetValue(output, prop.Property, prop.Expression, targetRootVariable, ref localVarIndex, ref localFuncIndex, ref isLineDirective, a);
 			}
-			output.AppendLine(
-$@"#line default");
+			ResetLineDirective(output, ref isLineDirective);
 		}
 	}
 
-	public string LineDirective(XamlNode xamlNode)
+	public string LineDirective(XamlNode xamlNode, ref bool isLineDirective)
 	{
+		isLineDirective = true;
 		var li = (IXmlLineInfo)xamlNode.Element;
 		var line = li.LineNumber;
 		if (LangVersion >= 10)
@@ -314,7 +319,7 @@ $@"#line default");
 			{
 				column2 +=
 					(attribute.Parent.GetPrefixOfNamespace(attribute.Name.Namespace)?.Length + 1 ?? 0) +
-					attribute.Name.LocalName.Length + 
+					attribute.Name.LocalName.Length +
 					attribute.Value.Length + 2;
 			}
 			//TODO Somehow it doesn't work as expected.
@@ -322,6 +327,20 @@ $@"#line default");
 			return $"#line ({line}, {column1}) - ({line}, {column2}) {line} \"{xamlNode.File}\"";
 		}
 		return $"#line {line} \"{xamlNode.File}\"";
+	}
+	
+	public string ResetLineDirective(ref bool isLineDirective)
+	{
+		isLineDirective = false;
+		return "#line default";
+	}
+
+	public void ResetLineDirective(StringBuilder output, ref bool isLineDirective)
+	{
+		if (isLineDirective)
+		{
+			output.AppendLine(ResetLineDirective(ref isLineDirective));
+		}
 	}
 }
 

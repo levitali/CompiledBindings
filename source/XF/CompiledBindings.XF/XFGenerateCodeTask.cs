@@ -308,6 +308,7 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	protected override void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)
 	{
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+		bool isLineDirective = false;
 
 		foreach (var bind in parseResult.EnumerateBindings())
 		{
@@ -327,9 +328,9 @@ $@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _b
 			var checkNull = bind.DataType.Reference.IsValueType ? null : "dataRoot == null ? (default, false) : ";
 			output.AppendLine(
 $@"			dataRoot => {checkNull}(
-{LineDirective(bind.Property.XamlNode)}
+{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 				{bind.SourceExpression!.CSharpCode},
-#line default
+{ResetLineDirective(ref isLineDirective)}
 				true),");
 
 			output.AppendLine(
@@ -348,9 +349,9 @@ $@"			new[]
 					{
 						output.AppendLine(
 $@"				new global::System.Tuple<global::System.Func<global::{bind.DataType!.Reference.GetCSharpFullName()}, object>, string>(dataRoot =>
-{LineDirective(bind.Property.XamlNode)}
+{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 					{source.SourceExpression},
-#line default
+{ResetLineDirective(ref isLineDirective)}
 					""{prop.Property.Definition.Name}""),");
 					}
 				}

@@ -248,7 +248,6 @@ namespace WPFTest.Views
 				_eventHandler14 = (p1, p2) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
 #line default
 				_targetRoot.button1.Click += _eventHandler14;
-#line default
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 
@@ -366,7 +365,6 @@ namespace WPFTest.Views
 					{
 					}
 				}
-#line default
 				Update0(dataRoot);
 			}
 
@@ -380,11 +378,13 @@ namespace WPFTest.Views
 				_targetRoot.textBlock6.Text = value1.ToString();
 #line (54, 20) - (54, 50) 54 "Page1.xml"
 				_targetRoot.textBlock7.Text = (value1 + 1).ToString();
+#line default
 				_settingBinding17 = true;
 				try
 				{
 #line (75, 13) - (75, 75) 75 "Page1.xml"
 					global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value2);
+#line default
 				}
 				finally
 				{
@@ -444,14 +444,15 @@ namespace WPFTest.Views
 					_settingBinding4 = true;
 					try
 					{
+#line (55, 18) - (55, 56) 55 "Page1.xml"
 						_targetRoot.textBox1.Text = value;
+#line default
 					}
 					finally
 					{
 						_settingBinding4 = false;
 					}
 				}
-#line default
 			}
 
 			private void Update0_IntProp(global::System.Int32 value)
@@ -459,11 +460,13 @@ namespace WPFTest.Views
 				var dataRoot = _dataRoot;
 #line (56, 20) - (56, 97) 56 "Page1.xml"
 				_targetRoot.textBlock8.Text = (((global::System.Int32)dataRoot.DecimalProp) + value + dataRoot.ModifyViewModel?.IntInput)?.ToString();
+#line default
 				_settingBinding17 = true;
 				try
 				{
 #line (75, 13) - (75, 75) 75 "Page1.xml"
 					global::WPFTest.TestExtensions.SetMyProperty(_targetRoot.textBox3, value);
+#line default
 				}
 				finally
 				{
@@ -496,14 +499,15 @@ namespace WPFTest.Views
 					_settingBinding6 = true;
 					try
 					{
+#line (57, 19) - (57, 154) 57 "Page1.xml"
 						_targetRoot.checkBox1.IsChecked = value1;
+#line default
 					}
 					finally
 					{
 						_settingBinding6 = false;
 					}
 				}
-#line default
 			}
 
 			private void Update0_ArrayProp(global::System.Int32[] value)
@@ -519,7 +523,9 @@ namespace WPFTest.Views
 					_settingBinding6 = true;
 					try
 					{
+#line (57, 19) - (57, 154) 57 "Page1.xml"
 						_targetRoot.checkBox1.IsChecked = value2;
+#line default
 					}
 					finally
 					{
@@ -533,7 +539,6 @@ namespace WPFTest.Views
 
 			private void Update0_TaskProp(global::System.Threading.Tasks.Task<global::System.String> value)
 			{
-#line default
 				Set0(_generatedCodeDisposed.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
@@ -560,7 +565,6 @@ namespace WPFTest.Views
 					{
 					}
 				}
-#line default
 			}
 
 			private void Update0_FocusedField(global::UI.FocusState<global::WPFTest.ViewModels.Page1ViewModel.Field> value)
@@ -570,12 +574,12 @@ namespace WPFTest.Views
 				{
 #line (78, 13) - (78, 110) 78 "Page1.xml"
 					global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
+#line default
 				}
 				finally
 				{
 					_settingBinding19 = false;
 				}
-#line default
 			}
 
 			private void Update1_IntInput(global::System.Int32? value)
@@ -598,14 +602,15 @@ namespace WPFTest.Views
 					_settingBinding16 = true;
 					try
 					{
+#line (73, 13) - (73, 63) 73 "Page1.xml"
 						_targetRoot.textBox2.Text = value;
+#line default
 					}
 					finally
 					{
 						_settingBinding16 = false;
 					}
 				}
-#line default
 			}
 
 			private void Update1_CanChangeInput1(global::System.Boolean? value)
@@ -623,19 +628,19 @@ namespace WPFTest.Views
 					_settingBinding22 = true;
 					try
 					{
+#line (83, 13) - (83, 71) 83 "Page1.xml"
 						_targetRoot.checkBox2.IsChecked = value;
+#line default
 					}
 					finally
 					{
 						_settingBinding22 = false;
 					}
 				}
-#line default
 			}
 
 			private void Update1_ModifyTaskProp(global::System.Threading.Tasks.Task<global::System.String> value)
 			{
-#line default
 				Set0(_generatedCodeDisposed.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
@@ -666,7 +671,6 @@ namespace WPFTest.Views
 					{
 					}
 				}
-#line default
 			}
 
 			private void Update2_TextInput(global::System.String value)
@@ -676,14 +680,15 @@ namespace WPFTest.Views
 					_settingBinding18 = true;
 					try
 					{
+#line (76, 13) - (76, 86) 76 "Page1.xml"
 						_targetRoot.textBox3.Text = value;
+#line default
 					}
 					finally
 					{
 						_settingBinding18 = false;
 					}
 				}
-#line default
 			}
 
 			private void Update2_BoolInput(global::System.Boolean? value)
@@ -696,14 +701,15 @@ namespace WPFTest.Views
 					_settingBinding20 = true;
 					try
 					{
+#line (79, 13) - (79, 86) 79 "Page1.xml"
 						_targetRoot.textBox4.Text = value1;
+#line default
 					}
 					finally
 					{
 						_settingBinding20 = false;
 					}
 				}
-#line default
 			}
 
 			private void OnTargetChanged0(global::System.Object p0, global::System.Windows.RoutedEventArgs p1)
@@ -1064,7 +1070,6 @@ namespace WPFTest.Views
 			textBlock3 = (global::System.Windows.Controls.TextBlock)rootElement.FindName("textBlock3");
 			image1 = (global::System.Windows.Controls.Image)rootElement.FindName("image1");
 
-#line default
 			Set0(_generatedCodeDisposed.Token);
 			async void Set0(global::System.Threading.CancellationToken cancellationToken)
 			{
@@ -1082,7 +1087,6 @@ namespace WPFTest.Views
 				{
 				}
 			}
-#line default
 
 			rootElement.DataContextChanged += rootElement_DataContextChanged;
 			if (rootElement.DataContext is global::WPFTest.ViewModels.EntityViewModel dataRoot0)
