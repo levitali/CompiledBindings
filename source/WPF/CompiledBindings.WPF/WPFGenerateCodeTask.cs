@@ -137,15 +137,16 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
 
-							generateDataTemplateBindings |= parseResult.DataTemplates.Count > 0;
-
 							var dirInfo = new DirectoryInfo(targetDir);
 							dirInfo.Create();
 
 							File.WriteAllText(sourceCodeTargetPath, code);
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
-							if (parseResult.DataTemplates.Any(dt => dt.GenerateClass))
+							bool generateDataTemplates = parseResult.DataTemplates.Any(dt => dt.GenerateClass);
+							generateDataTemplateBindings |= generateDataTemplates;
+
+							if (generateDataTemplates)
 							{
 								var compiledBindingsNs = "clr-namespace:CompiledBindings";
 								var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
@@ -235,7 +236,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 			if (generateDataTemplateBindings)
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.cs");
+				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.WPF.cs");
 				File.WriteAllText(dataTemplateBindingsFile, GenerateDataTemplateBindingsClass());
 				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 			}

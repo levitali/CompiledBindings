@@ -100,7 +100,7 @@ public class SimpleXamlDomParser : XamlDomParser
 
 				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
 
-				var attrs = xelement.Attributes().Where(a => IsMemExtension(a) != null).ToList();
+				var attrs = xelement.Attributes().Where(a => IsMemExtensionWrapper(a) != null).ToList();
 				if (attrs.Count > 0)
 				{
 					if (isDataTemplateElement)
@@ -116,7 +116,7 @@ public class SimpleXamlDomParser : XamlDomParser
 				var dataTypeAttr = xelement.Attribute(xDataType) ?? xelement.Attribute(mxDataType) ?? xelement.Attribute(DataTypeAttr);
 				if (dataTypeAttr != null &&
 					!xelement.DescendantsAndSelf().SelectMany(e => e.Attributes()).Any(a =>
-						IsMemExtension(a) == ExtenstionType.Bind))
+						IsMemExtensionWrapper(a) == ExtenstionType.Bind))
 				{
 					dataTypeAttr = null;
 				}
@@ -272,7 +272,7 @@ public class SimpleXamlDomParser : XamlDomParser
 					{
 						int index = dataTemplates.Count;
 						var dataTemplate = ProcessRoot(child, elementType, null);
-							dataTemplates.Insert(index, dataTemplate);
+						dataTemplates.Insert(index, dataTemplate);
 					}
 					else
 					{
@@ -285,6 +285,22 @@ public class SimpleXamlDomParser : XamlDomParser
 				currentBindingScope = savedCurrentBindingScope;
 
 				return obj;
+			}
+		}
+
+		ExtenstionType? IsMemExtensionWrapper(XAttribute attribute)
+		{
+			try
+			{
+				return IsMemExtension(attribute);
+			}
+			catch (ParseException ex)
+			{
+				throw new GeneratorException(ex.Message, file, attribute, ex.Position, ex.Length);
+			}
+			catch (Exception ex)
+			{
+				throw new GeneratorException(ex.Message, file, attribute);
 			}
 		}
 	}

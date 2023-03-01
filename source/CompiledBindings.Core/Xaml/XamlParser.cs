@@ -15,7 +15,7 @@ public class XamlParser
 			var expecedBracket = squareBracket ? "]" : "}";
 			if (!str.EndsWith(expecedBracket))
 			{
-				throw new ParseException($"Expected {expecedBracket}", str.Length);
+				throw new ParseException($"Expected {expecedBracket}", attribute.Name.LocalName.Length + str.Length + 2);
 			}
 			node.Children.Add(ParseMarkupExtension(file, attribute, knownNamespaces));
 		}

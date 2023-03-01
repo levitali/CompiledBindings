@@ -130,7 +130,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
 
-							generateDataTemplateBindings |= parseResult.DataTemplates.Count > 0;
+							generateDataTemplateBindings |= parseResult.DataTemplates.Any(d => d.GenerateClass);
 
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var dirInfo = new DirectoryInfo(targetDir);
@@ -152,7 +152,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 			if (generateDataTemplateBindings)
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.cs");
+				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.XF.cs");
 				File.WriteAllText(dataTemplateBindingsFile, GenerateDataTemplateBindingsClass());
 				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 			}

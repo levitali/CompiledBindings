@@ -129,8 +129,6 @@ public class WinUIGenerateCodeTask : Task
 							var codeGenerator = new WinUICodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 
-							generateDataTemplateBindings |= parseResult.DataTemplates.Count > 0;
-
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var dirInfo = new DirectoryInfo(targetDir);
 							dirInfo.Create();
@@ -140,7 +138,10 @@ public class WinUIGenerateCodeTask : Task
 
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
-							if (parseResult.DataTemplates.Count > 0)
+							bool generateDataTemplates = parseResult.DataTemplates.Any(d => d.GenerateClass);
+							generateDataTemplateBindings |= generateDataTemplates;
+
+							if (generateDataTemplates)
 							{
 								var compiledBindingsNs = "using:CompiledBindings.WinUI";
 								var localNs = "using:" + parseResult.TargetType!.Reference.Namespace;
@@ -226,7 +227,7 @@ public class WinUIGenerateCodeTask : Task
 
 			if (generateDataTemplateBindings)
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.cs");
+				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.WinUI.cs");
 				File.WriteAllText(dataTemplateBindingsFile, GenerateDataTemplateBindingsClass());
 				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 			}
