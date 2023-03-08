@@ -582,7 +582,6 @@ $@"			}}");
 				.OfType<VariableExpression>()
 				.Any(e => e.Name == "dataRoot"))
 			{
-
 				output.AppendLine(
 $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 			}

@@ -267,16 +267,7 @@ public static class BindingParser
 
 		if (sourceExpression != null && fallbackValue != null)
 		{
-			var expr = sourceExpression
-				.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
-			if (expr != null)
-			{
-				var localVarName = "v" + localVarIndex++;
-				sourceExpression = new FallbackExpression(
-					sourceExpression,
-					fallbackValue,
-					localVarName);
-			}
+			sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
 		}
 
 		return new Bind
@@ -482,21 +473,7 @@ public static class BindingParser
 			// - SetPropertyHandler methods
 
 			var props1 = bindings
-				.Select(b =>
-				{
-					var expr = b.SourceExpression!;
-					var expr2 = Replace(expr);
-					if (expr.EnumerateTree().OfType<FallbackExpression>().Any() &&
-						!expr2.EnumerateTree().OfType<FallbackExpression>().Any() &&
-						!taskType.IsAssignableFrom(expr.Type))
-					{
-						// The replaced expression is not FallbackExpression any more.
-						// This means, that the part, which must be checked for nullability is replaced.
-						// To solve it use full expression.
-						expr2 = expr;
-					}
-					return new PropertySetExpression(b.Property, expr2);
-				})
+				.Select(b => new PropertySetExpression(b.Property, Replace(b.SourceExpression!)))
 				.ToList();
 
 			var props2 = updateNotifySources
@@ -504,11 +481,7 @@ public static class BindingParser
 				.ToList();
 
 			var props3 = updateMethodNotifyProps
-				.Select(p =>
-				{
-					var expr = Replace(p.Expression);
-					return new PropertySetExpression(p.Bindings[0].Property, expr);
-				})
+				.Select(p => new PropertySetExpression(p.Bindings[0].Property, Replace(p.Expression)))
 				.ToList();
 
 			var props4 = notifySources1
@@ -568,7 +541,7 @@ public static class BindingParser
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
 			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e, notif: CheckPropertyNotifiable(e))))
 			.Where(e => e.notif != false)
-			.GroupBy(e => e.expr.Expression.CSharpCode)
+			.GroupBy(e => e.expr.Expression.Key)
 			.OrderBy(g => g.Key)
 			.Select((g, i) =>
 			{

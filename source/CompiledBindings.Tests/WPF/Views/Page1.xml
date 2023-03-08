@@ -70,12 +70,15 @@
             Click="{x:Bind ModifyViewModel.OnClick(BooleanProp)}" />
         <TextBox
             IsReadOnly="{x:Bind not ModifyViewModel.CanChangeInput1, FallbackValue=false}"
+						IsEnabled="{x:Bind ((viewModels:EntityViewModel)listView.SelectedItem).Title eq null, DataType={x:Null}, FallbackValue=false}"
             Text="{x:Bind ModifyViewModel.Input1, Mode=TwoWay}" />
         <TextBox
             local:TestExtensions.MyProperty="{x:Bind IntProp, Mode=TwoWay}"
+						IsEnabled="{x:Bind ((viewModels:EntityViewModel)listView.SelectedItem).Title eq null, DataType={x:Null}, FallbackValue=false}"
             Text="{x:Bind ModifyViewModel.ModifyTextViewModel.TextInput, Mode=TwoWay}" />
         <TextBox
             ui:FocusManager.Focused="{x:Bind FocusedField[Field1], UpdateSourceEventNames=GotFocus|LostFocus}"
+						IsEnabled="{x:Bind ((viewModels:EntityViewModel)listView.SelectedItem).DecimalProp eq 1, DataType={x:Null}, FallbackValue=true, Mode=OneTime}"
             Text="{x:Bind ModifyViewModel.ModifyTextViewModel.BoolInput, Mode=TwoWay}" />
         <CheckBox
             Grid.Column="{x:Bind IntProp}"

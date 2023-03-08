@@ -27,6 +27,7 @@ public class ExpressionTests : IDisposable
 
 		string expression, expectedCode;
 		Expression result;
+		int localVarIndex = 0;
 
 		expression = "(ListProp.Count - NullIntProp).ToString() ?? '-'";
 		expectedCode = "(dataRoot.ListProp?.Count - dataRoot.NullIntProp)?.ToString() ?? \"-\"";
@@ -74,9 +75,9 @@ public class ExpressionTests : IDisposable
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "((local:Class1)RefProp.ObjProp).Mode3 eq null";
-		expectedCode = "(((global::CompiledBindings.Tests.Class1)dataRoot.RefProp?.ObjProp)) is var var1 && var1 != null ? var1.Mode3 == null : false";
+		expectedCode = "(((global::CompiledBindings.Tests.Class1)dataRoot.RefProp?.ObjProp)) is var v0 && v0 != null ? v0.Mode3 == null : false";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
-		result = new FallbackExpression(result, new ConstantExpression(false), "var1");
+		result = FallbackExpression.CreateFallbackExpression(result, new ConstantExpression(false), ref localVarIndex);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 
