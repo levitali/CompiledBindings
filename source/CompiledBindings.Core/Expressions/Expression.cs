@@ -678,6 +678,7 @@ public class FallbackExpression : Expression
 		var clone = (FallbackExpression)base.CloneReplaceCore(current, replace);
 		clone.Expression = expression;
 		clone.Fallback = fallback;
+		clone._notNull = null;
 		return clone;
 	}
 
@@ -686,20 +687,7 @@ public class FallbackExpression : Expression
 		return $"{NullableExpression} is var {_localVarName} && {_localVarName} != null ? {NotNull} : {Fallback}";
 	}
 
-	private Expression NotNull
-	{
-		get
-		{
-			if (_notNull == null)
-			{
-				var expr = NullableExpression;
-				_notNull = Expression.CloneReplace(
-					expr,
-					new VariableExpression(new TypeInfo(Expression.Type, false), _localVarName));
-			}
-			return _notNull;
-		}
-	}
+	private Expression NotNull => _notNull ??= Expression.CloneReplace(NullableExpression, new VariableExpression(new TypeInfo(Expression.Type, false), _localVarName));
 }
 
 public class InterpolatedStringExpression : Expression
