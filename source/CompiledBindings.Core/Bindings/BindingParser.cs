@@ -268,7 +268,7 @@ public static class BindingParser
 		if (sourceExpression != null && fallbackValue != null)
 		{
 			var expr = sourceExpression
-				.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+				.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 			if (expr != null)
 			{
 				var localVarName = "v" + localVarIndex++;

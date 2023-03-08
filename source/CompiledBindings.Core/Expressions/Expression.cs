@@ -643,7 +643,7 @@ public class FallbackExpression : Expression
 	public Expression Expression { get; private set; }
 	public Expression Fallback { get; private set; }
 
-	public Expression NullableExpression => (Expression)Expression.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().First(e => e.Expression.IsNullable).Expression;
+	public Expression NullableExpression => (Expression)Expression.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().First(e => e.Expression.IsNullable).Expression;
 
 	public override bool IsNullable => Fallback.IsNullable;
 
@@ -657,7 +657,7 @@ public class FallbackExpression : Expression
 	{
 		var expression = Expression.CloneReplace(current, replace);
 		var expr = expression
-			.EnumerateTree().OrderByDescending(e => e.CSharpCode).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
+			.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 		if (expr == null)
 		{
 			return expression;

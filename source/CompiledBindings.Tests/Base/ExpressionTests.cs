@@ -72,6 +72,12 @@ public class ExpressionTests : IDisposable
 		expectedCode = "$\"{dataRoot.IntProp,2} {dataRoot.RefProp?.DecimalProp:0.###}\"";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "((local:Class1)RefProp.ObjProp).Mode3 eq null";
+		expectedCode = "(((global::CompiledBindings.Tests.Class1)dataRoot.RefProp?.ObjProp)) is var var1 && var1 != null ? var1.Mode3 == null : false";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
+		result = new FallbackExpression(result, new ConstantExpression(false), "var1");
+		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 
 	[Test]

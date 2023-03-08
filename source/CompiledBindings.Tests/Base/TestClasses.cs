@@ -51,6 +51,8 @@ public class Class2
 	public decimal DecimalProp { get; set; }
 
 	public string? StringProp { get; set; }
+
+	public object? ObjProp { get; set; }
 }
 
 public struct Struct1
