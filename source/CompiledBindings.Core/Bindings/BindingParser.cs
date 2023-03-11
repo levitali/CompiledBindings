@@ -267,7 +267,11 @@ public static class BindingParser
 
 		if (sourceExpression != null && fallbackValue != null)
 		{
-			sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
+			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			if (!taskType.IsAssignableFrom(sourceExpression.Type))
+			{
+				sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
+			}
 		}
 
 		return new Bind

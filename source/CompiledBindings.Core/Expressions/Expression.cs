@@ -68,7 +68,7 @@ public abstract class Expression
 
 public class ConstantExpression : Expression
 {
-	public ConstantExpression(object? value) : base(TypeInfo.GetTypeThrow(value?.GetType().FullName ?? "System.Object"))
+	public ConstantExpression(object? value) : base(TypeInfo.GetTypeThrow(value?.GetType() ?? typeof(object)))
 	{
 		Value = value;
 	}
@@ -92,7 +92,7 @@ public class ConstantExpression : Expression
 
 public class DefaultExpression : Expression
 {
-	public DefaultExpression(TypeInfo? type) : base(type ?? TypeInfo.GetTypeThrow("System.Object"))
+	public DefaultExpression(TypeInfo? type) : base(type ?? TypeInfo.GetTypeThrow(typeof(object)))
 	{
 	}
 
@@ -103,7 +103,6 @@ public class DefaultExpression : Expression
 		{
 			str += "(global::" + Type.Reference.GetCSharpFullName() + ")";
 		}
-
 		return str;
 	}
 
@@ -118,8 +117,6 @@ public class VariableExpression : Expression
 	}
 
 	public string Name { get; }
-
-	public override bool IsNullable => Type.IsNullable;
 
 	protected override string GetCSharpCode()
 	{
@@ -264,14 +261,14 @@ public class BinaryExpression : Expression
 			case "!=":
 			case "&&":
 			case "||":
-				return TypeInfo.GetTypeThrow("System.Boolean");
+				return TypeInfo.GetTypeThrow(typeof(bool));
 		}
 		var type = left.Type;
 		if ((type.Reference.IsValueType && left.IsNullable) || right.IsNullable)
 		{
 			if (!type.Reference.IsNullable())
 			{
-				type = TypeInfo.GetTypeThrow("System.Nullable`1").MakeGenericInstanceType(type);
+				type = TypeInfo.GetTypeThrow(typeof(Nullable<>)).MakeGenericInstanceType(type);
 			}
 		}
 		return type;
@@ -651,12 +648,6 @@ public class FallbackExpression : Expression
 
 	public static Expression CreateFallbackExpression(Expression expression, Expression fallbackValue, ref int localVarIndex)
 	{
-		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		if ( taskType.IsAssignableFrom(expression.Type))
-		{
-			return new AsyncFallbackExpression(expression, fallbackValue);
-		}
-
 		var expr = expression
 			.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 		if (expr == null)
@@ -712,39 +703,6 @@ public class FallbackExpression : Expression
 	public override string Key => _key ??= $"{NullableExpression} is var v && v != null ? {NotNull} : {Fallback}";
 
 	private Expression NotNull => _notNull ??= Expression.CloneReplace(NullableExpression, new VariableExpression(new TypeInfo(Expression.Type, false), _localVarName));
-}
-
-public class AsyncFallbackExpression : Expression
-{
-    public AsyncFallbackExpression(Expression expression, Expression fallback) : base(expression.Type)
-    {
-        Expression = expression;
-		Fallback = fallback;
-    }
-
-	public Expression Expression { get; private set; }
-	public Expression Fallback { get; private set; }
-
-	public override bool IsNullable => Fallback.IsNullable;
-
-	public override IEnumerable<Expression> Enumerate()
-	{
-		yield return Expression;
-		yield return Fallback;
-	}
-
-	protected override Expression CloneReplaceCore(Expression current, Expression replace)
-	{
-		var clone = (AsyncFallbackExpression)base.CloneReplaceCore(current, replace);
-		clone.Expression = Expression.CloneReplace(current, replace);
-		clone.Fallback = Expression.CloneReplace(current, replace);
-		return clone;
-	}
-
-	protected override string GetCSharpCode()
-	{
-		return Expression.CSharpCode;
-	}
 }
 
 public class InterpolatedStringExpression : Expression
