@@ -399,7 +399,7 @@ namespace WPFTest.Views
 #line (61, 13) - (61, 43) 61 "Page1.xml"
 				_targetRoot.listView.ItemsSource = dataRoot.ListProp;
 #line (66, 20) - (66, 79) 66 "Page1.xml"
-				_targetRoot.textBlock12.Text = dataRoot.Calculate(new WPFTest.ViewModels.ParamClass("text"));
+				_targetRoot.textBlock12.Text = dataRoot.Calculate(new global::WPFTest.ViewModels.ParamClass("text"));
 #line default
 				Set0(_generatedCodeDisposed.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)

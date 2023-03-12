@@ -383,15 +383,12 @@ public class NewExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"new {TypeExpression}({string.Join(", ", Args.Select(a => a.CSharpCode))})";
+		return $"new global::{TypeExpression}({string.Join(", ", Args.Select(a => a.CSharpCode))})";
 	}
 
 	public override IEnumerable<Expression> Enumerate()
 	{
-		foreach (var arg in Args)
-		{
-			yield return arg;
-		}
+		return Args;
 	}
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
@@ -707,35 +704,35 @@ public class FallbackExpression : Expression
 
 public class InterpolatedStringExpression : Expression
 {
-	private readonly string _format;
-	private readonly IList<Expression> _expressions;
-
-	public InterpolatedStringExpression(string format, IList<Expression> expressions) : base(TypeInfo.GetTypeThrow(typeof(string)))
+	public InterpolatedStringExpression(string format, IReadOnlyList<Expression> expressions) : base(TypeInfo.GetTypeThrow(typeof(string)))
 	{
-		_format = format;
-		_expressions = expressions;
+		Format = format;
+		Expressions = expressions;
 	}
+
+	public string Format { get; }
+	public IReadOnlyList<Expression> Expressions { get; }
 
 	public override IEnumerable<Expression> Enumerate()
 	{
-		return _expressions;
+		return Expressions;
 	}
 
 	public override bool IsNullable => false;
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
-		var expressions = new List<Expression>(_expressions.Count);
-		foreach (var expression in _expressions)
+		var expressions = new List<Expression>(Expressions.Count);
+		foreach (var expression in Expressions)
 		{
 			expressions.Add(expression.CloneReplace(current, replace));
 		}
-		return new InterpolatedStringExpression(_format, expressions);
+		return new InterpolatedStringExpression(Format, expressions);
 	}
 
 	protected override string GetCSharpCode()
 	{
-		return string.Format(_format, _expressions.Cast<object>().ToArray());
+		return string.Format(Format, Expressions.Cast<object>().ToArray());
 	}
 }
 
