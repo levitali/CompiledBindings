@@ -123,7 +123,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 						{
 							result = false;
 						}
-						else if (parseResult.GenerateCode == true)
+						else if (parseResult.GenerateCode)
 						{
 							var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion, _platformConstants);
 							string code = codeGenerator.GenerateCode(parseResult);

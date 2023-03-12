@@ -130,7 +130,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						{
 							result = false;
 						}
-						else if (parseResult.GenerateCode == true)
+						else if (parseResult.GenerateCode)
 						{
 							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);

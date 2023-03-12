@@ -99,7 +99,7 @@
 
   <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
     <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
-                     TargetAssembly="@(IntermediateAssembly)" />
+                         TargetAssembly="@(IntermediateAssembly)" />
   </Target>
 
   <Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">

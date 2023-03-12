@@ -305,13 +305,13 @@ public static class BindingParser
 		// Go through all expressions in bindings and find notifiable properties, grouped by notifiable source
 		var notifySources = GetNotifySources(binds, iNotifyPropertyChangedType, dependencyObjectType);
 
-		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).CSharpCode))
+		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).Key))
 		{
 			foreach (var prop in notifySource.Properties)
 			{
-				var expr = prop.Expression.CSharpCode;
+				var expr = prop.Expression.Key;
 				foreach (var notifPropData2 in notifySources
-					.Where(g => g != notifySource && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.CSharpCode.Equals(expr))))
+					.Where(g => g != notifySource && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.Key.Equals(expr))))
 				{
 					// Skip the notification source, if it's already added to some child
 					if (!prop.DependentNotifySources

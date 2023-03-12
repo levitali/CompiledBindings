@@ -124,7 +124,7 @@ public class WinUIGenerateCodeTask : Task
 						{
 							result = false;
 						}
-						else if (parseResult.GenerateCode == true)
+						else if (parseResult.GenerateCode)
 						{
 							var codeGenerator = new WinUICodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
