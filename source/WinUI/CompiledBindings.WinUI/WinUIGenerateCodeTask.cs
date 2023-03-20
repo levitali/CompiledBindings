@@ -173,16 +173,19 @@ public class WinUIGenerateCodeTask : Task
 								for (int i = 0; i < parseResult.DataTemplates.Count; i++)
 								{
 									var dataTemplate = parseResult.DataTemplates[i];
-									var rootElement = dataTemplate.RootElement.Elements().First();
-									var staticResources = dataTemplate.EnumerateAllProperties()
-										.Select(p => p.Value.BindValue?.Resources)
-										.Where(r => r != null)
-										.SelectMany(r => r.Select(r => r.name))
-										.Distinct();
-									rootElement.Add(
-										new XElement(compiledBindings + "DataTemplateBindings.Bindings",
-											new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
-												staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
+									if (dataTemplate.GenerateClass)
+									{
+										var rootElement = dataTemplate.RootElement.Elements().First();
+										var staticResources = dataTemplate.EnumerateAllProperties()
+											.Select(p => p.Value.BindValue?.Resources)
+											.Where(r => r != null)
+											.SelectMany(r => r.Select(r => r.name))
+											.Distinct();
+										rootElement.Add(
+											new XElement(compiledBindings + "DataTemplateBindings.Bindings",
+												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
+													staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
+									}
 								}
 							}
 

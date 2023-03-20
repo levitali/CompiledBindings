@@ -32,6 +32,19 @@
                     Text="{c:Bind IntProp, Converter={StaticResource testConverter}}" />
             </Grid>
         </DataTemplate>
+
+        <DataTemplate
+            x:Key="testTemplate2"
+            x:DataType="viewModels:EntityViewModel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{x:Bind IntProp}" />
+            </Grid>
+        </DataTemplate>
+
     </Page.Resources>
 
     <Grid>

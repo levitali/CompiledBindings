@@ -6,7 +6,7 @@
 		<AssemblyName>CompiledBindings.WinUI</AssemblyName>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.15</Version>
+		<Version>1.0.15.1</Version>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
