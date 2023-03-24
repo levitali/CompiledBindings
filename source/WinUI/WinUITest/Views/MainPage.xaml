@@ -51,6 +51,7 @@
         <StackPanel Margin="24">
             <TextBlock Text="{c:Bind Prop1}" />
             <TextBlock Text="{c:Bind Prop1}" />
+            <TextBlock Text="{c:Set 3}" />
 
             <TextBlock Text="{c:Bind Class1.Prop2}" />
             <TextBlock Text="{c:Bind Class1.Prop2}" />

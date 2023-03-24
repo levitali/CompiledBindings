@@ -9,6 +9,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Label label2;
 		private global::Xamarin.Forms.Label label3;
 		private global::Xamarin.Forms.Picker picker2;
+		private global::Xamarin.Forms.Label label4;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -22,7 +23,11 @@ namespace XFTest.Views
 			label2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label2");
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label3");
 			picker2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(this, "picker2");
+			label4 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label4");
 
+#line (31, 13) - (31, 28) 31 "Page3.xml"
+			label4.Text = 3.ToString();
+#line default
 
 			this.BindingContextChanged += this_BindingContextChanged;
 			if (this.BindingContext is global::XFTest.ViewModels.Page3ViewModel dataRoot0)

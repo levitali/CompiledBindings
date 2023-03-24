@@ -456,7 +456,7 @@ public class XamlDomParser
 
 	private static Expression CorrectSourceExpression(Expression expression, TypeInfo? targetType)
 	{
-		if (expression is not (ConstantExpression or DefaultExpression) &&
+		if (expression is not DefaultExpression &&
 			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
 			targetType?.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
 		{

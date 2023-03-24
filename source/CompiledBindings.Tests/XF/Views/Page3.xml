@@ -28,6 +28,7 @@
         <Picker
             ItemDisplayBinding="{x:Bind Description, DataType=viewModels:PickItem}"
             ItemsSource="{x:Bind PickedItems}" />
+			  <Label Text="{x:Set 3}" />
     </Grid>
 
 </Page>
