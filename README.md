@@ -319,7 +319,15 @@ public void Save(bool parameter)
 
 ## x:Set Markup Extension
 
-This library also provides {x:Set} Markup Extension. It has an expression parameter, similar like {x:Bind}, and no other parameters. The data source of {x:Set} is always the root page/control/window itself. The expression is evaluated and set only once at the end of constructors of the page/control/window. If an expression is a static property of some type, than it is similar to {x:Static} Markup Extension.
+This library also provides {x:Set} Markup Extension. It can be used to set once a property with some expression. The differences between x:Set and x:Bind are:
+
+1) x:Set expressions are always evaluated at the end of a constructor.
+x:Bind expressions, if x:DataType is specified, are evaluated when the DataContext/BindingContext is set.
+
+2) For x:Set no code is generated for listening to changes of properties if there are some notifiable properties in the expression.
+If no code listening to changes of properties is needed for x:Bind, it is needed to set Mode=OneTime
+
+3) The data root for x:Set is always the view itself. The data root for x:Bind depends on x:DataType attribute. Using static members in expressions is the same in x:Set and x:Bind
 
 ## Binding to methods and extension methods
 
