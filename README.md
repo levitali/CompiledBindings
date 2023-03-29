@@ -1,5 +1,13 @@
 # CompiledBindings
 
+<b>CompiledBindings.WPF</b> [![NuGet version (CompiledBindings.WPF)](https://img.shields.io/nuget/v/CompiledBindings.WPF)](https://www.nuget.org/packages/CompiledBindings.WPF/)
+
+<b>CompiledBindings.XF</b> [![NuGet version (CompiledBindings.XF)](https://img.shields.io/nuget/v/CompiledBindings.XF)](https://www.nuget.org/packages/CompiledBindings.XF/)
+
+<b>CompiledBindings.MAUI</b> [![NuGet version (CompiledBindings.MAUI)](https://img.shields.io/nuget/v/CompiledBindings.MAUI)](https://www.nuget.org/packages/CompiledBindings.MAUI/)
+
+<b>CompiledBindings.WinUI</b> [![NuGet version (CompiledBindings.WinUI)](https://img.shields.io/nuget/v/CompiledBindings.WinUI)](https://www.nuget.org/packages/CompiledBindings.WinUI/)
+
 This library provides {x:Bind} Markup Extension for WPF, MAUI and Xamarin Forms. You can read about {x:Bind} Markup Extension for UWP [here](https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/x-bind-markup-extension). The whole functionality of {x:Bind} for UWP and also many other features are supported.
 
 At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it in Visual Basis projects.
