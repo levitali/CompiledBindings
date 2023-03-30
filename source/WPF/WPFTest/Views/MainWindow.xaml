@@ -28,6 +28,7 @@
             <Grid>
                 <StackPanel>
                     <TextBlock
+                        Foreground="{x:Bind BooleanProp ? $Color1 : $Color2}"
                         Text="{x:Bind Model.SByteProp}"
                         Visibility="{x:Bind BooleanProp, Converter={StaticResource booleanToVisibilityConverter}}" />
                     <TextBlock Text="{x:Bind BooleanProp}" />
@@ -55,7 +56,9 @@
                 Text="[x:Bind DecimalProp]"
                 Visibility="{x:Bind BooleanProp, Converter={StaticResource booleanToVisibilityConverter}}" />
             <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='aaa'}" />
-            <TextBlock Text="{x:Bind ModifyViewModel.Input2, FallbackValue='aaa'}" />
+            <TextBlock
+                Foreground="{x:Bind BooleanProp ? $Color1 : $Color2}"
+                Text="{x:Bind ModifyViewModel.Input2, FallbackValue='aaa'}" />
             <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='ccc'}" />
             <TextBlock Text="{x:Bind TaskProp}" />
             <TextBlock

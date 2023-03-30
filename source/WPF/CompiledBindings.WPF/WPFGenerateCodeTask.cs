@@ -181,16 +181,11 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 									if (dataTemplate.GenerateClass)
 									{
 										var rootElement = dataTemplate.RootElement.Elements().First();
-										var staticResources = dataTemplate.EnumerateAllProperties()
-											.Select(p => p.Value.BindValue?.Resources)
-											.Where(r => r != null)
-											.SelectMany(r => r.Select(r => r.name))
-											.Distinct();
 
 										rootElement.Add(
 											new XElement(mbui + "DataTemplateBindings.Bindings",
 												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
-													staticResources.Select(r => new XAttribute(r, $"{{StaticResource {r}}}")))));
+													dataTemplate.EnumerateResources().Select(r => new XAttribute(r.name, $"{{StaticResource {r.name}}}")))));
 									}
 								}
 							}

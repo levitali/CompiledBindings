@@ -15,6 +15,9 @@
                 <Label Text="{x:Bind BooleanProp}" />
             </Grid>
         </DataTemplate>
-                
+
+        <Color x:Key="Color1">Red</Color>
+        <Color x:Key="Color2">Green</Color>
+
     </Application.Resources>
 </Application>

@@ -53,7 +53,7 @@ public class XFProcessResourceXamlTask : Task
 			};
 
 			using var assembly = AssemblyDefinition.ReadAssembly(Assembly, prm);
-			HashSet<string> assemblyTypes = new(assembly.MainModule.Types.Select(_ => _.FullName));
+			var assemblyTypes = assembly.MainModule.Types.ToDictionary(_ => _.FullName);
 
 			var xamlDomParser = new XFXamlDomParser(_platformConstants);
 
@@ -155,7 +155,7 @@ public class XFProcessResourceXamlTask : Task
 
 									var dateTemplateClassName = $"{className}_DataTemplate{i}";
 									var dateTemplateFullClassName = $"{classNs}.{dateTemplateClassName}";
-									if (!assemblyTypes.Contains(dateTemplateFullClassName))
+									if (!assemblyTypes.TryGetValue(dateTemplateFullClassName, out var dataTemplateType))
 									{
 										continue;
 									}
@@ -166,13 +166,7 @@ public class XFProcessResourceXamlTask : Task
 										classNsPrefix = SearchNsPrefix(classNs);
 									}
 
-									var regex = new Regex(@"{StaticResource\s+(\w+)}");
-
-									var staticResources = memExtensions
-										.SelectMany(a => regex.Matches(a.Value).Cast<Match>())
-										.Select(m => m.Groups[1].Value)
-										.Distinct();
-									var propInitializers = string.Join(", ", staticResources.Select(r => $"{r}={{StaticResource {r}}}"));
+									var propInitializers = string.Join(", ", dataTemplateType.Properties.Select(p => $"{p.Name}={{StaticResource {p.Name}}}"));
 
 									var rootElement = dataTemplate.Elements().First();
 									InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{dateTemplateClassName} {propInitializers}}}\"");
@@ -201,7 +195,7 @@ public class XFProcessResourceXamlTask : Task
 										}
 										markupExtensionName += $"_{name}_{attr.Name.LocalName}";
 										var markupExtensionFullName = $"{classNs}.{markupExtensionName}";
-										if (assemblyTypes.Contains(markupExtensionFullName))
+										if (assemblyTypes.ContainsKey(markupExtensionFullName))
 										{
 											// Replace the attribute with markup extension
 

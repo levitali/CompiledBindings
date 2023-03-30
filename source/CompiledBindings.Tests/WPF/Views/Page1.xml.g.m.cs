@@ -10,6 +10,8 @@ namespace WPFTest.Views
 		global::System.Threading.CancellationTokenSource _generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
 		global::System.Windows.Data.IValueConverter TrueToVisibleConverter;
 		global::System.Windows.Data.IValueConverter InverseBooleanConverter;
+		global::System.Windows.Media.Brush colorBrush1;
+		global::System.Windows.Media.Brush colorBrush2;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -21,6 +23,8 @@ namespace WPFTest.Views
 
 			TrueToVisibleConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["TrueToVisibleConverter"] ?? global::System.Windows.Application.Current.Resources["TrueToVisibleConverter"] ?? throw new global::System.Exception("Resource 'TrueToVisibleConverter' not found."));
 			InverseBooleanConverter = (global::System.Windows.Data.IValueConverter)(this.Resources["InverseBooleanConverter"] ?? global::System.Windows.Application.Current.Resources["InverseBooleanConverter"] ?? throw new global::System.Exception("Resource 'InverseBooleanConverter' not found."));
+			colorBrush1 = (global::System.Windows.Media.Brush)(this.Resources["colorBrush1"] ?? global::System.Windows.Application.Current.Resources["colorBrush1"] ?? throw new global::System.Exception("Resource 'colorBrush1' not found."));
+			colorBrush2 = (global::System.Windows.Media.Brush)(this.Resources["colorBrush2"] ?? global::System.Windows.Application.Current.Resources["colorBrush2"] ?? throw new global::System.Exception("Resource 'colorBrush2' not found."));
 
 #line (15, 5) - (15, 50) 15 "Page1.xml"
 			var value1 = WPFTest.Strings.Instance;
@@ -94,15 +98,15 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _targetRoot;
-#line (87, 7) - (87, 81) 87 "Page1.xml"
+#line (87, 13) - (87, 87) 87 "Page1.xml"
 				var value1 = dataRoot.listView.SelectedItems;
-#line (81, 7) - (81, 148) 81 "Page1.xml"
+#line (81, 13) - (81, 154) 81 "Page1.xml"
 				var value2 = dataRoot.listView.SelectedItem;
-#line (81, 7) - (81, 148) 81 "Page1.xml"
+#line (81, 13) - (81, 154) 81 "Page1.xml"
 				var value3 = (((global::WPFTest.ViewModels.EntityViewModel)value2));
 #line (46, 13) - (46, 53) 46 "Page1.xml"
 				_targetRoot.textBlock5.Text = dataRoot._viewModel.DecimalProp.ToString();
-#line (81, 7) - (81, 148) 81 "Page1.xml"
+#line (81, 13) - (81, 154) 81 "Page1.xml"
 				_targetRoot.textBox4.IsEnabled = (value3 != null ? value3.DecimalProp == 1 : true);
 #line default
 				Update1_SelectedItem(value2);
@@ -114,18 +118,18 @@ namespace WPFTest.Views
 			private void Update0_Title(global::System.String value)
 			{
 				var dataRoot = _targetRoot;
-#line (73, 7) - (73, 132) 73 "Page1.xml"
-				var value1 = (((global::WPFTest.ViewModels.EntityViewModel)dataRoot.listView.SelectedItem)) is var v2 && v2 != null ? value == null : false;
-#line (73, 7) - (73, 132) 73 "Page1.xml"
+#line (72, 13) - (72, 138) 72 "Page1.xml"
+				var value1 = (((global::WPFTest.ViewModels.EntityViewModel)dataRoot.listView.SelectedItem)) is var v1 && v1 != null ? value == null : false;
+#line (72, 13) - (72, 138) 72 "Page1.xml"
 				_targetRoot.textBox2.IsEnabled = value1;
-#line (77, 7) - (77, 132) 77 "Page1.xml"
+#line (77, 13) - (77, 138) 77 "Page1.xml"
 				_targetRoot.textBox3.IsEnabled = value1;
 #line default
 			}
 
 			private void Update1_SelectedItem(global::System.Object value)
 			{
-#line (73, 7) - (73, 132) 73 "Page1.xml"
+#line (72, 13) - (72, 138) 72 "Page1.xml"
 				var value1 = (((global::WPFTest.ViewModels.EntityViewModel)value));
 #line (69, 13) - (69, 81) 69 "Page1.xml"
 				_targetRoot.button1.IsEnabled = value != null;
@@ -136,7 +140,7 @@ namespace WPFTest.Views
 
 			private void Update2_Count(global::System.Int32? value)
 			{
-#line (87, 7) - (87, 81) 87 "Page1.xml"
+#line (87, 13) - (87, 87) 87 "Page1.xml"
 				_targetRoot.checkBox2.IsEnabled = value > 0;
 #line default
 			}
@@ -475,6 +479,8 @@ namespace WPFTest.Views
 				_targetRoot.header1.Visibility = (value ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
 #line (53, 13) - (53, 101) 53 "Page1.xml"
 				_targetRoot.textBlock6.Visibility = ((global::System.Windows.Visibility)_targetRoot.TrueToVisibleConverter.Convert(value, typeof(global::System.Windows.Visibility), null, null));
+#line (89, 13) - (89, 74) 89 "Page1.xml"
+				_targetRoot.textBlock13.Foreground = (value ? _targetRoot.colorBrush1 : _targetRoot.colorBrush2);
 #line default
 			}
 
@@ -669,8 +675,8 @@ namespace WPFTest.Views
 			private void Update1_CanChangeInput1(global::System.Boolean? value)
 			{
 				var dataRoot = _dataRoot;
-#line (72, 13) - (72, 90) 72 "Page1.xml"
-				_targetRoot.textBox2.IsReadOnly = dataRoot.ModifyViewModel is var v1 && v1 != null ? !value : false;
+#line (73, 13) - (73, 90) 73 "Page1.xml"
+				_targetRoot.textBox2.IsReadOnly = dataRoot.ModifyViewModel is var v2 && v2 != null ? !value : false;
 #line default
 			}
 
@@ -699,12 +705,12 @@ namespace WPFTest.Views
 				{
 					try
 					{
-#line (88, 20) - (88, 93) 88 "Page1.xml"
+#line (90, 13) - (90, 86) 90 "Page1.xml"
 						var task = value;
 #line default
 						if (task?.IsCompleted != true)
 						{
-#line (88, 20) - (88, 93) 88 "Page1.xml"
+#line (90, 13) - (90, 86) 90 "Page1.xml"
 							_targetRoot.textBlock13.Text = "Loading...";
 #line default
 							if (task == null)
@@ -712,7 +718,7 @@ namespace WPFTest.Views
 								return;
 							}
 						}
-#line (88, 20) - (88, 93) 88 "Page1.xml"
+#line (90, 13) - (90, 86) 90 "Page1.xml"
 						var result = await task;
 #line default
 						if (!cancellationToken.IsCancellationRequested)

@@ -800,6 +800,23 @@ public class IsExpression : Expression
 	public override bool IsNullable => false;
 }
 
+public class StaticResourceExpression : Expression
+{
+	public StaticResourceExpression(string name, TypeInfo type) : base(type)
+	{
+		Name = name;
+	}
+
+	public string Name { get; }
+
+	public override bool IsNullable => false;
+
+	protected override string GetCSharpCode()
+	{
+		return $"_targetRoot.{Name}";
+	}
+}
+
 public interface IAccessExpression
 {
 	Expression Expression { get; }

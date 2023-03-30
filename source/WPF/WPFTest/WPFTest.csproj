@@ -113,7 +113,7 @@
                          IntermediateOutputPath="$(IntermediateOutputPath)"
                          LangVersion="$(LangVersion)"
                          MSBuildVersion="$(MSBuildVersion)"
-                         AttachDebugger="false">
+                         AttachDebugger="true">
       <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
       <Output ItemName="NewPages" TaskParameter="NewPages" />

@@ -7,7 +7,8 @@
 
   <PropertyGroup>
     <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
-  </PropertyGroup>
+		<CompiledBindingsTargetDependsOn>$(MembrainTargetDependsOn);XamlG</CompiledBindingsTargetDependsOn>
+	</PropertyGroup>
 
   <Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">
     <MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />

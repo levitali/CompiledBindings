@@ -21,5 +21,8 @@
                 </StackPanel>
             </Grid>
         </DataTemplate>
+
+        <SolidColorBrush x:Key="Color1">Red</SolidColorBrush>
+        <SolidColorBrush x:Key="Color2">Green</SolidColorBrush>
     </Application.Resources>
 </Application>

@@ -464,6 +464,7 @@ public class ExpressionParser
 		return _token.id switch
 		{
 			TokenId.Identifier => ParseIdentifier(),
+			TokenId.Dollar => ParseStaticResource(),
 			TokenId.InterpolatedString => ParseInterpolatedString(),
 			TokenId.StringLiteral => ParseStringLiteral(),
 			TokenId.IntegerLiteral => ParseIntegerLiteral(),
@@ -508,6 +509,14 @@ public class ExpressionParser
 			throw new ParseException(Res.InvalidType, errorPos);
 		}
 		return new TypeofExpression(typeExpression);
+	}
+
+	private Expression ParseStaticResource()
+	{
+		NextToken();
+		string id = GetIdentifier();
+		NextToken();
+		return new StaticResourceExpression(id, _expectedType ?? TypeInfo.GetTypeThrow(typeof(object)));
 	}
 
 	private Expression ParseInterpolatedString()
@@ -1313,11 +1322,14 @@ Label_CreateMemberExpression:
 				break;
 			case '$':
 				NextChar();
-				if (_ch is not ('\'' or '"'))
+				if (_ch is ('\'' or '"'))
 				{
-					throw new ParseException("A string literal is expected.", _textPos);
+					t = TokenId.InterpolatedString;
 				}
-				t = TokenId.InterpolatedString;
+				else
+				{
+					t = TokenId.Dollar;
+				}
 				break;
 			default:
 				if (char.IsLetter(_ch) || _ch == '_')
@@ -1494,6 +1506,7 @@ Label_CreateMemberExpression:
 		DoubleEqual,
 		GreaterThanEqual,
 		DoubleBar,
+		Dollar,
 		InterpolatedString,
 		SlashDot,
 		BackslashDot

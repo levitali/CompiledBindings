@@ -99,8 +99,7 @@ $@"	}}");
 
 	private void GenerateResourceDeclarations(StringBuilder output, GeneratedClass parseResult, bool isDataTemplate)
 	{
-		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name);
-		foreach (var (name, type) in resources)
+		foreach (var (name, type) in parseResult.EnumerateResources())
 		{
 			if (isDataTemplate)
 			{
@@ -117,7 +116,7 @@ $@"		global::{type.Reference.GetCSharpFullName()} {name};");
 
 	private void GenerateInitializeResources(StringBuilder output, GeneratedClass parseResult)
 	{
-		var resources = parseResult.XamlObjects.SelectMany(o => o.Properties).Select(p => p.Value.BindValue).Where(b => b != null).SelectMany(b => b!.Resources).Distinct(b => b.name).ToList();
+		var resources = parseResult.EnumerateResources().ToList();
 		if (resources.Count > 0)
 		{
 			foreach (var (name, type) in resources)

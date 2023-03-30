@@ -379,6 +379,24 @@ public class GeneratedClass
 		return EnumerateAllProperties().Select(p => p.Value.BindingValue!).Where(b => b != null);
 	}
 
+	public IEnumerable<(string name, TypeInfo type)> EnumerateResources()
+	{
+		return XamlObjects
+			.SelectMany(o => o.Properties)
+			.Select(p => p.Value.BindValue)
+			.Where(b => b != null)
+			.SelectMany(b => b!.Resources)
+			.Select(b => (name: b.name, type: b.type))
+			.Union(XamlObjects
+				.SelectMany(o => o.Properties)
+				.Select(p => p.Value.StaticValue ?? p.Value.BindValue?.SourceExpression)
+				.Where(e => e != null)
+				.SelectMany(e => e!.EnumerateTree())
+				.OfType<StaticResourceExpression>()
+				.Select(e => (name: e.Name, type: e.Type)))
+			.Distinct(b => b.name);
+	}
+
 	public bool GenerateClass => BindingScopes.Count > 0 || !UpdateMethod.IsEmpty;
 
 	public bool GenerateCode => GenerateClass || EnumerateBindings().Any();
