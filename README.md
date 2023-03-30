@@ -113,13 +113,15 @@ IntProp1 is 0 or 10
 The "not" keyword can be used before comparison operator to negate the expression:
 
 ```xaml
-ListProp.Count is not > 0
+ListProp.Count is not gt 0
 ``` 
 
-To compare whether the left expression is not equal, you can use either "ne" or the "not" keywords:
+To compare whether the left expression is not equal, you can use either "not" or "ne" or "not eq" keywords:
 
 ```xaml
-IntProp1 is ne 0 or not 10
+IntProp1 is not 0
+IntProp1 is ne 0
+IntProp1 is not eq 0
 ```
 
 
@@ -236,6 +238,23 @@ The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullVal
 ### Observing changes
 
 If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
+
+Note, that whether a class implements the INotifyPropertyChanged, is done during compile time. If you have in your expression an object of a derived class, which does implement INotifyPropertyChanged, the listing to property changes anyway will not work. To overcome this problem, you can turn on dynamic checking at runtime whether the object implements the interface. For this, use the <c>\\.</c> (backsplash dot) operator before a property.
+
+For example, you have a ListBox, and you need to bind to SelectedItems.Count property. The SelectedItems property is of type IList, so normally no listing to changes of Count property is generated. By using \\. operator the code is generated to check at runtime, whether the object returned by the property implements INotifyPropertyChanged.
+
+``` xaml
+<ListBox x:Name="serialNumbersList"/>
+<TextBlock Text="{x:Bind serialNumbersList.SelectedItems\.Count}"/>
+```
+
+You can use the /. operator to stop listening to property changes. In the example above, the SelectedItems property is the dependency one, so normally the code is generated to check whether the property is changed. But actually the object (collection) returned by the property never changes. Only the collection itselft can change. So to optimize code generation you can use this:
+
+``` xaml
+<ListBox x:Name="serialNumbersList"/>
+<TextBlock Text="{x:Bind serialNumbersList/.SelectedItems\.Count}"/>
+```
+
 
 ### Nullability checking
 
