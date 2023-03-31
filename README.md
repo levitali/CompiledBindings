@@ -239,7 +239,9 @@ The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullVal
 
 If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
 
-Note, that whether a class implements the INotifyPropertyChanged, is done during compile time. If you have in your expression an object of a derived class, which does implement INotifyPropertyChanged, the listing to property changes anyway will not work. To overcome this problem, you can turn on dynamic checking at runtime whether the object implements the interface. For this, use the <c>\\.</c> (backsplash dot) operator before a property.
+**\\. and /. operators**
+\
+Checking whether a class implements the INotifyPropertyChanged is done during compile time. With the <c>\\.</c> (backsplash dot) operator before a property you can force checking at runtime whether the source class implements the interface (is notifiable).
 
 For example, you have a ListBox, and you need to bind to SelectedItems.Count property. The SelectedItems property is of type IList, so normally no listing to changes of Count property is generated. By using \\. operator the code is generated to check at runtime, whether the object returned by the property implements INotifyPropertyChanged.
 
@@ -247,14 +249,46 @@ For example, you have a ListBox, and you need to bind to SelectedItems.Count pro
 <ListBox x:Name="serialNumbersList"/>
 <TextBlock Text="{x:Bind serialNumbersList.SelectedItems\.Count}"/>
 ```
-
 You can use the /. operator to stop listening to property changes. In the example above, the SelectedItems property is the dependency one, so normally the code is generated to check whether the property is changed. But actually the object (collection) returned by the property never changes. Only the collection itselft can change. So to optimize code generation you can use this:
 
 ``` xaml
 <ListBox x:Name="serialNumbersList"/>
 <TextBlock Text="{x:Bind serialNumbersList/.SelectedItems\.Count}"/>
 ```
+**get-only properties and ReadOnlyAttribute**
+\
+To optimize the generated code, no code is generated for listining to changes of auto-generated get-only properties. For example:
 
+```c#
+class EntityViewModel : INotifyPropertyChanged
+{
+    public EntityViewModel(EntityModel model)
+    {
+    	Model = model;
+    }
+    
+    public EntityModel Model { get; }
+}
+```
+
+So actually the Model property cannot be changed later, so no code is generated for listining whether the property is changed.
+
+You can use the ReadOnlyAttribute for a property with false or true, to force generation or not generation of code for property changes.
+
+If in the example above the object returned by Model property is changed, but it doesn't itselft implement INotifyPropertyChanged, you can want to force refreshing bindings by raising the PropertyChanged event with the "Model" property name. In this case you can force generating listing code with the [ReadOnly(false)] attribute:
+
+```c#
+    
+    [ReadOnly(false)]
+    public EntityModel Model { get; }
+```
+
+In contrast, if a property is not an auto-generated get-only one, but you know that it never changes, you can optimize code generation by turning notifications for this property off.
+
+```c#    
+    [ReadOnly(true)]
+    public string Title => // some logic
+```
 
 ### Nullability checking
 
