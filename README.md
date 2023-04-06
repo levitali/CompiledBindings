@@ -233,7 +233,7 @@ If you use {x:Bind} to set the ItemsSource property of a collection control (Lis
 - **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
 - **UpdateSourceEventNames** Specifies an event, or a list of events separated by | symbol, to use for updating the binding's source.
 
-The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {x:Static} markup extension.
+The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {StaticResource } markup extension.
 
 ### Observing changes
 
