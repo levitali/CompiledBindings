@@ -49,6 +49,11 @@ public class ExpressionTests : IDisposable
 		var res4 = ExpressionParser.Parse(class1Type, "dataRoot", expression4, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.That(res4.CSharpCode.Equals(expectedCode4));
 
+		expression = "Method2(3)";
+		expectedCode = "dataRoot.Method2(3)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
 		expression = "FuncProp()";
 		expectedCode = "dataRoot.FuncProp()";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);

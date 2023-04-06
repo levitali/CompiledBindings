@@ -275,6 +275,46 @@ public class ExpressionParser
 		return expr;
 	}
 
+	private static bool IsExpressionAssignable(Expression expression, TypeInfo type)
+	{
+		if (type.IsAssignableFrom(expression.Type))
+		{
+			return true;
+		}
+
+		if (expression is not ConstantExpression ce)
+		{
+			return false;
+		}
+
+		if (type.IsNullable && ce.Value == null)
+		{
+			return true;
+		}
+
+		switch ((type.Reference.FullName, ce.Value))
+		{
+			case ("System.Char", string v1) when v1.Length == 1:
+			case ("System.Int8", long v2) when v2 >= sbyte.MinValue:
+			case ("System.UInt8", ulong v3) when v3 <= byte.MaxValue:
+			case ("System.Int16", long v4) when v4 >= short.MinValue:
+			case ("System.UInt16", ulong v5) when v5 <= ushort.MaxValue:
+			case ("System.Int32", long v6) when v6 >= int.MinValue:
+			case ("System.UInt32", ulong v7) when v7 <= uint.MaxValue:
+			case ("System.Decimal", long v8) when v8 >= decimal.MinValue:
+			case ("System.Decimal", ulong v9) when v9 <= decimal.MaxValue:
+			case ("System.Decimal", double v10) when v10 is >= ((double)decimal.MinValue) and <= ((double)decimal.MaxValue):
+			case ("System.Single", long v11) when v11 >= float.MinValue:
+			case ("System.Single", ulong v12) when v12 <= float.MaxValue:
+			case ("System.Single", double v13) when v13 is >= float.MinValue and <= float.MaxValue:
+			case ("System.Double", long v14) when v14 >= double.MinValue:
+			case ("System.Double", ulong v15) when v15 <= double.MaxValue:
+				return true;
+		}
+
+		return false;
+	}
+
 	private bool CheckMethodApplicable(MethodInfo method, Expression[] args, bool isExtension)
 	{
 		var parameters = method.Parameters;
@@ -314,8 +354,7 @@ public class ExpressionParser
 
 			bool CheckAssignable()
 			{
-				return prmType.IsAssignableFrom(args[i].Type) ||
-					(args[i] is ConstantExpression ce && ce.Value is string && prmType.Reference.FullName == "System.Char");
+				return IsExpressionAssignable(args[i], prmType);
 			}
 		}
 
@@ -553,7 +592,7 @@ public class ExpressionParser
 			_parsingInterpolatedString = false;
 
 			// If the current token is comma or colon, there is an alignment and/or format part
-			if (_token.id == TokenId.Comma || _token.id == TokenId.Colon)
+			if (_token.id is TokenId.Comma or TokenId.Colon)
 			{
 				// Find the closing }
 				pos = _text.IndexOf('}', _textPos);
@@ -622,7 +661,7 @@ public class ExpressionParser
 			start = i + 1;
 		}
 		NextToken();
-		return CreateLiteral(s, s);
+		return new ConstantExpression(s);
 	}
 
 	private Expression ParseIntegerLiteral()
@@ -635,24 +674,8 @@ public class ExpressionParser
 			{
 				throw new ParseException($"Invalid integer literal '{text}'", _token.pos);
 			}
-
 			NextToken();
-			if (value <= int.MaxValue)
-			{
-				return CreateLiteral((int)value, text);
-			}
-
-			if (value <= uint.MaxValue)
-			{
-				return CreateLiteral((uint)value, text);
-			}
-
-			if (value <= long.MaxValue)
-			{
-				return CreateLiteral((long)value, text);
-			}
-
-			return CreateLiteral(value, text);
+			return new ConstantExpression(value);
 		}
 		else
 		{
@@ -662,12 +685,7 @@ public class ExpressionParser
 			}
 
 			NextToken();
-			if (value is >= int.MinValue and <= int.MaxValue)
-			{
-				return CreateLiteral((int)value, text);
-			}
-
-			return CreateLiteral(value, text);
+			return new ConstantExpression(value);
 		}
 	}
 
@@ -704,13 +722,7 @@ public class ExpressionParser
 		}
 
 		NextToken();
-		return CreateLiteral(value, text);
-	}
-
-	private Expression CreateLiteral(object value, string text)
-	{
-		var expr = new ConstantExpression(value);
-		return expr;
+		return new ConstantExpression(value);
 	}
 
 	private Expression ParseParenExpression()
@@ -796,14 +808,7 @@ public class ExpressionParser
 			{
 				var expr = Parse2();
 
-				if (result == null)
-				{
-					result = expr;
-				}
-				else
-				{
-					result = new BinaryExpression(result, expr, logicalOperand!);
-				}
+				result = result == null ? expr : new BinaryExpression(result, expr, logicalOperand!);
 
 				if (_token.id != TokenId.DoubleAmphersand &&
 					 !ReplaceTokenIdentifier("and", TokenId.DoubleAmphersand) &&
@@ -1310,14 +1315,7 @@ Label_CreateMemberExpression:
 				break;
 			case '$':
 				NextChar();
-				if (_ch is ('\'' or '"'))
-				{
-					t = TokenId.InterpolatedString;
-				}
-				else
-				{
-					t = TokenId.Dollar;
-				}
+				t = _ch is '\'' or '"' ? TokenId.InterpolatedString : TokenId.Dollar;
 				break;
 			default:
 				if (char.IsLetter(_ch) || _ch == '_')

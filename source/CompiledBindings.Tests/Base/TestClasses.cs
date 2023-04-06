@@ -40,6 +40,11 @@ public class Class1
 	{
 		return null;
 	}
+
+	public bool Method2(float value)
+	{
+		return false;
+	}
 }
 
 public class Class2
