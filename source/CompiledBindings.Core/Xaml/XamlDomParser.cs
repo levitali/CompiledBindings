@@ -19,9 +19,7 @@ public class XamlDomParser
 	private int _localVarIndex;
 	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 	public XamlDomParser(
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 		XNamespace defaultNamespace,
 		XNamespace xNamespace,
 		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
@@ -60,10 +58,10 @@ public class XamlDomParser
 	public TypeInfo ConverterType { get; }
 	public TypeInfo BindingType { get; }
 	public IList<XamlNamespace>? KnownNamespaces { get; set; }
-	public string CurrentFile { get; set; }
-	public string CurrentLineFile { get; set; }
-	public TypeInfo TargetType { get; set; }
-	public TypeInfo DataType { get; set; }
+	public string CurrentFile { get; set; } = null!;
+	public string CurrentLineFile { get; set; } = null!;
+	public TypeInfo TargetType { get; set; } = null!;
+	public TypeInfo DataType { get; set; } = null!;
 
 	public TypeInfo GetRootType(XElement root)
 	{
@@ -188,6 +186,10 @@ public class XamlDomParser
 	{
 		try
 		{
+			PropertyInfo? targetProperty = null;
+			EventInfo? targetEvent = null;
+			MethodInfo? targetMethod = null;
+			bool isAttached = false;
 			XName? attachedClassName = null;
 			string? attachedPropertyName = null;
 
@@ -197,15 +199,7 @@ public class XamlDomParser
 				string typeName = memberName.Substring(0, index);
 				attachedClassName = (xamlNode.Name.Namespace is var n && n == XNamespace.None ? DefaultNamespace : n) + typeName;
 				attachedPropertyName = memberName.Substring(index + 1);
-			}
 
-			PropertyInfo? targetProperty = null;
-			EventInfo? targetEvent = null;
-			MethodInfo? targetMethod = null;
-			bool isAttached = false;
-
-			if (attachedClassName != null)
-			{
 				var attachPropertyOwnerType = FindType(attachedClassName, xamlNode.Element);
 
 				string setMethodName = "Set" + attachedPropertyName;

@@ -194,15 +194,8 @@ public class ExpressionParser
 			var right = ParseMultiplicative();
 			ValidateNotMethodAccess(right);
 			_expectedType = savedExpectedType;
-			switch (op.id)
-			{
-				case TokenId.Plus:
-					left = new BinaryExpression(left, right, "+");
-					break;
-				case TokenId.Minus:
-					left = new BinaryExpression(left, right, "-");
-					break;
-			}
+			var operand = op.id == TokenId.Plus ? "+" : "-";
+			left = new BinaryExpression(left, right, operand);
 		}
 		return left;
 	}
@@ -221,18 +214,13 @@ public class ExpressionParser
 			var right = ParseUnary();
 			ValidateNotMethodAccess(right);
 			_expectedType = savedExpectedType;
-			switch (op.id)
+			var operand = op.id switch
 			{
-				case TokenId.Asterisk:
-					left = new BinaryExpression(left, right, "*");
-					break;
-				case TokenId.Slash:
-					left = new BinaryExpression(left, right, "/");
-					break;
-				case TokenId.Percent:
-					left = new BinaryExpression(left, right, "%");
-					break;
-			}
+				TokenId.Percent => "%",
+				TokenId.Asterisk => "*",
+				_ => "/"
+			};
+			left = new BinaryExpression(left, right, operand);
 		}
 		return left;
 	}
