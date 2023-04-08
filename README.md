@@ -241,7 +241,7 @@ If the Mode is not OneTime or OneWayToSource, than a code is generated to observ
 
 **\\. and /. operators**
 \
-Checking whether a class implements the INotifyPropertyChanged is done during compile time. With the <c>\\.</c> (backsplash dot) operator before a property you can force checking at runtime whether the source class implements the interface (is notifiable).
+Checking whether a class implements the INotifyPropertyChanged is done during compile time. With the <c>\\.</c> (backslash dot) operator before a property you can force checking at runtime whether the source class implements the interface.
 
 For example, you have a ListBox, and you need to bind to SelectedItems.Count property. The SelectedItems property is of type IList, so normally no listing to changes of Count property is generated. By using \\. operator the code is generated to check at runtime, whether the object returned by the property implements INotifyPropertyChanged.
 
