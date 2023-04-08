@@ -265,7 +265,6 @@ public static class TypeInfoUtils
 		return selector(typeDefinition);
 	}
 
-
 	private static TypeReference ReplaceGenericParameters(TypeReference type, TypeDefinition typeDefinition, TypeReference interfaceType)
 	{
 		if (type is not IGenericInstance tgi || interfaceType is not IGenericInstance igi || igi.GenericArguments.All(a => !a.IsGenericParameter))

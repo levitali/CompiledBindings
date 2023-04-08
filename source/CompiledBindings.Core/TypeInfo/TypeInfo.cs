@@ -140,6 +140,36 @@ public class TypeInfo
 		return null;
 	}
 
+	public PropertyInfo? GetIndexerProperty()
+	{
+		var type = Reference;
+		do
+		{
+			if (type.IsGenericInstance)
+			{
+				type = type.GetElementType()!;
+			}
+			var typeDefinition = type.ResolveEx();
+			if (typeDefinition == null)
+			{
+				return null;
+			}
+			var defaultMemberAttr = typeDefinition.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Reflection.DefaultMemberAttribute");
+			if (defaultMemberAttr != null)
+			{
+				var itemPropName = defaultMemberAttr.ConstructorArguments.FirstOrDefault().Value as string;
+				if (itemPropName != null)
+				{
+					return Properties.FirstOrDefault(p => p.Definition.Name == itemPropName);
+				}
+			}
+			type = type.GetBaseType();
+		}
+		while (type != null);
+
+		return null;
+	}
+
 	public static TypeInfo? GetType(string typeName, bool ignoreCase = false)
 	{
 		if (_typeCache.TryGetValue(typeName, out var type) && (!ignoreCase || type.Reference.FullName == typeName))

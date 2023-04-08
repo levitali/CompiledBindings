@@ -58,5 +58,7 @@
             ItemDisplayBinding="{x:Bind Description, DataType=vm:PickItem}"
             ItemsSource="{x:Bind (systemCollections:IList)PickedItems}" />
 
+        <Label Text="{x:Bind this['test']}"/>
+
     </StackLayout>
 </ContentPage>

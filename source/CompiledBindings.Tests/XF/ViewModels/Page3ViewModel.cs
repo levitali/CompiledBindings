@@ -1,4 +1,6 @@
-﻿namespace XFTest.ViewModels;
+﻿using System.Runtime.CompilerServices;
+
+namespace XFTest.ViewModels;
 
 #pragma warning disable 0067
 
@@ -13,6 +15,13 @@ public class Page3ViewModel : INotifyPropertyChanged
 	public PickItem? SelectedPickItem { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
+
+	[IndexerName("State")]
+	public string? this[string index]
+	{
+		get => null;
+		set { }
+	}
 }
 
 public class PickItem : INotifyPropertyChanged

@@ -497,7 +497,7 @@ public class ExpressionParser
 			TokenId.IntegerLiteral => ParseIntegerLiteral(),
 			TokenId.RealLiteral => ParseRealLiteral(),
 			TokenId.OpenParen => ParseParenExpression(),
-			_ => throw new ParseException(Res.ExpressionExpected, _token.pos),
+			_ => throw new ParseException($"Invalid expression term {_token.text}", _token.pos),
 		};
 	}
 
@@ -1087,7 +1087,7 @@ Label_CreateMemberExpression:
 		}
 		else
 		{
-			var prop = expr.Type.Properties.FirstOrDefault(p => p.Definition.Name == "Item");
+			var prop = expr.Type.GetIndexerProperty();
 			if (prop == null)
 			{
 				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Reference.FullName}'", errorPos);
@@ -1435,7 +1435,6 @@ Label_CreateMemberExpression:
 	private static class Res
 	{
 		public const string EmptyExpression = "Empty expression.";
-		public const string ExpressionExpected = "Expression expected.";
 		public const string SyntaxError = "Syntax error.";
 		public const string ColonExpected = "':' expected.";
 		public const string OpenParenExpected = "'(' expected.";

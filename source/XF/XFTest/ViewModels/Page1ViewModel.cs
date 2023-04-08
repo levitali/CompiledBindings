@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace XFTest.ViewModels;
 
@@ -42,6 +43,13 @@ public class Page1ViewModel : INotifyPropertyChanged
 	};
 
 	public PickItem? SelectedPickItem { get; set; }
+
+	[IndexerName("State")]
+	public string? this[string index]
+	{
+		get => null;
+		set { }
+	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 

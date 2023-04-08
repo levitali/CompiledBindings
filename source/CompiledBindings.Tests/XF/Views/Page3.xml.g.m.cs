@@ -10,6 +10,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Label label3;
 		private global::Xamarin.Forms.Picker picker2;
 		private global::Xamarin.Forms.Label label4;
+		private global::Xamarin.Forms.Label label5;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -24,6 +25,7 @@ namespace XFTest.Views
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label3");
 			picker2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(this, "picker2");
 			label4 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label4");
+			label5 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label5");
 
 #line (31, 13) - (31, 28) 31 "Page3.xml"
 			label4.Text = 3.ToString();
@@ -79,6 +81,8 @@ namespace XFTest.Views
 				var dataRoot = _dataRoot;
 #line (30, 13) - (30, 46) 30 "Page3.xml"
 				_targetRoot.picker2.ItemsSource = dataRoot.PickedItems;
+#line (32, 13) - (32, 40) 32 "Page3.xml"
+				_targetRoot.label5.Text = dataRoot["test"];
 #line default
 				Update0(dataRoot);
 			}
