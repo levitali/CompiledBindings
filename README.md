@@ -1,6 +1,14 @@
 # CompiledBindings
 
-This library provides {x:Bind} Markup Extension for WPF, MAUI and Xamarin Forms. You can read about {x:Bind} Markup Extension for UWP [here](https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/x-bind-markup-extension). The whole functionality of {x:Bind} for UWP and also many other features are supported.
+<b>CompiledBindings.WPF</b> [![NuGet version (CompiledBindings.WPF)](https://img.shields.io/nuget/v/CompiledBindings.WPF)](https://www.nuget.org/packages/CompiledBindings.WPF/)
+
+<b>CompiledBindings.XF</b> [![NuGet version (CompiledBindings.XF)](https://img.shields.io/nuget/v/CompiledBindings.XF)](https://www.nuget.org/packages/CompiledBindings.XF/)
+
+<b>CompiledBindings.MAUI</b> [![NuGet version (CompiledBindings.MAUI)](https://img.shields.io/nuget/v/CompiledBindings.MAUI)](https://www.nuget.org/packages/CompiledBindings.MAUI/)
+
+<b>CompiledBindings.WinUI</b> [![NuGet version (CompiledBindings.WinUI)](https://img.shields.io/nuget/v/CompiledBindings.WinUI)](https://www.nuget.org/packages/CompiledBindings.WinUI/)
+
+This library provides {x:Bind} Markup Extension for WPF, MAUI and Xamarin Forms. You can read about {x:Bind} Markup Extension for UWP [here](https://docs.microsoft.com/en-us/windows/uwp/xaml-platform/x-bind-markup-extension). Most functionality of {x:Bind} for UWP and also many other features are supported.
 
 At XAML compile time, {x:Bind} is converted into C# code. Thus you can't use it in Visual Basis projects.
 
@@ -105,13 +113,15 @@ IntProp1 is 0 or 10
 The "not" keyword can be used before comparison operator to negate the expression:
 
 ```xaml
-ListProp.Count is not > 0
+ListProp.Count is not gt 0
 ``` 
 
-To compare whether the left expression is not equal, you can use either "ne" or the "not" keywords:
+To compare whether the left expression is not equal, you can use either "not" or "ne" or "not eq" keywords:
 
 ```xaml
-IntProp1 is ne 0 or not 10
+IntProp1 is not 0
+IntProp1 is ne 0
+IntProp1 is not eq 0
 ```
 
 
@@ -223,11 +233,62 @@ If you use {x:Bind} to set the ItemsSource property of a collection control (Lis
 - **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
 - **UpdateSourceEventNames** Specifies an event, or a list of events separated by | symbol, to use for updating the binding's source.
 
-The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {x:Static} markup extension.
+The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {StaticResource } markup extension.
 
 ### Observing changes
 
 If the Mode is not OneTime or OneWayToSource, than a code is generated to observe changes of properties in the {x:Bind} expression. The changes are observed to Dependency Properties, if there are any in the expression, as well as to objects of classes, implementing INotifyPropertyChanged interface.
+
+**\\. and /. operators**
+\
+Checking whether a class implements the INotifyPropertyChanged is done during compile time. With the <c>\\.</c> (backslash dot) operator before a property you can force checking at runtime whether the source class implements the interface.
+
+For example, you have a ListBox, and you need to bind to SelectedItems.Count property. The SelectedItems property is of type IList, so normally no listing to changes of Count property is generated. By using \\. operator the code is generated to check at runtime, whether the object returned by the property implements INotifyPropertyChanged.
+
+``` xaml
+<ListBox x:Name="serialNumbersList"/>
+<TextBlock Text="{x:Bind serialNumbersList.SelectedItems\.Count}"/>
+```
+You can use the /. operator to stop listening to property changes. In the example above, the SelectedItems property is the dependency one, so normally the code is generated to check whether the property is changed. But actually the object (collection) returned by the property never changes. Only the collection itselft can change. So to optimize code generation you can use this:
+
+``` xaml
+<ListBox x:Name="serialNumbersList"/>
+<TextBlock Text="{x:Bind serialNumbersList/.SelectedItems\.Count}"/>
+```
+**get-only properties and ReadOnlyAttribute**
+\
+To optimize the generated code, no code is generated for listining to changes of auto-generated get-only properties. For example:
+
+```c#
+class EntityViewModel : INotifyPropertyChanged
+{
+    public EntityViewModel(EntityModel model)
+    {
+    	Model = model;
+    }
+    
+    public EntityModel Model { get; }
+}
+```
+
+So actually the Model property cannot be changed later, so no code is generated for listining whether the property is changed.
+
+You can use the ReadOnlyAttribute for a property with false or true, to force generation or not generation of code for property changes.
+
+If in the example above the object returned by Model property is changed, but it doesn't itselft implement INotifyPropertyChanged, you can want to force refreshing bindings by raising the PropertyChanged event with the "Model" property name. In this case you can force generating listing code with the [ReadOnly(false)] attribute:
+
+```c#
+    
+    [ReadOnly(false)]
+    public EntityModel Model { get; }
+```
+
+In contrast, if a property is not an auto-generated get-only one, but you know that it never changes, you can optimize code generation by turning notifications for this property off.
+
+```c#    
+    [ReadOnly(true)]
+    public string Title => // some logic
+```
 
 ### Nullability checking
 
@@ -311,7 +372,15 @@ public void Save(bool parameter)
 
 ## x:Set Markup Extension
 
-This library also provides {x:Set} Markup Extension. It has an expression parameter, similar like {x:Bind}, and no other parameters. The data source of {x:Set} is always the root page/control/window itself. The expression is evaluated and set only once at the end of constructors of the page/control/window. If an expression is a static property of some type, than it is similar to {x:Static} Markup Extension.
+This library also provides {x:Set} Markup Extension. It can be used to set once a property with some expression. The differences between x:Set and x:Bind are:
+
+1) x:Set expressions are always evaluated at the end of a constructor.
+x:Bind expressions, if x:DataType is specified, are evaluated when the DataContext/BindingContext is set.
+
+2) For x:Set no code is generated for listening to changes of properties if there are some notifiable properties in the expression.
+If no code listening to changes of properties is needed for x:Bind, it is needed to set Mode=OneTime
+
+3) The data root for x:Set is always the view itself. The data root for x:Bind depends on x:DataType attribute. Using static members in expressions is the same in x:Set and x:Bind
 
 ## Binding to methods and extension methods
 
