@@ -5,6 +5,7 @@
         <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
         <LangVersion>latest</LangVersion>
         <Nullable>enable</Nullable>
+			  <DefineConstants>$(DefineConstants);XAMARIN_ESSENTIALS</DefineConstants>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,6 +14,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
         <PackageReference Include="Xamarin.Forms" Version="5.0.0.2545" />
     </ItemGroup>
 

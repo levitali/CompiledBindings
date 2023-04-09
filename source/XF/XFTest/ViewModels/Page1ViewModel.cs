@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace XFTest.ViewModels;
 
-public class Page1ViewModel : INotifyPropertyChanged
+public class Page1ViewModel : SynchronizedObservableObject
 {
 	FocusState<FocusField> _focusField = FocusField.Password;
 
@@ -21,7 +21,7 @@ public class Page1ViewModel : INotifyPropertyChanged
 		private set
 		{
 			_focusField = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FocusedField)));
+			OnPropertyChanged();
 		}
 	}
 
@@ -50,8 +50,6 @@ public class Page1ViewModel : INotifyPropertyChanged
 		get => null;
 		set { }
 	}
-
-	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public void FocusUserName()
 	{
