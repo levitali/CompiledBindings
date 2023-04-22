@@ -294,6 +294,7 @@ public static class BindingParser
 
 	public static BindingsData CreateBindingsData(IList<Bind> binds, TypeInfo? targetType, TypeInfo dataType, TypeInfo? dependencyObjectType = null)
 	{
+		// Set unique indexes used as ids for all binding in this binding scope
 		for (int i = 0; i < binds.Count; i++)
 		{
 			binds[i].Index = i;
@@ -305,6 +306,7 @@ public static class BindingParser
 		// Go through all expressions in bindings and find notifiable properties, grouped by notifiable source
 		var notifySources = GetNotifySources(binds, iNotifyPropertyChangedType, dependencyObjectType);
 
+		// Set dependencies between notify sources
 		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).Key))
 		{
 			foreach (var prop in notifySource.Properties)
@@ -331,8 +333,11 @@ public static class BindingParser
 			}
 		}
 
+		// Create Update methods for notify sources and properties
 		foreach (var notifySource in notifySources)
 		{
+			// If the notify source has more than one propert<, the update method is needed
+			// to update all properties for empty property name
 			if (notifySource.Properties.Count > 1 &&
 				iNotifyPropertyChangedType.IsAssignableFrom(notifySource.SourceExpression.Type))
 			{
@@ -346,11 +351,14 @@ public static class BindingParser
 			}
 		}
 
+		// Create the main Update method
 		var binds1 = binds
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.ToList();
 		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, null);
 
+		// Create data for two-way bindings
+		
 		var twoWayBinds = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
 		var twoWayEventHandlers1 = twoWayBinds
