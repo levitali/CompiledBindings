@@ -342,7 +342,7 @@ public static class BindingParser
 
 			foreach (var prop in notifySource.Properties)
 			{
-				prop.UpdateMethod = CreateUpdateMethodData(prop.SetBindings, prop.DependentNotifySources, null, prop.Expression);
+				prop.UpdateMethod = CreateUpdateMethodData(prop.SetBindings, prop.DependentNotifySources, null, notifySource.Expression);
 			}
 		}
 
@@ -485,7 +485,7 @@ public static class BindingParser
 				.ToList();
 
 			var props3 = updateMethodNotifyProps
-				.Select(p => new PropertySetExpression(p.Bindings[0].Property, Replace(p.Expression)))
+				.Select(p => new PropertySetExpression(p.Bindings[0].Property, Replace(p.Parent.Expression)))
 				.ToList();
 
 			var props4 = notifySources1

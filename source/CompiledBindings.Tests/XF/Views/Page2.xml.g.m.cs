@@ -104,77 +104,81 @@ namespace XFTest.Views
 
 			private void Update0(global::XFTest.ViewModels.Page2ViewModel value)
 			{
-				Update0_FuncProp(value.FuncProp);
-				Update0_CurrentItem(value.CurrentItem);
-				Update0_CurrentItem2(value.CurrentItem2);
-				Update0_Group(value.Group);
-				Update0_StringProp(value.StringProp);
+				Update0_FuncProp(value);
+				Update0_CurrentItem(value);
+				Update0_CurrentItem2(value);
+				Update0_Group(value);
+				Update0_StringProp(value);
 			}
 
-			private void Update0_CurrentItem(global::XFTest.ViewModels.ItemViewModel value)
+			private void Update0_CurrentItem(global::XFTest.ViewModels.Page2ViewModel value)
 			{
-				Update1_GuidProp(value?.GuidProp);
-				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
+#line (21, 16) - (21, 62) 21 "Page2.xml"
+				var value1 = value.CurrentItem;
+#line default
+				Update1_GuidProp(value1);
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
-			private void Update0_CurrentItem2(global::XFTest.ViewModels.Item2ViewModel value)
+			private void Update0_CurrentItem2(global::XFTest.ViewModels.Page2ViewModel value)
 			{
-				Update2_Prop1(value?.Prop1);
-				_bindingsTrackings.SetPropertyChangedEventHandler2(value);
+#line (22, 16) - (22, 60) 22 "Page2.xml"
+				var value1 = value.CurrentItem2;
+#line default
+				Update2_Prop1(value1);
+				_bindingsTrackings.SetPropertyChangedEventHandler2(value1);
 			}
 
-			private void Update0_StringProp(global::System.Decimal value)
+			private void Update0_StringProp(global::XFTest.ViewModels.Page2ViewModel value)
 			{
-				var dataRoot = _targetRoot;
 #line (23, 16) - (23, 141) 23 "Page2.xml"
-				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value, typeof(global::System.String), dataRoot._viewModel.DecimalProp + 1, null));
+				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value.StringProp, typeof(global::System.String), value.DecimalProp + 1, null));
 #line default
 			}
 
-			private void Update0_DecimalProp(global::System.Decimal value)
+			private void Update0_DecimalProp(global::XFTest.ViewModels.Page2ViewModel value)
 			{
-				var dataRoot = _targetRoot;
 #line (23, 16) - (23, 141) 23 "Page2.xml"
-				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(dataRoot._viewModel.StringProp, typeof(global::System.String), value + 1, null));
+				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value.StringProp, typeof(global::System.String), value.DecimalProp + 1, null));
 #line default
 			}
 
-			private void Update0_FuncProp(global::System.Func<global::System.String, global::XFTest.ViewModels.ItemViewModel> value)
+			private void Update0_FuncProp(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (25, 16) - (25, 67) 25 "Page2.xml"
-				var value1 = value?.Invoke("test");
+				var value1 = value.FuncProp?.Invoke("test");
 #line default
-				Update3_GuidProp(value1?.GuidProp);
+				Update3_GuidProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler3(value1);
 			}
 
-			private void Update0_Group(global::XFTest.ViewModels.GroupViewModel value)
+			private void Update0_Group(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (27, 16) - (27, 59) 27 "Page2.xml"
-				var value1 = value?[0];
+				var value1 = value.Group?[0];
 #line default
-				Update4_GuidProp(value1?.GuidProp);
+				Update4_GuidProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler4(value1);
 			}
 
-			private void Update1_GuidProp(global::System.Guid? value)
+			private void Update1_GuidProp(global::XFTest.ViewModels.ItemViewModel value)
 			{
 #line (21, 16) - (21, 62) 21 "Page2.xml"
-				_targetRoot.label1.Text = value?.ToString();
+				_targetRoot.label1.Text = value?.GuidProp.ToString();
 #line default
 			}
 
-			private void Update2_Prop1(global::System.String value)
+			private void Update2_Prop1(global::XFTest.ViewModels.Item2ViewModel value)
 			{
 #line (22, 16) - (22, 60) 22 "Page2.xml"
-				_targetRoot.label2.Text = value;
+				_targetRoot.label2.Text = value?.Prop1;
 #line default
 			}
 
-			private void Update3_GuidProp(global::System.Guid? value)
+			private void Update3_GuidProp(global::XFTest.ViewModels.ItemViewModel value)
 			{
 #line (25, 16) - (25, 67) 25 "Page2.xml"
-				var value1 = value?.ToString();
+				var value1 = value?.GuidProp.ToString();
 #line (25, 16) - (25, 67) 25 "Page2.xml"
 				_targetRoot.label5.Text = value1;
 #line (26, 16) - (26, 72) 26 "Page2.xml"
@@ -182,10 +186,10 @@ namespace XFTest.Views
 #line default
 			}
 
-			private void Update4_GuidProp(global::System.Guid? value)
+			private void Update4_GuidProp(global::XFTest.ViewModels.ItemViewModel value)
 			{
 #line (27, 16) - (27, 59) 27 "Page2.xml"
-				_targetRoot.label7.Text = value?.ToString();
+				_targetRoot.label7.Text = value?.GuidProp.ToString();
 #line default
 			}
 
@@ -298,22 +302,22 @@ namespace XFTest.Views
 							bindings.Update0(typedSender);
 							break;
 						case "CurrentItem":
-							bindings.Update0_CurrentItem(typedSender.CurrentItem);
+							bindings.Update0_CurrentItem(typedSender);
 							break;
 						case "CurrentItem2":
-							bindings.Update0_CurrentItem2(typedSender.CurrentItem2);
+							bindings.Update0_CurrentItem2(typedSender);
 							break;
 						case "StringProp":
-							bindings.Update0_StringProp(typedSender.StringProp);
+							bindings.Update0_StringProp(typedSender);
 							break;
 						case "DecimalProp":
-							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							bindings.Update0_DecimalProp(typedSender);
 							break;
 						case "FuncProp":
-							bindings.Update0_FuncProp(typedSender.FuncProp);
+							bindings.Update0_FuncProp(typedSender);
 							break;
 						case "Group":
-							bindings.Update0_Group(typedSender.Group);
+							bindings.Update0_Group(typedSender);
 							break;
 					}
 				}
@@ -329,7 +333,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.ItemViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "GuidProp")
 					{
-						bindings.Update1_GuidProp(typedSender.GuidProp);
+						bindings.Update1_GuidProp(typedSender);
 					}
 				}
 
@@ -344,7 +348,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.Item2ViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "Prop1")
 					{
-						bindings.Update2_Prop1(typedSender.Prop1);
+						bindings.Update2_Prop1(typedSender);
 					}
 				}
 
@@ -359,7 +363,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.ItemViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "GuidProp")
 					{
-						bindings.Update3_GuidProp(typedSender.GuidProp);
+						bindings.Update3_GuidProp(typedSender);
 					}
 				}
 
@@ -374,7 +378,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.ItemViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "GuidProp")
 					{
-						bindings.Update4_GuidProp(typedSender.GuidProp);
+						bindings.Update4_GuidProp(typedSender);
 					}
 				}
 

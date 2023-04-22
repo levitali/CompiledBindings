@@ -475,7 +475,7 @@ $@"					switch (e.PropertyName)
 							var prop = notifySource.Properties[i];
 							output.AppendLine(
 $@"						case ""{prop.Property.Definition.Name}"":
-							bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});
+							bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender);
 							break;");
 						}
 						output.AppendLine(
@@ -488,7 +488,7 @@ $@"					}}");
 						output.AppendLine(
 $@"					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == ""{propName}"")
 					{{
-						bindings.Update{notifySource.Index}_{propName}(typedSender.{propName});
+						bindings.Update{notifySource.Index}_{propName}(typedSender);
 					}}");
 					}
 					output.AppendLine(
@@ -513,7 +513,7 @@ $@"					var bindings = TryGetBindings();
 					var typedSender = (global::{notifySource.Expression.Type.Reference.GetCSharpFullName()})sender;");
 
 						output = output.AppendLine(
-$@"					bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender.{prop.Property.Definition.Name});");
+$@"					bindings.Update{notifySource.Index}_{prop.Property.Definition.Name}(typedSender);");
 						output.AppendLine(
 $@"				}}");
 					}

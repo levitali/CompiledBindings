@@ -93,23 +93,23 @@ namespace XFTest.Views
 			public void Update()
 			{
 				var dataRoot = _targetRoot;
-				Update1_SelectedItem(dataRoot.list.SelectedItem);
+				Update1_SelectedItem(dataRoot.list);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.list);
 			}
 
-			private void Update0_BooleanProp(global::System.Boolean? value)
+			private void Update0_BooleanProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
 #line (71, 13) - (71, 92) 71 "Page1.xml"
-				_targetRoot.button1.IsEnabled = value ?? default;
+				_targetRoot.button1.IsEnabled = value?.BooleanProp ?? default;
 #line default
 			}
 
-			private void Update1_SelectedItem(global::System.Object value)
+			private void Update1_SelectedItem(global::Xamarin.Forms.CollectionView value)
 			{
 #line (71, 13) - (71, 92) 71 "Page1.xml"
-				var value1 = (((global::XFTest.ViewModels.EntityViewModel)value));
+				var value1 = (((global::XFTest.ViewModels.EntityViewModel)value.SelectedItem));
 #line default
-				Update0_BooleanProp(value1?.BooleanProp);
+				Update0_BooleanProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
 			}
 
@@ -169,7 +169,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
 					{
-						bindings.Update0_BooleanProp(typedSender.BooleanProp);
+						bindings.Update0_BooleanProp(typedSender);
 					}
 				}
 
@@ -184,7 +184,7 @@ namespace XFTest.Views
 					var typedSender = (global::Xamarin.Forms.CollectionView)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "SelectedItem")
 					{
-						bindings.Update1_SelectedItem(typedSender.SelectedItem);
+						bindings.Update1_SelectedItem(typedSender);
 					}
 				}
 
@@ -255,7 +255,7 @@ namespace XFTest.Views
 				_targetRoot.list.ItemsSource = value1;
 #line default
 				Update0(dataRoot);
-				Update1_DecimalProp(value2.DecimalProp);
+				Update1_DecimalProp(value2);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value2);
 			}
 
@@ -284,41 +284,43 @@ namespace XFTest.Views
 						_settingBinding10 = false;
 					}
 				}
-				Update0_BooleanProp(value.BooleanProp);
-				Update0_NullableIntProp(value.NullableIntProp);
-				Update0_FocusedField(value.FocusedField);
-				Update0_ArrayProp(value.ArrayProp);
+				Update0_BooleanProp(value);
+				Update0_NullableIntProp(value);
+				Update0_FocusedField(value);
+				Update0_ArrayProp(value);
 			}
 
-			private void Update0_DecimalProp(global::System.Decimal value)
+			private void Update0_DecimalProp(global::XFTest.ViewModels.Page1ViewModel value)
 			{
-				var dataRoot = _dataRoot;
 #line (43, 13) - (43, 39) 43 "Page1.xml"
-				_targetRoot.label6.Text = value.ToString();
+				var value1 = value.DecimalProp;
+#line (43, 13) - (43, 39) 43 "Page1.xml"
+				_targetRoot.label6.Text = value1.ToString();
 #line (45, 16) - (45, 46) 45 "Page1.xml"
-				_targetRoot.label7.Text = (value + 1).ToString();
+				_targetRoot.label7.Text = (value1 + 1).ToString();
 #line (75, 13) - (75, 138) 75 "Page1.xml"
-				_targetRoot.label13.Text = $"Decimal value: {value:0.###}, Boolean value: {dataRoot.BooleanProp}, String value: {dataRoot.StringProp?.TrimStart('0')}";
+				_targetRoot.label13.Text = $"Decimal value: {value1:0.###}, Boolean value: {value.BooleanProp}, String value: {value.StringProp?.TrimStart('0')}";
 #line default
 			}
 
-			private void Update0_BooleanProp(global::System.Boolean value)
+			private void Update0_BooleanProp(global::XFTest.ViewModels.Page1ViewModel value)
 			{
-				var dataRoot = _dataRoot;
 #line (44, 13) - (44, 58) 44 "Page1.xml"
-				_targetRoot.label6.TextColor = (value ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
+				var value1 = value.BooleanProp;
+#line (44, 13) - (44, 58) 44 "Page1.xml"
+				_targetRoot.label6.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
 #line (47, 16) - (47, 46) 47 "Page1.xml"
-				_targetRoot.label9.Text = (!value).ToString();
+				_targetRoot.label9.Text = (!value1).ToString();
 #line (51, 13) - (51, 58) 51 "Page1.xml"
-				var value1 = value.ToString();
+				var value2 = value1.ToString();
 #line default
-				if (!object.Equals(_targetRoot.entry1.Text, value1))
+				if (!object.Equals(_targetRoot.entry1.Text, value2))
 				{
 					_settingBinding7 = true;
 					try
 					{
 #line (51, 13) - (51, 58) 51 "Page1.xml"
-						_targetRoot.entry1.Text = value1;
+						_targetRoot.entry1.Text = value2;
 #line default
 					}
 					finally
@@ -327,24 +329,26 @@ namespace XFTest.Views
 					}
 				}
 #line (75, 13) - (75, 138) 75 "Page1.xml"
-				_targetRoot.label13.Text = $"Decimal value: {dataRoot.DecimalProp:0.###}, Boolean value: {value}, String value: {dataRoot.StringProp?.TrimStart('0')}";
+				_targetRoot.label13.Text = $"Decimal value: {value.DecimalProp:0.###}, Boolean value: {value1}, String value: {value.StringProp?.TrimStart('0')}";
 #line default
 			}
 
-			private void Update0_NullableIntProp(global::System.Int32? value)
+			private void Update0_NullableIntProp(global::XFTest.ViewModels.Page1ViewModel value)
 			{
 #line (46, 16) - (46, 51) 46 "Page1.xml"
-				_targetRoot.label8.Text = (value ?? 0).ToString();
+				var value1 = value.NullableIntProp;
+#line (46, 16) - (46, 51) 46 "Page1.xml"
+				_targetRoot.label8.Text = (value1 ?? 0).ToString();
 #line (53, 16) - (53, 59) 53 "Page1.xml"
-				var value1 = value?.ToString();
+				var value2 = value1?.ToString();
 #line default
-				if (!object.Equals(_targetRoot.entry2.Text, value1))
+				if (!object.Equals(_targetRoot.entry2.Text, value2))
 				{
 					_settingBinding9 = true;
 					try
 					{
 #line (53, 16) - (53, 59) 53 "Page1.xml"
-						_targetRoot.entry2.Text = value1;
+						_targetRoot.entry2.Text = value2;
 #line default
 					}
 					finally
@@ -353,27 +357,28 @@ namespace XFTest.Views
 					}
 				}
 #line (74, 13) - (74, 52) 74 "Page1.xml"
-				global::Xamarin.Forms.Grid.SetRow(_targetRoot.label13, value ?? 9);
+				global::Xamarin.Forms.Grid.SetRow(_targetRoot.label13, value1 ?? 9);
 #line default
 			}
 
-			private void Update0_FocusedField(global::UI.FocusState<global::XFTest.ViewModels.Page1ViewModel.Field> value)
+			private void Update0_FocusedField(global::XFTest.ViewModels.Page1ViewModel value)
 			{
 #line (52, 13) - (52, 56) 52 "Page1.xml"
-				_targetRoot.entry1.SetFocused(value[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
+				_targetRoot.entry1.SetFocused(value.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line default
 			}
 
-			private void Update0_StringProp(global::System.String value)
+			private void Update0_StringProp(global::XFTest.ViewModels.Page1ViewModel value)
 			{
-				var dataRoot = _dataRoot;
-				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value))
+#line (54, 22) - (54, 68) 54 "Page1.xml"
+				var value1 = value.StringProp;
+				if (!object.Equals(_targetRoot.pickerEx1.SelectedItem, value1))
 				{
 					_settingBinding10 = true;
 					try
 					{
 #line (54, 22) - (54, 68) 54 "Page1.xml"
-						_targetRoot.pickerEx1.SelectedItem = value;
+						_targetRoot.pickerEx1.SelectedItem = value1;
 #line default
 					}
 					finally
@@ -382,21 +387,21 @@ namespace XFTest.Views
 					}
 				}
 #line (75, 13) - (75, 138) 75 "Page1.xml"
-				_targetRoot.label13.Text = $"Decimal value: {dataRoot.DecimalProp:0.###}, Boolean value: {dataRoot.BooleanProp}, String value: {value?.TrimStart('0')}";
+				_targetRoot.label13.Text = $"Decimal value: {value.DecimalProp:0.###}, Boolean value: {value.BooleanProp}, String value: {value1?.TrimStart('0')}";
 #line default
 			}
 
-			private void Update0_ArrayProp(global::System.Int32[] value)
+			private void Update0_ArrayProp(global::XFTest.ViewModels.Page1ViewModel value)
 			{
 #line (57, 13) - (57, 53) 57 "Page1.xml"
-				_targetRoot.list.IsVisible = value?.Length > 0;
+				_targetRoot.list.IsVisible = value.ArrayProp?.Length > 0;
 #line default
 			}
 
-			private void Update1_DecimalProp(global::System.Decimal value)
+			private void Update1_DecimalProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
 #line (48, 16) - (48, 54) 48 "Page1.xml"
-				_targetRoot.label10.Text = value.ToString();
+				_targetRoot.label10.Text = value.DecimalProp.ToString();
 #line default
 			}
 
@@ -538,22 +543,22 @@ namespace XFTest.Views
 							bindings.Update0(typedSender);
 							break;
 						case "DecimalProp":
-							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							bindings.Update0_DecimalProp(typedSender);
 							break;
 						case "BooleanProp":
-							bindings.Update0_BooleanProp(typedSender.BooleanProp);
+							bindings.Update0_BooleanProp(typedSender);
 							break;
 						case "NullableIntProp":
-							bindings.Update0_NullableIntProp(typedSender.NullableIntProp);
+							bindings.Update0_NullableIntProp(typedSender);
 							break;
 						case "FocusedField":
-							bindings.Update0_FocusedField(typedSender.FocusedField);
+							bindings.Update0_FocusedField(typedSender);
 							break;
 						case "StringProp":
-							bindings.Update0_StringProp(typedSender.StringProp);
+							bindings.Update0_StringProp(typedSender);
 							break;
 						case "ArrayProp":
-							bindings.Update0_ArrayProp(typedSender.ArrayProp);
+							bindings.Update0_ArrayProp(typedSender);
 							break;
 					}
 				}
@@ -569,7 +574,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "DecimalProp")
 					{
-						bindings.Update1_DecimalProp(typedSender.DecimalProp);
+						bindings.Update1_DecimalProp(typedSender);
 					}
 				}
 
@@ -659,22 +664,22 @@ namespace XFTest.Views
 #line (21, 24) - (21, 54) 21 "Page1.xml"
 				var value1 = dataRoot.Model;
 #line default
-				Update0_BooleanProp(dataRoot.BooleanProp);
-				Update1_SByteProp(value1?.SByteProp);
+				Update0_BooleanProp(dataRoot);
+				Update1_SByteProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
-			private void Update0_BooleanProp(global::System.Boolean value)
+			private void Update0_BooleanProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
 #line (22, 24) - (22, 59) 22 "Page1.xml"
-				_targetRoot.label2.Text = value.ToString();
+				_targetRoot.label2.Text = value.BooleanProp.ToString();
 #line default
 			}
 
-			private void Update1_SByteProp(global::System.SByte? value)
+			private void Update1_SByteProp(global::XFTest.ViewModels.EntityModel value)
 			{
 #line (21, 24) - (21, 54) 21 "Page1.xml"
-				_targetRoot.label1.Text = value?.ToString();
+				_targetRoot.label1.Text = value?.SByteProp.ToString();
 #line default
 			}
 
@@ -734,7 +739,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
 					{
-						bindings.Update0_BooleanProp(typedSender.BooleanProp);
+						bindings.Update0_BooleanProp(typedSender);
 					}
 				}
 
@@ -749,7 +754,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.EntityModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "SByteProp")
 					{
-						bindings.Update1_SByteProp(typedSender.SByteProp);
+						bindings.Update1_SByteProp(typedSender);
 					}
 				}
 
@@ -839,13 +844,13 @@ namespace XFTest.Views
 #line (32, 36) - (32, 100) 32 "Page1.xml"
 				_targetRoot.label4.Text = (dataRoot as global::XFTest.ViewModels.ExtEntityViewModel)?.ExtraProp;
 #line default
-				Update0_BooleanProp(dataRoot.BooleanProp);
+				Update0_BooleanProp(dataRoot);
 			}
 
-			private void Update0_BooleanProp(global::System.Boolean value)
+			private void Update0_BooleanProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
 #line (31, 36) - (31, 62) 31 "Page1.xml"
-				_targetRoot.label3.Text = value.ToString();
+				_targetRoot.label3.Text = value.BooleanProp.ToString();
 #line default
 			}
 
@@ -889,7 +894,7 @@ namespace XFTest.Views
 					var typedSender = (global::XFTest.ViewModels.EntityViewModel)sender;
 					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "BooleanProp")
 					{
-						bindings.Update0_BooleanProp(typedSender.BooleanProp);
+						bindings.Update0_BooleanProp(typedSender);
 					}
 				}
 
@@ -981,21 +986,21 @@ namespace XFTest.Views
 
 			private void Update0(global::XFTest.ViewModels.EntityViewModel value)
 			{
-				Update0_DecimalProp(value.DecimalProp);
-				Update0_StringProp(value.StringProp);
+				Update0_DecimalProp(value);
+				Update0_StringProp(value);
 			}
 
-			private void Update0_DecimalProp(global::System.Decimal value)
+			private void Update0_DecimalProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
 #line (63, 32) - (63, 58) 63 "Page1.xml"
-				_targetRoot.label11.Text = value.ToString();
+				_targetRoot.label11.Text = value.DecimalProp.ToString();
 #line default
 			}
 
-			private void Update0_StringProp(global::System.String value)
+			private void Update0_StringProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
 #line (64, 32) - (64, 72) 64 "Page1.xml"
-				_targetRoot.label12.Text = value?.TrimStart('0');
+				_targetRoot.label12.Text = value.StringProp?.TrimStart('0');
 #line default
 			}
 
@@ -1044,10 +1049,10 @@ namespace XFTest.Views
 							bindings.Update0(typedSender);
 							break;
 						case "DecimalProp":
-							bindings.Update0_DecimalProp(typedSender.DecimalProp);
+							bindings.Update0_DecimalProp(typedSender);
 							break;
 						case "StringProp":
-							bindings.Update0_StringProp(typedSender.StringProp);
+							bindings.Update0_StringProp(typedSender);
 							break;
 					}
 				}

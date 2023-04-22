@@ -89,44 +89,44 @@ namespace XFTest.Views
 
 			private void Update0(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-				Update0_Entity(value.Entity);
+				Update0_Entity(value);
 			}
 
 			private void Update1(global::XFTest.ViewModels.EntityModel value)
 			{
-				Update1_SByteProp(value?.SByteProp);
-				Update1_UShortProp(value?.UShortProp);
+				Update1_SByteProp(value);
+				Update1_UShortProp(value);
 			}
 
-			private void Update0_Entity(global::XFTest.ViewModels.EntityModel value)
+			private void Update0_Entity(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-				var dataRoot = _dataRoot;
 #line (25, 16) - (25, 64) 25 "Page3.xml"
-				_targetRoot.label1.IsVisible = value != null && dataRoot.IsLoading;
+				var value1 = value.Entity;
+#line (25, 16) - (25, 64) 25 "Page3.xml"
+				_targetRoot.label1.IsVisible = value1 != null && value.IsLoading;
 #line default
-				Update1(value);
-				_bindingsTrackings.SetPropertyChangedEventHandler1(value);
+				Update1(value1);
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
-			private void Update0_IsLoading(global::System.Boolean value)
+			private void Update0_IsLoading(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-				var dataRoot = _dataRoot;
 #line (25, 16) - (25, 64) 25 "Page3.xml"
-				_targetRoot.label1.IsVisible = dataRoot.Entity != null && value;
+				_targetRoot.label1.IsVisible = value.Entity != null && value.IsLoading;
 #line default
 			}
 
-			private void Update1_SByteProp(global::System.SByte? value)
+			private void Update1_SByteProp(global::XFTest.ViewModels.EntityModel value)
 			{
 #line (26, 16) - (26, 47) 26 "Page3.xml"
-				_targetRoot.label2.Text = value?.ToString();
+				_targetRoot.label2.Text = value?.SByteProp.ToString();
 #line default
 			}
 
-			private void Update1_UShortProp(global::System.UInt16? value)
+			private void Update1_UShortProp(global::XFTest.ViewModels.EntityModel value)
 			{
 #line (27, 16) - (27, 48) 27 "Page3.xml"
-				_targetRoot.label3.Text = value?.ToString();
+				_targetRoot.label3.Text = value?.UShortProp.ToString();
 #line default
 			}
 
@@ -191,10 +191,10 @@ namespace XFTest.Views
 							bindings.Update0(typedSender);
 							break;
 						case "Entity":
-							bindings.Update0_Entity(typedSender.Entity);
+							bindings.Update0_Entity(typedSender);
 							break;
 						case "IsLoading":
-							bindings.Update0_IsLoading(typedSender.IsLoading);
+							bindings.Update0_IsLoading(typedSender);
 							break;
 					}
 				}
@@ -215,10 +215,10 @@ namespace XFTest.Views
 							bindings.Update1(typedSender);
 							break;
 						case "SByteProp":
-							bindings.Update1_SByteProp(typedSender.SByteProp);
+							bindings.Update1_SByteProp(typedSender);
 							break;
 						case "UShortProp":
-							bindings.Update1_UShortProp(typedSender.UShortProp);
+							bindings.Update1_UShortProp(typedSender);
 							break;
 					}
 				}
