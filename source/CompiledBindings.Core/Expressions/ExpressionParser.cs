@@ -251,25 +251,33 @@ public class ExpressionParser
 		var expr = ParsePrimaryStart();
 		while (true)
 		{
-			if (_token.id is TokenId.Dot or TokenId.SlashDot or TokenId.BackslashDot)
-			{
-				bool? isNotifiable = _token.id switch { TokenId.BackslashDot => true, TokenId.SlashDot => false, _ => null };
-				ValidateNotMethodAccess(expr);
-				NextToken();
-				expr = ParseMemberAccess(expr, isNotifiable);
-			}
-			else if (_token.id == TokenId.OpenBracket)
-			{
-				ValidateNotMethodAccess(expr);
-				expr = ParseElementAccess(expr);
-			}
-			else if (_token.id == TokenId.OpenParen)
+			if (_token.id == TokenId.OpenParen)
 			{
 				expr = ParseInvoke(expr);
 			}
 			else
 			{
-				break;
+				bool? isNotifiable = null;
+				if (_token.id is TokenId.Slash or TokenId.Backslash)
+				{
+					isNotifiable = _token.id == TokenId.Backslash;
+					NextToken();
+				}
+				if (_token.id == TokenId.Dot)
+				{
+					ValidateNotMethodAccess(expr);
+					NextToken();
+					expr = ParseMemberAccess(expr, isNotifiable);
+				}
+				else if (_token.id == TokenId.OpenBracket)
+				{
+					ValidateNotMethodAccess(expr);
+					expr = ParseElementAccess(expr, isNotifiable);
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
 		return expr;
@@ -296,10 +304,13 @@ public class ExpressionParser
 		{
 			case ("System.Char", string v1) when v1.Length == 1:
 			case ("System.Int8", long v2) when v2 >= sbyte.MinValue:
+			case ("System.Int8", ulong v22) when v22 <= (ulong)sbyte.MaxValue:
 			case ("System.UInt8", ulong v3) when v3 <= byte.MaxValue:
 			case ("System.Int16", long v4) when v4 >= short.MinValue:
+			case ("System.Int16", ulong v44) when v44 <= (ulong)short.MaxValue:
 			case ("System.UInt16", ulong v5) when v5 <= ushort.MaxValue:
 			case ("System.Int32", long v6) when v6 >= int.MinValue:
+			case ("System.Int32", ulong v66) when v66 <= int.MaxValue:
 			case ("System.UInt32", ulong v7) when v7 <= uint.MaxValue:
 			case ("System.Decimal", long v8) when v8 >= decimal.MinValue:
 			case ("System.Decimal", ulong v9) when v9 <= decimal.MaxValue:
@@ -953,7 +964,7 @@ public class ExpressionParser
 					CorrectCharParameters(method, args, ns != null, errorPos);
 					CorrectNotNullableParameters(method, args);
 
-					return new CallExpression(inst, method, args);
+					return new CallExpression(inst, method, args, isNotifiable);
 
 					void GetNextMethod()
 					{
@@ -1074,26 +1085,44 @@ Label_CreateMemberExpression:
 		return argList.ToArray();
 	}
 
-	private Expression ParseElementAccess(Expression expr)
+	private Expression ParseElementAccess(Expression expr, bool? isNotifiable)
 	{
 		int errorPos = _token.pos;
 
 		TypeInfo expressionType;
 		IList<TypeInfo> argumentTypes;
+		IList<PropertyInfo>? indexerProperties;
+		PropertyInfo? indexerProperty;
+
 		if (expr.Type.Reference.IsArray)
 		{
 			expressionType = expr.Type.GetElementType()!;
 			argumentTypes = new[] { TypeInfo.GetTypeThrow(typeof(int)) };
+			indexerProperties = null;
+			indexerProperty = null;
 		}
 		else
 		{
-			var prop = expr.Type.GetIndexerProperty();
-			if (prop == null)
+			var indexerName = expr.Type.GetIndexerName();
+			if (indexerName == null)
 			{
-				throw new ParseException($"No applicable indexer exists in type '{expr.Type.Reference.FullName}'", errorPos);
+				ThrowException();
 			}
-			expressionType = prop.PropertyType;
-			var method = expr.Type.Methods.Single(m => m.Definition == prop.Definition.GetMethod);
+			// Get the indexer property with the getter.
+			// Note, there can be indexer property only with setter.
+			indexerProperties = expr.Type.Properties
+				.Where(p => p.Definition.GetMethod != null && p.Definition.Name == indexerName)
+				.ToList();
+			if (indexerProperties.Count == 0)
+			{
+				ThrowException();
+			}
+
+			// Use first indexer for argument types.
+			// Later more applicable property will be found.
+			indexerProperty = indexerProperties[0];
+			expressionType = indexerProperty.PropertyType;			
+			var method = expr.Type.Methods.Single(m => m.Definition == indexerProperty.Definition.GetMethod);
 			argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
 		}
 
@@ -1102,7 +1131,32 @@ Label_CreateMemberExpression:
 		var args = ParseArguments(argumentTypes);
 		ValidateToken(TokenId.CloseBracket, Res.CloseBracketOrCommaExpected);
 		NextToken();
-		return new ElementAccessExpression(expressionType, expr, args);
+
+		if (indexerProperties?.Count > 1)
+		{
+			// Try to find more applicable indexer.
+			// Note! Even if no applicable indexer is found,
+			// still the first one ist use.
+			// If it's not correct, there will be an error in the generated C# code,
+			// which will refer to the position in XAML.
+			foreach (var prop in indexerProperties)
+			{
+				var method = expr.Type.Methods.Single(m => m.Definition == prop.Definition.GetMethod);
+				if (CheckMethodApplicable(method, args, false))
+				{
+					indexerProperty = prop;
+					expressionType = prop.PropertyType;
+					break;
+				}
+			}
+		}
+
+		return new ElementAccessExpression(expressionType, expr, args, indexerProperty, isNotifiable);
+
+		void ThrowException()
+		{
+			throw new ParseException($"No applicable indexer exists in type '{expr.Type.Reference.FullName}'", errorPos);
+		}
 	}
 
 	private void SetTextPos(int pos)
@@ -1190,25 +1244,12 @@ Label_CreateMemberExpression:
 				break;
 			case '/':
 				NextChar();
-				if (_ch == '.')
-				{
-					NextChar();
-					t = TokenId.SlashDot;
-				}
-				else
-				{
-					t = TokenId.Slash;
-				}
+				t = TokenId.Slash;
 				break;
 			case '\\':
 				NextChar();
-				if (_ch == '.')
-				{
-					NextChar();
-					t = TokenId.BackslashDot;
-					break;
-				}
-				goto default;
+				t = TokenId.Backslash;
+				break;
 			case ':':
 				NextChar();
 				t = TokenId.Colon;
@@ -1475,6 +1516,7 @@ Label_CreateMemberExpression:
 		Minus,
 		Dot,
 		Slash,
+		Backslash,
 		Colon,
 		LessThan,
 		Equal,
@@ -1493,8 +1535,6 @@ Label_CreateMemberExpression:
 		DoubleBar,
 		Dollar,
 		InterpolatedString,
-		SlashDot,
-		BackslashDot
 	}
 }
 

@@ -375,7 +375,7 @@ $@"			private long _targetCallbackToken{ev.Index};");
 				foreach (var notifyProp in notifySource.Properties)
 				{
 					output.AppendLine(
-$@"				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Property.Definition.Name};");
+$@"				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
 				}
 			}
 		}
@@ -403,13 +403,13 @@ $@"{a}			private void {methodName}(Microsoft.UI.Xaml.DependencyObject sender, Mi
 		protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 		{
 			output.AppendLine(
-$@"						_sourceCallbackToken{notifySource.Index}_{notifyProp.Property.Definition.Name} = {cacheVar}.RegisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, {methodName});");
+$@"						_sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name} = {cacheVar}.RegisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member.Definition.Name}Property, {methodName});");
 		}
 
 		protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 		{
 			output.AppendLine(
-$@"						{cacheVar}.UnregisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, _sourceCallbackToken{notifySource.Index}_{notifyProp.Property.Definition.Name});");
+$@"						{cacheVar}.UnregisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, _sourceCallbackToken{notifySource.Index}_{notifyProp.Member.Definition.Name});");
 		}
 	}
 }

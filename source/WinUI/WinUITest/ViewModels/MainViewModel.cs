@@ -26,6 +26,7 @@ public class MainViewModel : INotifyPropertyChanged
 public class EntityViewModel
 {
 	public int IntProp { get; set; }
+	public string? StringProp { get; set; }
 }
 
 public class Class1 : INotifyPropertyChanged

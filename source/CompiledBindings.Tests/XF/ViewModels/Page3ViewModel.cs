@@ -22,6 +22,12 @@ public class Page3ViewModel : INotifyPropertyChanged
 		get => null;
 		set { }
 	}
+
+	[IndexerName("State")]
+	public int this[int index, string name]
+	{
+		get => 0;
+	}
 }
 
 public class PickItem : INotifyPropertyChanged

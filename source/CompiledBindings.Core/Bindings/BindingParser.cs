@@ -551,7 +551,7 @@ public static class BindingParser
 			.Where(b => b.Property.TargetEvent == null &&
 						b.SourceExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
-			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<MemberExpression>().Select(e => (bind: b, expr: e, notif: CheckPropertyNotifiable(e))))
+			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<INotifiableExpression>().Select(e => (bind: b, expr: e, notif: CheckPropertyNotifiable(e))))
 			.Where(e => e.notif != false)
 			.GroupBy(e => e.expr.Expression.Key)
 			.OrderBy(g => g.Key)
@@ -566,16 +566,26 @@ public static class BindingParser
 					CheckINotifyPropertyChanged = f.notif == null,
 					Index = i,
 				};
-				d.Properties = g.GroupBy(e => e.expr.Member.Definition.Name).Select(g2 =>
+				d.Properties = g.GroupBy(e => e.expr.Member?.Definition.Name).Select(g2 =>
 				{
 					var expr2 = g2.First().expr;
 					var bindings = g2.Select(e => e.bind).Distinct().ToList();
+
+					string propertyCodeName = expr2.Member?.Definition.Name ?? "Item";
+					var propertyNames = new List<string> { propertyCodeName };
+					if (expr2 is ElementAccessExpression)
+					{
+						propertyNames.Add("Items[]");
+					}
+
 					return new NotifyProperty
 					{
 						Parent = d,
-						Property = (PropertyInfo)expr2.Member,
-						Expression = expr2,
-						SourceExpression = expr2,
+						Member = expr2.Member,
+						PropertyCodeName = propertyCodeName,
+						PropertyNames = propertyNames,
+						Expression = (Expression)expr2,
+						SourceExpression = (Expression)expr2,
 						Bindings = new ReadOnlyCollection<Bind>(bindings),
 						SetBindings = bindings.ToList(), // Make copy
 					};
@@ -585,27 +595,99 @@ public static class BindingParser
 			})
 			.ToList();
 
-		bool? CheckPropertyNotifiable(MemberExpression expr)
+		return notifySources;
+		
+		bool? CheckPropertyNotifiable(INotifiableExpression expr)
 		{
+			// Not notifiable if explicitley turn of with / operator
 			if (expr.IsNotifiable == false)
 			{
 				return false;
 			}
+
+			// Check if type is notifiable
 			var type = expr.Expression.Type;
-			var res = expr.Member is PropertyInfo pi &&
-				   !pi.Definition.IsStatic() &&
-				   (iNotifyPropertyChangedType.IsAssignableFrom(type) ||
-				   (dependencyObjectType?.IsAssignableFrom(type) == true && 
-						type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == pi.Definition.Name + "Property"))) &&
-				   !pi.IsReadOnly;
-			if (res)
+
+			if (type.Reference.IsArray)
+			{
+				return false;
+			}
+
+			bool isDependencyType = dependencyObjectType?.IsAssignableFrom(type) == true;
+			bool isNotifyPropertyChangedType = iNotifyPropertyChangedType.IsAssignableFrom(type);
+			if (!isDependencyType && !isNotifyPropertyChangedType)
+			{
+				// Check if the type can be potentally notifiable
+				if (!type!.Reference.IsInterface() && type.Reference.ResolveEx()?.IsSealed == true)
+				{
+					return false;
+				}
+			}
+
+			if (expr is MemberExpression me)
+			{
+				// No notifications for static members
+				// TODO maybe for NET 7 with abstract static interfaces
+				if (me.Member.Definition.IsStatic())
+				{
+					return false;
+				}
+
+				// The \ operator overrides ReadOnlyAttribute and get-only properties
+				if (expr.IsNotifiable == null)
+				{
+					// Check if ReadOnlyAttribute is set
+					var attr = me.Member.Definition.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute");
+					bool? readOnly = (bool?)attr?.ConstructorArguments[0].Value;
+					if (readOnly == true)
+					{
+						return isNotifyPropertyChangedType ? true : null;
+					}
+
+					// Check if the property is get-only
+					else if (readOnly == null && me.Member is PropertyInfo pi && pi.IsReadOnly)
+					{
+						return false;
+					}
+
+					// Notifications for not properties (other members), must be explicitely enabled
+					if (me.Member is not PropertyInfo)
+					{
+						return false;
+					}
+
+					// If the type is not notifiable and no \ operator is used
+					if (!isNotifyPropertyChangedType && !isDependencyType)
+					{
+						return false;
+					}
+				}
+				// If the type is not notifiable, but \ operator is used.
+				else if (!isNotifyPropertyChangedType && !isDependencyType)
+				{
+					return null;
+				}
+
+				// For dependency property check if there is the backing store field or property (WinCE/UWP).
+				// It must be named <PropertyName>Property
+				if (isDependencyType &&
+					!type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == me.Member.Definition.Name + "Property"))
+				{
+					return false;
+				}
+
 				return true;
-			if (expr.IsNotifiable == true)
-				return null;
+			}
+			else
+			{
+				// Notifications for elment access are active ony if explicitly enabled with \ operator
+				if (expr.IsNotifiable == true)
+				{
+					return isNotifyPropertyChangedType ? true : null;
+				}
+			}
 			return false;
 		}
-
-		return notifySources;
 	}
 
 	private static class Res
@@ -646,7 +728,9 @@ public class NotifySource
 public class NotifyProperty
 {
 	public required NotifySource Parent { get; init; }
-	public required PropertyInfo Property { get; init; }
+	public required IMemberInfo? Member { get; init; }
+	public required IList<string> PropertyNames { get; init; }
+	public required string PropertyCodeName { get; init; }
 	public required Expression Expression { get; init; }
 	public required Expression SourceExpression { get; set; }
 	public required ReadOnlyCollection<Bind> Bindings { get; init; }

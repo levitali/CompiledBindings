@@ -352,7 +352,7 @@ $@"				new global::System.Tuple<global::System.Func<global::{bind.DataType!.Refe
 {LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 					{source.SourceExpression},
 {ResetLineDirective(ref isLineDirective)}
-					""{prop.Property.Definition.Name}""),");
+					""{prop.Member!.Definition.Name}""),");
 					}
 				}
 

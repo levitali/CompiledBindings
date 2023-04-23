@@ -423,7 +423,7 @@ $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
+								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
 							.AddValueChanged({cacheVar}, {methodName});");
 	}
 
@@ -432,7 +432,7 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 		output.AppendLine(
 $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 							.FromProperty(
-								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Property.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
+								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
 							.RemoveValueChanged({cacheVar}, {methodName});");
 	}
 }

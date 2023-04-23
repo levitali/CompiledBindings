@@ -17,7 +17,10 @@
         <DataTemplate
             x:Key="test1Template"
             x:DataType="viewModels:EntityViewModel">
-            <Picker ItemDisplayBinding="{x:Bind SByteProp, DataType=viewModels:EntityModel}" />
+					  <Grid>
+              <Picker ItemDisplayBinding="{x:Bind SByteProp, DataType=viewModels:EntityModel}" />
+							<Label Text="{x:Bind this\[0]}"/>
+						</Grid>
         </DataTemplate>
     </Page.Resources>
 
@@ -29,7 +32,8 @@
             ItemDisplayBinding="{x:Bind Description, DataType=viewModels:PickItem}"
             ItemsSource="{x:Bind PickedItems}" />
 			  <Label Text="{x:Set 3}" />
-			  <Label Text="{x:Bind this['test']}"/>
+			  <Label Text="{x:Bind this\[1,'test']}"/>
+			  <Label Text="{x:Bind Entity\._field1}"/>
     </Grid>
 
 </Page>

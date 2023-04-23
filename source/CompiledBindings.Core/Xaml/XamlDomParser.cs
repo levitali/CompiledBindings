@@ -350,6 +350,9 @@ public class XamlDomParser
 					}
 
 					value.BindingValue = bind;
+
+					// Name is not needed.
+					obj.Name = null;
 				}
 				else
 				{

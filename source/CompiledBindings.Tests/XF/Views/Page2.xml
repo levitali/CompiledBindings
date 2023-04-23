@@ -21,7 +21,7 @@
         <Label Text="{x:Bind _viewModel.CurrentItem.GuidProp}" />
         <Label Text="{x:Bind _viewModel.CurrentItem2.Prop1}" />
         <Label Text="{x:Bind _viewModel.StringProp, Converter={StaticResource someConverter}, ConverterParameter=_viewModel.DecimalProp + 1}" />
-        <Label Text="{x:Bind _viewModel.CalculateString().TrimNumber()}" />
+        <Label Text="{x:Bind _viewModel\.CalculateString().TrimNumber()}" />
         <Label Text="{x:Bind _viewModel.FuncProp('test').GuidProp}" />
         <Label Text="{x:Bind Path=_viewModel.FuncProp('test').GuidProp}" />
         <Label Text="{x:Bind _viewModel.Group[0].GuidProp}" />

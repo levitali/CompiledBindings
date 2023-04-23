@@ -126,9 +126,26 @@ public static class TypeInfoUtils
 		return type is IGenericInstance gi ? (IList<TypeReference>)gi.GenericArguments : Array.Empty<TypeReference>();
 	}
 
+	public static bool IsStatic(this IMemberDefinition member)
+	{
+		return member switch
+		{
+			PropertyDefinition pd => pd.IsStatic(),
+			FieldDefinition fd => fd.IsStatic,
+			MethodDefinition md => md.IsStatic,
+			EventDefinition ed => ed.IsStatic(),
+			_ => false
+		};
+	}
+
 	public static bool IsStatic(this TypeDefinition type)
 	{
 		return type.IsAbstract && type.IsSealed;
+	}
+
+	public static bool IsStatic(this EventDefinition @event)
+	{
+		return @event.AddMethod?.IsStatic ?? @event.RemoveMethod?.IsStatic ?? false;
 	}
 
 	public static bool IsStatic(this PropertyDefinition property)

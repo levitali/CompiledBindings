@@ -91,8 +91,6 @@ namespace XFTest.Views
 				var dataRoot = _targetRoot;
 #line (30, 13) - (30, 65) 30 "Page2.xml"
 				var value1 = dataRoot._viewModel.GetIcon();
-#line (24, 16) - (24, 72) 24 "Page2.xml"
-				_targetRoot.label4.Text = dataRoot._viewModel.CalculateString().TrimNumber();
 #line (30, 13) - (30, 65) 30 "Page2.xml"
 				_targetRoot.label9.FontFamily = value1.Item1;
 #line (31, 13) - (31, 54) 31 "Page2.xml"
@@ -109,6 +107,7 @@ namespace XFTest.Views
 				Update0_CurrentItem2(value);
 				Update0_Group(value);
 				Update0_StringProp(value);
+				Update0_CalculateString(value);
 			}
 
 			private void Update0_CurrentItem(global::XFTest.ViewModels.Page2ViewModel value)
@@ -140,6 +139,13 @@ namespace XFTest.Views
 			{
 #line (23, 16) - (23, 141) 23 "Page2.xml"
 				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value.StringProp, typeof(global::System.String), value.DecimalProp + 1, null));
+#line default
+			}
+
+			private void Update0_CalculateString(global::XFTest.ViewModels.Page2ViewModel value)
+			{
+#line (24, 16) - (24, 73) 24 "Page2.xml"
+				_targetRoot.label4.Text = value.CalculateString().TrimNumber();
 #line default
 			}
 
@@ -312,6 +318,9 @@ namespace XFTest.Views
 							break;
 						case "DecimalProp":
 							bindings.Update0_DecimalProp(typedSender);
+							break;
+						case "CalculateString":
+							bindings.Update0_CalculateString(typedSender);
 							break;
 						case "FuncProp":
 							bindings.Update0_FuncProp(typedSender);

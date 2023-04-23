@@ -140,7 +140,7 @@ public class TypeInfo
 		return null;
 	}
 
-	public PropertyInfo? GetIndexerProperty()
+	public string? GetIndexerName()
 	{
 		var type = Reference;
 		do
@@ -157,11 +157,7 @@ public class TypeInfo
 			var defaultMemberAttr = typeDefinition.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Reflection.DefaultMemberAttribute");
 			if (defaultMemberAttr != null)
 			{
-				var itemPropName = defaultMemberAttr.ConstructorArguments.FirstOrDefault().Value as string;
-				if (itemPropName != null)
-				{
-					return Properties.FirstOrDefault(p => p.Definition.Name == itemPropName);
-				}
+				return defaultMemberAttr.ConstructorArguments.FirstOrDefault().Value as string;
 			}
 			type = type.GetBaseType();
 		}
@@ -365,10 +361,8 @@ public class PropertyInfo : IMemberInfo
 	public PropertyDefinition Definition { get; }
 	public TypeInfo PropertyType { get; }
 
-	public bool IsReadOnly => _isReadOnly ??=
-		Definition.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.ComponentModel.ReadOnlyAttribute") is var attr && attr != null
-		? (bool)attr.ConstructorArguments[0].Value
-		: Definition.GetMethod.Body?.Instructions is var instructions &&
+	public bool IsReadOnly => _isReadOnly ??= 
+		Definition.GetMethod.Body?.Instructions is var instructions &&
 			instructions != null &&
 			instructions.Count == 3 &&
 			instructions[0].OpCode == OpCodes.Ldarg_0 &&
@@ -458,4 +452,6 @@ public interface IMemberInfo
 	IMemberDefinition Definition { get; }
 	TypeInfo MemberType { get; }
 }
+
+
 

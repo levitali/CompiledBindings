@@ -124,7 +124,7 @@ public class VariableExpression : Expression
 	}
 }
 
-public class MemberExpression : Expression, IAccessExpression
+public class MemberExpression : Expression, INotifiableExpression
 {
 	public MemberExpression(Expression expression, IMemberInfo member, TypeInfo type, bool? isNotifiable = null) : base(type)
 	{
@@ -275,18 +275,20 @@ public class BinaryExpression : Expression
 	}
 }
 
-public class CallExpression : Expression, IAccessExpression
+public class CallExpression : Expression, INotifiableExpression
 {
-	public CallExpression(Expression expression, MethodInfo method, Expression[] args) : base(method.ReturnType)
+	public CallExpression(Expression expression, MethodInfo method, Expression[] args, bool? isNotifiable = null) : base(method.ReturnType)
 	{
 		Expression = expression;
 		Method = method;
 		Args = args;
+		IsNotifiable = isNotifiable;
 	}
 
 	public Expression Expression { get; private set; }
 	public MethodInfo Method { get; private set; }
 	public Expression[] Args { get; private set; }
+	public bool? IsNotifiable { get; }
 
 	protected override string GetCSharpCode()
 	{
@@ -322,6 +324,8 @@ public class CallExpression : Expression, IAccessExpression
 		}
 		return clone;
 	}
+
+	IMemberInfo? INotifiableExpression.Member => Method;
 }
 
 public class InvokeExpression : Expression, IAccessExpression
@@ -481,16 +485,20 @@ public class ParenExpression : Expression
 	}
 }
 
-public class ElementAccessExpression : Expression, IAccessExpression
+public class ElementAccessExpression : Expression, INotifiableExpression
 {
-	public ElementAccessExpression(TypeInfo elementType, Expression instance, Expression[] parameters) : base(elementType)
+	public ElementAccessExpression(TypeInfo elementType, Expression instance, Expression[] parameters, PropertyInfo? indexerProperty, bool? isNotifiable) : base(elementType)
 	{
 		Expression = instance;
 		Parameters = parameters;
+		IndexerProperty = indexerProperty;
+		IsNotifiable = isNotifiable;
 	}
 
 	public Expression Expression { get; private set; }
 	public Expression[] Parameters { get; private set; }
+	public PropertyInfo? IndexerProperty { get; }
+	public bool? IsNotifiable { get; }
 
 	protected override string GetCSharpCode()
 	{
@@ -522,6 +530,8 @@ public class ElementAccessExpression : Expression, IAccessExpression
 		}
 		return clone;
 	}
+
+	IMemberInfo? INotifiableExpression.Member => IndexerProperty;
 }
 
 public class ConditionalExpression : Expression
@@ -820,4 +830,10 @@ public class StaticResourceExpression : Expression
 public interface IAccessExpression
 {
 	Expression Expression { get; }
+}
+
+public interface INotifiableExpression : IAccessExpression
+{
+	IMemberInfo? Member { get; }
+	bool? IsNotifiable { get; }
 }

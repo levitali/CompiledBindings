@@ -49,6 +49,12 @@ public class EntityViewModel : INotifyPropertyChanged
 
 	public bool BooleanProp { get; set; }
 
+	public string? this[int index]
+	{
+		get => null;
+	}
+
+
 	public event PropertyChangedEventHandler? PropertyChanged;
 }
 
@@ -59,6 +65,8 @@ public class ExtEntityViewModel : EntityViewModel
 
 public class EntityModel : INotifyPropertyChanged
 {
+	public int _field1;
+
 	public sbyte SByteProp { get; set; }
 
 	public ushort UShortProp { get; set; }
