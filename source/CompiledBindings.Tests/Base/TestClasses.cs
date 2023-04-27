@@ -62,6 +62,8 @@ public class Class2
 
 public struct Struct1
 {
+	public int Prop1 { get; set; }
+
 	public int TestMethod()
 	{
 		return 0;

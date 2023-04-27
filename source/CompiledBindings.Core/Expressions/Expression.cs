@@ -64,6 +64,15 @@ public abstract class Expression
 		}
 		return expression;
 	}
+
+	// Checks the need to add null-check operator ? to the expression when generating C# code.
+	public static bool CheckEndExpressionNullable(Expression expression)
+	{
+		return
+			expression is not (TypeExpression or NewExpression) &&
+			(expression.Type.IsNullable ||
+			 (expression.IsNullable && StripParenExpression(expression) is CastExpression && !expression.Type.IsNullable));
+	}
 }
 
 public class ConstantExpression : Expression
@@ -144,7 +153,7 @@ public class MemberExpression : Expression, INotifiableExpression
 		string res = Expression.CSharpCode;
 		if (res != null)
 		{
-			if (CheckExpressionNullable(Expression))
+			if (CheckEndExpressionNullable(Expression))
 			{
 				res += '?';
 			}
@@ -163,12 +172,6 @@ public class MemberExpression : Expression, INotifiableExpression
 		var clone = (MemberExpression)base.CloneReplaceCore(current, replace);
 		clone.Expression = Expression.CloneReplace(current, replace);
 		return clone;
-	}
-
-	internal static bool CheckExpressionNullable(Expression expression)
-	{
-		return expression is not (TypeExpression or NewExpression) &&
-			expression.Type.IsNullable && (expression is not VariableExpression pe || pe.IsNullable);
 	}
 }
 
@@ -293,8 +296,7 @@ public class CallExpression : Expression, INotifiableExpression
 	protected override string GetCSharpCode()
 	{
 		string expr = Expression.CSharpCode;
-		if (MemberExpression.CheckExpressionNullable(Expression) ||
-			(Expression.IsNullable && StripParenExpression(Expression) is CastExpression && !Expression.Type.IsNullable))
+		if (CheckEndExpressionNullable(Expression))
 		{
 			expr += '?';
 		}
@@ -344,7 +346,7 @@ public class InvokeExpression : Expression, IAccessExpression
 		string res = Expression.CSharpCode;
 		if (res != null)
 		{
-			if (MemberExpression.CheckExpressionNullable(Expression))
+			if (CheckEndExpressionNullable(Expression))
 			{
 				res += "?.Invoke";
 			}

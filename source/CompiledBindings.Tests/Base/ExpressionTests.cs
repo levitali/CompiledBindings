@@ -23,7 +23,11 @@ public class ExpressionTests : IDisposable
 		var stringType = TypeInfo.GetTypeThrow(typeof(string));
 		var intType = TypeInfo.GetTypeThrow(typeof(int));
 
-		var ns = new[] { new XamlNamespace("local", "using:CompiledBindings.Tests") };
+		var ns = new[]
+		{
+			new XamlNamespace("system", "using:System"),
+			new XamlNamespace("local", "using:CompiledBindings.Tests")
+		};
 
 		string expression, expectedCode;
 		Expression result;
@@ -83,6 +87,16 @@ public class ExpressionTests : IDisposable
 		expectedCode = "(((global::CompiledBindings.Tests.Class1)dataRoot.RefProp?.ObjProp)) is var v0 && v0 != null ? v0.Mode3 == null : false";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		result = FallbackExpression.CreateFallbackExpression(result, new ConstantExpression(false), ref localVarIndex);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "((system:Int32)RefProp.ObjProp).ToString()";
+		expectedCode = "(((global::System.Int32?)dataRoot.RefProp?.ObjProp))?.ToString()";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+		
+		expression = "((local:Struct1)RefProp.ObjProp).Prop1";
+		expectedCode = "(((global::CompiledBindings.Tests.Struct1?)dataRoot.RefProp?.ObjProp))?.Prop1";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out dummyNamespaces, out dummyPos);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 
