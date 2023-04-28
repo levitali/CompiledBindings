@@ -20,6 +20,7 @@ public static class BindingParser
 		Expression? fallbackValue = null;
 		Expression? targetNullValue = null;
 		TypeInfo? dataType = null;
+		string? stringFormat = null;
 		bool dataTypeSet = false;
 		BindingMode? mode = null;
 		bool isItemsSource = false;
@@ -155,6 +156,26 @@ public static class BindingParser
 					converterParameter = expr;
 				}
 			}
+			else if (name is "StringFormat")
+			{
+				if (str.StartsWith("{}"))
+				{
+					str = str.Substring(2);
+				}
+
+				//TODO: how to match optional comma?
+				match = Regex.Match(str, @"^(.+)(?<!\\),");
+				if (match.Success)
+				{
+					stringFormat = match.Groups[1].Value;
+					pos1 = stringFormat.Length + 1;
+				}
+				else
+				{
+					stringFormat = str;
+					pos1 = stringFormat.Length;
+				}
+			}
 			else if (name is "Mode" or "UpdateSourceEventNames" or "DataType" or "IsItemsSource")
 			{
 				int pos2 = str.IndexOf(',');
@@ -273,6 +294,16 @@ public static class BindingParser
 				sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
 			}
 		}
+		if (sourceExpression != null && stringFormat != null)
+		{
+			var stringFormatSaved = stringFormat;
+			stringFormat = Regex.Replace(stringFormat, @"(.*)(\{)(0)(?:(\:.+))?(\})(.*)", "$\"$1{{{0}$4}}$6\"");
+			if (stringFormat == stringFormatSaved)
+			{
+				stringFormat = $"$\"{{{{{{0}}:{stringFormat}}}}}\"";
+			}
+			sourceExpression = new InterpolatedStringExpression(stringFormat, new[] { sourceExpression });
+		}
 
 		return new Bind
 		{
@@ -358,7 +389,7 @@ public static class BindingParser
 		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, null);
 
 		// Create data for two-way bindings
-		
+
 		var twoWayBinds = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
 		var twoWayEventHandlers1 = twoWayBinds
@@ -596,7 +627,7 @@ public static class BindingParser
 			.ToList();
 
 		return notifySources;
-		
+
 		bool? CheckPropertyNotifiable(INotifiableExpression expr)
 		{
 			// Not notifiable if explicitley turn of with / operator
@@ -751,7 +782,7 @@ public class UpdateMethodData
 	public required List<NotifySource> UpdateNotifySources { get; init; }
 	public required List<NotifyProperty> UpdateNotifyProperties { get; init; }
 	public required List<NotifySource> SetEventHandlers { get; init; }
-} 
+}
 
 public class TwoWayEventData
 {

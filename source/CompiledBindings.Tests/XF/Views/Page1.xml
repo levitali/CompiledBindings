@@ -28,7 +28,7 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="viewModels:EntityViewModel">
                         <Grid>
-                            <Label Text="{x:Bind BooleanProp}" />
+                            <Label Text="{x:Bind BooleanProp, StringFormat={}Test: {0}}" />
                             <Label Text="{x:Bind (this as viewModels:ExtEntityViewModel).ExtraProp}" />
                         </Grid>
                     </DataTemplate>

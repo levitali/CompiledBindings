@@ -523,16 +523,29 @@ public class ExpressionParser
 		ValidateToken(TokenId.Colon, Res.ColonExpected);
 
 		var typeExpr = ParseTypeExpression(prefix, errorPos);
-		var args = ParseArgumentList();
 
-		var method = typeExpr.Type.Constructors.FirstOrDefault(c => CheckMethodApplicable(c, args, false));
-		if (method == null)
+		// Get the first constructor for argument types.
+		// Later more suitable constructor will be taken
+		var ctor = typeExpr.Type.Constructors.FirstOrDefault();
+		if (ctor == null)
 		{
-			throw new ParseException($"No applicable constructor exists in type '{typeExpr.Type.Reference.FullName}'", errorPos);
+			throw new ParseException($"No constructor exists in type '{typeExpr.Type.Reference.FullName}'", errorPos);
+		}
+		var argumentTypes = ctor.Parameters.Select(p => p.ParameterType).ToList();
+		var args = ParseArgumentList(argumentTypes);
+
+		// Try to find contructor for the argments.
+		foreach (var ctor2 in typeExpr.Type.Constructors)
+		{
+			if (CheckMethodApplicable(ctor2, args, false))
+			{
+				ctor = ctor2;
+				break;
+			}
 		}
 
-		CorrectCharParameters(method, args, false, errorPos);
-		CorrectNotNullableParameters(method, args);
+		CorrectCharParameters(ctor, args, false, errorPos);
+		CorrectNotNullableParameters(ctor, args);
 
 		return new NewExpression(typeExpr, args);
 	}
@@ -541,7 +554,7 @@ public class ExpressionParser
 	{
 		NextToken();
 		int errorPos = _token.pos;
-		var args = ParseArgumentList();
+		var args = ParseArgumentList(new[] { TypeInfo.GetTypeThrow(typeof(Type)) });
 		if (args.Length != 1 || args[0] is not TypeExpression typeExpression)
 		{
 			throw new ParseException(Res.InvalidType, errorPos);

@@ -34,6 +34,8 @@
 			  <Label Text="{x:Set 3}" />
 			  <Label Text="{x:Bind this\[1,'test']}"/>
 			  <Label Text="{x:Bind Entity\._field1}"/>
+			  <Entry Text="{x:Bind QuantityInput, StringFormat=0.###, Mode=TwoWay}"/>
+			
     </Grid>
 
 </Page>

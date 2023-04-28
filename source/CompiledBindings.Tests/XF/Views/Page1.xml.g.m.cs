@@ -849,8 +849,8 @@ namespace XFTest.Views
 
 			private void Update0_BooleanProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
-#line (31, 36) - (31, 62) 31 "Page1.xml"
-				_targetRoot.label3.Text = value.BooleanProp.ToString();
+#line (31, 36) - (31, 88) 31 "Page1.xml"
+				_targetRoot.label3.Text = $"Test: {value.BooleanProp}";
 #line default
 			}
 

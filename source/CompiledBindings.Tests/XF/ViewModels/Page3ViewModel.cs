@@ -8,6 +8,8 @@ public class Page3ViewModel : INotifyPropertyChanged
 {
 	public bool IsLoading { get; set; }
 
+	public decimal? QuantityInput { get; set; }
+
 	public EntityModel? Entity { get; set; }
 
 	public IList<PickItem> PickedItems { get; } = new List<PickItem>();
