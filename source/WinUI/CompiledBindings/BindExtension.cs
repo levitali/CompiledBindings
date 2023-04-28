@@ -28,6 +28,8 @@ public class BindExtension : MarkupExtension
 
 	public object? UpdateSourceEventNames { get; set; }
 
+	public string? StringFormat { get; set; }
+
 	protected override object? ProvideValue(IXamlServiceProvider serviceProvider)
 	{
 		return null;

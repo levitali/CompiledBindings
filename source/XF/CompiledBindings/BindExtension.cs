@@ -29,6 +29,8 @@ public class BindExtension : IMarkupExtension
 
 	public string? UpdateSourceEventNames { get; set; }
 
+	public string? StringFormat { get; set; }
+
 	public object? ProvideValue(IServiceProvider serviceProvider)
 	{
 		return null;

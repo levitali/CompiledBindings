@@ -72,6 +72,8 @@ public class BindExtension : MarkupExtension
 
 	public object? UpdateSourceEventNames { get; set; }
 
+	public string? StringFormat { get; set; }
+
 	public override object? ProvideValue(IServiceProvider serviceProvider)
 	{
 		var provideValueTarget = (IProvideValueTarget)serviceProvider.GetService(typeof(IProvideValueTarget));

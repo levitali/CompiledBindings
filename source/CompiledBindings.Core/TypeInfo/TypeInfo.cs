@@ -452,6 +452,3 @@ public interface IMemberInfo
 	IMemberDefinition Definition { get; }
 	TypeInfo MemberType { get; }
 }
-
-
-
