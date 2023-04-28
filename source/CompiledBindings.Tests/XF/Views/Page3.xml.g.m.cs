@@ -8,6 +8,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Label label2;
 		private global::Xamarin.Forms.Label label3;
 		private global::Xamarin.Forms.Label label4;
+		private global::Xamarin.Forms.Picker picker2;
 		private global::Xamarin.Forms.Label label5;
 		private global::Xamarin.Forms.Label label6;
 		private global::Xamarin.Forms.Label label7;
@@ -24,6 +25,7 @@ namespace XFTest.Views
 			label2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label2");
 			label3 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label3");
 			label4 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label4");
+			picker2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(this, "picker2");
 			label5 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label5");
 			label6 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label6");
 			label7 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label7");
@@ -86,7 +88,7 @@ namespace XFTest.Views
 			{
 				var dataRoot = _dataRoot;
 #line (33, 13) - (33, 46) 33 "Page3.xml"
-				_targetRoot.ItemsSource = dataRoot.PickedItems;
+				_targetRoot.picker2.ItemsSource = dataRoot.PickedItems;
 #line default
 				Update0(dataRoot);
 			}
@@ -315,7 +317,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3__ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
+	class Page3_picker2_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
 			dataRoot => dataRoot == null ? (default, false) : (
@@ -341,10 +343,12 @@ namespace XFTest.Views
 
 	class Page3_DataTemplate0 : global::CompiledBindings.IGeneratedDataTemplate
 	{
+		private global::Xamarin.Forms.Picker picker1;
 		private global::Xamarin.Forms.Label label1;
 
 		public void Initialize(global::Xamarin.Forms.Element rootElement)
 		{
+			picker1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Picker>(rootElement, "picker1");
 			label1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(rootElement, "label1");
 
 
@@ -474,7 +478,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3_DataTemplate0__ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
+	class Page3_DataTemplate0_picker1_ItemDisplayBinding : global::Xamarin.Forms.Xaml.IMarkupExtension
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.EntityModel, global::System.SByte>(
 			dataRoot => dataRoot == null ? (default, false) : (
