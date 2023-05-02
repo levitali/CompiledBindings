@@ -1,6 +1,6 @@
 ﻿namespace CompiledBindings;
 
-public class XamlDomParser
+public abstract class XamlDomParser
 {
 	private static readonly XName NameAttr = XNamespace.None + "Name";
 
@@ -17,19 +17,16 @@ public class XamlDomParser
 	public readonly TypeInfo? DependencyPropertyType;
 
 	private int _localVarIndex;
-	private readonly Func<string, IEnumerable<string>> _getClrNsFromXmlNs;
 
 	public XamlDomParser(
 		XNamespace defaultNamespace,
 		XNamespace xNamespace,
-		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
 		TypeInfo converterType,
 		TypeInfo bindingType,
 		TypeInfo? dependencyObjectType,
 		TypeInfo? dependencyPropertyType)
 	{
 		DefaultNamespace = defaultNamespace;
-		_getClrNsFromXmlNs = getClrNsFromXmlNs;
 		ConverterType = converterType;
 		BindingType = bindingType;
 		DependencyObjectType = dependencyObjectType;
@@ -157,6 +154,8 @@ public class XamlDomParser
 		return id;
 	}
 
+	protected abstract IEnumerable<string> GetClrNsFromXmlNs(string xmlNs);
+
 	private TypeInfo FindType(XName className, XObject xobject)
 	{
 		var clrNs = XamlNamespace.GetClrNamespace(className.NamespaceName);
@@ -164,7 +163,7 @@ public class XamlDomParser
 		{
 			return TypeInfo.GetTypeThrow(clrNs + "." + className.LocalName);
 		}
-		foreach (string clrNr2 in _getClrNsFromXmlNs(className.NamespaceName))
+		foreach (string clrNr2 in GetClrNsFromXmlNs(className.NamespaceName))
 		{
 			string clrTypeName = clrNr2;
 			if (!clrTypeName.EndsWith("/"))

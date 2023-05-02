@@ -228,34 +228,37 @@ $@"namespace CompiledBindings
 
 public class XFXamlDomParser : SimpleXamlDomParser
 {
-	private static ILookup<string, string>? _nsMappings;
+	private PlatformConstants _platformConstants;
+	private ILookup<string, string>? _nsMappings;
 
 	public XFXamlDomParser(PlatformConstants platformConstants) : base(
 		platformConstants.DefaultNamespace,
 		"http://schemas.microsoft.com/winfx/2009/xaml",
-		getClrNsFromXmlNs: xmlNs =>
-		{
-			if (_nsMappings == null)
-			{
-				string attrName = $"{platformConstants.BaseClrNamespace}.XmlnsDefinitionAttribute";
-				_nsMappings = TypeInfoUtils.Assemblies
-					.SelectMany(ass => ass.CustomAttributes.Where(at => at.AttributeType.FullName == attrName))
-					.Select(at => (
-						XmlNamespace: (string)at.ConstructorArguments[0].Value,
-						ClrNamespace: (string)at.ConstructorArguments[1].Value))
-					.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
-				// For old XF versions
-				if (_nsMappings.Count == 0)
-				{
-					_nsMappings = new[] { (XmlNamespace: "http://xamarin.com/schemas/2014/forms", ClrNamespace: "Xamarin.Forms") }
-					.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
-				}
-			}
-			return _nsMappings[xmlNs];
-		},
 		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.IValueConverter"),
 		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.BindingBase"))
 	{
+		_platformConstants = platformConstants;
+	}
+
+	protected override IEnumerable<string> GetClrNsFromXmlNs(string xmlNs)
+	{
+		if (_nsMappings == null)
+		{
+			string attrName = $"{_platformConstants.BaseClrNamespace}.XmlnsDefinitionAttribute";
+			_nsMappings = TypeInfoUtils.Assemblies
+				.SelectMany(ass => ass.CustomAttributes.Where(at => at.AttributeType.FullName == attrName))
+				.Select(at => (
+					XmlNamespace: (string)at.ConstructorArguments[0].Value,
+					ClrNamespace: (string)at.ConstructorArguments[1].Value))
+				.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
+			// For old XF versions
+			if (_nsMappings.Count == 0)
+			{
+				_nsMappings = new[] { (XmlNamespace: "http://xamarin.com/schemas/2014/forms", ClrNamespace: "Xamarin.Forms") }
+				.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
+			}
+		}
+		return _nsMappings[xmlNs];
 	}
 
 	public override ExtenstionType? IsMemExtension(XAttribute a)

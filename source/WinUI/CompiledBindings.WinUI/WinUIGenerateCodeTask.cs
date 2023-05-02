@@ -308,17 +308,18 @@ $@"namespace CompiledBindings.WinUI
 		public WinUIXamlDomParser() : base(
 			_xmlns,
 			"http://schemas.microsoft.com/winfx/2006/xaml",
-			getClrNsFromXmlNs: xmlNs =>
-			{
-				if (xmlNs == _xmlns)
-					return _defaultClrNamespaces;
-				return Enumerable.Empty<string>();
-			},
 			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.Data.IValueConverter"),
 			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.Data.BindingBase"),
 			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.DependencyObject"),
 			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.DependencyProperty"))
 		{
+		}
+
+		protected override IEnumerable<string> GetClrNsFromXmlNs(string xmlNs)
+		{
+			if (xmlNs == _xmlns)
+				return _defaultClrNamespaces;
+			return Enumerable.Empty<string>();
 		}
 
 		public override bool IsDataContextSupported(TypeInfo type)

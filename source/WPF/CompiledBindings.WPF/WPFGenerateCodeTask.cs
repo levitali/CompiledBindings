@@ -317,28 +317,28 @@ $@"namespace CompiledBindings
 
 public class WpfXamlDomParser : SimpleXamlDomParser
 {
-	private static ILookup<string, string>? _nsMappings = null;
+	private ILookup<string, string>? _nsMappings = null;
 
 	public WpfXamlDomParser()
 		: base("http://schemas.microsoft.com/winfx/2006/xaml/presentation",
 			   "http://schemas.microsoft.com/winfx/2006/xaml",
-				getClrNsFromXmlNs: xmlNs =>
-				{
-					_nsMappings ??= TypeInfoUtils.Assemblies
+				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
+				TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
+				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"),
+				TypeInfo.GetTypeThrow("System.Windows.DependencyProperty"))
+	{
+	}
+
+	protected override IEnumerable<string> GetClrNsFromXmlNs(string xmlNs)
+	{
+		_nsMappings ??= TypeInfoUtils.Assemblies
 							.SelectMany(ass => ass.CustomAttributes.Where(at => at.AttributeType.FullName == "System.Windows.Markup.XmlnsDefinitionAttribute"))
 							.Select(at => (
 								XmlNamespace: (string)at.ConstructorArguments[0].Value,
 								ClrNamespace: (string)at.ConstructorArguments[1].Value))
 							.ToLookup(at => at.XmlNamespace, at => at.ClrNamespace);
 
-					return _nsMappings[xmlNs];
-				},
-				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
-				TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
-				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"),
-				TypeInfo.GetTypeThrow("System.Windows.DependencyProperty")
-			  )
-	{
+		return _nsMappings[xmlNs];
 	}
 
 	public override ExtenstionType? IsMemExtension(XAttribute a)

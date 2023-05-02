@@ -1,6 +1,6 @@
 ﻿namespace CompiledBindings;
 
-public class SimpleXamlDomParser : XamlDomParser
+public abstract class SimpleXamlDomParser : XamlDomParser
 {
 	public static readonly XNamespace mNamespace = "http://compiledbindings.com";
 	public static readonly XNamespace mxNamespace = "http://compiledbindings.com/x";
@@ -16,12 +16,11 @@ public class SimpleXamlDomParser : XamlDomParser
 	public SimpleXamlDomParser(
 		XNamespace xmlns,
 		XNamespace xNs,
-		Func<string, IEnumerable<string>> getClrNsFromXmlNs,
 		TypeInfo converterType,
 		TypeInfo bindingType,
 		TypeInfo? dependencyObjectType = null,
 		TypeInfo? dependencyPropertyType = null)
-		: base(xmlns, xNs, getClrNsFromXmlNs, converterType, bindingType, dependencyObjectType, dependencyPropertyType)
+		: base(xmlns, xNs, converterType, bindingType, dependencyObjectType, dependencyPropertyType)
 	{
 		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
 	}
