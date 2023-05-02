@@ -582,7 +582,6 @@ public class CoalesceExpression : Expression
 {
 	public CoalesceExpression(Expression left, Expression right) : base(right.Type)
 	{
-		Debug.Assert(left.IsNullable);
 		Left = left;
 		Right = right;
 	}

@@ -281,7 +281,7 @@ public static class BindingParser
 			}
 		}
 
-		if (sourceExpression?.IsNullable == true && targetNullValue != null)
+		if (sourceExpression != null && targetNullValue != null)
 		{
 			sourceExpression = new CoalesceExpression(sourceExpression, targetNullValue);
 		}
@@ -294,6 +294,7 @@ public static class BindingParser
 				sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
 			}
 		}
+		
 		if (sourceExpression != null && stringFormat != null)
 		{
 			var stringFormatSaved = stringFormat;
@@ -701,7 +702,7 @@ public static class BindingParser
 
 				// For dependency property check if there is the backing store field or property (WinCE/UWP).
 				// It must be named <PropertyName>Property
-				if (isDependencyType &&
+				if (!isNotifyPropertyChangedType &&
 					!type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == me.Member.Definition.Name + "Property"))
 				{
 					return false;
