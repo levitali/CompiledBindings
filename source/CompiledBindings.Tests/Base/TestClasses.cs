@@ -58,6 +58,11 @@ public class Class2
 	public string? StringProp { get; set; }
 
 	public object? ObjProp { get; set; }
+
+	public int Method1(string? str)
+	{
+		return 0;
+	}
 }
 
 public struct Struct1

@@ -96,7 +96,7 @@ public class ConstantExpression : Expression
 		};
 	}
 
-	public override bool IsNullable => false;
+	public override bool IsNullable => Value == null;
 }
 
 public class DefaultExpression : Expression
@@ -313,6 +313,7 @@ public class CallExpression : Expression, INotifiableExpression
 		}
 	}
 
+	// Do not consinder argument expressions
 	public override bool IsNullable => Expression.IsNullable || Type.IsNullable;
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
@@ -362,6 +363,9 @@ public class InvokeExpression : Expression, IAccessExpression
 			yield return arg;
 		}
 	}
+
+	// Do not consinder argument expressions
+	public override bool IsNullable => Expression.IsNullable || Type.IsNullable;
 
 	protected override Expression CloneReplaceCore(Expression current, Expression replace)
 	{
@@ -501,6 +505,9 @@ public class ElementAccessExpression : Expression, INotifiableExpression
 	public Expression[] Parameters { get; private set; }
 	public PropertyInfo? IndexerProperty { get; }
 	public bool? IsNotifiable { get; }
+
+	// Do not consinder parameter expressions
+	public override bool IsNullable => Expression.IsNullable || Type.IsNullable;
 
 	protected override string GetCSharpCode()
 	{
