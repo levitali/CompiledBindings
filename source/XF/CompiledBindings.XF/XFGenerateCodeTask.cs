@@ -68,7 +68,6 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 			var xamlDomParser = new XFXamlDomParser(_platformConstants);
 
 			var generatedCodeFiles = new List<TaskItem>();
-			bool generateDataTemplateBindings = false;
 			bool result = true;
 
 			var xamlFiles = XamlFiles
@@ -130,8 +129,6 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
 
-							generateDataTemplateBindings |= parseResult.DataTemplates.Any(d => d.GenerateClass);
-
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
 							var dirInfo = new DirectoryInfo(targetDir);
 							dirInfo.Create();
@@ -148,13 +145,6 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 					Log.LogError(null, null, null, file, 0, 0, 0, 0, ex.Message);
 					return false;
 				}
-			}
-
-			if (generateDataTemplateBindings)
-			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.XF.cs");
-				File.WriteAllText(dataTemplateBindingsFile, GenerateDataTemplateBindingsClass());
-				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 			}
 
 			GeneratedCodeFiles = generatedCodeFiles.ToArray();
@@ -175,49 +165,6 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 		{
 			TypeInfoUtils.Cleanup();
 		}
-	}
-
-	private string GenerateDataTemplateBindingsClass()
-	{
-		return
-$@"namespace CompiledBindings
-{{
-	using {_platformConstants.BaseClrNamespace};
-
-	class DataTemplateBindings
-	{{
-		public static readonly BindableProperty BindingsProperty =
-			BindableProperty.CreateAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), null, propertyChanged: BindingsChanged);
-
-		public static IGeneratedDataTemplate GetBindings(BindableObject @object)
-		{{
-			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
-		}}
-
-		public static void SetBindings(BindableObject @object, IGeneratedDataTemplate value)
-		{{
-			@object.SetValue(BindingsProperty, value);
-		}}
-
-		static void BindingsChanged(BindableObject bindable, object oldValue, object newValue)
-		{{
-			if (oldValue != null)
-			{{
-				((IGeneratedDataTemplate)oldValue).Cleanup((Element)bindable);
-			}}
-			if (newValue != null)
-			{{
-				((IGeneratedDataTemplate)newValue).Initialize((Element)bindable);
-			}}			
-		}}
-	}}
-
-	interface IGeneratedDataTemplate
-	{{
-		void Initialize(Element rootElement);
-		void Cleanup(Element rootElement);
-	}}
-}}";
 	}
 
 	void ICancelableTask.Cancel()
@@ -290,13 +237,14 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	private readonly PlatformConstants _platformConstants;
 
 	public XFCodeGenerator(string langVersion, string msbuildVersion, PlatformConstants platformConstants)
-		: base(new BindingsCodeGenerator(langVersion, msbuildVersion),
+		: base(new BindingsCodeGenerator(platformConstants.FrameworkId, langVersion, msbuildVersion),
 			   "Binding",
 			   "System.EventArgs",
 			   $"{platformConstants.BaseClrNamespace}.Element",
 			   "global::" + platformConstants.BaseClrNamespace + ".NameScopeExtensions.FindByName<global::{0}>({1}, \"{2}\")",
 			   true,
 			   true,
+			   platformConstants.FrameworkId,
 			   langVersion,
 			   msbuildVersion)
 	{
@@ -384,6 +332,7 @@ $@"	}}");
 
 public class PlatformConstants
 {
+	public virtual string FrameworkId => "XF";
 	public virtual string BaseClrNamespace => "Xamarin.Forms";
 	public virtual string DefaultNamespace => "http://xamarin.com/schemas/2014/forms";
 }

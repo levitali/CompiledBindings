@@ -199,8 +199,8 @@ namespace XFTest.Views
 			class Page3_BindingsTrackings_this
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::XFTest.ViewModels.Page3ViewModel _propertyChangeSource0;
-				global::XFTest.ViewModels.EntityModel _propertyChangeSource1;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource1;
 
 				public Page3_BindingsTrackings_this(Page3_Bindings_this bindings)
 				{
@@ -215,35 +215,17 @@ namespace XFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.Page3ViewModel value)
 				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
+					global::CompiledBindings.XF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::XFTest.ViewModels.EntityModel value)
 				{
-					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
-					if (_propertyChangeSource1 == null && value != null)
-					{
-						_propertyChangeSource1 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged += OnPropertyChanged1;
-					}
+					global::CompiledBindings.XF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.XF.BindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -274,7 +256,7 @@ namespace XFTest.Views
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.XF.BindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -297,21 +279,6 @@ namespace XFTest.Views
 							bindings.Update1__field1(typedSender);
 							break;
 					}
-				}
-
-				Page3_Bindings_this TryGetBindings()
-				{
-					Page3_Bindings_this bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page3_Bindings_this)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
 				}
 			}
 		}
@@ -341,7 +308,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3_DataTemplate0 : global::CompiledBindings.IGeneratedDataTemplate
+	class Page3_DataTemplate0 : global::CompiledBindings.XF.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Picker picker1;
 		private global::Xamarin.Forms.Label label1;
@@ -419,7 +386,7 @@ namespace XFTest.Views
 			class Page3_DataTemplate0_BindingsTrackings_rootElement
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::XFTest.ViewModels.EntityViewModel _propertyChangeSource0;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
 
 				public Page3_DataTemplate0_BindingsTrackings_rootElement(Page3_DataTemplate0_Bindings_rootElement bindings)
 				{
@@ -433,21 +400,12 @@ namespace XFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
 				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
+					global::CompiledBindings.XF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.XF.BindingsHelper.TryGetBindings<Page3_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -458,21 +416,6 @@ namespace XFTest.Views
 					{
 						bindings.Update0_Item(typedSender);
 					}
-				}
-
-				Page3_DataTemplate0_Bindings_rootElement TryGetBindings()
-				{
-					Page3_DataTemplate0_Bindings_rootElement bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page3_DataTemplate0_Bindings_rootElement)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
 				}
 			}
 		}

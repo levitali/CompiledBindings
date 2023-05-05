@@ -56,7 +56,6 @@
 	<UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.dll" />
 	<UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.dll" />
 	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.Core.dll" />
-	<UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.Core.dll" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
@@ -145,18 +144,6 @@
 
 	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" />
-	</Target>
-
-	<Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-
-		<UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)">
-			<Output TaskParameter="UpdatedReferenceCopyLocalFiles" ItemName="UpdatedReferenceCopyLocalFiles" />
-		</UpdateReferenceCopyLocalTask>
-
-		<ItemGroup>
-			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
-			<ReferenceCopyLocalPaths Include="@(UpdatedReferenceCopyLocalFiles)" />
-		</ItemGroup>
 	</Target>
 
 </Project>

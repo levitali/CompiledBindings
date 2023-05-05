@@ -2,7 +2,7 @@
 
 public class BindingsCodeGenerator : XamlCodeGenerator
 {
-	public BindingsCodeGenerator(string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
+	public BindingsCodeGenerator(string frameworkId, string langVersion, string msbuildVersion) : base(frameworkId, langVersion, msbuildVersion)
 	{
 	}
 
@@ -146,9 +146,9 @@ $@"
 					targetExpr += "." + first.Property.Object.Name;
 				}
 
-				if (ev.Events != null)
+				if (ev.TargetChangedEvents != null)
 				{
-					foreach (var evnt in ev.Events)
+					foreach (var evnt in ev.TargetChangedEvents)
 					{
 						var targetExpr2 = targetExpr + "." + evnt.Definition.Name;
 
@@ -198,9 +198,9 @@ $@"					_generatedCodeDisposed.Cancel();");
 				targetExpr += "." + first.Property.Object.Name;
 			}
 
-			if (ev.Events != null)
+			if (ev.TargetChangedEvents != null)
 			{
-				foreach (var evnt in ev.Events)
+				foreach (var evnt in ev.TargetChangedEvents)
 				{
 					var targetExpr2 = targetExpr + "." + evnt.Definition.Name;
 					output.AppendLine(
@@ -290,10 +290,10 @@ $@"			}}");
 			output.AppendLine();
 
 			var first = ev.Bindings[0];
-			if (ev.Events != null)
+			if (ev.TargetChangedEvents != null)
 			{
 				output.AppendLine(
-$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Events[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Reference.GetCSharpFullName()} p{i}"))})");
+$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.TargetChangedEvents[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Reference.GetCSharpFullName()} p{i}"))})");
 			}
 			else if (first.DependencyProperty != null)
 			{
@@ -308,7 +308,7 @@ $@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.Events[0].Get
 $@"			{{
 				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 
-			if (ev.Events?[0].Definition.Name == "PropertyChanged")
+			if (ev.TargetChangedEvents?[0].Definition.Name == "PropertyChanged")
 			{
 				output.AppendLine(
 $@"				switch (p1.PropertyName)
@@ -360,13 +360,22 @@ $@"
 $@"				global::System.WeakReference _bindingsWeakRef;");
 
 			// Generate _propertyChangeSourceXXX fields
-			foreach (var group in bindingsData.NotifySources)
+			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				output.AppendLine(
-$@"				global::{group.Expression.Type.Reference.GetCSharpFullName()} _propertyChangeSource{group.Index};");
+				var cacheVar = $"_propertyChangeSource{notifySource.Index}";
+				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
+				{
+					output.AppendLine(
+$@"				global::System.ComponentModel.INotifyPropertyChanged {cacheVar};");
+				}
+				else
+				{
+					foreach (var notifProp in notifySource.Properties)
+					{
+						GenerateDependencyPropertyChangeCacheVariables(output, notifySource, notifProp, cacheVar);
+					}
+				}
 			}
-
-			GenerateTrackingsExtraFieldDeclarations(output, bindingsData);
 
 			#endregion
 
@@ -406,37 +415,25 @@ $@"				}}");
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
 				string cacheVar = "_propertyChangeSource" + notifySource.Index;
+
+				output.AppendLine();
 				output.AppendLine(
-$@"
-				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()} value)
-				{{
-					if ({cacheVar} != null && !object.ReferenceEquals({cacheVar}, value))
-					{{");
-				GenerateUnsetPropertyChangedEventHandler(notifySource, cacheVar, "\t");
-				output.AppendLine(
-$@"						{cacheVar} = null;
-					}}
-					if ({cacheVar} == null && value != null)
-					{{");
-				string? a = null;
-				if (notifySource.CheckINotifyPropertyChanged)
+$@"				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()} value)
+				{{");
+				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
-$@"						if (value is INotifyPropertyChanged)
-						{{");
-					a = "\t";
+$@"					global::CompiledBindings.{FrameworkId}.BindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, OnPropertyChanged{notifySource.Index});");
 				}
-				output.AppendLine(
-$@"{a}						{cacheVar} = value;");
-				GenerateSetPropertyChangedEventHandler(notifySource, cacheVar, a + "\t");
-				if (notifySource.CheckINotifyPropertyChanged)
+				else
 				{
-					output.AppendLine(
-$@"						}}");
+					foreach (var notifyProp in notifySource.Properties)
+					{
+						GenerateDependencyPropertySetPropertyHandler(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
+					}
 				}
 				output.AppendLine(
-$@"					}}
-				}}");
+$@"				}}");				
 			}
 
 			#endregion
@@ -452,7 +449,7 @@ $@"
 				private void OnPropertyChanged{notifySource.Index}(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{{");
 					output.AppendLine(
-$@"					var bindings = TryGetBindings();
+$@"					var bindings = global::CompiledBindings.{FrameworkId}.BindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;
@@ -507,7 +504,7 @@ $@"				}}");
 						output.AppendLine(
 $@"				{{");
 						output.AppendLine(
-$@"					var bindings = TryGetBindings();
+$@"					var bindings = global::CompiledBindings.{FrameworkId}.BindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;
@@ -522,27 +519,6 @@ $@"				}}");
 					}
 				}
 			}
-
-			#endregion
-
-			#region TryGetBindings method
-
-			output.AppendLine(
-$@"
-				{targetClassName}_Bindings{nameSuffix} TryGetBindings()
-				{{
-					{targetClassName}_Bindings{nameSuffix} bindings = null;
-					if (_bindingsWeakRef != null)
-					{{
-						bindings = ({targetClassName}_Bindings{nameSuffix})_bindingsWeakRef.Target;
-						if (bindings == null)
-						{{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}}
-					}}
-					return bindings;
-				}}");
 
 			#endregion
 
@@ -609,39 +585,7 @@ $@"				Update{propUpdate.Parent.Index}_{propUpdate.PropertyCodeName}({propUpdate
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
 			}
 		}
-
-		void GenerateSetPropertyChangedEventHandler(NotifySource notifySource, string cacheVar, string? a)
-		{
-			if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
-			{
-				output.AppendLine(
-$@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged += OnPropertyChanged{notifySource.Index};");
-			}
-			else
-			{
-				foreach (var notifyProp in notifySource.Properties)
-				{
-					GenerateRegisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
-				}
-			}
-		}
-
-		void GenerateUnsetPropertyChangedEventHandler(NotifySource notifySource, string cacheVar, string? a)
-		{
-			if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
-			{
-				output.AppendLine(
-$@"{a}					((System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged -= OnPropertyChanged{notifySource.Index};");
-			}
-			else
-			{
-				foreach (var notifyProp in notifySource.Properties)
-				{
-					GenerateUnregisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
-				}
-			}
-		}
-
+		
 		void GenerateSetSource(Bind bind, string? a)
 		{
 			var expr = bind.BindBackExpression ?? bind.Expression!;
@@ -792,23 +736,19 @@ $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 	{
 	}
 
-	protected virtual void GenerateTrackingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)
+	protected virtual void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
 	{
 	}
 
-	protected virtual void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
+	protected virtual void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
 	{
 	}
 
-	protected virtual void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
+	protected virtual void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
 	{
 	}
 
-	protected virtual void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
-	{
-	}
-
-	protected virtual void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	protected virtual void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 	{
 	}
 

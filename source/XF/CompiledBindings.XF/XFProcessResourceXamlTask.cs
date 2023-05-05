@@ -162,14 +162,14 @@ public class XFProcessResourceXamlTask : Task
 
 									if (compiledBindingsNsPrefix == null)
 									{
-										compiledBindingsNsPrefix = SearchNsPrefix("CompiledBindings");
-										classNsPrefix = SearchNsPrefix(classNs);
+										compiledBindingsNsPrefix = SearchNsPrefix($"CompiledBindings.{_platformConstants.FrameworkId}", "CompiledBindings");
+										classNsPrefix = SearchNsPrefix(classNs, null);
 									}
 
 									var propInitializers = string.Join(", ", dataTemplateType.Properties.Select(p => $"{p.Name}={{StaticResource {p.Name}}}"));
 
 									var rootElement = dataTemplate.Elements().First();
-									InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:DataTemplateBindings.Bindings=\"{{{classNsPrefix}:{dateTemplateClassName} {propInitializers}}}\"");
+									InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:BindingsHelper.Bindings=\"{{{classNsPrefix}:{dateTemplateClassName} {propInitializers}}}\"");
 								}
 
 								// Replace/Remove attributes with CompiledBindings namespace
@@ -201,7 +201,7 @@ public class XFProcessResourceXamlTask : Task
 
 											if (classNsPrefix == null)
 											{
-												classNsPrefix = SearchNsPrefix(classNs);
+												classNsPrefix = SearchNsPrefix(classNs, null);
 											}
 
 											int nameEnd = textLine.Text.IndexOf('=', start);
@@ -230,7 +230,7 @@ public class XFProcessResourceXamlTask : Task
 
 							replaceResources.Add((resource, newResource));
 
-							string SearchNsPrefix(string clrNs)
+							string SearchNsPrefix(string clrNs, string? assembly)
 							{
 								var searchedUsingNs = "using:" + clrNs;
 								var searchedClrNs = "clr-namespace:" + clrNs;
@@ -252,7 +252,12 @@ public class XFProcessResourceXamlTask : Task
 									while (xdoc.Root.Attributes().Any(a =>
 										a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == prefix));
 
-									InsertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"using:{clrNs}\"");
+									var ns = $"clr-namespace:{clrNs}";
+									if (assembly != null)
+									{
+										ns += ";assembly=" + assembly;
+									}
+									InsertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"{ns}\"");
 								}
 
 								return prefix;

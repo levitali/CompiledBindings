@@ -11,6 +11,7 @@ public class MauiGenerateCodeTask : XFGenerateCodeTask
 
 public class MauiPlatformConstants : PlatformConstants
 {
+	public override string FrameworkId => "MAUI";
 	public override string DefaultNamespace => "http://schemas.microsoft.com/dotnet/2021/maui";
 	public override string BaseClrNamespace => "Microsoft.Maui.Controls";
 }

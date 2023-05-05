@@ -12,6 +12,7 @@
 		<WarningsAsErrors>nullable</WarningsAsErrors>
 		<OutputPath>..\..\..\bin\winui\build</OutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<NoWarn>$(NoWarn);8632</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

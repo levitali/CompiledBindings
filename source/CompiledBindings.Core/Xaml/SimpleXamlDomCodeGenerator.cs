@@ -10,16 +10,18 @@ public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	private readonly bool _generateVariableDeclarations;
 	private readonly bool _generateVariableInitialization;
 
-	public SimpleXamlDomCodeGenerator(BindingsCodeGenerator bindingsCodeGenerator,
-									  string bindingContextStart,
-									  string bindingConextArgs,
-									  string bindableObject,
-									  string findByNameFormat,
-									  bool generateVariableDeclarations,
-									  bool generateVariableInitialization,
-									  string langVersion,
-									  string msbuildVersion)
-		: base(langVersion, msbuildVersion)
+	public SimpleXamlDomCodeGenerator(
+		BindingsCodeGenerator bindingsCodeGenerator,
+		string bindingContextStart,
+		string bindingConextArgs,
+		string bindableObject,
+		string findByNameFormat,
+		bool generateVariableDeclarations,
+		bool generateVariableInitialization,
+		string frameworkId,
+		string langVersion,
+		string msbuildVersion)
+		: base(frameworkId, langVersion, msbuildVersion)
 	{
 		_bindingsCodeGenerator = bindingsCodeGenerator;
 		_bindingContextStart = bindingContextStart;
@@ -94,8 +96,6 @@ $@"	}}");
 	protected virtual void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)
 	{
 	}
-
-	protected virtual string IGeneratedDataTemplateFullName => "CompiledBindings.IGeneratedDataTemplate";
 
 	private void GenerateResourceDeclarations(StringBuilder output, GeneratedClass parseResult, bool isDataTemplate)
 	{
@@ -274,7 +274,7 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 		{
 			output.AppendLine(
 $@"
-	class {dataTemplateClassName} : global::{IGeneratedDataTemplateFullName}
+	class {dataTemplateClassName} : global::CompiledBindings.{FrameworkId}.IGeneratedDataTemplate
 	{{");
 
 			GenerateVariablesDeclarations(output, parseResult, false);

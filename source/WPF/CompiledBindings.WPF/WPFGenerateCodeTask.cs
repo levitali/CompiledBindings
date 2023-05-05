@@ -68,7 +68,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
-			bool generateDataTemplateBindings = false;
 			bool result = true;
 
 			var allXaml = Pages.ToList();
@@ -144,11 +143,10 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
 							bool generateDataTemplates = parseResult.DataTemplates.Any(dt => dt.GenerateClass);
-							generateDataTemplateBindings |= generateDataTemplates;
 
 							if (generateDataTemplates)
 							{
-								var compiledBindingsNs = "clr-namespace:CompiledBindings";
+								var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF;assembly=CompiledBindings";
 								var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
 
 								EnsureNamespaceDeclared(compiledBindingsNs);
@@ -183,7 +181,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 										var rootElement = dataTemplate.RootElement.Elements().First();
 
 										rootElement.Add(
-											new XElement(mbui + "DataTemplateBindings.Bindings",
+											new XElement(mbui + "BindingsHelper.Bindings",
 												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
 													dataTemplate.EnumerateResources().Select(r => new XAttribute(r.name, $"{{StaticResource {r.name}}}")))));
 									}
@@ -229,13 +227,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				}
 			}
 
-			if (generateDataTemplateBindings)
-			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.WPF.cs");
-				File.WriteAllText(dataTemplateBindingsFile, GenerateDataTemplateBindingsClass());
-				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
-			}
-
 			GeneratedCodeFiles = generatedCodeFiles.ToArray();
 			NewPages = newPages.ToArray();
 
@@ -264,49 +255,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 		{
 			TypeInfoUtils.Cleanup();
 		}
-	}
-
-	private string GenerateDataTemplateBindingsClass()
-	{
-		return
-$@"namespace CompiledBindings
-{{
-	using System.Windows;
-
-	class DataTemplateBindings
-	{{
-		public static readonly DependencyProperty BindingsProperty =
-			DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), new PropertyMetadata(BindingsChanged));
-
-		public static IGeneratedDataTemplate GetBindings(DependencyObject @object)
-		{{
-			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
-		}}
-
-		public static void SetBindings(DependencyObject @object, IGeneratedDataTemplate value)
-		{{
-			@object.SetValue(BindingsProperty, value);
-		}}
-
-		static void BindingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{{
-			if (e.OldValue != null)
-			{{
-				((IGeneratedDataTemplate)e.OldValue).Cleanup((FrameworkElement)d);
-			}}
-			if (e.NewValue != null)
-			{{
-				((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
-			}}
-		}}
-	}}
-
-	interface IGeneratedDataTemplate
-	{{
-		void Initialize(FrameworkElement rootElement);
-		void Cleanup(FrameworkElement rootElement);
-	}}
-}}";
 	}
 
 	void ICancelableTask.Cancel()
@@ -373,6 +321,7 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 			   "(global::{0}){1}.FindName(\"{2}\")",
 			   false,
 			   false,
+			   "WPF",
 			   langVersion,
 			   msbuildVersion)
 	{
@@ -386,11 +335,12 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 
 public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 {
-	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
+	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion) 
+		: base("WPF", langVersion, msbuildVersion)
 	{
 	}
 
-	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
+	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
 	{
 		var dp = ev.Bindings[0].DependencyProperty!;
 		output.AppendLine(
@@ -401,7 +351,7 @@ $@"				global::System.ComponentModel.DependencyPropertyDescriptor
 					.AddValueChanged({targetExpr}, OnTargetChanged{ev.Index});");
 	}
 
-	protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
+	protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
 	{
 		var dp = ev.Bindings[0].DependencyProperty!;
 		output.AppendLine(
@@ -418,22 +368,17 @@ $@"					global::System.ComponentModel.DependencyPropertyDescriptor
 $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 	}
 
-	protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
 	{
 		output.AppendLine(
-$@"						global::System.ComponentModel.DependencyPropertyDescriptor
-							.FromProperty(
-								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
-							.AddValueChanged({cacheVar}, {methodName});");
+$@"				global::System.Windows.DependencyObject {cacheVar};");
+
 	}
 
-	protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	protected override void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 	{
 		output.AppendLine(
-$@"						global::System.ComponentModel.DependencyPropertyDescriptor
-							.FromProperty(
-								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
-							.RemoveValueChanged({cacheVar}, {methodName});");
+$@"					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}), OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName});");
 	}
 }
 

@@ -66,7 +66,6 @@ public class WinUIGenerateCodeTask : Task
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
-			bool generateDataTemplateBindings = false;
 			bool result = true;
 
 			var intermediateOutputPath = IntermediateOutputPath;
@@ -139,7 +138,6 @@ public class WinUIGenerateCodeTask : Task
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
 							bool generateDataTemplates = parseResult.DataTemplates.Any(d => d.GenerateClass);
-							generateDataTemplateBindings |= generateDataTemplates;
 
 							if (generateDataTemplates)
 							{
@@ -177,7 +175,7 @@ public class WinUIGenerateCodeTask : Task
 									{
 										var rootElement = dataTemplate.RootElement.Elements().First();
 										rootElement.Add(
-											new XElement(compiledBindings + "DataTemplateBindings.Bindings",
+											new XElement(compiledBindings + "BindingsHelper.Bindings",
 												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
 													dataTemplate.EnumerateResources().Select(r => new XAttribute(r.name, $"{{StaticResource {r.name}}}")))));
 									}
@@ -223,13 +221,6 @@ public class WinUIGenerateCodeTask : Task
 				}
 			}
 
-			if (generateDataTemplateBindings)
-			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "DataTemplateBindings.WinUI.cs");
-				File.WriteAllText(dataTemplateBindingsFile, GenerateDataTemplateBindingsClass());
-				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
-			}
-
 			GeneratedCodeFiles = generatedCodeFiles.ToArray();
 			NewPages = newPages.ToArray();
 
@@ -249,49 +240,6 @@ public class WinUIGenerateCodeTask : Task
 		{
 			TypeInfoUtils.Cleanup();
 		}
-	}
-
-	private string GenerateDataTemplateBindingsClass()
-	{
-		return
-$@"namespace CompiledBindings.WinUI
-{{
-	using Microsoft.UI.Xaml;
-
-	public class DataTemplateBindings
-	{{
-		public static readonly DependencyProperty BindingsProperty =
-			DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(DataTemplateBindings), new PropertyMetadata(null, BindingsChanged));
-
-		public static IGeneratedDataTemplate GetBindings(DependencyObject @object)
-		{{
-			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
-		}}
-
-		public static void SetBindings(DependencyObject @object, IGeneratedDataTemplate value)
-		{{
-			@object.SetValue(BindingsProperty, value);
-		}}
-
-		static void BindingsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-		{{
-			if (e.OldValue != null)
-			{{
-				((IGeneratedDataTemplate)e.OldValue).Cleanup((FrameworkElement)d);
-			}}
-			if (e.NewValue != null)
-			{{
-				((IGeneratedDataTemplate)e.NewValue).Initialize((FrameworkElement)d);
-			}}
-		}}
-	}}
-
-	public interface IGeneratedDataTemplate
-	{{
-		void Initialize(FrameworkElement rootElement);
-		void Cleanup(FrameworkElement rootElement);
-	}}
-}}";
 	}
 
 	public class WinUIXamlDomParser : SimpleXamlDomParser
@@ -338,12 +286,11 @@ $@"namespace CompiledBindings.WinUI
 				   "(global::{0}){1}.FindName(\"{2}\")",
 				   true,
 				   false,
+				   "WinUI",
 				   langVersion,
 				   msbuildVersion)
 		{
 		}
-
-		protected override string IGeneratedDataTemplateFullName => "CompiledBindings.WinUI.IGeneratedDataTemplate";
 
 		protected override string CreateGetResourceCode(string resourceName)
 		{
@@ -353,7 +300,7 @@ $@"namespace CompiledBindings.WinUI
 
 	public class WinUIBindingsCodeGenerator : BindingsCodeGenerator
 	{
-		public WinUIBindingsCodeGenerator(string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
+		public WinUIBindingsCodeGenerator(string langVersion, string msbuildVersion) : base("WinUI", langVersion, msbuildVersion)
 		{
 		}
 
@@ -367,28 +314,14 @@ $@"			private long _targetCallbackToken{ev.Index};");
 			}
 		}
 
-		protected override void GenerateTrackingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)
-		{
-			var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
-			foreach (var notifySource in bindingsData.NotifySources
-				.Where(g => !iNotifyPropertyChangedType.IsAssignableFrom(g.SourceExpression.Type)))
-			{
-				foreach (var notifyProp in notifySource.Properties)
-				{
-					output.AppendLine(
-$@"				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
-				}
-			}
-		}
-
-		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
+		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
 		{
 			var first = ev.Bindings[0];
 			output.AppendLine(
 $@"				_targetCallbackToken{ev.Index} = {targetExpr}.RegisterPropertyChangedCallback({first.Property.Object.Type.Reference.FullName}.{first.Property.MemberName}Property, OnTargetChanged{ev.Index});");
 		}
 
-		protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayEventData ev, string targetExpr)
+		protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
 		{
 			var first = ev.Bindings[0];
 			output.AppendLine(
@@ -398,19 +331,20 @@ $@"					{targetExpr}.UnregisterPropertyChangedCallback({first.Property.Object.Ty
 		protected override void GenerateDependencyPropertyChangedCallback(StringBuilder output, string methodName, string? a)
 		{
 			output.AppendLine(
-$@"{a}			private void {methodName}(Microsoft.UI.Xaml.DependencyObject sender, Microsoft.UI.Xaml.DependencyProperty dp)");
+$@"{a}			private void {methodName}(global::Microsoft.UI.Xaml.DependencyObject sender, Microsoft.UI.Xaml.DependencyProperty dp)");
 		}
 
-		protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+		protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
 		{
 			output.AppendLine(
-$@"						_sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name} = {cacheVar}.RegisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member.Definition.Name}Property, {methodName});");
+$@"				private global::Microsoft.UI.Xaml.DependencyObject {cacheVar};
+				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
 		}
 
-		protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+		protected override void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 		{
 			output.AppendLine(
-$@"						{cacheVar}.UnregisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, _sourceCallbackToken{notifySource.Index}_{notifyProp.Member.Definition.Name});");
+$@"					global::CompiledBindings.WinUI.BindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, ref _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name}, OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName});");
 		}
 	}
 }

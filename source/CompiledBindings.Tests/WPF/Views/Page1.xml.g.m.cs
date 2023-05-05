@@ -145,9 +145,9 @@ namespace WPFTest.Views
 			class Page1_BindingsTrackings_
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::WPFTest.ViewModels.EntityViewModel _propertyChangeSource0;
-				global::System.Windows.Controls.ListView _propertyChangeSource1;
-				global::System.Collections.IList _propertyChangeSource2;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+				global::System.Windows.DependencyObject _propertyChangeSource1;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource2;
 
 				public Page1_BindingsTrackings_(Page1_Bindings_ bindings)
 				{
@@ -163,58 +163,22 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
 				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::System.Windows.Controls.ListView value)
 				{
-					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
-					{
-						global::System.ComponentModel.DependencyPropertyDescriptor
-							.FromProperty(
-								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
-							.RemoveValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
-						_propertyChangeSource1 = null;
-					}
-					if (_propertyChangeSource1 == null && value != null)
-					{
-						_propertyChangeSource1 = value;
-						global::System.ComponentModel.DependencyPropertyDescriptor
-							.FromProperty(
-								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
-							.AddValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView), OnPropertyChanged1_SelectedItem);
 				}
 
 				public void SetPropertyChangedEventHandler2(global::System.Collections.IList value)
 				{
-					if (_propertyChangeSource2 != null && !object.ReferenceEquals(_propertyChangeSource2, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource2).PropertyChanged -= OnPropertyChanged2;
-						_propertyChangeSource2 = null;
-					}
-					if (_propertyChangeSource2 == null && value != null)
-					{
-						if (value is INotifyPropertyChanged)
-						{
-							_propertyChangeSource2 = value;
-							((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource2).PropertyChanged += OnPropertyChanged2;
-						}
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource2, value, OnPropertyChanged2);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -229,7 +193,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1_SelectedItem(object sender, global::System.EventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -241,7 +205,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -252,21 +216,6 @@ namespace WPFTest.Views
 					{
 						bindings.Update2_Count(typedSender);
 					}
-				}
-
-				Page1_Bindings_ TryGetBindings()
-				{
-					Page1_Bindings_ bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page1_Bindings_)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
 				}
 			}
 		}
@@ -944,9 +893,9 @@ namespace WPFTest.Views
 			class Page1_BindingsTrackings_this
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::WPFTest.ViewModels.Page1ViewModel _propertyChangeSource0;
-				global::WPFTest.ViewModels.Page1ModifyViewModel _propertyChangeSource1;
-				global::WPFTest.ViewModels.Page1ModifyTextViewModel _propertyChangeSource2;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource1;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource2;
 
 				public Page1_BindingsTrackings_this(Page1_Bindings_this bindings)
 				{
@@ -962,49 +911,22 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.Page1ViewModel value)
 				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 				{
-					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
-					if (_propertyChangeSource1 == null && value != null)
-					{
-						_propertyChangeSource1 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged += OnPropertyChanged1;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
 				}
 
 				public void SetPropertyChangedEventHandler2(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
 				{
-					if (_propertyChangeSource2 != null && !object.ReferenceEquals(_propertyChangeSource2, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource2).PropertyChanged -= OnPropertyChanged2;
-						_propertyChangeSource2 = null;
-					}
-					if (_propertyChangeSource2 == null && value != null)
-					{
-						_propertyChangeSource2 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource2).PropertyChanged += OnPropertyChanged2;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource2, value, OnPropertyChanged2);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1049,7 +971,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1082,7 +1004,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1103,26 +1025,11 @@ namespace WPFTest.Views
 							break;
 					}
 				}
-
-				Page1_Bindings_this TryGetBindings()
-				{
-					Page1_Bindings_this bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page1_Bindings_this)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
-				}
 			}
 		}
 	}
 
-	class Page1_DataTemplate0 : global::CompiledBindings.IGeneratedDataTemplate
+	class Page1_DataTemplate0 : global::CompiledBindings.WPF.IGeneratedDataTemplate
 	{
 		private global::System.Windows.Controls.TextBlock textBlock1;
 		private global::System.Windows.Controls.TextBlock textBlock2;
@@ -1243,8 +1150,8 @@ namespace WPFTest.Views
 			class Page1_DataTemplate0_BindingsTrackings_rootElement
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::WPFTest.ViewModels.EntityViewModel _propertyChangeSource0;
-				global::WPFTest.ViewModels.EntityModel _propertyChangeSource1;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource1;
 
 				public Page1_DataTemplate0_BindingsTrackings_rootElement(Page1_DataTemplate0_Bindings_rootElement bindings)
 				{
@@ -1259,35 +1166,17 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
 				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::WPFTest.ViewModels.EntityModel value)
 				{
-					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged -= OnPropertyChanged1;
-						_propertyChangeSource1 = null;
-					}
-					if (_propertyChangeSource1 == null && value != null)
-					{
-						_propertyChangeSource1 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource1).PropertyChanged += OnPropertyChanged1;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1302,7 +1191,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1314,26 +1203,11 @@ namespace WPFTest.Views
 						bindings.Update1_SByteProp(typedSender);
 					}
 				}
-
-				Page1_DataTemplate0_Bindings_rootElement TryGetBindings()
-				{
-					Page1_DataTemplate0_Bindings_rootElement bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page1_DataTemplate0_Bindings_rootElement)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
-				}
 			}
 		}
 	}
 
-	class Page1_DataTemplate1 : global::CompiledBindings.IGeneratedDataTemplate
+	class Page1_DataTemplate1 : global::CompiledBindings.WPF.IGeneratedDataTemplate
 	{
 		private global::System.Windows.Controls.TextBlock textBlock4;
 
@@ -1409,7 +1283,7 @@ namespace WPFTest.Views
 			class Page1_DataTemplate1_BindingsTrackings_rootElement
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::WPFTest.ViewModels.EntityViewModel _propertyChangeSource0;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
 
 				public Page1_DataTemplate1_BindingsTrackings_rootElement(Page1_DataTemplate1_Bindings_rootElement bindings)
 				{
@@ -1423,21 +1297,12 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
 				{
-					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
-					{
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
-						_propertyChangeSource0 = null;
-					}
-					if (_propertyChangeSource0 == null && value != null)
-					{
-						_propertyChangeSource0 = value;
-						((System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged += OnPropertyChanged0;
-					}
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = TryGetBindings();
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_DataTemplate1_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1448,21 +1313,6 @@ namespace WPFTest.Views
 					{
 						bindings.Update0_Title(typedSender);
 					}
-				}
-
-				Page1_DataTemplate1_Bindings_rootElement TryGetBindings()
-				{
-					Page1_DataTemplate1_Bindings_rootElement bindings = null;
-					if (_bindingsWeakRef != null)
-					{
-						bindings = (Page1_DataTemplate1_Bindings_rootElement)_bindingsWeakRef.Target;
-						if (bindings == null)
-						{
-							_bindingsWeakRef = null;
-							Cleanup();
-						}
-					}
-					return bindings;
 				}
 			}
 		}

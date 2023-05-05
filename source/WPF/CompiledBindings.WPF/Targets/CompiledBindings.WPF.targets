@@ -2,7 +2,6 @@
 
 	<UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)..\build\CompiledBindings.WPF.dll" />
 	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\build\CompiledBindings.Core.dll" />
-	<UsingTask TaskName="UpdateReferenceCopyLocalTask" AssemblyFile="$(MSBuildThisFileDirectory)..\build\CompiledBindings.Core.dll" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
@@ -150,18 +149,5 @@
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
 							 TargetAssembly="@(IntermediateAssembly)"/>
 	</Target>
-
-	<!-- Unfortulately brings problems in Designer if the CompiledBingins.dll is not in output -->
-	<!--<Target Name="UpdateCopyLocalFilesTarget" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-
-    <UpdateReferenceCopyLocalTask ReferenceCopyLocalFiles="@(ReferenceCopyLocalPaths)">
-      <Output TaskParameter="UpdatedReferenceCopyLocalFiles" ItemName="UpdatedReferenceCopyLocalFiles" />
-    </UpdateReferenceCopyLocalTask>
-
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" />
-      <ReferenceCopyLocalPaths Include="@(UpdatedReferenceCopyLocalFiles)" />
-    </ItemGroup>
-  </Target>-->
 
 </Project>
