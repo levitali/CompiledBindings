@@ -290,6 +290,12 @@ public class ExpressionParser
 			return true;
 		}
 
+		if (expression.Type.Reference.IsValueNullable() &&
+			expression.Type.Reference.GetGenericArguments()![0].FullName == type.Reference.FullName)
+		{
+			return true;
+		}
+
 		if (expression is not ConstantExpression ce)
 		{
 			return false;

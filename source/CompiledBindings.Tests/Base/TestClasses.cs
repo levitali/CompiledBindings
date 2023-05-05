@@ -59,6 +59,8 @@ public class Class2
 
 	public object? ObjProp { get; set; }
 
+	public bool? NullableBoolProp => null;
+
 	public int Method1(string? str)
 	{
 		return 0;

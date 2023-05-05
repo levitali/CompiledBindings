@@ -39,6 +39,11 @@ public class ExpressionTests : IDisposable
 		var expectedCode = "(dataRoot.ListProp?.Count - dataRoot.NullIntProp)?.ToString() ?? \"-\"";
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "NullDateTimeProp.ToString('g')";
+		expectedCode = "dataRoot.NullDateTimeProp?.ToString(\"g\")";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 
 	[Test]
@@ -160,7 +165,7 @@ public class ExpressionTests : IDisposable
 	}
 
 	[Test]
-	public void NotNullableMethodCall()
+	public void MethodCall_NotNullableExpression()
 	{
 		var expression = "local:Class1.Instance.Method1(null).ToString()";
 		var expectedCode = "CompiledBindings.Tests.Class1.Instance.Method1(null).ToString()";
@@ -169,51 +174,83 @@ public class ExpressionTests : IDisposable
 	}
 
 	[Test]
-	public void OtherTests()
+	public void Chars()
 	{
-		var expression3 = "RefProp.StringProp == 'C' ? 1 : 0";
-		var expectedCode3 = "(dataRoot.RefProp?.StringProp == \"C\" ? 1 : 0)";
-		var res3 = ExpressionParser.Parse(class1Type, "dataRoot", expression3, intType, true, ns, out _, out _);
-		Assert.That(res3.CSharpCode.Equals(expectedCode3));
+		var expression = "RefProp.StringProp == 'C' ? 1 : 0";
+		var expectedCode = "(dataRoot.RefProp?.StringProp == \"C\" ? 1 : 0)";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
-		var expression4 = "local:Class1.Instance.StringProp";
-		var expectedCode4 = "CompiledBindings.Tests.Class1.Instance.StringProp";
-		var res4 = ExpressionParser.Parse(class1Type, "dataRoot", expression4, intType, true, ns, out _, out _);
-		Assert.That(res4.CSharpCode.Equals(expectedCode4));
+	[Test]
+	public void StaticProperty()
+	{
+		var expression = "local:Class1.Instance.StringProp";
+		var expectedCode = "CompiledBindings.Tests.Class1.Instance.StringProp";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
+	[Test]
+	public void NotNullableParameter_NullableExpression()
+	{
+		var expression = "Check(RefProp.NullableBoolProp)";
+		var expectedCode = "dataRoot.Check(dataRoot.RefProp?.NullableBoolProp ?? default)";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
+
+	[Test]
+	public void MethodCall()
+	{
 		var expression = "Method2(3)";
 		var expectedCode = "dataRoot.Method2(3)";
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
-		expression = "FuncProp()";
-		expectedCode = "dataRoot.FuncProp()";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+	[Test]
+	public void Invoke()
+	{
+		var expression = "FuncProp()";
+		var expectedCode = "dataRoot.FuncProp()";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
-		expression = "FuncProp2('test').GuidProp";
-		expectedCode = "dataRoot.FuncProp2?.Invoke(\"test\")?.GuidProp";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+	[Test]
+	public void NullableInvoke()
+	{
+		var expression = "FuncProp2('test').GuidProp";
+		var expectedCode = "dataRoot.FuncProp2?.Invoke(\"test\")?.GuidProp";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
-		expression = "local:Class1.Method1(typeof(local:Class2))";
-		expectedCode = "CompiledBindings.Tests.Class1.Method1(typeof(global::CompiledBindings.Tests.Class2))";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+	[Test]
+	public void Typeof()
+	{
+		var expression = "local:Class1.Method1(typeof(local:Class2))";
+		var expectedCode = "CompiledBindings.Tests.Class1.Method1(typeof(global::CompiledBindings.Tests.Class2))";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
-		expression = "NullDateTimeProp.ToString('g')";
-		expectedCode = "dataRoot.NullDateTimeProp?.ToString(\"g\")";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+	[Test]
+	public void InterpolatedString()
+	{
+		var expression = "$'{IntProp,2} {RefProp.DecimalProp:0.###}'";
+		var expectedCode = "$\"{dataRoot.IntProp,2} {dataRoot.RefProp?.DecimalProp:0.###}\"";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 
-		expression = "$'{IntProp,2} {RefProp.DecimalProp:0.###}'";
-		expectedCode = "$\"{dataRoot.IntProp,2} {dataRoot.RefProp?.DecimalProp:0.###}\"";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
-		Assert.That(result.CSharpCode.Equals(expectedCode));
-
-		expression = "((system:Int32)RefProp.ObjProp).ToString()";
-		expectedCode = "(((global::System.Int32?)dataRoot.RefProp?.ObjProp))?.ToString()";
-		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+	[Test]
+	public void Cast()
+	{
+		var expression = "((system:Int32)RefProp.ObjProp).ToString()";
+		var expectedCode = "(((global::System.Int32?)dataRoot.RefProp?.ObjProp))?.ToString()";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "((local:Struct1)RefProp.ObjProp).Prop1";
