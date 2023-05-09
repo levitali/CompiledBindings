@@ -38,9 +38,7 @@ public class XamlObjectProperty
 	public required MethodInfo? TargetMethod { get; set; }
 	public required EventInfo? TargetEvent { get; init; }
 	public required string MemberName { get; init; }
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public XamlObjectValue Value { get; set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	public XamlObjectValue Value { get; set; } = null!;
 
 	public TypeInfo MemberType => TargetMethod?.Parameters.Last().ParameterType ?? TargetProperty?.PropertyType ?? TargetEvent!.EventType;
 
@@ -93,8 +91,8 @@ public class XamlObjectValue
 
 public class BindingScope
 {
-	public string? ViewName;
-	public TypeInfo? DataType;
-	public List<Bind> Bindings = new();
-	public BindingsData? BindingsData;
+	public string? ViewName { get; set; }
+	public required TypeInfo? DataType { get; init; }
+	public List<Bind> Bindings { get; } = new();
+	public BindingsData BindingsData { get; set; } = null!;
 }

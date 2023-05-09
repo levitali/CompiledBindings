@@ -746,9 +746,7 @@ public class NotifySource
 {
 	public required Expression Expression { get; init; }
 	public required Expression SourceExpression { get; set; }
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-	public List<NotifyProperty> Properties { get; set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+	public List<NotifyProperty> Properties { get; set; } = null!;
 	public UpdateMethodData? UpdateMethod { get; set; }
 	public bool CheckINotifyPropertyChanged { get; init; }
 	public int Index { get; init; }

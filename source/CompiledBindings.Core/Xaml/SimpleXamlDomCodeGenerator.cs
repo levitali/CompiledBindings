@@ -45,7 +45,7 @@ $@"namespace {parseResult.TargetType.Reference.Namespace}
 
 		if (parseResult.IncludeNamespaces.Count > 0)
 		{
-			foreach (string ns in parseResult.IncludeNamespaces)
+			foreach (string ns in parseResult.IncludeNamespaces.Where(n => n != parseResult.TargetType.Reference.Namespace))
 			{
 				output.AppendLine(
 $@"	using {ns};");
@@ -254,7 +254,7 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 			{
 				nameSuffix += bs.ViewName ?? "this";
 			}
-			_bindingsCodeGenerator.GenerateBindingsClass(output, bs.BindingsData!, className, nameSuffix: nameSuffix);
+			_bindingsCodeGenerator.GenerateBindingsClass(output, bs.BindingsData, className, nameSuffix: nameSuffix);
 		}
 	}
 

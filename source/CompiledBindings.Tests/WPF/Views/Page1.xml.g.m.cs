@@ -1,6 +1,5 @@
 namespace WPFTest.Views
 {
-	using WPFTest.Views;
 
 #nullable disable
 
