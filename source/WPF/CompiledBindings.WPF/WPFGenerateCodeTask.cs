@@ -335,7 +335,7 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 
 public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 {
-	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion) 
+	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion)
 		: base("WPF", langVersion, msbuildVersion)
 	{
 	}
@@ -368,19 +368,28 @@ $@"					global::System.ComponentModel.DependencyPropertyDescriptor
 $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 	}
 
-	protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
-	{
-		if (notifyProp == notifySource.Properties[0])
-		{
-			output.AppendLine(
-$@"				global::System.Windows.DependencyObject {cacheVar};");
-		}
-	}
-
-	protected override void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
 	{
 		output.AppendLine(
-$@"					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}), OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName});");
+$@"				global::System.Windows.DependencyObject _propertyChangeSource{notifySource.Index};");
+	}
+
+	protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	{
+		output.AppendLine(
+$@"						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
+							.AddValueChanged({cacheVar}, {methodName});");
+	}
+
+	protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	{
+		output.AppendLine(
+$@"						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
+							.RemoveValueChanged({cacheVar}, {methodName});");
 	}
 }
 

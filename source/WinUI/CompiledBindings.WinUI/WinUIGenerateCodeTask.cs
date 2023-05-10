@@ -334,21 +334,27 @@ $@"					{targetExpr}.UnregisterPropertyChangedCallback({first.Property.Object.Ty
 $@"{a}			private void {methodName}(global::Microsoft.UI.Xaml.DependencyObject sender, Microsoft.UI.Xaml.DependencyProperty dp)");
 		}
 
-		protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
+		protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
 		{
-			if (notifyProp == notifySource.Properties[0])
+			output.AppendLine(
+$@"				global::Microsoft.UI.Xaml.DependencyObject _propertyChangeSource{notifySource.Index};");
+			foreach (var notifyProp in notifySource.Properties)
 			{
 				output.AppendLine(
-$@"				private global::Microsoft.UI.Xaml.DependencyObject {cacheVar};");
+$@"				long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
 			}
-			output.AppendLine(
-$@"				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
 		}
 
-		protected override void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+		protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 		{
 			output.AppendLine(
-$@"					global::CompiledBindings.WinUI.BindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, ref _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name}, OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName});");
+$@"						_sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name} = {cacheVar}.RegisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, {methodName});");
+		}
+
+		protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+		{
+			output.AppendLine(
+$@"						{cacheVar}.UnregisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name});");
 		}
 	}
 }

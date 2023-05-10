@@ -175,8 +175,30 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler1(global::System.Windows.Controls.ListView value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView), OnPropertyChanged1_SelectedItem);
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, global::System.Windows.Controls.ListView.ActualWidthProperty, typeof(global::System.Windows.Controls.ListView), OnPropertyChanged1_ActualWidth);
+					if (_propertyChangeSource1 != null && !object.ReferenceEquals(_propertyChangeSource1, value))
+					{
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
+							.RemoveValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.ActualWidthProperty, typeof(global::System.Windows.Controls.ListView))
+							.RemoveValueChanged(_propertyChangeSource1, OnPropertyChanged1_ActualWidth);
+						_propertyChangeSource1 = null;
+					}
+					if (_propertyChangeSource1 == null && value != null)
+					{
+						_propertyChangeSource1 = value;
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView))
+							.AddValueChanged(_propertyChangeSource1, OnPropertyChanged1_SelectedItem);
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::System.Windows.Controls.ListView.ActualWidthProperty, typeof(global::System.Windows.Controls.ListView))
+							.AddValueChanged(_propertyChangeSource1, OnPropertyChanged1_ActualWidth);
+					}
 				}
 
 				public void SetPropertyChangedEventHandler2(global::System.Collections.IList value)

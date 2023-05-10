@@ -34,20 +34,6 @@ public class BindingsHelper
 		}
 	}
 
-	public static void SetPropertyChangedEventHandler(ref DependencyObject? cache, DependencyObject? source, DependencyProperty property, ref long token, DependencyPropertyChangedCallback handler)
-	{
-		if (cache != null && !object.ReferenceEquals(cache, source))
-		{
-			cache.UnregisterPropertyChangedCallback(property, token);
-			cache = null;
-		}
-		if (cache == null && source != null)
-		{
-			cache = source;
-			token = cache.RegisterPropertyChangedCallback(property, handler);
-		}
-	}
-
 
 	public static T? TryGetBindings<T>(ref WeakReference? bindingsWeakReference, Action cleanup)
 		where T : class

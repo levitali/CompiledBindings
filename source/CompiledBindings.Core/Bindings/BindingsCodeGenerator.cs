@@ -181,7 +181,7 @@ $@"
 			{{
 				if (_targetRoot != null)
 				{{");
-		
+
 		if (asyncFunctions)
 		{
 			output.AppendLine(
@@ -362,18 +362,14 @@ $@"				global::System.WeakReference _bindingsWeakRef;");
 			// Generate _propertyChangeSourceXXX fields
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				var cacheVar = $"_propertyChangeSource{notifySource.Index}";
 				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
-$@"				global::System.ComponentModel.INotifyPropertyChanged {cacheVar};");
+$@"				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource{notifySource.Index};");
 				}
 				else
 				{
-					foreach (var notifProp in notifySource.Properties)
-					{
-						GenerateDependencyPropertyChangeCacheVariables(output, notifySource, notifProp, cacheVar);
-					}
+					GenerateDependencyPropertyChangeCacheVariables(output, notifySource);
 				}
 			}
 
@@ -427,13 +423,29 @@ $@"					global::CompiledBindings.{FrameworkId}.BindingsHelper.SetPropertyChanged
 				}
 				else
 				{
+					output.AppendLine(
+$@"					if ({cacheVar} != null && !object.ReferenceEquals({cacheVar}, value))
+					{{");
 					foreach (var notifyProp in notifySource.Properties)
 					{
-						GenerateDependencyPropertySetPropertyHandler(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
+						GenerateUnregisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
 					}
+					output.AppendLine(
+	$@"						{cacheVar} = null;
+					}}
+					if ({cacheVar} == null && value != null)
+					{{");
+					output.AppendLine(
+	$@"						{cacheVar} = value;");
+					foreach (var notifyProp in notifySource.Properties)
+					{
+						GenerateRegisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
+					}
+					output.AppendLine(
+$@"					}}");
 				}
 				output.AppendLine(
-$@"				}}");				
+$@"				}}");
 			}
 
 			#endregion
@@ -486,7 +498,7 @@ $@"					}}");
 					{
 						var prop = notifySource.Properties[0];
 						output.AppendLine(
-$@"					if (string.IsNullOrEmpty(e.PropertyName) || {string.Join(" || ", prop.PropertyNames.Select(n => $"e.PropertyName == \"{n}\"")) })
+$@"					if (string.IsNullOrEmpty(e.PropertyName) || {string.Join(" || ", prop.PropertyNames.Select(n => $"e.PropertyName == \"{n}\""))})
 					{{
 						bindings.Update{notifySource.Index}_{prop.PropertyCodeName}(typedSender);
 					}}");
@@ -585,7 +597,7 @@ $@"				Update{propUpdate.Parent.Index}_{propUpdate.PropertyCodeName}({propUpdate
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
 			}
 		}
-		
+
 		void GenerateSetSource(Bind bind, string? a)
 		{
 			var expr = bind.BindBackExpression ?? bind.Expression!;
@@ -744,11 +756,15 @@ $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 	{
 	}
 
-	protected virtual void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
+	protected virtual void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
 	{
 	}
 
-	protected virtual void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	protected virtual void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
+	{
+	}
+
+	protected virtual void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 	{
 	}
 

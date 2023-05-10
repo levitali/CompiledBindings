@@ -34,20 +34,6 @@ public class BindingsHelper
 		}
 	}
 
-	public static void SetPropertyChangedEventHandler(ref DependencyObject? cache, DependencyObject? source, DependencyProperty property, Type targetType, EventHandler handler)
-	{
-		if (cache != null && !object.ReferenceEquals(cache, source))
-		{
-			DependencyPropertyDescriptor.FromProperty(property, targetType).RemoveValueChanged(cache, handler);
-			cache = null;
-		}
-		if (cache == null && source != null)
-		{
-			cache = source;
-			DependencyPropertyDescriptor.FromProperty(property, targetType).AddValueChanged(cache, handler);
-		}
-	}
-
 	public static T? TryGetBindings<T>(ref WeakReference? bindingsWeakReference, Action cleanup)
 		where T : class
 	{
