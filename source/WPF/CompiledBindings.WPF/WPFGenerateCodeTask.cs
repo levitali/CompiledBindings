@@ -370,9 +370,11 @@ $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
 
 	protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
 	{
-		output.AppendLine(
+		if (notifyProp == notifySource.Properties[0])
+		{
+			output.AppendLine(
 $@"				global::System.Windows.DependencyObject {cacheVar};");
-
+		}
 	}
 
 	protected override void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)

@@ -336,9 +336,13 @@ $@"{a}			private void {methodName}(global::Microsoft.UI.Xaml.DependencyObject se
 
 		protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar)
 		{
+			if (notifyProp == notifySource.Properties[0])
+			{
+				output.AppendLine(
+$@"				private global::Microsoft.UI.Xaml.DependencyObject {cacheVar};");
+			}
 			output.AppendLine(
-$@"				private global::Microsoft.UI.Xaml.DependencyObject {cacheVar};
-				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
+$@"				private long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name};");
 		}
 
 		protected override void GenerateDependencyPropertySetPropertyHandler(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)

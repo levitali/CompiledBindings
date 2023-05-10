@@ -105,6 +105,7 @@ namespace WPFTest.Views
 				_targetRoot.textBox4.IsEnabled = (((global::WPFTest.ViewModels.EntityViewModel)dataRoot.listView.SelectedItem)) is var v4 && v4 != null ? v4.DecimalProp == 1 : true;
 #line default
 				Update1_SelectedItem(dataRoot.listView);
+				Update1_ActualWidth(dataRoot.listView);
 				Update2_Count(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.listView);
 				_bindingsTrackings.SetPropertyChangedEventHandler2(value1);
@@ -132,6 +133,13 @@ namespace WPFTest.Views
 #line default
 				Update0_Title(value2);
 				_bindingsTrackings.SetPropertyChangedEventHandler0(value2);
+			}
+
+			private void Update1_ActualWidth(global::System.Windows.Controls.ListView value)
+			{
+#line (91, 20) - (91, 74) 91 "Page1.xml"
+				_targetRoot.textBlock14.Text = value.ActualWidth.ToString();
+#line default
 			}
 
 			private void Update2_Count(global::System.Collections.IList value)
@@ -168,6 +176,7 @@ namespace WPFTest.Views
 				public void SetPropertyChangedEventHandler1(global::System.Windows.Controls.ListView value)
 				{
 					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, global::System.Windows.Controls.ListView.SelectedItemProperty, typeof(global::System.Windows.Controls.ListView), OnPropertyChanged1_SelectedItem);
+					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, global::System.Windows.Controls.ListView.ActualWidthProperty, typeof(global::System.Windows.Controls.ListView), OnPropertyChanged1_ActualWidth);
 				}
 
 				public void SetPropertyChangedEventHandler2(global::System.Collections.IList value)
@@ -200,6 +209,18 @@ namespace WPFTest.Views
 
 					var typedSender = (global::System.Windows.Controls.ListView)sender;
 					bindings.Update1_SelectedItem(typedSender);
+				}
+
+				private void OnPropertyChanged1_ActualWidth(object sender, global::System.EventArgs e)
+				{
+					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::System.Windows.Controls.ListView)sender;
+					bindings.Update1_ActualWidth(typedSender);
 				}
 
 				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)

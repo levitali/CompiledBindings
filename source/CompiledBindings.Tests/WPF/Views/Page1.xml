@@ -88,6 +88,7 @@
         <TextBlock
             Foreground="{x:Bind BooleanProp? $colorBrush1 : $colorBrush2}"
             Text="{x:Bind ModifyViewModel.ModifyTaskProp, FallbackValue='Loading...'}" />
+        <TextBlock Text="{x:Bind listView.ActualWidth, DataType={x:Null}}" />
     </StackPanel>
 
 </Page>
