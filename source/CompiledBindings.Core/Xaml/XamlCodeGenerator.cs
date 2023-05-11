@@ -54,7 +54,7 @@ public class XamlCodeGenerator
 		}
 		else if (property.Object.Name == null)
 		{
-			setExpr = "this";
+			setExpr = targetRootVariable ?? "this";
 		}
 
 		string value;

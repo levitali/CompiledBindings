@@ -822,12 +822,12 @@ public class ExpressionParser
 		var savedExpectedType = _expectedType;
 		_expectedType = expression.Type;
 
-		var result = Parse1();
+		var result = parse1();
 
 		_expectedType = savedExpectedType;
 		return result;
 
-		Expression Parse1()
+		Expression parse1()
 		{
 			NextToken();
 
@@ -836,7 +836,7 @@ public class ExpressionParser
 
 			while (true)
 			{
-				var expr = Parse2();
+				var expr = parse2();
 
 				result = result == null ? expr : new BinaryExpression(result, expr, logicalOperand!);
 
@@ -855,11 +855,11 @@ public class ExpressionParser
 			return result;
 		}
 
-		Expression Parse2()
+		Expression parse2()
 		{
 			if (_token.id == TokenId.OpenParen)
 			{
-				var expr = Parse1();
+				var expr = parse1();
 				ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
 				NextToken();
 				return new ParenExpression(expr);
@@ -868,7 +868,7 @@ public class ExpressionParser
 			if (_token.id == TokenId.Exclamation || TokenIdentifierIs("not"))
 			{
 				NextToken();
-				var expr = Parse2();
+				var expr = parse2();
 
 				if (expr is BinaryExpression be && be.Operand == "==")
 				{

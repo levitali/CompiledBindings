@@ -256,7 +256,7 @@ $@"					_targetRoot = null;
 $@"
 			public void Update()
 			{{");
-		GenerateUpdateMethodBody(bindingsData.UpdateMethod);
+		generateUpdateMethodBody(bindingsData.UpdateMethod);
 		output.AppendLine(
 $@"			}}");
 
@@ -266,7 +266,7 @@ $@"			}}");
 
 		foreach (var notifySource in bindingsData.NotifySources.Where(s => s.UpdateMethod != null))
 		{
-			GenerateUpdateMethod(notifySource.UpdateMethod!, $"Update{notifySource.Index}");
+			generateUpdateMethod(notifySource.UpdateMethod!, $"Update{notifySource.Index}");
 		}
 
 		#endregion
@@ -277,7 +277,7 @@ $@"			}}");
 		{
 			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateMethod != null))
 			{
-				GenerateUpdateMethod(prop.UpdateMethod!, $"Update{notifySource.Index}_{prop.PropertyCodeName}");
+				generateUpdateMethod(prop.UpdateMethod!, $"Update{notifySource.Index}_{prop.PropertyCodeName}");
 			}
 		}
 
@@ -319,7 +319,7 @@ $@"				switch (p1.PropertyName)
 $@"					case ""{group.Key}"":");
 					foreach (var bind in group)
 					{
-						GenerateSetSource(bind, "\t\t");
+						generateSetSource(bind, "\t\t");
 					}
 					output.AppendLine(
 $@"						break;");
@@ -331,7 +331,7 @@ $@"				}}");
 			{
 				foreach (var bind in ev.Bindings)
 				{
-					GenerateSetSource(bind, null);
+					generateSetSource(bind, null);
 				}
 			}
 
@@ -552,18 +552,18 @@ $@"		}}");
 
 		#region Local Functions
 
-		void GenerateUpdateMethod(UpdateMethodData updateMethod, string name)
+		void generateUpdateMethod(UpdateMethodData updateMethod, string name)
 		{
 			output.AppendLine();
 			output.AppendLine(
 $@"			private void {name}({string.Join(", ", updateMethod.Parameters.Select(p => $"global::{p.Type.Reference.GetCSharpFullName()} {p.Name}"))})
 			{{");
-			GenerateUpdateMethodBody(updateMethod);
+			generateUpdateMethodBody(updateMethod);
 			output.AppendLine(
 $@"			}}");
 		}
 
-		void GenerateUpdateMethodBody(UpdateMethodData updateMethod)
+		void generateUpdateMethodBody(UpdateMethodData updateMethod)
 		{
 			if (updateMethod!.Expressions.SetExpressions.Select(d => d.Expression)
 				.Concat(updateMethod!.Expressions.LocalVariables.Select(v => v.Expression))
@@ -598,7 +598,7 @@ $@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.Sou
 			}
 		}
 
-		void GenerateSetSource(Bind bind, string? a)
+		void generateSetSource(Bind bind, string? a)
 		{
 			var expr = bind.BindBackExpression ?? bind.Expression!;
 			var me = expr as MemberExpression;

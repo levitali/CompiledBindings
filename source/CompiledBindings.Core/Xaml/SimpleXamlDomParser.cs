@@ -39,7 +39,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 		var includeNamespaces = new HashSet<string>();
 		var dataTemplates = new List<GeneratedClass>();
 
-		var generationRoot = ProcessRoot(xdoc.Root, null, TargetType);
+		var generationRoot = processRoot(xdoc.Root, null, TargetType);
 
 		return errors ? null : new SimpleXamlDom
 		{
@@ -49,7 +49,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 			DataTemplates = dataTemplates,
 		};
 
-		GeneratedClass ProcessRoot(XElement xroot, TypeInfo? dataType, TypeInfo? targetType)
+		GeneratedClass processRoot(XElement xroot, TypeInfo? dataType, TypeInfo? targetType)
 		{
 			var rootBindingScope = new BindingScope { DataType = dataType };
 			var bindingScopes = new List<BindingScope> { rootBindingScope };
@@ -61,7 +61,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				DataType = dataType;
 			}
 
-			var obj = ProcessElement(xroot, rootBindingScope, null, true, null);
+			var obj = processElement(xroot, rootBindingScope, null, true, null);
 			if (obj != null)
 			{
 				obj.IsRoot = true;
@@ -92,14 +92,14 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				XamlObjects = xamlObjects,
 			};
 
-			XamlObject? ProcessElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType, bool isSupportedParent, string? parentDescription)
+			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType, bool isSupportedParent, string? parentDescription)
 			{
 				var savedCurrentBindingScope = currentBindingScope;
 				var savedDataType = DataType;
 
 				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
 
-				var attrs = xelement.Attributes().Where(a => IsMemExtensionWrapper(a) != null).ToList();
+				var attrs = xelement.Attributes().Where(a => isMemExtensionWrapper(a) != null).ToList();
 				if (attrs.Count > 0)
 				{
 					if (isDataTemplateElement)
@@ -115,7 +115,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				var dataTypeAttr = xelement.Attribute(xDataType) ?? xelement.Attribute(mxDataType) ?? xelement.Attribute(DataTypeAttr);
 				if (dataTypeAttr != null &&
 					!xelement.DescendantsAndSelf().SelectMany(e => e.Attributes()).Any(a =>
-						IsMemExtensionWrapper(a) == ExtenstionType.Bind))
+						isMemExtensionWrapper(a) == ExtenstionType.Bind))
 				{
 					dataTypeAttr = null;
 				}
@@ -270,13 +270,13 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
 					{
 						int index = dataTemplates.Count;
-						var dataTemplate = ProcessRoot(child, elementType, null);
+						var dataTemplate = processRoot(child, elementType, null);
 						dataTemplates.Insert(index, dataTemplate);
 					}
 					else
 					{
 						var (isSupported, controlName) = IsElementSupported(child.Name);
-						ProcessElement(child, currentBindingScope, elementType, isSupported && isSupportedParent, controlName ?? parentDescription);
+						processElement(child, currentBindingScope, elementType, isSupported && isSupportedParent, controlName ?? parentDescription);
 					}
 				}
 
@@ -287,7 +287,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 			}
 		}
 
-		ExtenstionType? IsMemExtensionWrapper(XAttribute attribute)
+		ExtenstionType? isMemExtensionWrapper(XAttribute attribute)
 		{
 			try
 			{

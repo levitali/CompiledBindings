@@ -339,13 +339,13 @@ public static class BindingParser
 		var notifySources = GetNotifySources(binds, iNotifyPropertyChangedType, dependencyObjectType);
 
 		// Set dependencies between notify sources
-		foreach (var notifySource in notifySources.OrderByDescending(d => GetSourceExpr(d.Expression).Key))
+		foreach (var notifySource in notifySources.OrderByDescending(d => getSourceExpr(d.Expression).Key))
 		{
 			foreach (var prop in notifySource.Properties)
 			{
 				var expr = prop.Expression.Key;
 				foreach (var notifPropData2 in notifySources
-					.Where(g => g != notifySource && GetSourceExpr(g.Expression).EnumerateTree().Any(e => e.Key.Equals(expr))))
+					.Where(g => g != notifySource && getSourceExpr(g.Expression).EnumerateTree().Any(e => e.Key.Equals(expr))))
 				{
 					// Skip the notification source, if it's already added to some child
 					if (!prop.DependentNotifySources
@@ -427,15 +427,15 @@ public static class BindingParser
 			UpdateMethod = updateMethod,
 		};
 
-		static Expression GetSourceExpr(Expression expr)
+		static Expression getSourceExpr(Expression expr)
 		{
 			if (expr is ParenExpression pe)
 			{
-				return GetSourceExpr(pe.Expression);
+				return getSourceExpr(pe.Expression);
 			}
 			else if (expr is CastExpression ce)
 			{
-				return GetSourceExpr(ce.Expression);
+				return getSourceExpr(ce.Expression);
 			}
 			return expr;
 		}
@@ -448,7 +448,10 @@ public static class BindingParser
 			.Where(b => b.Property.TargetEvent == null &&
 						b.SourceExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
-			.SelectMany(b => b.SourceExpression!.EnumerateTree().OfType<INotifiableExpression>().Select(e => (bind: b, expr: e, notif: CheckPropertyNotifiable(e))))
+			.SelectMany(b => b.SourceExpression!
+			                 .EnumerateTree()
+							 .OfType<INotifiableExpression>()
+							 .Select(e => (bind: b, expr: e, notif: checkPropertyNotifiable(e))))
 			.Where(e => e.notif != false)
 			.GroupBy(e => e.expr.Expression.Key)
 			.OrderBy(g => g.Key)
@@ -494,7 +497,7 @@ public static class BindingParser
 
 		return notifySources;
 
-		bool? CheckPropertyNotifiable(INotifiableExpression expr)
+		bool? checkPropertyNotifiable(INotifiableExpression expr)
 		{
 			// Not notifiable if explicitley turn of with / operator
 			if (expr.IsNotifiable == false)
@@ -665,19 +668,19 @@ public static class BindingParser
 		// - SetPropertyHandler methods
 
 		var props1 = bindings
-			.Select(b => new PropertySetExpression(b.Property, Replace(b.SourceExpression!)))
+			.Select(b => new PropertySetExpression(b.Property, replace(b.SourceExpression!)))
 			.ToList();
 
 		var props2 = updateNotifySources
-			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, Replace(g.Expression)))
+			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
 			.ToList();
 
 		var props3 = updateMethodNotifyProps
-			.Select(p => new PropertySetExpression(p.Bindings[0].Property, Replace(p.Parent.Expression)))
+			.Select(p => new PropertySetExpression(p.Bindings[0].Property, replace(p.Parent.Expression)))
 			.ToList();
 
 		var props4 = notifySources1
-			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, Replace(g.Expression)))
+			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
 			.ToList();
 
 		var props5 = props1.Concat(props2).Concat(props3).Concat(props4).ToList();
@@ -714,7 +717,7 @@ public static class BindingParser
 			SetEventHandlers = notifySources1,
 		};
 
-		Expression Replace(Expression expr)
+		Expression replace(Expression expr)
 		{
 			if (replacedExpression != null)
 			{

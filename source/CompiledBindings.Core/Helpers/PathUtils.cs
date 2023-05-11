@@ -4,8 +4,8 @@ public static class PathUtils
 {
 	public static string GetRelativePath(string relativeTo, string path)
 	{
-		var relativeToParts = GetPathParts(relativeTo);
-		var pathParts = GetPathParts(path);
+		var relativeToParts = getPathParts(relativeTo);
+		var pathParts = getPathParts(path);
 
 		int i, c;
 		for (i = 0, c = Math.Min(relativeToParts.Count, pathParts.Count); i < c; i++)
@@ -28,7 +28,7 @@ public static class PathUtils
 
 		return result;
 
-		static List<string> GetPathParts(string path)
+		static List<string> getPathParts(string path)
 		{
 			if (path.EndsWith("/") || path.EndsWith("\\"))
 			{
