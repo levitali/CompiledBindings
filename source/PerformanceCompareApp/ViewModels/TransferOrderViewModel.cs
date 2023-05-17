@@ -4,17 +4,17 @@ namespace PreformanceCompareApp.ViewModels
 {
 	public class TransferOrder
 	{
-		public string From { get; init; }
+		public string From { get; init; } = null!;
 
-		public string To { get; init; }
+		public string To { get; init; } = null!;
 
 		public decimal Quantity { get; init; }
 
-		public string QuantityUnit { get; init; }
+		public string QuantityUnit { get; init; } = null!;
 
-		public string Material { get; init; }
+		public string Material { get; init; } = null!;
 
-		public string MaterialText { get; init; }
+		public string MaterialText { get; init; } = null!;
 	}
 
 	public class TransferOrderViewModel

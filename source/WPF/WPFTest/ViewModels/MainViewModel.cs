@@ -59,7 +59,7 @@ public class Page1ModifyViewModel
 
 public class EntityViewModel : INotifyPropertyChanged
 {
-	public string Title { get; set; }
+	public string Title { get; set; } = null!;
 
 	public IList<EntityViewModel>? Children { get; set; }
 

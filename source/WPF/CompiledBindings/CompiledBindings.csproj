@@ -8,6 +8,7 @@
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
 		<OutputPath>..\..\..\bin\wpf\lib</OutputPath>
 		<NoWarn>1701;1702;netsdk1138</NoWarn>
 	</PropertyGroup>

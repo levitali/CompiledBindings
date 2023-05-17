@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Markup;
 
 namespace CompiledBindings.Markup;

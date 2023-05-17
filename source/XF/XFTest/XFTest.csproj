@@ -1,60 +1,61 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-        <LangVersion>latest</LangVersion>
-        <Nullable>enable</Nullable>
-			  <DefineConstants>$(DefineConstants);XAMARIN_ESSENTIALS</DefineConstants>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<DefineConstants>$(DefineConstants);XAMARIN_ESSENTIALS</DefineConstants>
+	</PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <DebugType>portable</DebugType>
-        <DebugSymbols>true</DebugSymbols>
-    </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
-        <PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
+	</ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
+	</ItemGroup>
 
-    <UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
-    <UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
-    <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" />
+	<UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
+	<UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" />
 
-    <PropertyGroup>
-        <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
-    </PropertyGroup>
+	<PropertyGroup>
+		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
+	</PropertyGroup>
 
-    <Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">
-        <MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />
+	<Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">
+		<MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />
 		<Csc Condition=" '$(LocalAssemblyGenerated)' == 'false' " AdditionalLibPaths="$(AdditionalLibPaths)" AddModules="@(AddModules)" AdditionalFiles="@(AdditionalFiles)" AllowUnsafeBlocks="$(AllowUnsafeBlocks)" AnalyzerConfigFiles="@(EditorConfigFiles)" Analyzers="@(Analyzer)" ApplicationConfiguration="$(AppConfigForCompiler)" BaseAddress="$(BaseAddress)" CheckForOverflowUnderflow="$(CheckForOverflowUnderflow)" CodeAnalysisRuleSet="$(ResolvedCodeAnalysisRuleSet)" CodePage="$(CodePage)" DebugType="$(DebugType)" DefineConstants="$(DefineConstants)" DelaySign="$(DelaySign)" DisabledWarnings="$(NoWarn)" DocumentationFile="@(DocFileItem)" EmitDebugInformation="$(DebugSymbols)" EnvironmentVariables="$(CscEnvironment)" ErrorEndLocation="$(ErrorEndLocation)" ErrorLog="$(ErrorLog)" ErrorReport="$(ErrorReport)" FileAlignment="$(FileAlignment)" GenerateFullPaths="$(GenerateFullPaths)" HighEntropyVA="$(HighEntropyVA)" KeyContainer="$(KeyContainerName)" KeyFile="$(KeyOriginatorFile)" LangVersion="$(LangVersion)" LinkResources="@(LinkResource)" MainEntryPoint="$(StartupObject)" ModuleAssemblyName="$(ModuleAssemblyName)" NoConfig="true" NoLogo="$(NoLogo)" NoStandardLib="$(NoCompilerStandardLib)" NoWin32Manifest="$(NoWin32Manifest)" Nullable="$(Nullable)" Optimize="$(Optimize)" OutputAssembly="$(IntermediateOutputPath)intermediate\$(AssemblyName)$(TargetExt)" PdbFile="$(PdbFile)" Platform="$(PlatformTarget)" Prefer32Bit="$(Prefer32Bit)" PreferredUILang="$(PreferredUILang)" References="@(ReferencePath)" ReportAnalyzer="$(ReportAnalyzer)" Resources="@(_CoreCompileResourceInputs);@(CompiledLicenseFile)" ResponseFiles="$(CompilerResponseFile)" Sources="@(Compile)" SubsystemVersion="$(SubsystemVersion)" TargetType="$(OutputType)" ToolExe="$(CscToolExe)" ToolPath="$(CscToolPath)" TreatWarningsAsErrors="$(TreatWarningsAsErrors)" UseHostCompilerIfAvailable="$(UseHostCompilerIfAvailable)" UseSharedCompilation="$(UseSharedCompilation)" Utf8Output="$(Utf8Output)" VsSessionGuid="$(VsSessionGuid)" WarningLevel="$(WarningLevel)" WarningsAsErrors="$(WarningsAsErrors)" WarningsNotAsErrors="$(WarningsNotAsErrors)" Win32Icon="$(ApplicationIcon)" Win32Manifest="$(Win32Manifest)" Win32Resource="$(Win32Resource)" />
 		<PropertyGroup>
-            <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
-        </PropertyGroup>
+			<LocalAssemblyGenerated>true</LocalAssemblyGenerated>
+		</PropertyGroup>
 
-        <CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
-            <Output TaskParameter="Include" ItemName="XamlFiles" />
-        </CreateItem>
-        <XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" AttachDebugger="true">
-            <Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
-        </XFGenerateCodeTask>
-        <ItemGroup>
-            <Compile Include="@(GeneratedCodeFiles)" />
-            <FileWrites Include="@(GeneratedCodeFiles)" />
-        </ItemGroup>
+		<CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
+			<Output TaskParameter="Include" ItemName="XamlFiles" />
+		</CreateItem>
+		<XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" AttachDebugger="true">
+			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
+		</XFGenerateCodeTask>
+		<ItemGroup>
+			<Compile Include="@(GeneratedCodeFiles)" />
+			<FileWrites Include="@(GeneratedCodeFiles)" />
+		</ItemGroup>
 
-    </Target>
+	</Target>
 
-    <Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-        <XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="false" />
-    </Target>
+	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
+		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="false" />
+	</Target>
 
-    <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-        <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="false" />
-    </Target>
+	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="false" />
+	</Target>
 </Project>

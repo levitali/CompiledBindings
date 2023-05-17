@@ -1,17 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+	<PropertyGroup>
 		<Company>levitali</Company>
 		<Version>1.0.16</Version>
-    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-    <RootNamespace>CompiledBindings</RootNamespace>
-    <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
-    <UseWinUI>true</UseWinUI>
+		<TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<RootNamespace>CompiledBindings</RootNamespace>
+		<RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<UseWinUI>true</UseWinUI>
 		<OutputPath>..\..\..\bin\winui\lib</OutputPath>
 		<NoWarn>$(NoWarn);8632</NoWarn>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230331000" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230331000" />
+	</ItemGroup>
 </Project>
