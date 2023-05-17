@@ -362,7 +362,7 @@ public class PropertyInfo : IMemberInfo
 	public TypeInfo PropertyType { get; }
 
 	public bool IsReadOnly => _isReadOnly ??= 
-		Definition.GetMethod.Body?.Instructions is var instructions &&
+		Definition.GetMethod?.Body?.Instructions is var instructions &&
 			instructions != null &&
 			instructions.Count == 3 &&
 			instructions[0].OpCode == OpCodes.Ldarg_0 &&
