@@ -2,7 +2,7 @@
 
 public class ExpressionParser
 {
-	private static readonly Dictionary<string, Expression> _keywords = new()
+	private static readonly Dictionary<string, Expression> _constractKeywords = new()
 	{
 		{ "true", new ConstantExpression(true) },
 		{ "false", new ConstantExpression(false) },
@@ -26,7 +26,7 @@ public class ExpressionParser
 		_text = expression;
 		_textLen = _text.Length;
 		_expectedType = resultType;
-		SetTextPos(0);
+		_ch = _text[0];
 		NextToken();
 	}
 
@@ -784,7 +784,7 @@ public class ExpressionParser
 			return _root;
 		}
 
-		if (_keywords.TryGetValue(_token.text, out var value))
+		if (_constractKeywords.TryGetValue(_token.text, out var value))
 		{
 			NextToken();
 			return value;
@@ -1176,12 +1176,6 @@ Label_CreateMemberExpression:
 		{
 			throw new ParseException($"No applicable indexer exists in type '{expr.Type.Reference.FullName}'", errorPos);
 		}
-	}
-
-	private void SetTextPos(int pos)
-	{
-		_textPos = pos;
-		_ch = _textPos < _textLen ? _text[_textPos] : '\0';
 	}
 
 	private void NextChar()
