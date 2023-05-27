@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
@@ -6,7 +6,7 @@
 		<AssemblyName>CompiledBindings.WinUI</AssemblyName>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.16</Version>
+		<Version>1.0.17</Version>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
