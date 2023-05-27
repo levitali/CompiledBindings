@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
-		<CompiledBindingsTargetDependsOn>$(MembrainTargetDependsOn);XamlG</CompiledBindingsTargetDependsOn>
+		<CompiledBindingsTargetDependsOn>$(CompiledBindingsTargetDependsOn);XamlG</CompiledBindingsTargetDependsOn>
 	</PropertyGroup>
 
   <Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">

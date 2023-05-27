@@ -1,13 +1,13 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<UsingTask TaskName="WinUIGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)..\build\CompiledBindings.WinUI.dll" />
+	<UsingTask TaskName="UWPGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)..\build\CompiledBindings.UWP.dll" />
 	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)..\build\CompiledBindings.Core.dll" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
 	</PropertyGroup>
 
-	<Target Name="WinUIGenerateCode"
+	<Target Name="UWPGenerateCode"
 					AfterTargets="MarkupCompilePass1"
 					DependsOnTargets="$(CompiledBindingsTargetDependsOn)"
           Condition="'$(DesignTimeBuild)' != 'True' and ('@(Page)' != '' or '@(ApplicationDefinition)' != '')">
@@ -79,7 +79,7 @@
 			<LocalAssemblyGenerated>true</LocalAssemblyGenerated>
 		</PropertyGroup>
 
-		<WinUIGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)"
+		<UWPGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)"
                            Pages="@(Page)"
                            ReferenceAssemblies="@(ReferencePath)"
                            LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
@@ -92,7 +92,7 @@
 			<Output ItemName="NewPages" TaskParameter="NewPages" />
 
 			<Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
-		</WinUIGenerateCodeTask>
+		</UWPGenerateCodeTask>
 		<ItemGroup>
 			<ApplicationDefinition Remove="@(ApplicationDefinition)" />
 			<ApplicationDefinition Include="@(NewApplicationDefinition)" />

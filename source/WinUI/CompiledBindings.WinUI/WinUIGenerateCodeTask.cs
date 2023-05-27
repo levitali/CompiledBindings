@@ -1,17 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace CompiledBindings;
 
-public class WinUIGenerateCodeTask : Task
+public class WinUIGenerateCodeTask : Task, ICancelableTask
 {
+	private CancellationTokenSource? _cancellationTokenSource;
+	private readonly PlatformConstants _platformConstants;
+
+	public WinUIGenerateCodeTask() : this(new PlatformConstants())
+	{
+	}
+
+	public WinUIGenerateCodeTask(PlatformConstants platformConstants)
+	{
+		_platformConstants = platformConstants;
+	}
+
 	[Required]
 	public required string LangVersion { get; init; }
 
@@ -46,6 +58,7 @@ public class WinUIGenerateCodeTask : Task
 
 	public bool AttachDebugger { get; set; }
 
+
 	public override bool Execute()
 	{
 		try
@@ -55,14 +68,16 @@ public class WinUIGenerateCodeTask : Task
 				System.Diagnostics.Debugger.Launch();
 			}
 
+			_cancellationTokenSource = new CancellationTokenSource();
+
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
-			TypeInfo.NotNullableProperties["Microsoft.UI.Xaml.Controls.TextBox"] = new HashSet<string> { "Text" };
-			TypeInfo.NotNullableProperties["Microsoft.UI.Xaml.Controls.TextBlock"] = new HashSet<string> { "Text" };
-			TypeInfo.NotNullableProperties["Microsoft.UI.Xaml.Documents.Run"] = new HashSet<string> { "Text" };
+			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBox"] = new HashSet<string> { "Text" };
+			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBlock"] = new HashSet<string> { "Text" };
+			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Documents.Run"] = new HashSet<string> { "Text" };
 
-			var xamlDomParser = new WinUIXamlDomParser();
+			var xamlDomParser = new WinUIXamlDomParser(_platformConstants);
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
@@ -92,6 +107,11 @@ public class WinUIGenerateCodeTask : Task
 
 			foreach (var (xaml, file, xdoc) in xamlFiles)
 			{
+				if (_cancellationTokenSource.IsCancellationRequested)
+				{
+					return true;
+				}
+
 				var newXaml = xaml;
 
 				try
@@ -125,7 +145,7 @@ public class WinUIGenerateCodeTask : Task
 						}
 						else if (parseResult.GenerateCode)
 						{
-							var codeGenerator = new WinUICodeGenerator(LangVersion, MSBuildVersion);
+							var codeGenerator = new WinUICodeGenerator(_platformConstants, LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
@@ -141,7 +161,7 @@ public class WinUIGenerateCodeTask : Task
 
 							if (generateDataTemplates)
 							{
-								var compiledBindingsNs = "using:CompiledBindings.WinUI";
+								var compiledBindingsNs = $"using:CompiledBindings.{_platformConstants.FrameworkId}";
 								var localNs = "using:" + parseResult.TargetType!.Reference.Namespace;
 
 								EnsureNamespaceDeclared(compiledBindingsNs);
@@ -242,25 +262,35 @@ public class WinUIGenerateCodeTask : Task
 		}
 	}
 
+	void ICancelableTask.Cancel()
+	{
+		_cancellationTokenSource?.Cancel();
+	}
+
 	public class WinUIXamlDomParser : SimpleXamlDomParser
 	{
 		private static readonly XNamespace _xmlns = "http://schemas.microsoft.com/winfx/2006/xaml/presentation";
 
-		private static readonly string[] _defaultClrNamespaces = new string[]
-		{
-			"Microsoft.UI.Xaml.Documents",
-			"Microsoft.UI.Xaml.Controls",
-			"Microsoft.UI.Xaml.Shapes",
-		};
+		private readonly string[] _defaultClrNamespaces;
 
-		public WinUIXamlDomParser() : base(
+		private PlatformConstants _platformConstants;
+
+
+		public WinUIXamlDomParser(PlatformConstants platformConstants) : base(
 			_xmlns,
 			"http://schemas.microsoft.com/winfx/2006/xaml",
-			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.Data.IValueConverter"),
-			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.Data.BindingBase"),
-			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.DependencyObject"),
-			TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.DependencyProperty"))
+			TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.UI.Xaml.Data.IValueConverter"),
+			TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.UI.Xaml.Data.BindingBase"),
+			TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject"),
+			TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty"))
 		{
+			_platformConstants = platformConstants;
+			_defaultClrNamespaces = new string[]
+			{
+				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Documents",
+				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Controls",
+				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Shapes",
+			};
 		}
 
 		protected override IEnumerable<string> GetClrNsFromXmlNs(string xmlNs)
@@ -272,36 +302,42 @@ public class WinUIGenerateCodeTask : Task
 
 		public override bool IsDataContextSupported(TypeInfo type)
 		{
-			return TypeInfo.GetTypeThrow("Microsoft.UI.Xaml.FrameworkElement").IsAssignableFrom(type);
+			return TypeInfo.GetTypeThrow($"{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement").IsAssignableFrom(type);
 		}
 	}
 
 	public class WinUICodeGenerator : SimpleXamlDomCodeGenerator
 	{
-		public WinUICodeGenerator(string langVersion, string msbuildVersion)
-			: base(new WinUIBindingsCodeGenerator(langVersion, msbuildVersion),
+		PlatformConstants _platformConstants;
+
+		public WinUICodeGenerator(PlatformConstants platformConstants, string langVersion, string msbuildVersion)
+			: base(new WinUIBindingsCodeGenerator(platformConstants, langVersion, msbuildVersion),
 				   "Data",
-				   "Microsoft.UI.Xaml.DataContextChangedEventArgs",
-				   "Microsoft.UI.Xaml.FrameworkElement",
+				   $"{platformConstants.BaseClrNamespace}.UI.Xaml.DataContextChangedEventArgs",
+				   $"{platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement",
 				   "(global::{0}){1}.FindName(\"{2}\")",
 				   true,
 				   false,
-				   "WinUI",
+				   platformConstants.FrameworkId,
 				   langVersion,
 				   msbuildVersion)
 		{
+			_platformConstants = platformConstants;
 		}
 
 		protected override string CreateGetResourceCode(string resourceName)
 		{
-			return $@"this.Resources.TryGetValue(""{resourceName}"", out var r) ? r : global::Microsoft.UI.Xaml.Application.Current.Resources[""{resourceName}""]";
+			return $@"this.Resources.TryGetValue(""{resourceName}"", out var r) ? r : global::{_platformConstants.BaseClrNamespace}.UI.Xaml.Application.Current.Resources[""{resourceName}""]";
 		}
 	}
 
 	public class WinUIBindingsCodeGenerator : BindingsCodeGenerator
 	{
-		public WinUIBindingsCodeGenerator(string langVersion, string msbuildVersion) : base("WinUI", langVersion, msbuildVersion)
+		PlatformConstants _platformConstants;
+
+		public WinUIBindingsCodeGenerator(PlatformConstants platformConstants, string langVersion, string msbuildVersion) : base(platformConstants.FrameworkId, langVersion, msbuildVersion)
 		{
+			_platformConstants = platformConstants;
 		}
 
 		protected override void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)
@@ -331,13 +367,13 @@ $@"					{targetExpr}.UnregisterPropertyChangedCallback({first.Property.Object.Ty
 		protected override void GenerateDependencyPropertyChangedCallback(StringBuilder output, string methodName, string? a)
 		{
 			output.AppendLine(
-$@"{a}			private void {methodName}(global::Microsoft.UI.Xaml.DependencyObject sender, Microsoft.UI.Xaml.DependencyProperty dp)");
+$@"{a}			private void {methodName}(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject sender, {_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty dp)");
 		}
 
 		protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
 		{
 			output.AppendLine(
-$@"				global::Microsoft.UI.Xaml.DependencyObject _propertyChangeSource{notifySource.Index};");
+$@"				global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject _propertyChangeSource{notifySource.Index};");
 			foreach (var notifyProp in notifySource.Properties)
 			{
 				output.AppendLine(
@@ -357,4 +393,11 @@ $@"						_sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition
 $@"						{cacheVar}.UnregisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name});");
 		}
 	}
+}
+
+public class PlatformConstants
+{
+	public virtual string FrameworkId => "WinUI";
+	public virtual string BaseClrNamespace => "Microsoft";
+
 }

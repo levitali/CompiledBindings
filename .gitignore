@@ -39,4 +39,7 @@
 /source/XF/XFTest/.vs
 /source/PerformanceCompareApp/obj
 /source/PerformanceCompareApp/bin
-
+/source/UWP/CompiledBindings/obj
+/source/UWP/CompiledBindings.UWP/obj
+/source/UWP/UWPTest/bin
+/source/UWP/UWPTest/obj

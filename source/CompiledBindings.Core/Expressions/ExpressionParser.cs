@@ -349,16 +349,16 @@ public class ExpressionParser
 			{
 				prmType = parameters[prmIndex].ParameterType;
 			}
-			else if (!CheckLastParameterArray())
+			else if (!checkLastParameterArray())
 			{
 				return false;
 			}
-			if (!CheckAssignable() && (!CheckLastParameterArray() || !CheckAssignable()))
+			if (!checkAssignable() && (!checkLastParameterArray() || !checkAssignable()))
 			{
 				return false;
 			}
 
-			bool CheckLastParameterArray()
+			bool checkLastParameterArray()
 			{
 				var lastPrm = parameters[parameters.Count - 1];
 				if (!lastPrm.Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
@@ -369,7 +369,7 @@ public class ExpressionParser
 				return true;
 			}
 
-			bool CheckAssignable()
+			bool checkAssignable()
 			{
 				return IsExpressionAssignable(args[i], prmType);
 			}

@@ -1,0 +1,74 @@
+﻿<Page
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:c="using:CompiledBindings.Markup"
+    xmlns:converters="using:UWPTest.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mx="http://compiledbindings.com/x"
+    xmlns:viewModels="using:UWPTest.ViewModels"
+    mc:Ignorable="d m mx"
+    x:Class="UWPTest.MainPage"
+    mx:DataType="viewModels:MainViewModel"
+    x:DefaultBindMode="OneWay"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+
+        <converters:TestConverter x:Key="testConverter" />
+
+        <DataTemplate
+            x:Key="testTemplate"
+            x:DataType="viewModels:EntityViewModel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{c:Bind Path=IntProp}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="8,0,0,0"
+                    Text="{c:Bind Path=StringProp, Converter={StaticResource testConverter}}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate
+            x:Key="testTemplate2"
+            x:DataType="viewModels:EntityViewModel">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock m:Text="{x:Bind IntProp}" />
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
+    <Grid>
+        <StackPanel Margin="24">
+            <TextBlock Text="{c:Bind Path=Prop1}" />
+            <TextBlock m:Text="{x:Bind Prop1}" />
+            <TextBlock m:Text="{c:Set 3}" />
+
+            <TextBlock m:Text="{c:Bind Class1.Prop2}" />
+            <TextBlock m:Text="{c:Bind Class1.Prop2}" />
+
+            <TextBox Text="{c:Bind Path=StringInput, Mode=TwoWay, Converter={StaticResource testConverter}}" />
+            <TextBox Text="{c:Bind Path=InputProp1, Mode=TwoWay}" />
+
+            <ListView
+                x:Name="listView"
+                ItemTemplate="{StaticResource testTemplate}"
+                ItemsSource="{c:Bind Path=ListProp}" />
+
+            <Button
+                mx:DataType="{x:Null}"
+                Content="Click"
+                m:IsEnabled="{c:Bind listView.SelectedItem ne null}" />
+        </StackPanel>
+    </Grid>
+</Page>

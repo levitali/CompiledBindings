@@ -132,7 +132,6 @@ public class XFProcessResourceXamlTask : Task
 									}
 									else
 									{
-										usedNames.Add(xname.Value);
 										elementNames.Add(xelement, xname.Value);
 									}
 								}

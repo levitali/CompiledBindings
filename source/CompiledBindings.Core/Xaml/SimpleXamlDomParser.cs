@@ -403,8 +403,6 @@ public class GeneratedClass
 
 public class SimpleXamlDom : XamlDomBase
 {
-	public required TypeInfo TargetType { get; init; }
-
 	public required GeneratedClass GeneratedClass { get; init; }
 
 	public required List<GeneratedClass> DataTemplates { get; init; }
