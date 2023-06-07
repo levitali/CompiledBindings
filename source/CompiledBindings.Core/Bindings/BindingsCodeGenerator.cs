@@ -748,11 +748,11 @@ $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 	{
 	}
 
-	protected virtual void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
+	protected virtual void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
 	{
 	}
 
-	protected virtual void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
+	protected virtual void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
 	{
 	}
 

@@ -4,9 +4,9 @@ public class XamlParser
 {
 	private static readonly Regex _typeNameRegex = new(@"^(?:(\w+):)?(\w+)$");
 
-	public static XamlNode ParseAttribute(string file, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode ParseAttribute(string lineFile, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		var node = new XamlNode(file, attribute, attribute.Name);
+		var node = new XamlNode(lineFile, attribute, attribute.Name);
 
 		string str = attribute.Value.Trim();
 		bool squareBracket = false;
@@ -17,7 +17,7 @@ public class XamlParser
 			{
 				throw new ParseException($"Expected {expecedBracket}", attribute.Name.LocalName.Length + str.Length + 2);
 			}
-			node.Children.Add(ParseMarkupExtension(file, attribute, knownNamespaces));
+			node.Children.Add(ParseMarkupExtension(lineFile, attribute, knownNamespaces));
 		}
 		else
 		{
@@ -27,12 +27,12 @@ public class XamlParser
 		return node;
 	}
 
-	private static XamlNode ParseMarkupExtension(string file, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
+	private static XamlNode ParseMarkupExtension(string lineFile, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		return ParseMarkupExtension(file, attribute.Value.Trim(), attribute, knownNamespaces);
+		return ParseMarkupExtension(lineFile, attribute.Value.Trim(), attribute, knownNamespaces);
 	}
 
-	public static XamlNode ParseMarkupExtension(string file, string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode ParseMarkupExtension(string lineFile, string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
 		string? value;
 		int valueOffset;
@@ -55,7 +55,7 @@ public class XamlParser
 		string name = str.Substring(1, pos - 1);
 		var nodeName = GetTypeName(name, attribute.Parent, knownNamespaces);
 
-		return new XamlNode(file, attribute, nodeName) { Value = value, ValueOffset = valueOffset };
+		return new XamlNode(lineFile, attribute, nodeName) { Value = value, ValueOffset = valueOffset };
 	}
 
 	public static XName GetTypeName(string value, XObject xobject, IList<XamlNamespace>? knownNamespaces)
@@ -109,14 +109,14 @@ public class XamlNode
 	private List<XamlNode>? _properties;
 	private List<XamlNode>? _children;
 
-	public XamlNode(string file, XObject element, XName name)
+	public XamlNode(string lineFile, XObject element, XName name)
 	{
-		File = file;
+		LineFile = lineFile;
 		Element = element;
 		Name = name;
 	}
 
-	public string File { get; }
+	public string LineFile { get; }
 	public XObject Element { get; }
 	public XName Name { get; }
 

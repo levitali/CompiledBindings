@@ -328,9 +328,9 @@ $@"{LineDirective(variable.XamlNode, ref isLineDirective)}
 			}
 			//TODO Somehow it doesn't work as expected.
 			//Experimentally was found out, that it works if the "column offset" is the line number
-			return $"#line ({line}, {column1}) - ({line}, {column2}) {line} \"{xamlNode.File}\"";
+			return $"#line ({line}, {column1}) - ({line}, {column2}) {line} \"{xamlNode.LineFile}\"";
 		}
-		return $"#line {line} \"{xamlNode.File}\"";
+		return $"#line {line} \"{xamlNode.LineFile}\"";
 	}
 	
 	public string ResetLineDirective(ref bool isLineDirective)

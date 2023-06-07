@@ -397,7 +397,7 @@ public static class BindingParser
 			.Where(b => b.UpdateSourceEvents.Count > 0)
 			.SelectMany(b => b.UpdateSourceEvents.Select(e => (bind: b, evnt: e)))
 			.GroupBy(e => (e.bind.Property.Object, e.evnt.Signature))
-			.Select(g => new TwoWayBindingsData
+			.Select(g => new TwoWayBindingData
 			{
 				TargetChangedEvents = g.Select(_ => _.evnt).Distinct().ToList(),
 				Bindings = g.Select(_ => _.bind).Distinct().ToList(),
@@ -406,7 +406,7 @@ public static class BindingParser
 		var twoWayEventHandlers2 = twoWayBinds
 			.Where(b => b.UpdateSourceEvents.Count == 0 && b.DependencyProperty != null)
 			.GroupBy(b => (b.Property.Object, b.DependencyProperty))
-			.Select(g => new TwoWayBindingsData
+			.Select(g => new TwoWayBindingData
 			{
 				Bindings = g.ToList(),
 			});
@@ -741,7 +741,7 @@ public class BindingsData
 	public required TypeInfo DataType { get; init; }
 	public required IList<Bind> Bindings { get; init; }
 	public required List<NotifySource> NotifySources { get; init; }
-	public required List<TwoWayBindingsData> TwoWayEvents { get; init; }
+	public required List<TwoWayBindingData> TwoWayEvents { get; init; }
 	public required UpdateMethodData UpdateMethod { get; init; }
 };
 
@@ -788,7 +788,7 @@ public class UpdateMethodData
 	public required List<NotifySource> SetEventHandlers { get; init; }
 }
 
-public class TwoWayBindingsData
+public class TwoWayBindingData
 {
 	public required List<Bind> Bindings { get; init; }
 	public List<EventInfo>? TargetChangedEvents { get; init; }

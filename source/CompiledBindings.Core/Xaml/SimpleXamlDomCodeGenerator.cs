@@ -165,32 +165,17 @@ $@"		}}");
 			var viewName = bs.ViewName ?? "this";
 			var prm = bs.DataType!.Reference.FullName == targetType?.Reference.FullName ? null : $", dataRoot";
 
+			output.AppendLine();
 			output.AppendLine(
-$@"
-		private void {bs.ViewName ?? "this"}_{_bindingContextStart}ContextChanged(object sender, global::{_bindingConextArgs} e)
+$@"		private void {viewName}_{_bindingContextStart}ContextChanged(object sender, global::{_bindingConextArgs} e)
 		{{
-			Bindings_{viewName}.Cleanup();");
-
-			string? a = null;
-			if (bs.DataType != null)
-			{
-				output.AppendLine(
-$@"			if (((global::{_bindableObject})sender).{_bindingContextStart}Context is global::{bs.DataType.Reference.GetCSharpFullName()} dataRoot)
-			{{");
-				a = "\t";
-			}
-			output.AppendLine(
-$@"{a}			Bindings_{viewName}.Initialize(this{prm});");
-			if (bs.DataType != null)
-			{
-				output.AppendLine(
-$@"			}}");
-			}
-
-			output.AppendLine(
-$@"		}}");
+			Bindings_{viewName}.Cleanup();
+			if (((global::{_bindableObject})sender).{_bindingContextStart}Context is global::{bs.DataType.Reference.GetCSharpFullName()} dataRoot)
+			{{
+				Bindings_{viewName}.Initialize(this{prm});
+			}}
+		}}");
 		}
-
 	}
 
 	private void GenerateInitializeMethodBody(StringBuilder output, GeneratedClass parseResult, string rootElement, bool isDataTemplate, TypeInfo? targetType)
@@ -219,7 +204,7 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCShar
 		bool isLineDirective = false;
 		_bindingsCodeGenerator.GenerateSetExpressions(output, parseResult.UpdateMethod, ref isLineDirective);
 		ResetLineDirective(output, ref isLineDirective);
-		
+
 		output.AppendLine();
 
 		for (int i = 0; i < parseResult.BindingScopes.Count; i++)

@@ -350,14 +350,14 @@ $@"			private long _targetCallbackToken{ev.Index};");
 			}
 		}
 
-		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
+		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
 		{
 			var first = ev.Bindings[0];
 			output.AppendLine(
 $@"				_targetCallbackToken{ev.Index} = {targetExpr}.RegisterPropertyChangedCallback({first.Property.Object.Type.Reference.FullName}.{first.Property.MemberName}Property, OnTargetChanged{ev.Index});");
 		}
 
-		protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingsData ev, string targetExpr)
+		protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
 		{
 			var first = ev.Bindings[0];
 			output.AppendLine(

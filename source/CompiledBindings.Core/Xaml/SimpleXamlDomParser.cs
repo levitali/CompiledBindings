@@ -201,22 +201,24 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 							{
 								if (bind.DataTypeSet)
 								{
-									BindingScope? scope;
+									BindingScope? scope = null;
 									if (bind.DataType == null)
 									{
 										scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
-										if (scope != null)
-										{
-											scope.Bindings.Add(bind);
-											continue;
-										}
 									}
-									scope = new BindingScope
+									if (scope != null)
 									{
-										DataType = bind.DataType,
-										ViewName = viewName
-									};
-									bindingScopes.Add(scope);
+										scope.Bindings.Add(bind);
+									}
+									else
+									{
+										scope = new BindingScope
+										{
+											DataType = bind.DataType,
+											ViewName = viewName
+										};
+										bindingScopes.Add(scope);
+									}
 								}
 								else
 								{
@@ -319,7 +321,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 		{
 			return isSet ? ExtenstionType.Set : ExtenstionType.Bind;
 		}
-		var xamlNode = XamlParser.ParseAttribute(CurrentFile, a, KnownNamespaces);
+		var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, a, KnownNamespaces);
 		if (xamlNode.Children.Count == 1)
 		{
 			var c = xamlNode.Children[0].Name;
@@ -385,7 +387,7 @@ public class GeneratedClass
 			.Select(p => p.Value.BindValue)
 			.Where(b => b != null)
 			.SelectMany(b => b!.Resources)
-			.Select(b => (name: b.name, type: b.type))
+			.Select(b => (b.name, b.type))
 			.Union(XamlObjects
 				.SelectMany(o => o.Properties)
 				.Select(p => p.Value.StaticValue ?? p.Value.BindValue?.SourceExpression)
