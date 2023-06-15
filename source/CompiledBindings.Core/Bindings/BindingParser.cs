@@ -439,7 +439,6 @@ public static class BindingParser
 			}
 			return expr;
 		}
-
 	}
 
 	public static List<NotifySource> GetNotifySources(IList<Bind> binds, TypeInfo iNotifyPropertyChangedType, TypeInfo? dependencyObjectType)

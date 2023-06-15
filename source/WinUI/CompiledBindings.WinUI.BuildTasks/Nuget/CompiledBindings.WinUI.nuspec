@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+	<metadata>
+		<id>CompiledBindings.WinUI</id>
+		<version>1.0.17</version>
+		<title>x:Bind Compiled Bindings for WinUI</title>
+		<authors>levitali</authors>
+		<owners>levitali</owners>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>x:Bind Compiled Bindings for WinUI</description>
+		<license type="expression">MIT</license>
+		<licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+		<projectUrl>https://github.com/levitali/CompiledBindings</projectUrl>
+		<dependencies>
+			<group targetFramework="net6.0-windows10.0.19041">
+				<dependency id="Microsoft.WindowsAppSDK" version="1.0.0" />
+			</group>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\Targets\CompiledBindings.WinUI.targets" target="build" />
+		<file src="..\..\..\..\bin\winui\build\netstandard2.0\CompiledBindings.WinUI.BuildTasks.dll" target="build" />
+		<file src="..\..\..\..\bin\winui\lib\net6.0-windows10.0.19041.0\CompiledBindings.WinUI.dll" target="lib\net6.0-windows10.0.19041.0\" />
+	</files>
+</package>

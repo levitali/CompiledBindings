@@ -1,27 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0</TargetFrameworks>
-		<RootNamespace>CompiledBindings</RootNamespace>
-		<AssemblyName>CompiledBindings.WPF</AssemblyName>
+		<TargetFrameworks>netcoreapp3.0;net40</TargetFrameworks>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
 		<Version>1.0.17</Version>
+		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
-		<OutputPath>..\..\..\bin\wpf\build</OutputPath>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<OutputPath>..\..\..\bin\wpf\lib</OutputPath>
+		<NoWarn>1701;1702;netsdk1138</NoWarn>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Build.Framework" Version="17.6.3" IncludeAssets="compile" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" IncludeAssets="compile" />
-		<PackageReference Include="Mono.Cecil" Version="0.11.4" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\CompiledBindings.Core\CompiledBindings.Core.csproj" />
-	</ItemGroup>
 
 </Project>

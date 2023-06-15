@@ -157,18 +157,12 @@
       <Version>6.2.14</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj">
-      <Project>{9b7b6cd8-468f-47ea-81e1-55487125f581}</Project>
-      <Name>CompiledBindings</Name>
-    </ProjectReference>
-  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <UsingTask TaskName="UWPGenerateCodeTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.dll" />
-  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.Core.dll" />
+  <UsingTask TaskName="UWPGenerateCodeTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.merged.dll" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.merged.dll" TaskFactory="TaskHostFactory" />
   <PropertyGroup>
     <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
   </PropertyGroup>

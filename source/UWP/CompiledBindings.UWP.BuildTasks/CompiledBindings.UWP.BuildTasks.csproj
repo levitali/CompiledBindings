@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<RootNamespace>CompiledBindings</RootNamespace>
+		<AssemblyName>CompiledBindings.UWP.BuildTasks.Temp</AssemblyName>
+		<Product>CompiledBindings</Product>
+		<Company>levitali</Company>
+		<Version>1.0.17</Version>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+		<OutputPath>..\..\..\bin\uwp\build</OutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<NoWarn>$(NoWarn);8632</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ilmerge" Version="3.0.41" />
+		<PackageReference Include="Microsoft.Build.Framework" Version="17.6.3" IncludeAssets="compile" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" IncludeAssets="compile" GeneratePathProperty="true" />
+		<PackageReference Include="Mono.Cecil" Version="0.11.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\CompiledBindings.Core\CompiledBindings.Core.csproj" />
+		<ProjectReference Include="..\..\WinUI\CompiledBindings.WinUI.BuildTasks\CompiledBindings.WinUI.BuildTasks.csproj" />
+	</ItemGroup>
+
+	<Target Name="ILMerge" AfterTargets="Build" Condition="$(ILMergeConsolePath) != '' and $(PkgMicrosoft_Build_Utilities_Core) != ''">
+		<Exec Command="$(ILMergeConsolePath) /lib:&quot;$(PkgMicrosoft_Build_Utilities_Core)\ref\netstandard2.0&quot; /out:..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.BuildTasks.dll ..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.BuildTasks.Temp.dll ..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.WinUI.BuildTasks.Temp.dll ..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.Core.dll ..\..\..\bin\uwp\build\netstandard2.0\Mono.Cecil.dll ..\..\..\bin\uwp\build\netstandard2.0\Mono.Cecil.Mdb.dll ..\..\..\bin\uwp\build\netstandard2.0\Mono.Cecil.Pdb.dll ..\..\..\bin\uwp\build\netstandard2.0\Mono.Cecil.Rocks.dll" />
+	</Target>
+
+</Project>

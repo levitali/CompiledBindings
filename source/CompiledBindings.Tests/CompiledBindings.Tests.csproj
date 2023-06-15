@@ -92,8 +92,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WPF\CompiledBindings.WPF\CompiledBindings.WPF.csproj" />
-		<ProjectReference Include="..\XF\CompiledBindings.XF\CompiledBindings.XF.csproj" />
+		<ProjectReference Include="..\WPF\CompiledBindings.WPF.BuildTasks\CompiledBindings.WPF.BuildTasks.csproj" />
+		<ProjectReference Include="..\XF\CompiledBindings.XF.BuildTasks\CompiledBindings.XF.BuildTasks.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -15,17 +15,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.7.6" />
 		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2578" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\CompiledBindings\CompiledBindings.csproj" />
+	  <ProjectReference Include="..\CompiledBindings.XF\CompiledBindings.XF.csproj" />
 	</ItemGroup>
 
-	<UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
-	<UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.dll" />
-	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" />
+	<UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.dll" TaskFactory="TaskHostFactory" />
+	<UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.dll" TaskFactory="TaskHostFactory" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll" TaskFactory="TaskHostFactory" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
