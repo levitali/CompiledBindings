@@ -1,8 +1,8 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-    <UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.MAUI.merged.dll" />
-    <UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.MAUI.merged.dll" />
-    <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.MAUI.merged.dll" />
+    <UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.MAUI.BuildTasks.merged.dll" />
+    <UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.MAUI.BuildTasks.merged.dll" />
+    <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.MAUI.BuildTasks.merged.dll" />
 
     <PropertyGroup>
         <LocalAssemblyGenerated>false</LocalAssemblyGenerated>

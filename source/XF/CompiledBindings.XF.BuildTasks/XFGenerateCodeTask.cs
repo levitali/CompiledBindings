@@ -148,9 +148,9 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 			}
 
 			if (generatedCodeFiles.Count > 0 &&
-				!TypeInfoUtils.TryGetType("CompiledBindings.XF.CompiledBindingsHelper", out _))
+				!TypeInfoUtils.TryGetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper", out _))
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.XF.cs");
+				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
 				File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
 				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 			}
@@ -178,7 +178,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	private string GenerateCompiledBindingsHelper()
 	{
 		return
-$@"namespace CompiledBindings.XF
+$@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 {{
 	public class CompiledBindingsHelper
 	{{
