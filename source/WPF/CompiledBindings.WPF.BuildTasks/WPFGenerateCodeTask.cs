@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml.Linq;
-using CompiledBindings.Bindings;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Mono.Cecil.Rocks;
 
 namespace CompiledBindings;
 
@@ -63,6 +63,11 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 			_cancellationTokenSource = new CancellationTokenSource();
 
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
+
+			var helperTypeAssembly = TypeInfoUtils.Assemblies
+				.FirstOrDefault(a => a.MainModule.GetAllTypes().Any(t => t.FullName == "CompiledBindings.WPF.CompiledBindingsHelper"))?
+				.Name.Name;
+
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
 			var xamlDomParser = new WpfXamlDomParser();
@@ -147,13 +152,17 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 							if (generateDataTemplates)
 							{
-								var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF;assembly=CompiledBindings.WPF";
+								var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF";
+								if (helperTypeAssembly != null)
+								{
+									compiledBindingsNs += ";assembly=" + helperTypeAssembly;
+								}
 								var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
 
-								EnsureNamespaceDeclared(compiledBindingsNs);
-								EnsureNamespaceDeclared(localNs);
+								ensureNamespaceDeclared(compiledBindingsNs);
+								ensureNamespaceDeclared(localNs);
 
-								void EnsureNamespaceDeclared(string searchedClrNs)
+								void ensureNamespaceDeclared(string searchedClrNs)
 								{
 									var attr = xdoc.Root.Attributes().FirstOrDefault(a => a.Name.Namespace == XNamespace.Xmlns && a.Value == searchedClrNs);
 									if (attr == null)
@@ -182,7 +191,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 										var rootElement = dataTemplate.RootElement.Elements().First();
 
 										rootElement.Add(
-											new XElement(mbui + "BindingsHelper.Bindings",
+											new XElement(mbui + "CompiledBindingsHelper.Bindings",
 												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
 													dataTemplate.EnumerateResources().Select(r => new XAttribute(r.name, $"{{StaticResource {r.name}}}")))));
 									}
@@ -213,9 +222,9 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 					throw new GeneratorException(ex.Message, file, 0, 0, 0);
 				}
 
-				SetNewXaml();
+				setNewXaml();
 
-				void SetNewXaml()
+				void setNewXaml()
 				{
 					if (xaml == ApplicationDefinition)
 					{
@@ -226,6 +235,13 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						newPages.Add(newXaml);
 					}
 				}
+			}
+
+			if (generatedCodeFiles.Count > 0 && helperTypeAssembly == null)
+			{
+				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.WPF.cs");
+				File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 			}
 
 			GeneratedCodeFiles = generatedCodeFiles.ToArray();
@@ -256,6 +272,91 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 		{
 			TypeInfoUtils.Cleanup();
 		}
+	}
+
+	private static string GenerateCompiledBindingsHelper()
+	{
+		return
+@"namespace CompiledBindings.WPF
+{
+	public class CompiledBindingsHelper
+	{
+		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged? cache, global::System.ComponentModel.INotifyPropertyChanged? source, global::System.ComponentModel.PropertyChangedEventHandler handler)
+		{
+			if (cache != null && !object.ReferenceEquals(cache, source))
+			{
+				cache.PropertyChanged -= handler;
+				cache = null;
+			}
+			if (cache == null && source != null)
+			{
+				cache = source;
+				cache.PropertyChanged += handler;
+			}
+		}
+
+		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged? cache, object? source, global::System.ComponentModel.PropertyChangedEventHandler handler)
+		{
+			if (cache != null && !object.ReferenceEquals(cache, source))
+			{
+				cache.PropertyChanged -= handler;
+				cache = null;
+			}
+			if (cache == null && source is global::System.ComponentModel.INotifyPropertyChanged npc)
+			{
+				cache = npc;
+				cache.PropertyChanged += handler;
+			}
+		}
+
+		public static T? TryGetBindings<T>(ref global::System.WeakReference? bindingsWeakReference, global::System.Action cleanup)
+			where T : class
+		{
+			T? bindings = null;
+			if (bindingsWeakReference != null)
+			{
+				bindings = (T?)bindingsWeakReference.Target;
+				if (bindings == null)
+				{
+					bindingsWeakReference = null;
+					cleanup();
+				}
+			}
+			return bindings;
+		}
+
+		public static readonly global::System.Windows.DependencyProperty BindingsProperty =
+			global::System.Windows.DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(CompiledBindingsHelper), new global::System.Windows.PropertyMetadata(BindingsChanged));
+
+		public static IGeneratedDataTemplate GetBindings(global::System.Windows.DependencyObject @object)
+		{
+			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
+		}
+
+		public static void SetBindings(global::System.Windows.DependencyObject @object, IGeneratedDataTemplate value)
+		{
+			@object.SetValue(BindingsProperty, value);
+		}
+
+		static void BindingsChanged(global::System.Windows.DependencyObject d, global::System.Windows.DependencyPropertyChangedEventArgs e)
+		{
+			if (e.OldValue != null)
+			{
+				((IGeneratedDataTemplate)e.OldValue).Cleanup((global::System.Windows.FrameworkElement)d);
+			}
+			if (e.NewValue != null)
+			{
+				((IGeneratedDataTemplate)e.NewValue).Initialize((global::System.Windows.FrameworkElement)d);
+			}
+		}
+	}
+
+	public interface IGeneratedDataTemplate
+	{
+		void Initialize(global::System.Windows.FrameworkElement rootElement);
+		void Cleanup(global::System.Windows.FrameworkElement rootElement);
+	}
+}";
 	}
 
 	void ICancelableTask.Cancel()

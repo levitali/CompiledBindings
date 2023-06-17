@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "CHF40sJPZ3ogGZFzk6QQ34GM3IB6Wl5QF16IIwcvXEZxiv3K3Jwsb+LynwMBYek5vpUZoAdf040FrpzdCM0KXQ==",
+  "dgSpecHash": "KVrDw8lIWDvcL4sOqn6lcj0ICVIt6wPyf249MjQ4D/PDizkiwZ6JeUjLPVnL2ao0RkdcHL6LzOSJ2w/uHTjeFw==",
   "success": true,
   "projectFilePath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings.WPF.BuildTasks\\CompiledBindings.WPF.BuildTasks.csproj",
   "expectedPackageFiles": [

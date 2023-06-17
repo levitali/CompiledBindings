@@ -4,8 +4,8 @@ W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Re
 W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.AssemblyInfo.cs
 W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.csproj.CoreCompileInputs.cache
 W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.csproj.CopyComplete
-W:\MyProjects\CompiledBindings\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.Temp.deps.json
-W:\MyProjects\CompiledBindings\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.Temp.dll
-W:\MyProjects\CompiledBindings\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.Temp.pdb
-W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.Temp.dll
-W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.Temp.pdb
+W:\MyProjects\CompiledBindings\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.deps.json
+W:\MyProjects\CompiledBindings\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.dll
+W:\MyProjects\CompiledBindings\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.pdb
+W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.dll
+W:\MyProjects\CompiledBindings\source\WPF\CompiledBindings.WPF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.WPF.BuildTasks.pdb

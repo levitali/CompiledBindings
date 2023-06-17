@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "C0u/aTypz1mKvDlH8iUntXmYNzrUPHcu17OsGlYJPXJw05QtisE4KHjETAzy8hE6lanVdyUbmMLT0rlH9/bH6g==",
+  "dgSpecHash": "pCum7mYFXl+Rodbr1R6oEKtEkZBxvFyBHr2aShOETRFfDyjaZMzPULHEM8wTfXTnjBX27S38gAPdIFW6TrYOMw==",
   "success": true,
   "projectFilePath": "W:\\MyProjects\\CompiledBindings\\source\\UWP\\CompiledBindings.UWP.BuildTasks\\CompiledBindings.UWP.BuildTasks.csproj",
   "expectedPackageFiles": [

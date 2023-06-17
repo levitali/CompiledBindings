@@ -27,7 +27,7 @@
     <Resource Include="Images\download.png" />
   </ItemGroup>
 
-  <UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="..\..\..\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.Temp.dll" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="..\..\..\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.dll" TaskFactory="TaskHostFactory" />
   <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\wpf\build\netstandard2.0\CompiledBindings.Core.dll" TaskFactory="TaskHostFactory" />
   
   <PropertyGroup>

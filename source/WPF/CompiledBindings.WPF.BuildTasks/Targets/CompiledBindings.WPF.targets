@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WPF.BuildTasks.dll" />
-	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WPF.BuildTasks.dll" />
+	<UsingTask TaskName="WPFGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WPF.BuildTasks.merged.dll" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WPF.BuildTasks.merged.dll" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>

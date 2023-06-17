@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>CompiledBindings.UWP</id>
-		<version>1.0.17</version>
+		<version>1.0.17.1</version>
 		<title>x:Bind Compiled Bindings for UWP</title>
 		<authors>levitali</authors>
 		<owners>levitali</owners>
@@ -14,7 +14,7 @@
 	</metadata>
 	<files>
 		<file src="..\Targets\CompiledBindings.UWP.targets" target="build" />
-		<file src="..\..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.BuildTasks.dll" target="build" />
+		<file src="..\..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.BuildTasks.merged.dll" target="build" />
 		<file src="..\..\..\..\bin\uwp\lib\uap10.0\CompiledBindings.UWP.dll" target="lib\uap10.0\" />
 	</files>
 </package>

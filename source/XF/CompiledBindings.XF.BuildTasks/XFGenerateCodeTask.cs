@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Xml.Linq;
-using CompiledBindings.Bindings;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -148,6 +147,14 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 				}
 			}
 
+			if (generatedCodeFiles.Count > 0 &&
+				!TypeInfoUtils.TryGetType("CompiledBindings.XF.CompiledBindingsHelper", out _))
+			{
+				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.XF.cs");
+				File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
+			}
+
 			GeneratedCodeFiles = generatedCodeFiles.ToArray();
 
 			return result;
@@ -166,6 +173,91 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 		{
 			TypeInfoUtils.Cleanup();
 		}
+	}
+
+	private string GenerateCompiledBindingsHelper()
+	{
+		return
+$@"namespace CompiledBindings.XF
+{{
+	public class CompiledBindingsHelper
+	{{
+		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged? cache, global::System.ComponentModel.INotifyPropertyChanged? source, global::System.ComponentModel.PropertyChangedEventHandler handler)
+		{{
+			if (cache != null && !object.ReferenceEquals(cache, source))
+			{{
+				cache.PropertyChanged -= handler;
+				cache = null;
+			}}
+			if (cache == null && source != null)
+			{{
+				cache = source;
+				cache.PropertyChanged += handler;
+			}}
+		}}
+
+		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged? cache, object? source, global::System.ComponentModel.PropertyChangedEventHandler handler)
+		{{
+			if (cache != null && !object.ReferenceEquals(cache, source))
+			{{
+				cache.PropertyChanged -= handler;
+				cache = null;
+			}}
+			if (cache == null && source is System.ComponentModel.INotifyPropertyChanged npc)
+			{{
+				cache = npc;
+				cache.PropertyChanged += handler;
+			}}
+		}}
+
+		public static T? TryGetBindings<T>(ref global::System.WeakReference? bindingsWeakReference, global::System.Action cleanup)
+			where T : class
+		{{
+			T? bindings = null;
+			if (bindingsWeakReference != null)
+			{{
+				bindings = (T?)bindingsWeakReference.Target;
+				if (bindings == null)
+				{{
+					bindingsWeakReference = null;
+					cleanup();
+				}}
+			}}
+			return bindings;
+		}}
+
+		public static readonly global::{_platformConstants.BaseClrNamespace}.BindableProperty BindingsProperty =
+			global::{_platformConstants.BaseClrNamespace}.BindableProperty.CreateAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(CompiledBindingsHelper), null, propertyChanged: BindingsChanged);
+
+		public static IGeneratedDataTemplate GetBindings(global::{_platformConstants.BaseClrNamespace}.BindableObject @object)
+		{{
+			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
+		}}
+
+		public static void SetBindings(global::{_platformConstants.BaseClrNamespace}.BindableObject @object, IGeneratedDataTemplate value)
+		{{
+			@object.SetValue(BindingsProperty, value);
+		}}
+
+		static void BindingsChanged(global::{_platformConstants.BaseClrNamespace}.BindableObject bindable, object oldValue, object newValue)
+		{{
+			if (oldValue != null)
+			{{
+				((IGeneratedDataTemplate)oldValue).Cleanup((global::{_platformConstants.BaseClrNamespace}.Element)bindable);
+			}}
+			if (newValue != null)
+			{{
+				((IGeneratedDataTemplate)newValue).Initialize((global::{_platformConstants.BaseClrNamespace}.Element)bindable);
+			}}
+		}}
+	}}
+
+	public interface IGeneratedDataTemplate
+	{{
+		void Initialize(global::{_platformConstants.BaseClrNamespace}.Element rootElement);
+		void Cleanup(global::{_platformConstants.BaseClrNamespace}.Element rootElement);
+	}}
+}}";
 	}
 
 	void ICancelableTask.Cancel()

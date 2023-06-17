@@ -316,7 +316,7 @@
           }
         }
       },
-      "CompiledBindings.Core/1.0.17": {
+      "CompiledBindings.Core/1.0.17.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -331,21 +331,21 @@
           "bin/placeholder/CompiledBindings.Core.dll": {}
         }
       },
-      "CompiledBindings.WinUI.BuildTasks.Temp/1.0.17": {
+      "CompiledBindings.WinUI.BuildTasks/1.0.17.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "CompiledBindings.Core": "1.0.17",
+          "CompiledBindings.Core": "1.0.17.1",
           "Microsoft.Build.Framework": "17.6.3",
           "Microsoft.Build.Utilities.Core": "17.6.3",
           "Mono.Cecil": "0.11.5",
           "ilmerge": "3.0.41"
         },
         "compile": {
-          "bin/placeholder/CompiledBindings.WinUI.BuildTasks.Temp.dll": {}
+          "bin/placeholder/CompiledBindings.WinUI.BuildTasks.dll": {}
         },
         "runtime": {
-          "bin/placeholder/CompiledBindings.WinUI.BuildTasks.Temp.dll": {}
+          "bin/placeholder/CompiledBindings.WinUI.BuildTasks.dll": {}
         }
       }
     }
@@ -1025,12 +1025,12 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "CompiledBindings.Core/1.0.17": {
+    "CompiledBindings.Core/1.0.17.1": {
       "type": "project",
       "path": "../../CompiledBindings.Core/CompiledBindings.Core.csproj",
       "msbuildProject": "../../CompiledBindings.Core/CompiledBindings.Core.csproj"
     },
-    "CompiledBindings.WinUI.BuildTasks.Temp/1.0.17": {
+    "CompiledBindings.WinUI.BuildTasks/1.0.17.1": {
       "type": "project",
       "path": "../../WinUI/CompiledBindings.WinUI.BuildTasks/CompiledBindings.WinUI.BuildTasks.csproj",
       "msbuildProject": "../../WinUI/CompiledBindings.WinUI.BuildTasks/CompiledBindings.WinUI.BuildTasks.csproj"
@@ -1038,8 +1038,8 @@
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
-      "CompiledBindings.Core >= 1.0.17",
-      "CompiledBindings.WinUI.BuildTasks.Temp >= 1.0.17",
+      "CompiledBindings.Core >= 1.0.17.1",
+      "CompiledBindings.WinUI.BuildTasks >= 1.0.17.1",
       "Microsoft.Build.Framework >= 17.6.3",
       "Microsoft.Build.Utilities.Core >= 17.6.3",
       "Mono.Cecil >= 0.11.5",
@@ -1052,10 +1052,10 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.0.17",
+    "version": "1.0.17.1",
     "restore": {
       "projectUniqueName": "W:\\MyProjects\\CompiledBindings\\source\\UWP\\CompiledBindings.UWP.BuildTasks\\CompiledBindings.UWP.BuildTasks.csproj",
-      "projectName": "CompiledBindings.UWP.BuildTasks.Temp",
+      "projectName": "CompiledBindings.UWP.BuildTasks",
       "projectPath": "W:\\MyProjects\\CompiledBindings\\source\\UWP\\CompiledBindings.UWP.BuildTasks\\CompiledBindings.UWP.BuildTasks.csproj",
       "packagesPath": "C:\\Users\\Vitali.MEMBRAIN\\.nuget\\packages\\",
       "outputPath": "W:\\MyProjects\\CompiledBindings\\source\\UWP\\CompiledBindings.UWP.BuildTasks\\obj\\",

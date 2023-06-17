@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>CompiledBindings.MAUI</id>
-		<version>1.0.17</version>
+		<version>1.0.17.1</version>
 		<title>x:Bind Compiled Bindings for MAUI</title>
 		<authors>levitali</authors>
 		<owners>levitali</owners>
@@ -14,7 +14,7 @@
 	</metadata>
 	<files>
 		<file src="..\Targets\CompiledBindings.MAUI.targets" target="build" />
-		<file src="..\..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.dll" target="build" />
+		<file src="..\..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.merged.dll" target="build" />
 		<file src="..\..\..\..\bin\maui\lib\net6.0\CompiledBindings.MAUI.dll" target="lib\net6.0\" />
 	</files>
 </package>

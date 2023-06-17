@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
+using Mono.Cecil.Rocks;
 
 namespace CompiledBindings;
 
@@ -53,6 +54,11 @@ public class XFProcessResourceXamlTask : Task
 			};
 
 			using var assembly = AssemblyDefinition.ReadAssembly(Assembly, prm);
+
+			var helperTypeAssembly = TypeInfoUtils.Assemblies
+				.FirstOrDefault(a => a.MainModule.GetAllTypes().Any(t => t.FullName == "CompiledBindings.XF.CompiledBindingsHelper"))?
+				.Name.Name;
+
 			var assemblyTypes = assembly.MainModule.Types.ToDictionary(_ => _.FullName);
 
 			var xamlDomParser = new XFXamlDomParser(_platformConstants);
@@ -125,7 +131,7 @@ public class XFProcessResourceXamlTask : Task
 											 (xelement.Attribute(xamlDomParser.xDataType) != null && xelement.Name != xamlDomParser.DataTemplate)))
 										{
 											var name = XamlDomParser.GenerateName(xelement, usedNames);
-											InsertAtEnd(xelement, $" x:Name=\"{name}\"");
+											insertAtEnd(xelement, $" x:Name=\"{name}\"");
 
 											elementNames.Add(xelement, name);
 										}
@@ -138,7 +144,7 @@ public class XFProcessResourceXamlTask : Task
 
 								// Process DataTemplates
 								var dataTemplates = xdoc.Descendants(xamlDomParser.DataTemplate).ToList();
-								for (int i = 0; i < dataTemplates.Count; i++) 
+								for (int i = 0; i < dataTemplates.Count; i++)
 								{
 									var dataTemplate = dataTemplates[i];
 									var memExtensions = dataTemplate.Descendants()
@@ -161,14 +167,14 @@ public class XFProcessResourceXamlTask : Task
 
 									if (compiledBindingsNsPrefix == null)
 									{
-										compiledBindingsNsPrefix = SearchNsPrefix($"CompiledBindings.{_platformConstants.FrameworkId}", $"CompiledBindings.{_platformConstants.FrameworkId}");
-										classNsPrefix = SearchNsPrefix(classNs, null);
+										compiledBindingsNsPrefix = searchNsPrefix($"CompiledBindings.{_platformConstants.FrameworkId}", helperTypeAssembly!);
+										classNsPrefix = searchNsPrefix(classNs, null);
 									}
 
 									var propInitializers = string.Join(", ", dataTemplateType.Properties.Select(p => $"{p.Name}={{StaticResource {p.Name}}}"));
 
 									var rootElement = dataTemplate.Elements().First();
-									InsertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:BindingsHelper.Bindings=\"{{{classNsPrefix}:{dateTemplateClassName} {propInitializers}}}\"");
+									insertAtEnd(rootElement, $" {compiledBindingsNsPrefix}:CompiledBindingsHelper.Bindings=\"{{{classNsPrefix}:{dateTemplateClassName} {propInitializers}}}\"");
 								}
 
 								// Replace/Remove attributes with CompiledBindings namespace
@@ -179,7 +185,7 @@ public class XFProcessResourceXamlTask : Task
 									var textLine = lines[lineNumber];
 									var start = lineInfo.LinePosition - 1 - textLine.RemovedTextOffset;
 									Debug.Assert(start >= 0);
-									var end = GetAttributeEnd(attr, textLine);
+									var end = getAttributeEnd(attr, textLine);
 									Debug.Assert(end > start);
 									var length = end - start;
 
@@ -200,7 +206,7 @@ public class XFProcessResourceXamlTask : Task
 
 											if (classNsPrefix == null)
 											{
-												classNsPrefix = SearchNsPrefix(classNs, null);
+												classNsPrefix = searchNsPrefix(classNs, null);
 											}
 
 											int nameEnd = textLine.Text.IndexOf('=', start);
@@ -229,7 +235,7 @@ public class XFProcessResourceXamlTask : Task
 
 							replaceResources.Add((resource, newResource));
 
-							string SearchNsPrefix(string clrNs, string? assembly)
+							string searchNsPrefix(string clrNs, string? assembly)
 							{
 								var searchedUsingNs = "using:" + clrNs;
 								var searchedClrNs = "clr-namespace:" + clrNs;
@@ -256,13 +262,13 @@ public class XFProcessResourceXamlTask : Task
 									{
 										ns += ";assembly=" + assembly;
 									}
-									InsertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"{ns}\"");
+									insertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"{ns}\"");
 								}
 
 								return prefix;
 							}
 
-							void InsertAtEnd(XElement xelement, string text)
+							void insertAtEnd(XElement xelement, string text)
 							{
 								var lineInfo = (IXmlLineInfo)xelement;
 
@@ -277,7 +283,7 @@ public class XFProcessResourceXamlTask : Task
 								{
 									var lineInfo2 = (IXmlLineInfo)attr;
 									lineNumber = lineInfo2.LineNumber;
-									startPos = GetAttributeEnd(attr, lines[lineNumber - 1]);
+									startPos = getAttributeEnd(attr, lines[lineNumber - 1]);
 								}
 
 								lineNumber--;
@@ -296,7 +302,7 @@ public class XFProcessResourceXamlTask : Task
 								textLine.Text = lineText.Insert(pos, text);
 							}
 
-							int GetAttributeEnd(XAttribute attr, TextLine textLine)
+							int getAttributeEnd(XAttribute attr, TextLine textLine)
 							{
 								var lineInfo = (IXmlLineInfo)attr;
 								var start = lineInfo.LinePosition - 1 - textLine.RemovedTextOffset;

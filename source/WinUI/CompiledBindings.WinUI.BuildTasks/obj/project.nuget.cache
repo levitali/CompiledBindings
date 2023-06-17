@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "zdTAMcqQyZtJ/HSkG12ylY5+Y17UimGmQo6/TO6ffJXRV1qqvfpL81nefIWrGEpDCgPwfrOUd3hs5NikALOFqA==",
+  "dgSpecHash": "2eOgWhCL/JsGCp6y5WBNW30XRZJAry5AOKzrBMQr0MeWmbhaJzhlcRpDxd79PiaDmV+cr38AhizLs2AiCpZorg==",
   "success": true,
   "projectFilePath": "W:\\MyProjects\\CompiledBindings\\source\\WinUI\\CompiledBindings.WinUI.BuildTasks\\CompiledBindings.WinUI.BuildTasks.csproj",
   "expectedPackageFiles": [

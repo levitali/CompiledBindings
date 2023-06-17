@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
 	<metadata>
 		<id>CompiledBindings.WinUI</id>
-		<version>1.0.17</version>
+		<version>1.0.17.1</version>
 		<title>x:Bind Compiled Bindings for WinUI</title>
 		<authors>levitali</authors>
 		<owners>levitali</owners>
@@ -19,7 +19,7 @@
 	</metadata>
 	<files>
 		<file src="..\Targets\CompiledBindings.WinUI.targets" target="build" />
-		<file src="..\..\..\..\bin\winui\build\netstandard2.0\CompiledBindings.WinUI.BuildTasks.dll" target="build" />
+		<file src="..\..\..\..\bin\winui\build\netstandard2.0\CompiledBindings.WinUI.BuildTasks.merged.dll" target="build" />
 		<file src="..\..\..\..\bin\winui\lib\net6.0-windows10.0.19041.0\CompiledBindings.WinUI.dll" target="lib\net6.0-windows10.0.19041.0\" />
 	</files>
 </package>

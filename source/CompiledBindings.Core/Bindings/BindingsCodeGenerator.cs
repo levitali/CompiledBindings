@@ -419,7 +419,7 @@ $@"				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{n
 				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
-$@"					global::CompiledBindings.{FrameworkId}.BindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, OnPropertyChanged{notifySource.Index});");
+$@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, OnPropertyChanged{notifySource.Index});");
 				}
 				else
 				{
@@ -461,7 +461,7 @@ $@"
 				private void OnPropertyChanged{notifySource.Index}(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{{");
 					output.AppendLine(
-$@"					var bindings = global::CompiledBindings.{FrameworkId}.BindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
+$@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;
@@ -516,7 +516,7 @@ $@"				}}");
 						output.AppendLine(
 $@"				{{");
 						output.AppendLine(
-$@"					var bindings = global::CompiledBindings.{FrameworkId}.BindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
+$@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;

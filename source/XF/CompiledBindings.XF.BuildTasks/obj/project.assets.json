@@ -316,7 +316,7 @@
           }
         }
       },
-      "CompiledBindings.Core/1.0.17": {
+      "CompiledBindings.Core/1.0.17.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1008,7 +1008,7 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "CompiledBindings.Core/1.0.17": {
+    "CompiledBindings.Core/1.0.17.1": {
       "type": "project",
       "path": "../../CompiledBindings.Core/CompiledBindings.Core.csproj",
       "msbuildProject": "../../CompiledBindings.Core/CompiledBindings.Core.csproj"
@@ -1016,7 +1016,7 @@
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
-      "CompiledBindings.Core >= 1.0.17",
+      "CompiledBindings.Core >= 1.0.17.1",
       "Microsoft.Build.Framework >= 17.6.3",
       "Microsoft.Build.Utilities.Core >= 17.6.3",
       "Mono.Cecil >= 0.11.5",
@@ -1029,10 +1029,10 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "1.0.17",
+    "version": "1.0.17.1",
     "restore": {
       "projectUniqueName": "W:\\MyProjects\\CompiledBindings\\source\\XF\\CompiledBindings.XF.BuildTasks\\CompiledBindings.XF.BuildTasks.csproj",
-      "projectName": "CompiledBindings.XF.BuildTasks.Temp",
+      "projectName": "CompiledBindings.XF.BuildTasks",
       "projectPath": "W:\\MyProjects\\CompiledBindings\\source\\XF\\CompiledBindings.XF.BuildTasks\\CompiledBindings.XF.BuildTasks.csproj",
       "packagesPath": "C:\\Users\\Vitali.MEMBRAIN\\.nuget\\packages\\",
       "outputPath": "W:\\MyProjects\\CompiledBindings\\source\\XF\\CompiledBindings.XF.BuildTasks\\obj\\",

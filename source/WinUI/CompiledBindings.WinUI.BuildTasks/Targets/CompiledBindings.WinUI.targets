@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-	<UsingTask TaskName="WinUIGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WinUI.BuildTasks.dll" />
-	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WinUI.BuildTasks.dll" />
+	<UsingTask TaskName="WinUIGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WinUI.BuildTasks.merged.dll" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.WinUI.BuildTasks.merged.dll" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>

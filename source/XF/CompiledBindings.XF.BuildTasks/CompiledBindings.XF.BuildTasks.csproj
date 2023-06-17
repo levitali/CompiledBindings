@@ -3,10 +3,9 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<RootNamespace>CompiledBindings</RootNamespace>
-		<AssemblyName>CompiledBindings.XF.BuildTasks.Temp</AssemblyName>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.17</Version>
+		<Version>1.0.17.1</Version>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
@@ -25,8 +24,8 @@
 		<ProjectReference Include="..\..\CompiledBindings.Core\CompiledBindings.Core.csproj" />
 	</ItemGroup>
 	
-	<Target Name="ILMerge" AfterTargets="Build" Condition="$(ILMergeConsolePath) != '' and $(PkgMicrosoft_Build_Utilities_Core) != ''">
-		<Exec Command="$(ILMergeConsolePath) /lib:&quot;$(PkgMicrosoft_Build_Utilities_Core)\ref\netstandard2.0&quot; /out:..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.dll ..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.dll ..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Mdb.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Pdb.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Rocks.dll" />
+	<Target Name="ILMerge" AfterTargets="Build" Condition="'$(Configuration)' == 'Release' and $(ILMergeConsolePath) != '' and $(PkgMicrosoft_Build_Utilities_Core) != ''">
+		<Exec Command="$(ILMergeConsolePath) /lib:&quot;$(PkgMicrosoft_Build_Utilities_Core)\ref\netstandard2.0&quot; /out:..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.merged.dll ..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.dll ..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.Core.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Mdb.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Pdb.dll ..\..\..\bin\xf\build\netstandard2.0\Mono.Cecil.Rocks.dll" />
 	</Target>
 
 </Project>

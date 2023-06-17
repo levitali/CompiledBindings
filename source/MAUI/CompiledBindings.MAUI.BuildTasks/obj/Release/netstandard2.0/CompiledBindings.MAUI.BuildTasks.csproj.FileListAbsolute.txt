@@ -1,0 +1,11 @@
+W:\MyProjects\CompiledBindings\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.deps.json
+W:\MyProjects\CompiledBindings\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.dll
+W:\MyProjects\CompiledBindings\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.pdb
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.csproj.AssemblyReference.cache
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.GeneratedMSBuildEditorConfig.editorconfig
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.AssemblyInfoInputs.cache
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.AssemblyInfo.cs
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.csproj.CoreCompileInputs.cache
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.csproj.CopyComplete
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.dll
+W:\MyProjects\CompiledBindings\source\MAUI\CompiledBindings.MAUI.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.MAUI.BuildTasks.pdb

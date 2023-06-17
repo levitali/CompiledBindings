@@ -5,7 +5,7 @@
   },
   "projects": {
     "W:\\MyProjects\\CompiledBindings\\source\\CompiledBindings.Core\\CompiledBindings.Core.csproj": {
-      "version": "1.0.17",
+      "version": "1.0.17.1",
       "restore": {
         "projectUniqueName": "W:\\MyProjects\\CompiledBindings\\source\\CompiledBindings.Core\\CompiledBindings.Core.csproj",
         "projectName": "CompiledBindings.Core",
@@ -82,10 +82,10 @@
       }
     },
     "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings.WPF.BuildTasks\\CompiledBindings.WPF.BuildTasks.csproj": {
-      "version": "1.0.17",
+      "version": "1.0.17.1",
       "restore": {
         "projectUniqueName": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings.WPF.BuildTasks\\CompiledBindings.WPF.BuildTasks.csproj",
-        "projectName": "CompiledBindings.WPF.BuildTasks.Temp",
+        "projectName": "CompiledBindings.WPF.BuildTasks",
         "projectPath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings.WPF.BuildTasks\\CompiledBindings.WPF.BuildTasks.csproj",
         "packagesPath": "C:\\Users\\Vitali.MEMBRAIN\\.nuget\\packages\\",
         "outputPath": "W:\\MyProjects\\CompiledBindings\\source\\WPF\\CompiledBindings.WPF.BuildTasks\\obj\\",

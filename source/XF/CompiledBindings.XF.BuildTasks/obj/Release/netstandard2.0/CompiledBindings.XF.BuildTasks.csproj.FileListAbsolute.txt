@@ -1,11 +1,11 @@
-W:\MyProjects\CompiledBindings\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.deps.json
-W:\MyProjects\CompiledBindings\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.dll
-W:\MyProjects\CompiledBindings\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.pdb
 W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.csproj.AssemblyReference.cache
 W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.GeneratedMSBuildEditorConfig.editorconfig
 W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.AssemblyInfoInputs.cache
 W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.AssemblyInfo.cs
 W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.csproj.CoreCompileInputs.cache
 W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.csproj.CopyComplete
-W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.dll
-W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.Temp.pdb
+W:\MyProjects\CompiledBindings\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.deps.json
+W:\MyProjects\CompiledBindings\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.dll
+W:\MyProjects\CompiledBindings\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.pdb
+W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.dll
+W:\MyProjects\CompiledBindings\source\XF\CompiledBindings.XF.BuildTasks\obj\Release\netstandard2.0\CompiledBindings.XF.BuildTasks.pdb

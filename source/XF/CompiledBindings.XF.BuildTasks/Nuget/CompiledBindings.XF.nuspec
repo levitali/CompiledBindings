@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>CompiledBindings.XF</id>
-    <version>1.0.17</version>
+    <version>1.0.17.1</version>
     <title>x:Bind Compiled Bindings for Xamarin Forms</title>
     <authors>levitali</authors>
     <owners>levitali</owners>
@@ -14,7 +14,7 @@
   </metadata>
   <files>
     <file src="..\Targets\CompiledBindings.XF.targets" target="build" />
-    <file src="..\..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.dll" target="build" />
+    <file src="..\..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.merged.dll" target="build" />
     <file src="..\..\..\..\bin\xf\lib\netstandard2.0\CompiledBindings.XF.dll" target="lib\netstandard2.0\" />
   </files>
 </package>

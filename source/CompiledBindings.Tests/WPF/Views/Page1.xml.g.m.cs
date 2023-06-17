@@ -170,7 +170,7 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::System.Windows.Controls.ListView value)
@@ -203,12 +203,12 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler2(global::System.Collections.IList value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource2, value, OnPropertyChanged2);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource2, value, OnPropertyChanged2);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -223,7 +223,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1_SelectedItem(object sender, global::System.EventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -235,7 +235,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1_ActualWidth(object sender, global::System.EventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -247,7 +247,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -953,22 +953,22 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.Page1ViewModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
 				}
 
 				public void SetPropertyChangedEventHandler2(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource2, value, OnPropertyChanged2);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource2, value, OnPropertyChanged2);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1013,7 +1013,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1046,7 +1046,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged2(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1208,17 +1208,17 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::WPFTest.ViewModels.EntityModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1233,7 +1233,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -1339,12 +1339,12 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.EntityViewModel value)
 				{
-					global::CompiledBindings.WPF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.BindingsHelper.TryGetBindings<Page1_DataTemplate1_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page1_DataTemplate1_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;

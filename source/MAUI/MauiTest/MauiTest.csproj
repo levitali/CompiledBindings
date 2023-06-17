@@ -54,9 +54,9 @@
 	  <ProjectReference Include="..\CompiledBindings.MAUI\CompiledBindings.MAUI.csproj" />
 	</ItemGroup>
 
-	<UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.merged.dll" TaskFactory="TaskHostFactory" />
-	<UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.merged.dll" TaskFactory="TaskHostFactory" />
-	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.merged.dll" TaskFactory="TaskHostFactory" />
+	<UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.dll" TaskFactory="TaskHostFactory" />
+	<UsingTask TaskName="MauiProcessResourceXamlTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.dll" TaskFactory="TaskHostFactory" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.Core.dll" TaskFactory="TaskHostFactory" />
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>

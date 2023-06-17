@@ -161,8 +161,8 @@
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
-  <UsingTask TaskName="UWPGenerateCodeTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.merged.dll" TaskFactory="TaskHostFactory" />
-  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.merged.dll" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="UWPGenerateCodeTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.UWP.BuildTasks.dll" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\uwp\build\netstandard2.0\CompiledBindings.Core.dll" TaskFactory="TaskHostFactory" />
   <PropertyGroup>
     <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
   </PropertyGroup>

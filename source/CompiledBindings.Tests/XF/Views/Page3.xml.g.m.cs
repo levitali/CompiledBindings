@@ -215,17 +215,17 @@ namespace XFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.Page3ViewModel value)
 				{
-					global::CompiledBindings.XF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					global::CompiledBindings.XF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				public void SetPropertyChangedEventHandler1(global::XFTest.ViewModels.EntityModel value)
 				{
-					global::CompiledBindings.XF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
+					global::CompiledBindings.XF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.XF.BindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.XF.CompiledBindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -256,7 +256,7 @@ namespace XFTest.Views
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.XF.BindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.XF.CompiledBindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -400,12 +400,12 @@ namespace XFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::XFTest.ViewModels.EntityViewModel value)
 				{
-					global::CompiledBindings.XF.BindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					global::CompiledBindings.XF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.XF.BindingsHelper.TryGetBindings<Page3_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.XF.CompiledBindingsHelper.TryGetBindings<Page3_DataTemplate0_Bindings_rootElement>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
