@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CompiledBindings.XF\CompiledBindings.XF.csproj" />
+	  <ProjectReference Include="..\CompiledBindings.XF\CompiledBindings.XF.csproj" Private="False" />
 	</ItemGroup>
 
 	<UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.dll" TaskFactory="TaskHostFactory" />

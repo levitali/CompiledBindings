@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings.WPF\CompiledBindings.WPF.csproj" />
+    <ProjectReference Include="..\CompiledBindings.WPF\CompiledBindings.WPF.csproj" Private="False" />
   </ItemGroup>
 
   <ItemGroup>

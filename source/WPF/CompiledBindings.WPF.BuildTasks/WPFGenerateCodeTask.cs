@@ -205,7 +205,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 							foreach (var prop in parseResult.EnumerateAllProperties())
 							{
-								var prop2 = prop.XamlNode.Element.Parent.Attribute(prop.MemberName);
+								var prop2 = prop.XamlNode.Element.Parent.Attribute(prop.XamlNode.Name);
 								prop2?.Remove();
 							}
 

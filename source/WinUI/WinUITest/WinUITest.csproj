@@ -38,8 +38,9 @@
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings.WinUI\CompiledBindings.WinUI.csproj" />
+  
+	<ItemGroup>
+    <ProjectReference Include="..\CompiledBindings.WinUI\CompiledBindings.WinUI.csproj" Private="False" />
   </ItemGroup>
  
   <!-- 
@@ -84,6 +85,5 @@
 	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" />
 	</Target>
-	
 	
 </Project>

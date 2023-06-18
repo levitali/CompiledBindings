@@ -51,7 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CompiledBindings.MAUI\CompiledBindings.MAUI.csproj" />
+	  <ProjectReference Include="..\CompiledBindings.MAUI\CompiledBindings.MAUI.csproj" Private="False" />
 	</ItemGroup>
 
 	<UsingTask TaskName="MauiGenerateCodeTask" AssemblyFile="..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.dll" TaskFactory="TaskHostFactory" />

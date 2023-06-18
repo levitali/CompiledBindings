@@ -157,6 +157,12 @@
       <Version>6.2.14</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CompiledBindings.UWP\CompiledBindings.UWP.csproj"  Private="False">
+      <Project>{a08518bb-1d83-4c40-9bbc-7ee7c290195d}</Project>
+      <Name>CompiledBindings.UWP</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
