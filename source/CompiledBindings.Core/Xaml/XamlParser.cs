@@ -8,51 +8,42 @@ public class XamlParser
 	{
 		var node = new XamlNode(lineFile, attribute, attribute.Name);
 
-		string str = attribute.Value.Trim();
-		bool squareBracket = false;
-		if (str.StartsWith("{") || (squareBracket = str.StartsWith("[")))
+		var markupExtension = ParseMarkupExtension(lineFile, attribute, knownNamespaces);
+		if (markupExtension != null)
 		{
-			var expecedBracket = squareBracket ? "]" : "}";
-			if (!str.EndsWith(expecedBracket))
-			{
-				throw new ParseException($"Expected {expecedBracket}", attribute.Name.LocalName.Length + str.Length + 2);
-			}
-			node.Children.Add(ParseMarkupExtension(lineFile, attribute, knownNamespaces));
+			node.Children.Add(markupExtension);
 		}
 		else
 		{
-			node.Value = str;
+			node.Value = attribute.Value;
 		}
 
 		return node;
 	}
 
-	private static XamlNode ParseMarkupExtension(string lineFile, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
+	private static XamlNode? ParseMarkupExtension(string lineFile, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
 		return ParseMarkupExtension(lineFile, attribute.Value.Trim(), attribute, knownNamespaces);
 	}
 
-	public static XamlNode ParseMarkupExtension(string lineFile, string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
+	public static XamlNode? ParseMarkupExtension(string lineFile, string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		string? value;
-		int valueOffset;
-
-		// Get the name
-		int pos = str.IndexOf(' ', 1);
-		if (pos == -1)
+		var match = Regex.Match(str, @"^\s*([{\[])\s*([\w:]+)\s*(?:(.+?))?\s*([}\]])\s*$");
+		if (!match.Success)
 		{
-			pos = str.Length - 1;
-			value = null;
-			valueOffset = 0;
-		}
-		else
-		{
-			value = str.Substring(pos + 1, str.Length - pos - 2).TrimStart();
-			valueOffset = str.Length - value.Length - 1;
-			value = value.TrimEnd();
+			return null;
 		}
 
-		string name = str.Substring(1, pos - 1);
+		var expectedEndBracket = match.Groups[1].Value == "{" ? "}" : "]";
+		if (match.Groups[4].Value != expectedEndBracket)
+		{
+			throw new ParseException($"Expected {expectedEndBracket}", match.Groups[4].Length);
+		}
+
+		var name = match.Groups[2].Value;
+		var value = match.Groups[3].Value;
+		int valueOffset = match.Groups[3].Index;
+
 		var nodeName = GetTypeName(name, attribute.Parent, knownNamespaces);
 
 		return new XamlNode(lineFile, attribute, nodeName) { Value = value, ValueOffset = valueOffset };

@@ -82,9 +82,9 @@ public abstract class XamlDomParser
 
 	public XName? GetTypeNameFromAttribute(string value, XAttribute attr)
 	{
-		if (value.StartsWith("{"))
+		var xamlNode = XamlParser.ParseMarkupExtension(CurrentLineFile, value, attr, KnownNamespaces);
+		if (xamlNode != null)
 		{
-			var xamlNode = XamlParser.ParseMarkupExtension(CurrentLineFile, value, attr, KnownNamespaces);
 			if (xamlNode.Name == xNull)
 			{
 				return null;
