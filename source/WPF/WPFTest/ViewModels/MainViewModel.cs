@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -54,6 +55,10 @@ public class Page1ModifyViewModel
 
 	public void OnClick(object parameter)
 	{
+	}
+
+	public void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+	{ 
 	}
 }
 

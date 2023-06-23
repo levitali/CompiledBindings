@@ -95,6 +95,15 @@ public class XamlCodeGenerator
 						expression = new CallExpression(me.Expression, sourceMethod, new Expression[0]);
 						value = expression.CSharpCode;
 					}
+					else
+					{
+						wrap = expression.IsNullable;
+						if (wrap)
+						{
+							expression = new CallExpression(me.Expression, sourceMethod, types.Select((t, i) => new VariableExpression(t, "p" + (i + 1))).ToArray());
+							value = expression.CSharpCode;
+						}
+					}
 				}
 				else
 				{

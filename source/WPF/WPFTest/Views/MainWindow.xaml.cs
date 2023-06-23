@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using WPFTest.ViewModels;
 
 namespace WPFTest.Views
@@ -16,7 +15,7 @@ namespace WPFTest.Views
 		}
 
 		public string InstanceFunction(int val1, int val2) => $"InstanceFunction({val1}, {val2})";
-	}
+    }
 }
 
 namespace WPFTest

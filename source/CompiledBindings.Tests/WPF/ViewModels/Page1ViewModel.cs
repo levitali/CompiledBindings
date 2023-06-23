@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Windows.Controls;
+using System.Windows.Media;
 using UI;
 
 namespace WPFTest.ViewModels;
@@ -66,6 +67,10 @@ public class Page1ModifyViewModel : INotifyPropertyChanged
 	public Page1ModifyTextViewModel ModifyTextViewModel { get; } = new Page1ModifyTextViewModel();
 
 	public void OnClick(bool parameter)
+	{
+	}
+
+	public void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
 	{
 	}
 

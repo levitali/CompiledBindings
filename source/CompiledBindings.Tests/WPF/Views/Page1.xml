@@ -59,6 +59,7 @@
             x:Name="listView"
             ItemTemplate="{StaticResource test1Template}"
             ItemsSource="{x:Bind ListProp}"
+            SelectionChanged="{x:Bind ModifyViewModel.OnSelectionChanged}"
             m:SetVisible="{x:Bind ArrayProp.Length > 0}" />
         <TextBlock Text="{x:Bind ModifyViewModel.Input1, FallbackValue='abc'}" />
         <TextBlock Text="{x:Bind ModifyViewModel.Input1, TargetNullValue='aaa'}" />
