@@ -232,6 +232,7 @@ If you use {x:Bind} to set the ItemsSource property of a collection control (Lis
 - **FallbackValue** Specifies a value to display when the source or path cannot be resolved.
 - **TargetNullValue** Specifies a value to display when the source value resolves but is explicitly null.
 - **UpdateSourceEventNames** Specifies an event, or a list of events separated by | symbol, to use for updating the binding's source.
+- **StringFormat** A string that specifies how to format the source value as a string.
 
 The **Converter**, **ConverterParameter**, **FallbackValue** and **TargetNullValue** can be either an expression, or a {StaticResource } markup extension.
 
