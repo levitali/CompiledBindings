@@ -11,7 +11,7 @@ public class TypeInfo
 	private IList<EventInfo>? _events;
 	private readonly bool? _canBeNullable;
 	private readonly byte? _nullableContext;
-	private readonly byte[]? _nullabileFlags;
+	private readonly byte[]? _nullableFlags;
 
 	public TypeInfo(TypeInfo typeInfo, bool canBeNullable)
 	{
@@ -20,7 +20,7 @@ public class TypeInfo
 		_fields = typeInfo._fields;
 		_methods = typeInfo._methods;
 		_events = typeInfo._events;
-		_nullabileFlags = typeInfo._nullabileFlags;
+		_nullableFlags = typeInfo._nullableFlags;
 		_nullableContext = typeInfo._nullableContext;
 
 		_canBeNullable = canBeNullable;
@@ -30,8 +30,8 @@ public class TypeInfo
 	{
 		Reference = typeReference;
 		_nullableContext = GetNullableContext(typeReference);
-		_nullabileFlags = GetNullableFlags(typeReference);
-		var b = _nullabileFlags?[0] ?? _nullableContext;
+		_nullableFlags = GetNullableFlags(typeReference);
+		var b = _nullableFlags?[0] ?? _nullableContext;
 		_canBeNullable = b is null or 0 ? null : b == 2;
 	}
 
@@ -39,7 +39,7 @@ public class TypeInfo
 	{
 		Reference = typeReference;
 		_nullableContext = nullableContext;
-		_nullabileFlags = nullabileFlags;
+		_nullableFlags = nullabileFlags;
 
 		if (isNullable != null)
 		{
@@ -47,7 +47,7 @@ public class TypeInfo
 		}
 		else
 		{
-			var b = _nullabileFlags?[0] ?? _nullableContext;
+			var b = _nullableFlags?[0] ?? _nullableContext;
 			_canBeNullable = b is null or 0 ? null : b == 2;
 		}
 	}
@@ -221,7 +221,7 @@ public class TypeInfo
 	public TypeInfo MakeGenericInstanceType(params TypeInfo[] arguments)
 	{
 		var typeRef = Reference.MakeGenericInstanceType(arguments.Select(a => a.Reference).ToArray());
-		var typeInfo = new TypeInfo(typeRef, null, _nullabileFlags, _nullableContext);
+		var typeInfo = new TypeInfo(typeRef, null, _nullableFlags, _nullableContext);
 		return typeInfo;
 	}
 
@@ -343,7 +343,7 @@ Label_Break1:
 
 	private bool? GetIsNullableSubElement(int index)
 	{
-		var b = _nullabileFlags?.Length > index ? _nullabileFlags[index] : _nullableContext;
+		var b = _nullableFlags?.Length > index ? _nullableFlags[index] : _nullableContext;
 		return b is null or 0 ? null : b == 2;
 	}
 }
