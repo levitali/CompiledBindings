@@ -94,7 +94,6 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 
 			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType, bool isSupportedParent, string? parentDescription)
 			{
-				var savedCurrentBindingScope = currentBindingScope;
 				var savedDataType = DataType;
 
 				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
@@ -193,58 +192,8 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 						try
 						{
 							var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-							var prop = GetObjectProperty(obj, xamlNode, includeNamespaces, xroot != xdoc.Root && currentBindingScope.DataType == null);
+							var prop = GetObjectProperty(obj, xamlNode, includeNamespaces, currentBindingScope, bindingScopes, ref elementType, xroot != xdoc.Root && currentBindingScope.DataType == null);
 							obj.Properties.Add(prop);
-
-							var bind = prop.Value.BindValue;
-							if (bind != null)
-							{
-								if (bind.DataTypeSet)
-								{
-									BindingScope? scope = null;
-									if (bind.DataType == null)
-									{
-										scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
-									}
-									if (scope != null)
-									{
-										scope.Bindings.Add(bind);
-									}
-									else
-									{
-										scope = new BindingScope
-										{
-											DataType = bind.DataType,
-											ViewName = viewName
-										};
-										bindingScopes.Add(scope);
-									}
-								}
-								else
-								{
-									currentBindingScope.Bindings.Add(bind);
-								}
-								if (bind.IsItemsSource)
-								{
-									if (elementType != null)
-									{
-										throw new ParseException(Res.IsItemsSourceAlreadySet);
-									}
-									elementType = bind.Expression!.Type.GetItemType();
-									if (elementType == null)
-									{
-										var expr = Expression.StripParenExpression(bind.Expression);
-										if (expr is CastExpression cast)
-										{
-											elementType = cast.Expression.Type.GetItemType();
-										}
-										if (elementType == null)
-										{
-											throw new ParseException(Res.ElementTypeCannotBeInferred);
-										}
-									}
-								}
-							}
 						}
 						catch (GeneratorException ex)
 						{
@@ -283,7 +232,6 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				}
 
 				DataType = savedDataType;
-				currentBindingScope = savedCurrentBindingScope;
 
 				return obj;
 			}
@@ -341,12 +289,6 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 	}
 
 	public virtual bool IsDataContextSupported(TypeInfo type) => true;
-
-	private static class Res
-	{
-		public const string IsItemsSourceAlreadySet = "IsItemsSource is already set in some other x:Bind of this element.";
-		public const string ElementTypeCannotBeInferred = "Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.";
-	}
 }
 
 public enum ExtenstionType

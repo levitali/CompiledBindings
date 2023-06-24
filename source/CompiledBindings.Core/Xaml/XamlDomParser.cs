@@ -130,9 +130,16 @@ public abstract class XamlDomParser
 		return namespaces;
 	}
 
-	public XamlObjectProperty GetObjectProperty(XamlObject obj, XamlNode xamlNode, HashSet<string> includeNamespaces, bool throwIfBindWithoutDataType)
+	public XamlObjectProperty GetObjectProperty(
+		XamlObject obj,
+		XamlNode xamlNode,
+		HashSet<string> includeNamespaces,
+		BindingScope currentBindingScope,
+		List<BindingScope> bindingScopes,
+		ref TypeInfo? elementType,
+		bool throwIfBindWithoutDataType)
 	{
-		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, includeNamespaces, throwIfBindWithoutDataType);
+		return GetObjectProperty(obj, xamlNode.Name.LocalName, xamlNode, includeNamespaces, currentBindingScope, bindingScopes, ref elementType, throwIfBindWithoutDataType);
 	}
 
 	public static string GenerateName(XElement element, HashSet<string> usedNames)
@@ -181,7 +188,15 @@ public abstract class XamlDomParser
 		throw new GeneratorException($"The type {className} was not found.", CurrentFile, xobject);
 	}
 
-	private XamlObjectProperty GetObjectProperty(XamlObject obj, string memberName, XamlNode xamlNode, HashSet<string> includeNamespaces, bool throwIfBindWithoutDataType)
+	private XamlObjectProperty GetObjectProperty(
+		XamlObject obj,
+		string memberName,
+		XamlNode xamlNode,
+		HashSet<string> includeNamespaces,
+		BindingScope currentBindingScope,
+		List<BindingScope> bindingScopes,
+		ref TypeInfo? elementType,
+		bool throwIfBindWithoutDataType)
 	{
 		try
 		{
@@ -280,7 +295,7 @@ public abstract class XamlDomParser
 				IsAttached = isAttached,
 			};
 
-			objProp.Value = GetObjectValue(obj, objProp, xamlNode, throwIfBindWithoutDataType, includeNamespaces);
+			objProp.Value = GetObjectValue(obj, objProp, xamlNode, includeNamespaces, currentBindingScope, bindingScopes, ref elementType, throwIfBindWithoutDataType);
 			return objProp;
 		}
 		catch (ParseException ex)
@@ -293,7 +308,15 @@ public abstract class XamlDomParser
 		}
 	}
 
-	private XamlObjectValue GetObjectValue(XamlObject obj, XamlObjectProperty objProp, XamlNode xamlNode, bool throwIfBindWithoutDataType, HashSet<string> includeNamespaces)
+	private XamlObjectValue GetObjectValue(
+		XamlObject obj,
+		XamlObjectProperty objProp,
+		XamlNode xamlNode,
+		HashSet<string> includeNamespaces,
+		BindingScope currentBindingScope,
+		List<BindingScope> bindingScopes,
+		ref TypeInfo? elementType,
+		bool throwIfBindWithoutDataType)
 	{
 		var value = new XamlObjectValue();
 
@@ -408,6 +431,53 @@ public abstract class XamlDomParser
 						}
 					}
 
+					if (bind.DataTypeSet)
+					{
+						BindingScope? scope = null;
+						if (bind.DataType == null)
+						{
+							scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
+						}
+						if (scope != null)
+						{
+							scope.Bindings.Add(bind);
+						}
+						else
+						{
+							scope = new BindingScope
+							{
+								DataType = bind.DataType,
+								ViewName = obj.Name,
+							};
+							bindingScopes.Add(scope);
+						}
+					}
+					else
+					{
+						currentBindingScope.Bindings.Add(bind);
+					}
+
+					if (bind.IsItemsSource)
+					{
+						if (elementType != null)
+						{
+							throw new ParseException(Res.IsItemsSourceAlreadySet);
+						}
+						elementType = bind.Expression!.Type.GetItemType();
+						if (elementType == null)
+						{
+							var expr = Expression.StripParenExpression(bind.Expression);
+							if (expr is CastExpression cast)
+							{
+								elementType = cast.Expression.Type.GetItemType();
+							}
+							if (elementType == null)
+							{
+								throw new ParseException(Res.ElementTypeCannotBeInferred);
+							}
+						}
+					}
+
 					value.BindValue = bind;
 					obj.GenerateMember = true;
 				}
@@ -512,4 +582,11 @@ public abstract class XamlDomParser
 			}
 		}
 	}
+
+	private static class Res
+	{
+		public const string IsItemsSourceAlreadySet = "IsItemsSource is already set in some other x:Bind of this element.";
+		public const string ElementTypeCannotBeInferred = "Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.";
+	}
+
 }
