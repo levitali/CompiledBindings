@@ -268,12 +268,13 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 
 public class XFXamlDomParser : SimpleXamlDomParser
 {
+	private readonly static XNamespace xNs = "http://schemas.microsoft.com/winfx/2009/xaml";
 	private PlatformConstants _platformConstants;
 	private ILookup<string, string>? _nsMappings;
 
 	public XFXamlDomParser(PlatformConstants platformConstants) : base(
 		platformConstants.DefaultNamespace,
-		"http://schemas.microsoft.com/winfx/2009/xaml",
+		xNs,
 		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.IValueConverter"),
 		TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.BindingBase"))
 	{
@@ -299,11 +300,24 @@ public class XFXamlDomParser : SimpleXamlDomParser
 			}
 		}
 		return _nsMappings[xmlNs];
-	}
+	}	
 
-	public override ExtenstionType? IsMemExtension(XAttribute a)
+	protected override ExtenstionType? IsMemExtension(XName name)
 	{
-		return base.IsMemExtension(a) ?? (a.Value.StartsWith("{x:Bind ") ? ExtenstionType.Bind : null);
+		var res = base.IsMemExtension(name);
+		if (res == null)
+		{
+			if (name.Namespace == xNs)
+			{
+				res = name.LocalName switch
+				{
+					"Bind" or "BindExtension" => ExtenstionType.Bind,
+					"Set" or "SetExtension" => ExtenstionType.Set,
+					_ => null
+				};
+			}
+		}
+		return res;
 	}
 
 	public override (bool isSupported, string? controlName) IsElementSupported(XName elementName)

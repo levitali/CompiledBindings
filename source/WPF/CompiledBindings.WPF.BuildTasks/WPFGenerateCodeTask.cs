@@ -49,8 +49,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 	public bool AttachDebugger { get; set; }
 
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
 	public override bool Execute()
 	{
 		try
@@ -367,15 +365,16 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 public class WpfXamlDomParser : SimpleXamlDomParser
 {
+	private readonly static XNamespace xNs = "http://schemas.microsoft.com/winfx/2006/xaml";
 	private ILookup<string, string>? _nsMappings = null;
 
 	public WpfXamlDomParser()
 		: base("http://schemas.microsoft.com/winfx/2006/xaml/presentation",
-			   "http://schemas.microsoft.com/winfx/2006/xaml",
-				TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
-				TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
-				TypeInfo.GetTypeThrow("System.Windows.DependencyObject"),
-				TypeInfo.GetTypeThrow("System.Windows.DependencyProperty"))
+			   xNs,
+			   TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
+			   TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
+			   TypeInfo.GetTypeThrow("System.Windows.DependencyObject"),
+			   TypeInfo.GetTypeThrow("System.Windows.DependencyProperty"))
 	{
 	}
 
@@ -391,9 +390,22 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 		return _nsMappings[xmlNs];
 	}
 
-	public override ExtenstionType? IsMemExtension(XAttribute a)
+	protected override ExtenstionType? IsMemExtension(XName name)
 	{
-		return base.IsMemExtension(a) ?? (a.Value.StartsWith("{x:Bind ") ? ExtenstionType.Bind : null);
+		var res = base.IsMemExtension(name);
+		if (res == null)
+		{
+			if (name.Namespace == xNs)
+			{
+				res = name.LocalName switch
+				{
+					"Bind" or "BindExtension" => ExtenstionType.Bind,
+					"Set" or "SetExtension" => ExtenstionType.Set,
+					_ => null
+				};
+			}
+		}
+		return res;
 	}
 
 	public override (bool isSupported, string? controlName) IsElementSupported(XName elementName)

@@ -308,33 +308,25 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 
 	public virtual ExtenstionType? IsMemExtension(XAttribute a)
 	{
-		var ns = a.Name.Namespace.NamespaceName;
-		if (ns.EndsWith("/"))
-		{
-			ns = ns.Substring(0, ns.Length - 1);
-		}
-		bool isSet = false;
-		if (ns == mNamespace.NamespaceName ||
-			   a.Value.StartsWith("[x:Bind ") ||
-			   (isSet = a.Value.StartsWith("{x:Set ")) ||
-			   (isSet = a.Value.StartsWith("[x:Set ")))
-		{
-			return isSet ? ExtenstionType.Set : ExtenstionType.Bind;
-		}
 		var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, a, KnownNamespaces);
 		if (xamlNode.Children.Count == 1)
 		{
-			var c = xamlNode.Children[0].Name;
-			var clrNs = XamlNamespace.GetClrNamespace(c.NamespaceName);
-			if (clrNs == "CompiledBindings.Markup")
+			return IsMemExtension(xamlNode.Children[0].Name);
+		}
+		return null;
+	}
+
+	protected virtual ExtenstionType? IsMemExtension(XName name)
+	{
+		var clrNs = XamlNamespace.GetClrNamespace(name.NamespaceName);
+		if (clrNs == "CompiledBindings.Markup")
+		{
+			return name.LocalName switch
 			{
-				return c.LocalName switch
-				{
-					"Bind" or "BindExtension" => ExtenstionType.Bind,
-					"Set" or "SetExtension" => ExtenstionType.Set,
-					_ => null
-				};
-			}
+				"Bind" or "BindExtension" => ExtenstionType.Bind,
+				"Set" or "SetExtension" => ExtenstionType.Set,
+				_ => null
+			};
 		}
 		return null;
 	}
