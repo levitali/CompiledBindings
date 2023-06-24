@@ -14,6 +14,8 @@
     x:DataType="viewModels:Page3ViewModel">
 
     <Page.Resources>
+			  <test:SomeConverter x:Key="someConverter" />
+			
         <DataTemplate
             x:Key="test1Template"
             x:DataType="viewModels:EntityViewModel">
@@ -28,6 +30,10 @@
 								this\[0]
 								}
 								"/>
+							<Label
+									 IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
+									 Text="{x:Bind BooleanProp}"
+									 TextColor="{x:Bind BooleanProp ? $Color1 : $Color2}" />
 						</Grid>
         </DataTemplate>
     </Page.Resources>

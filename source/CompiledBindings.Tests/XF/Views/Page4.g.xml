@@ -14,10 +14,12 @@
     x:DataType="viewModels:Page3ViewModel" xmlns:g0="clr-namespace:CompiledBindings.XF">
 
     <Page.Resources>
+			  <test:SomeConverter x:Key="someConverter" />
+			
         <DataTemplate
             x:Key="test1Template"
             x:DataType="viewModels:EntityViewModel">
-					  <Grid g0:CompiledBindingsHelper.Bindings="{views:Page4_DataTemplate0 }">
+					  <Grid g0:CompiledBindingsHelper.Bindings="{views:Page4_DataTemplate0 inverseBooleanConverter={StaticResource inverseBooleanConverter}, Color1={StaticResource Color1}, Color2={StaticResource Color2}}">
               <Picker ItemDisplayBinding="{views:Page4_DataTemplate0_picker1_ItemDisplayBinding}" x:Name="picker1" />
 							<Label
 								
@@ -28,20 +30,24 @@
 
 
  x:Name="label1"/>
+							<Label
+									 
+									 
+									  x:Name="label2" />
 						</Grid>
         </DataTemplate>
     </Page.Resources>
 
     <Grid>
-        <Label  x:Name="label2" />
         <Label  x:Name="label3" />
         <Label  x:Name="label4" />
+        <Label  x:Name="label5" />
         <Picker
             ItemDisplayBinding="{views:Page4_picker2_ItemDisplayBinding}"
              x:Name="picker2" />
-			  <Label  x:Name="label5" />
-			  <Label  x:Name="label6"/>
+			  <Label  x:Name="label6" />
 			  <Label  x:Name="label7"/>
+			  <Label  x:Name="label8"/>
 			  <Entry  x:Name="entry1"/>
 			
     </Grid>
