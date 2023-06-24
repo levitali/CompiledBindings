@@ -588,5 +588,4 @@ public abstract class XamlDomParser
 		public const string IsItemsSourceAlreadySet = "IsItemsSource is already set in some other x:Bind of this element.";
 		public const string ElementTypeCannotBeInferred = "Element type cannot be inferred. Set IsItemsSource to false or remove, and set DataType for child DataTemplates manually.";
 	}
-
 }

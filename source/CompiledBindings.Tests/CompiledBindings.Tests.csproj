@@ -48,6 +48,9 @@
 		<Compile Update="XF\Views\Page3.xml.cs">
 			<DependentUpon>Page3.xml</DependentUpon>
 		</Compile>
+		<Compile Update="XF\Views\Page4.xml.cs">
+			<DependentUpon>Page4.xml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -85,6 +88,13 @@
 		</None>
 		<None Update="XF\Views\Page2.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="XF\Views\Page4.g.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page4.xml</DependentUpon>
+		</None>
+		<None Update="XF\Views\Page4.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="XF\Views\Page3.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

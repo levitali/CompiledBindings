@@ -14,7 +14,15 @@
             x:Key="test1Template"
             x:DataType="vm:EntityViewModel">
             <StackLayout Orientation="Horizontal">
-                <Label Text="{x:Bind DecimalProp}" />
+                <Label                     
+                    Text
+                       =
+                       "
+                       {
+                       x:Bind
+                       DecimalProp
+                       }
+                       " />
                 <Label
                     IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
                     Text="{x:Bind BooleanProp}"

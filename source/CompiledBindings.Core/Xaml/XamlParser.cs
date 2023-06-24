@@ -28,7 +28,7 @@ public class XamlParser
 
 	public static XamlNode? ParseMarkupExtension(string lineFile, string str, XAttribute attribute, IList<XamlNamespace>? knownNamespaces)
 	{
-		var match = Regex.Match(str, @"^\s*([{\[])\s*([\w:]+)\s*(?:(.+?))?\s*([}\]])\s*$");
+		var match = Regex.Match(str, @"^\s*([{\[])\s*((?:\w+:)?\w+)(?:(\s+.+?))?\s*([}\]])\s*$");
 		if (!match.Success)
 		{
 			return null;

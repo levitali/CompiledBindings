@@ -1,0 +1,49 @@
+﻿<Page
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:extensions="using:XFTest.Extensions"
+    xmlns:local="clr-namespace:XFTest"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mx="http://compiledbindings.com/x"
+    xmlns:test="using:Test"
+    xmlns:viewModels="using:XFTest.ViewModels"
+    xmlns:views="clr-namespace:XFTest.Views"
+    mc:Ignorable="m mx"
+    x:Class="XFTest.Views.Page4"
+    x:DataType="viewModels:Page3ViewModel">
+
+    <Page.Resources>
+        <DataTemplate
+            x:Key="test1Template"
+            x:DataType="viewModels:EntityViewModel">
+					  <Grid>
+              <Picker ItemDisplayBinding="{x:Bind SByteProp, DataType=viewModels:EntityModel}" />
+							<Label
+								Text
+								=
+								"
+								{
+								x:Bind
+								this\[0]
+								}
+								"/>
+						</Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid>
+        <Label IsVisible="{x:Bind Entity ne null and IsLoading}" />
+        <Label Text="{x:Bind Entity.SByteProp}" />
+        <Label Text="{x:Bind Entity.UShortProp}" />
+        <Picker
+            ItemDisplayBinding="{x:Bind Description, DataType=viewModels:PickItem}"
+            ItemsSource="{x:Bind PickedItems}" />
+			  <Label Text="{x:Set 3}" />
+			  <Label Text="{x:Bind this\[1,'test']}"/>
+			  <Label Text="{x:Bind Entity\._field1}"/>
+			  <Entry Text="{x:Bind QuantityInput, StringFormat=0.###, Mode=TwoWay}"/>
+			
+    </Grid>
+
+</Page>
