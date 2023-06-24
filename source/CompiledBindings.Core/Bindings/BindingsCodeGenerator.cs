@@ -431,12 +431,12 @@ $@"					if ({cacheVar} != null && !object.ReferenceEquals({cacheVar}, value))
 						GenerateUnregisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
 					}
 					output.AppendLine(
-	$@"						{cacheVar} = null;
+$@"						{cacheVar} = null;
 					}}
 					if ({cacheVar} == null && value != null)
 					{{");
 					output.AppendLine(
-	$@"						{cacheVar} = value;");
+$@"						{cacheVar} = value;");
 					foreach (var notifyProp in notifySource.Properties)
 					{
 						GenerateRegisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
