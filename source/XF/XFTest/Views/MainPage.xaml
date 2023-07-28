@@ -66,7 +66,21 @@
             ItemDisplayBinding="{x:Bind Description, DataType=vm:PickItem}"
             ItemsSource="{x:Bind (systemCollections:IList)PickedItems}" />
 
-        <Label Text="{x:Bind this['test']}"/>
+        <Label Text="{x:Bind this['test']}" />
+
+        <ContentView>
+            <ContentView.ControlTemplate>
+                <ControlTemplate x:DataType="vm:Page1ViewModel">
+                    <StackLayout
+                        BindingContext="{TemplateBinding BindingContext}"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <Label Text="Test" />
+                        <Label Text="{x:Bind DecimalProp}" />
+                    </StackLayout>
+                </ControlTemplate>
+            </ContentView.ControlTemplate>
+        </ContentView>
 
     </StackLayout>
 </ContentPage>

@@ -9,7 +9,8 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 	public static readonly XName NameAttr = XNamespace.None + "Name"; // WPF Name attribute
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
 
-	public readonly XName HierarchicalDataTemplate; // WPF
+	public XName HierarchicalDataTemplate { get; } // WPF
+	public XName ControlTemplate { get; }
 
 	public HashSet<string>? UsedNames { get; private set; }
 
@@ -23,6 +24,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 		: base(xmlns, xNs, converterType, bindingType, dependencyObjectType, dependencyPropertyType)
 	{
 		HierarchicalDataTemplate = DefaultNamespace + "HierarchicalDataTemplate";
+		ControlTemplate = DefaultNamespace + "ControlTemplate";
 	}
 
 	public SimpleXamlDom? Parse(string file, string lineFile, XDocument xdoc, Action<int, int, int, string> log)
@@ -96,14 +98,16 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 			{
 				var savedDataType = DataType;
 
-				bool isDataTemplateElement = xelement.Name == DataTemplate || xelement.Name == HierarchicalDataTemplate;
+				bool isDataTemplateElement = xelement.Name == DataTemplate ||
+					                         xelement.Name == HierarchicalDataTemplate ||
+											 xelement.Name == ControlTemplate;
 
 				var attrs = xelement.Attributes().Where(a => isMemExtensionWrapper(a) != null).ToList();
 				if (attrs.Count > 0)
 				{
 					if (isDataTemplateElement)
 					{
-						throw new GeneratorException("x:Bind or x:Set extensions cannot be used to set properties of a DataTemplate.", CurrentFile, attrs[0]);
+						throw new GeneratorException("x:Bind or x:Set extensions cannot be used to set properties of a DataTemplate/ControlTemplate.", CurrentFile, attrs[0]);
 					}
 					if (!isSupportedParent)
 					{
@@ -218,7 +222,9 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 
 				foreach (var child in xelement.Elements())
 				{
-					if (child.Name == DataTemplate || child.Name == HierarchicalDataTemplate)
+					if (child.Name == DataTemplate ||
+						child.Name == HierarchicalDataTemplate ||
+						child.Name == ControlTemplate)
 					{
 						int index = dataTemplates.Count;
 						var dataTemplate = processRoot(child, elementType, null);
@@ -284,6 +290,10 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 		if (elementName == VisualStateGroups)
 		{
 			return (false, "VisualStateManager");
+		}
+		if (elementName == Style)
+		{
+			return (false, "a Style");
 		}
 		return (true, null);
 	}

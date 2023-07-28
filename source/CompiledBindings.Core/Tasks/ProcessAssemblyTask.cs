@@ -55,10 +55,9 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 										instructions.Add(Instruction.Create(OpCodes.Call, method));
 										instructions.Add(Instruction.Create(OpCodes.Ret));
 
-										for (var index = 0; index < instructions.Count - 1; index++)
+										for (int index = 0, n = instructions.Count - 4; index < n; index++)
 										{
-											var instruction = instructions[index];
-											if (instruction.OpCode == OpCodes.Ret)
+											if (instructions[index].OpCode == OpCodes.Ret)
 											{
 												instructions[index] = Instruction.Create(OpCodes.Leave, firstInstruction);
 											}

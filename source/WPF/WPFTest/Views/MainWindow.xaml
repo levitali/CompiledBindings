@@ -81,6 +81,17 @@
                 Content="TEST"
                 IsEnabled="{x:Bind listView.SelectedItem ne null, DataType={x:Null}}"
                 Click="{x:Bind _viewModel.ModifyViewModel.OnClick(button.CommandParameter), DataType={x:Null}}" />
+
+            <Label>
+                <Label.Template>
+                    <ControlTemplate
+                        mx:DataType="viewModels:MainViewModel"
+                        TargetType="Label">
+
+                        <TextBlock Text="{x:Bind DecimalProp}" />
+                    </ControlTemplate>
+                </Label.Template>
+            </Label>
         </StackPanel>
     </ScrollViewer>
 

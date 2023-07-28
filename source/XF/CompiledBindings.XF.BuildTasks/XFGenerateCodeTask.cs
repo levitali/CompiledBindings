@@ -320,22 +320,6 @@ public class XFXamlDomParser : SimpleXamlDomParser
 		return res;
 	}
 
-	public override (bool isSupported, string? controlName) IsElementSupported(XName elementName)
-	{
-		var b = base.IsElementSupported(elementName);
-		if (!b.isSupported)
-		{
-			return b;
-		}
-
-		if (elementName == Style)
-		{
-			return (false, "a Style");
-		}
-
-		return (true, null);
-	}
-
 	protected override bool CanSetBindingTypeProperty => true;
 }
 

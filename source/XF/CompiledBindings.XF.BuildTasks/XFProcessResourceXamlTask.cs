@@ -174,7 +174,7 @@ public static class XFXamlProcessor
 						{
 							if (xelement != xdoc.Root &&
 								(xelement.Attributes().Any(a => xamlDomParser.IsMemExtension(a) != null) ||
-								 (xelement.Attribute(xamlDomParser.xDataType) != null && xelement.Name != xamlDomParser.DataTemplate)))
+								 ((xelement.Attribute(xamlDomParser.xDataType) != null || xelement.Attribute(xamlDomParser.ControlTemplate) != null) && xelement.Name != xamlDomParser.DataTemplate)))
 							{
 								var name = XamlDomParser.GenerateName(xelement, usedNames);
 								insertAtEnd(xelement, $" x:Name=\"{name}\"");
@@ -189,7 +189,7 @@ public static class XFXamlProcessor
 					}
 
 					// Process DataTemplates
-					var dataTemplates = xdoc.Descendants(xamlDomParser.DataTemplate).ToList();
+					var dataTemplates = xdoc.Descendants().Where(x => x.Name == xamlDomParser.DataTemplate || x.Name == xamlDomParser.ControlTemplate).ToList();
 					for (int i = 0; i < dataTemplates.Count; i++)
 					{
 						var dataTemplate = dataTemplates[i];
@@ -197,7 +197,7 @@ public static class XFXamlProcessor
 							.SelectMany(e => e.Attributes())
 							.Where(a =>
 								xamlDomParser.IsMemExtension(a) != null &&
-								a.Parent.Ancestors(xamlDomParser.DataTemplate).First() == dataTemplate)
+								a.Parent.Ancestors().Where(a => a.Name == xamlDomParser.DataTemplate || a.Name == xamlDomParser.ControlTemplate).First() == dataTemplate)
 							.ToList();
 						if (memExtensions.Count == 0)
 						{
