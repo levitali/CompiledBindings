@@ -38,7 +38,7 @@ namespace XFTest.Views
 			label9 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label9");
 			button1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Button>(this, "button1");
 
-			someConverter = (global::Xamarin.Forms.IValueConverter)(this.Resources.ContainsKey("someConverter") == true ? this.Resources["someConverter"] : global::Xamarin.Forms.Application.Current.Resources["someConverter"]);
+			someConverter = (global::Xamarin.Forms.IValueConverter)(this.Resources.TryGetValue("someConverter", out var r0) || global::Xamarin.Forms.Application.Current.Resources.TryGetValue("someConverter", out r0) ? r0 : throw new global::System.Exception("Resource 'someConverter' not found."));
 
 #line (28, 16) - (28, 80) 28 "Page2.xml"
 			label8.Text = Test.BarcodeKeys.HU + "," + Test.BarcodeKeys.Batch;
