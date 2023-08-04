@@ -8,7 +8,7 @@
     x:DataType="vm:Page1ViewModel">
 
     <Page.Resources>
-        <converters:InverseBooleanConverter x:Key="inverseBooleanConverter" />
+        <converters:InverseBooleanConverter x:Key="inverseBooleanConverter2" />
 
         <DataTemplate
             x:Key="test1Template"
@@ -24,7 +24,7 @@
                        }
                        " />
                 <Label
-                    IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
+                    IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter2}}"
                     Text="{x:Bind BooleanProp}"
                     TextColor="{x:Bind BooleanProp ? $Color1 : $Color2}" />
             </StackLayout>
@@ -49,7 +49,7 @@
 
         <Label Text="{x:Set local:Strings.Instance.Header1}" />
         <Label
-            IsVisible="{x:Bind BooleanProp, Converter={StaticResource inverseBooleanConverter}}"
+            IsVisible="{x:Bind BooleanProp, Converter={StaticResource InverseBooleanConverter}}"
             Text="{x:Bind DecimalProp.ToString('0.###')}"
             TextColor="{x:Set Color.Aqua}" />
         <Label

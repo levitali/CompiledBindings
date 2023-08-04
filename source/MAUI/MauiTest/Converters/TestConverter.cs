@@ -1,18 +1,16 @@
-﻿using System;
-using System.Globalization;
-using Xamarin.Forms;
+﻿using System.Globalization;
 
-namespace XFTest.Converters;
+namespace MauiTest.Converters;
 
-public class InverseBooleanConverter : IValueConverter
+public class TestConverter : IValueConverter
 {
 	public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 	{
-		return !(bool)value;
+		return value;
 	}
 
 	public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
 	{
-		return !(bool)value;
+		return value;
 	}
 }

@@ -425,7 +425,7 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 	{
 	}
 
-	protected override string CreateGetResourceCode(string resourceName)
+	protected override string CreateGetResourceCode(string resourceName, int varIndex)
 	{
 		return $@"this.Resources[""{resourceName}""] ?? global::System.Windows.Application.Current.Resources[""{resourceName}""] ?? throw new global::System.Exception(""Resource '{resourceName}' not found."")";
 	}

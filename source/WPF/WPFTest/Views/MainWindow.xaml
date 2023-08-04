@@ -92,6 +92,8 @@
                     </ControlTemplate>
                 </Label.Template>
             </Label>
+
+            <TextBlock Text="{x:Bind DecimalProp, Converter={StaticResource TestConverter}}" />
         </StackPanel>
     </ScrollViewer>
 

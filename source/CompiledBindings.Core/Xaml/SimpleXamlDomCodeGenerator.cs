@@ -119,17 +119,18 @@ $@"		global::{type.Reference.GetCSharpFullName()} {name};");
 		var resources = parseResult.EnumerateResources().ToList();
 		if (resources.Count > 0)
 		{
+			int varIndex = 0;
 			foreach (var (name, type) in resources)
 			{
 				output.AppendLine(
-$@"			{name} = (global::{type.Reference.GetCSharpFullName()})({CreateGetResourceCode(name)});");
+$@"			{name} = (global::{type.Reference.GetCSharpFullName()})({CreateGetResourceCode(name, varIndex++)});");
 			}
 
 			output.AppendLine();
 		}
 	}
 
-	protected abstract string CreateGetResourceCode(string resourceName);
+	protected abstract string CreateGetResourceCode(string resourceName, int varIndex);
 
 	private void GenerateInitializeMethod(StringBuilder output, SimpleXamlDom parseResult)
 	{

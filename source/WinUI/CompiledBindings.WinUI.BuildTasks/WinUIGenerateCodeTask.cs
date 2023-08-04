@@ -417,9 +417,9 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 			_platformConstants = platformConstants;
 		}
 
-		protected override string CreateGetResourceCode(string resourceName)
+		protected override string CreateGetResourceCode(string resourceName, int varIndex)
 		{
-			return $@"this.Resources.TryGetValue(""{resourceName}"", out var r) ? r : global::{_platformConstants.BaseClrNamespace}.UI.Xaml.Application.Current.Resources[""{resourceName}""]";
+			return $@"this.Resources.TryGetValue(""{resourceName}"", out var r{varIndex}) || global::{_platformConstants.BaseClrNamespace}.UI.Xaml.Application.Current.Resources.TryGetValue(""{resourceName}"", out r{varIndex}) ? r{varIndex} : throw new global::System.Exception(""Resource '{resourceName}' not found."")";
 		}
 	}
 

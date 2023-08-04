@@ -342,9 +342,9 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 		_platformConstants = platformConstants;
 	}
 
-	protected override string CreateGetResourceCode(string resourceName)
+	protected override string CreateGetResourceCode(string resourceName, int varIndex)
 	{
-		return $@"this.Resources.ContainsKey(""{resourceName}"") == true ? this.Resources[""{resourceName}""] : global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources[""{resourceName}""]";
+		return $@"this.Resources.TryGetValue(""{resourceName}"", out var r{varIndex}) || global::{_platformConstants.BaseClrNamespace}.Application.Current.Resources.TryGetValue(""{resourceName}"", out r{varIndex}) ? r{varIndex} : throw new global::System.Exception(""Resource '{resourceName}' not found."")";
 	}
 
 	protected override void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)

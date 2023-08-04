@@ -7,17 +7,21 @@
     x:Class="XFTest.App">
 
     <Application.Resources>
-        
-        <DataTemplate
-            x:Key="EntityTemplate"
-            x:DataType="vm:EntityViewModel">
-            <Grid>
-                <Label Text="{x:Bind BooleanProp}" />
-            </Grid>
-        </DataTemplate>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <Color x:Key="Color1">Red</Color>
-        <Color x:Key="Color2">Green</Color>
+            <DataTemplate
+                x:Key="EntityTemplate"
+                x:DataType="vm:EntityViewModel">
+                <Grid>
+                    <Label Text="{x:Bind BooleanProp}" />
+                </Grid>
+            </DataTemplate>
 
+            <Color x:Key="Color1">Red</Color>
+            <Color x:Key="Color2">Green</Color>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

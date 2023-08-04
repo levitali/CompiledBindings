@@ -9,20 +9,26 @@
     mc:Ignorable="mx m"
     x:Class="WPFTest.App"
     StartupUri="Views\MainWindow.xaml">
-    
+
     <Application.Resources>
-        <DataTemplate
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <DataTemplate
             x:Key="GlobalTestTemplate"
             DataType="viewModels:EntityViewModel">
-            <Grid>
-                <StackPanel>
-                    <TextBlock Text="{x:Bind Model.SByteProp}" />
-                    <TextBlock Text="{x:Bind BooleanProp}" />
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="{x:Bind Model.SByteProp}" />
+                        <TextBlock Text="{x:Bind BooleanProp}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
 
-        <SolidColorBrush x:Key="Color1">Red</SolidColorBrush>
-        <SolidColorBrush x:Key="Color2">Green</SolidColorBrush>
+            <SolidColorBrush x:Key="Color1">Red</SolidColorBrush>
+            <SolidColorBrush x:Key="Color2">Green</SolidColorBrush>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -22,7 +22,7 @@
                 HorizontalOptions="Center"
                 FontSize="32"
                 SemanticProperties.HeadingLevel="Level1"
-                Text="{x:Bind Hello}" />
+                Text="{x:Bind Hello, Converter={StaticResource TestConverter}}" />
 
             <Label
                 HorizontalOptions="Center"

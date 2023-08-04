@@ -52,7 +52,7 @@
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
   </PropertyGroup>
 
-	<UsingTask TaskName="WinUIGenerateCodeTask" AssemblyFile="..\..\..\bin\winui\build\netstandard2.0\CompiledBindings.WinUI.BuildTasks.Temp.dll" TaskFactory="TaskHostFactory" />
+	<UsingTask TaskName="WinUIGenerateCodeTask" AssemblyFile="..\..\..\bin\winui\build\netstandard2.0\CompiledBindings.WinUI.BuildTasks.dll" TaskFactory="TaskHostFactory" />
 	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="..\..\..\bin\winui\build\netstandard2.0\CompiledBindings.Core.dll" TaskFactory="TaskHostFactory" />
 
 	<PropertyGroup>
