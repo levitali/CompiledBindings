@@ -54,7 +54,7 @@ public class ExpressionParser
 	// ?:, ??, as, is operators
 	private Expression ParseExpression()
 	{
-		var expr = ParseLogicalOr();
+		var expr = ParseAs();
 
 		if (_token.id == TokenId.Question)
 		{
@@ -63,10 +63,6 @@ public class ExpressionParser
 		else if (_token.id == TokenId.DoubleQuestion)
 		{
 			return ParseCoalesceExpression(expr);
-		}
-		else if (TokenIdentifierIs("as"))
-		{
-			return ParseAsExpression(expr);
 		}
 		else if (TokenIdentifierIs("is"))
 		{
@@ -802,19 +798,30 @@ public class ExpressionParser
 		return ParseMemberAccess(null, null);
 	}
 
-	private Expression ParseAsExpression(Expression expression)
+	private Expression ParseAs()
 	{
-		NextToken();
+		var expression = ParseLogicalOr();
+		while (TokenIdentifierIs("as"))
+		{
+			NextToken();
 
-		int errorPos = _token.pos;
-		string prefix = GetIdentifier();
+			int errorPos = _token.pos;
+			string prefix = GetIdentifier();
 
-		NextToken();
-		ValidateToken(TokenId.Colon, Res.ColonExpected);
+			NextToken();
+			ValidateToken(TokenId.Colon, Res.ColonExpected);
 
-		var typeExpr = ParseTypeExpression(prefix, errorPos);
+			var typeExpr = ParseTypeExpression(prefix, errorPos);
+			var type = typeExpr.Type;
+			if (type.Reference.IsValueType && !type.Reference.IsValueNullable())
+			{
+				type = TypeInfo.GetTypeThrow(typeof(Nullable<>)).MakeGenericInstanceType(type);
+				typeExpr = new TypeExpression(type);
+			}
 
-		return new AsExpression(expression, typeExpr);
+			expression = new AsExpression(expression, typeExpr);
+		}
+		return expression;
 	}
 
 	private Expression ParseIsExpression(Expression expression)
@@ -1140,7 +1147,7 @@ Label_CreateMemberExpression:
 			// Use first indexer for argument types.
 			// Later more applicable property will be found.
 			indexerProperty = indexerProperties[0];
-			expressionType = indexerProperty.PropertyType;			
+			expressionType = indexerProperty.PropertyType;
 			var method = expr.Type.Methods.Single(m => m.Definition == indexerProperty.Definition.GetMethod);
 			argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
 		}
@@ -1550,4 +1557,3 @@ Label_CreateMemberExpression:
 		InterpolatedString,
 	}
 }
-

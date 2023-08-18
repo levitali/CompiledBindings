@@ -66,6 +66,23 @@ public class ExpressionTests : IDisposable
 	}
 
 	[Test]
+	public void TestAsExpression()
+	{
+		string expression, expectedCode;
+		Expression result;
+
+		expression = "Mode3 + ObjProp as system:String as system:Object";
+		expectedCode = "((dataRoot.Mode3 + dataRoot.ObjProp as global::System.String) as global::System.Object)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "not TestMode as system:Int32";
+		expectedCode = "(!dataRoot.TestMode as global::System.Int32?)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
+
+	[Test]
 	public void TestIsExpression()
 	{
 		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
