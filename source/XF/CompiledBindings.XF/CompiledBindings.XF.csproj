@@ -4,7 +4,7 @@
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.17.1</Version>
+		<Version>1.0.17.2</Version>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
