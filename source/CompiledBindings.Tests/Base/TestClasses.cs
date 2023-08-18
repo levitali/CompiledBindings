@@ -12,6 +12,8 @@ public class Class1
 
 	public bool TestMode => false;
 
+	public bool BoolProp => false;
+
 	public void Check(bool mode)
 	{
 	}

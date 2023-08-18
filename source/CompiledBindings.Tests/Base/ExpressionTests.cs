@@ -97,48 +97,64 @@ public class ExpressionTests : IDisposable
 
 		string expression, expectedCode;
 		Expression result;
-
+		
 		expression = "IntProp is 0 or 1";
-		expectedCode = "dataRoot.IntProp == 0 || dataRoot.IntProp == 1";
+		expectedCode = "(dataRoot.IntProp == 0 || dataRoot.IntProp == 1)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "IntProp is gt 0 and lt 10";
-		expectedCode = "dataRoot.IntProp > 0 && dataRoot.IntProp < 10";
+		expectedCode = "(dataRoot.IntProp > 0 && dataRoot.IntProp < 10)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "IntProp is not 0 and lt 10";
-		expectedCode = "dataRoot.IntProp != 0 && dataRoot.IntProp < 10";
+		expectedCode = "(dataRoot.IntProp != 0 && dataRoot.IntProp < 10)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "IntProp is not (0 or 10)";
-		expectedCode = "!(dataRoot.IntProp == 0 || dataRoot.IntProp == 10)";
+		expectedCode = "(!(dataRoot.IntProp == 0 || dataRoot.IntProp == 10))";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 
 		expression = "IntProp is ge 0 and not NullIntProp";
-		expectedCode = "dataRoot.IntProp >= 0 && dataRoot.IntProp != dataRoot.NullIntProp";
+		expectedCode = "(dataRoot.IntProp >= 0 && dataRoot.IntProp != dataRoot.NullIntProp)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "(Mode is Mode1 or Mode2) and RefProp.DecimalProp ne 4";
-		expectedCode = "(dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode1 || dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode2) && dataRoot.RefProp?.DecimalProp != 4";
+		expectedCode = "((dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode1 || dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode2)) && dataRoot.RefProp?.DecimalProp != 4";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "ListProp.Count is not > 0";
-		expectedCode = "!(dataRoot.ListProp?.Count > 0)";
+		expectedCode = "(!(dataRoot.ListProp?.Count > 0))";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "ObjProp is system:String or not system:Int32";
-		expectedCode = "dataRoot.ObjProp is global::System.String || !(dataRoot.ObjProp is global::System.Int32)";
+		expectedCode = "(dataRoot.ObjProp is global::System.String || !(dataRoot.ObjProp is global::System.Int32))";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "IntProp eq 1 and Mode3 is 'a' or 'b'";
+		expectedCode = "dataRoot.IntProp == 1 && (dataRoot.Mode3 == \"a\" || dataRoot.Mode3 == \"b\")";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "IntProp eq 1 and TestMode is false is BoolProp";
+		expectedCode = "dataRoot.IntProp == 1 && ((dataRoot.TestMode == false) == dataRoot.BoolProp)";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "IntProp eq 1 and TestMode is (false is BoolProp)";
+		expectedCode = "dataRoot.IntProp == 1 && (dataRoot.TestMode == (false == dataRoot.BoolProp))";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
+
 
 	[Test]
 	public void ExpectedTypeAsMember()

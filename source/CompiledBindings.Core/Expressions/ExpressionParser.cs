@@ -18,6 +18,7 @@ public class ExpressionParser
 	private Token _token;
 	private TypeInfo? _expectedType;
 	private bool _parsingInterpolatedString;
+	private bool _parsingIs;
 
 	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
 	{
@@ -63,10 +64,6 @@ public class ExpressionParser
 		else if (_token.id == TokenId.DoubleQuestion)
 		{
 			return ParseCoalesceExpression(expr);
-		}
-		else if (TokenIdentifierIs("is"))
-		{
-			return ParseIsExpression(expr);
 		}
 		return expr;
 	}
@@ -199,7 +196,7 @@ public class ExpressionParser
 	// *, /, %, mod operators
 	private Expression ParseMultiplicative()
 	{
-		var left = ParseUnary();
+		var left = ParseIs();
 		while (_token.id is TokenId.Asterisk or TokenId.Slash or TokenId.Percent || TokenIdentifierIs("mod"))
 		{
 			var savedExpectedType = _expectedType;
@@ -207,7 +204,7 @@ public class ExpressionParser
 			ValidateNotMethodAccess(left);
 			var op = _token;
 			NextToken();
-			var right = ParseUnary();
+			var right = ParseIs();
 			ValidateNotMethodAccess(right);
 			_expectedType = savedExpectedType;
 			var operand = op.id switch
@@ -824,95 +821,108 @@ public class ExpressionParser
 		return expression;
 	}
 
-	private Expression ParseIsExpression(Expression expression)
+	private Expression ParseIs()
 	{
-		var savedExpectedType = _expectedType;
-		_expectedType = expression.Type;
-
-		var result = parse1();
-
-		_expectedType = savedExpectedType;
-		return result;
-
-		Expression parse1()
+		var expression = ParseUnary();
+		while (!_parsingIs && TokenIdentifierIs("is"))
 		{
-			NextToken();
+			_parsingIs = true;
+			var savedExpectedType = _expectedType;
+			_expectedType = expression.Type;
 
-			Expression result = null!;
-			string? logicalOperand = null;
-
-			while (true)
+			expression = parse1();
+			if (expression is not ParenExpression)
 			{
-				var expr = parse2();
-
-				result = result == null ? expr : new BinaryExpression(result, expr, logicalOperand!);
-
-				if (_token.id != TokenId.DoubleAmphersand &&
-					 !ReplaceTokenIdentifier("and", TokenId.DoubleAmphersand) &&
-					 _token.id != TokenId.DoubleBar &&
-					 !ReplaceTokenIdentifier("or", TokenId.DoubleBar))
-				{
-					break;
-				}
-
-				logicalOperand = _token.id == TokenId.DoubleAmphersand ? "&&" : "||";
-				NextToken();
+				expression = new ParenExpression(expression);
 			}
 
-			return result;
+			_parsingIs = false;
+			_expectedType = savedExpectedType;
+
+			Expression parse1()
+			{
+				NextToken();
+
+				Expression result = null!;
+				string? logicalOperand = null;
+
+				while (true)
+				{
+					var expr = parse2();
+
+					result = result == null ? expr : new BinaryExpression(result, expr, logicalOperand!);
+
+					if (_token.id != TokenId.DoubleAmphersand &&
+						 !ReplaceTokenIdentifier("and", TokenId.DoubleAmphersand) &&
+						 _token.id != TokenId.DoubleBar &&
+						 !ReplaceTokenIdentifier("or", TokenId.DoubleBar))
+					{
+						break;
+					}
+
+					logicalOperand = _token.id == TokenId.DoubleAmphersand ? "&&" : "||";
+					NextToken();
+				}
+
+				return result;
+			}
+
+			Expression parse2()
+			{
+				if (_token.id == TokenId.OpenParen)
+				{
+					_parsingIs = false;
+					var expr = parse1();
+					ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
+					NextToken();
+					_parsingIs = true;
+					return new ParenExpression(expr);
+				}
+
+				if (_token.id == TokenId.Exclamation || TokenIdentifierIs("not"))
+				{
+					NextToken();
+					var expr = parse2();
+
+					if (expr is BinaryExpression be && be.Operand == "==")
+					{
+						return new BinaryExpression(be.Left, be.Right, "!=");
+					}
+					if (expr is not ParenExpression)
+					{
+						expr = new ParenExpression(expr);
+					}
+					return new UnaryExpression(expr, "!");
+				}
+
+				var errPos = _token.pos;
+				bool isComparisonToken;
+				TokenId op;
+				if (isComparisonToken = IsCompasionToken())
+				{
+					op = _token.id;
+					NextToken();
+				}
+				else
+				{
+					op = TokenId.DoubleEqual;
+				}
+
+				var right = ParseComparison();
+				if (right is TypeExpression te)
+				{
+					if (isComparisonToken)
+					{
+						throw new ParseException("Comparison operator cannot be used for type checking.", errPos);
+					}
+					return new IsExpression(expression, te);
+				}
+
+				return new BinaryExpression(expression, right, GetComparisonOperand(op));
+			}
+
 		}
-
-		Expression parse2()
-		{
-			if (_token.id == TokenId.OpenParen)
-			{
-				var expr = parse1();
-				ValidateToken(TokenId.CloseParen, Res.CloseParenOrOperatorExpected);
-				NextToken();
-				return new ParenExpression(expr);
-			}
-
-			if (_token.id == TokenId.Exclamation || TokenIdentifierIs("not"))
-			{
-				NextToken();
-				var expr = parse2();
-
-				if (expr is BinaryExpression be && be.Operand == "==")
-				{
-					return new BinaryExpression(be.Left, be.Right, "!=");
-				}
-				if (expr is not ParenExpression)
-				{
-					expr = new ParenExpression(expr);
-				}
-				return new UnaryExpression(expr, "!");
-			}
-
-			var errPos = _token.pos;
-			bool isComparisonToken;
-			TokenId op;
-			if (isComparisonToken = IsCompasionToken())
-			{
-				op = _token.id;
-				NextToken();
-			}
-			else
-			{
-				op = TokenId.DoubleEqual;
-			}
-
-			var right = ParseComparison();
-			if (right is TypeExpression te)
-			{
-				if (isComparisonToken)
-				{
-					throw new ParseException("Comparison operator cannot be used for type checking.", errPos);
-				}
-				return new IsExpression(expression, te);
-			}
-
-			return new BinaryExpression(expression, right, GetComparisonOperand(op));
-		}
+		return expression;
 	}
 
 	private Expression ParseMemberAccess(Expression? instance, bool? isNotifiable)
