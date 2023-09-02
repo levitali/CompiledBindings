@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\CompiledBindings.XF\CompiledBindings.XF.csproj" Private="False" />
+		<ProjectReference Include="..\CompiledBindings.XF\CompiledBindings.XF.csproj" Private="False" />
 	</ItemGroup>
 
 	<UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="..\..\..\bin\xf\build\netstandard2.0\CompiledBindings.XF.BuildTasks.dll" TaskFactory="TaskHostFactory" />
@@ -29,6 +29,7 @@
 
 	<PropertyGroup>
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
+		<EnableNullables>true</EnableNullables>
 	</PropertyGroup>
 
 	<Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">
@@ -41,7 +42,7 @@
 		<CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
 			<Output TaskParameter="Include" ItemName="XamlFiles" />
 		</CreateItem>
-		<XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" AttachDebugger="false">
+		<XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" EnableNullables="$(EnableNullables)" AttachDebugger="false">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 		</XFGenerateCodeTask>
 		<ItemGroup>
@@ -52,7 +53,7 @@
 	</Target>
 
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="true" />
+		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="false" />
 	</Target>
 
 	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">

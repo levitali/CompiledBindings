@@ -49,6 +49,8 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	[Output]
 	public ITaskItem[] GeneratedCodeFiles { get; private set; } = null!;
 
+	public bool EnableNullables { get; init; }
+
 	public bool AttachDebugger { get; init; }
 
 	public override bool Execute()
@@ -59,6 +61,8 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 			{
 				System.Diagnostics.Debugger.Launch();
 			}
+
+			TypeInfo.EnableNullables = EnableNullables;
 
 			_cancellationTokenSource = new CancellationTokenSource();
 

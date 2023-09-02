@@ -125,7 +125,8 @@
 												 ProjectPath="$(MSBuildProjectDirectory)"
 												 IntermediateOutputPath="$(IntermediateOutputPath)"
 												 LangVersion="$(LangVersion)"
-												 MSBuildVersion="$(MSBuildVersion)">
+												 MSBuildVersion="$(MSBuildVersion)"
+												 EnableNullables="$(EnableNullables)">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
 			<Output ItemName="NewPages" TaskParameter="NewPages" />

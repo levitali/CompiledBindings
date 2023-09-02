@@ -32,7 +32,10 @@ public class TypeInfo
 		_nullableContext = GetNullableContext(typeReference);
 		_nullableFlags = GetNullableFlags(typeReference);
 		var b = _nullableFlags?[0] ?? _nullableContext;
-		_canBeNullable = b is null or 0 ? null : b == 2;
+		if (EnableNullables)
+		{
+			_canBeNullable = b is null or 0 ? null : b == 2;
+		}
 	}
 
 	private TypeInfo(TypeReference typeReference, bool? isNullable, byte[]? nullabileFlags, byte? nullableContext)
@@ -41,16 +44,21 @@ public class TypeInfo
 		_nullableContext = nullableContext;
 		_nullableFlags = nullabileFlags;
 
-		if (isNullable != null)
+		if (EnableNullables)
 		{
-			_canBeNullable = isNullable;
-		}
-		else
-		{
-			var b = _nullableFlags?[0] ?? _nullableContext;
-			_canBeNullable = b is null or 0 ? null : b == 2;
+			if (isNullable != null)
+			{
+				_canBeNullable = isNullable;
+			}
+			else
+			{
+				var b = _nullableFlags?[0] ?? _nullableContext;
+				_canBeNullable = b is null or 0 ? null : b == 2;
+			}
 		}
 	}
+
+	public static bool EnableNullables { get; set; } = true;
 
 	public static Dictionary<string, HashSet<string>> NotNullableProperties { get; } = new Dictionary<string, HashSet<string>>();
 

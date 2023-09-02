@@ -47,6 +47,8 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 	[Output]
 	public ITaskItem[] GeneratedCodeFiles { get; private set; } = null!;
 
+	public bool EnableNullables { get; init; }
+
 	public bool AttachDebugger { get; set; }
 
 	public override bool Execute()
@@ -57,6 +59,8 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 			{
 				System.Diagnostics.Debugger.Launch();
 			}
+
+			TypeInfo.EnableNullables = EnableNullables;
 
 			_cancellationTokenSource = new CancellationTokenSource();
 
