@@ -126,7 +126,7 @@
 												 IntermediateOutputPath="$(IntermediateOutputPath)"
 												 LangVersion="$(LangVersion)"
 												 MSBuildVersion="$(MSBuildVersion)"
-												 EnableNullables="$(EnableNullables)">
+											   Nullable="$(Nullable)">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
 			<Output ItemName="NewPages" TaskParameter="NewPages" />

@@ -86,7 +86,7 @@
 							                ProjectPath="$(MSBuildProjectDirectory)"
 							                LangVersion="$(LangVersion)"
 							                MSBuildVersion="$(MSBuildVersion)"
-															EnableNullables="$(EnableNullables)">
+															Nullable="$(Nullable)">
             <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
             <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
         </MauiGenerateCodeTask>

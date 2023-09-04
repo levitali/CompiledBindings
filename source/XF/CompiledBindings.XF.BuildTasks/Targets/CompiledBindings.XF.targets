@@ -1,17 +1,17 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.XF.BuildTasks.merged.dll" />
-  <UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.XF.BuildTasks.merged.dll" />
-  <UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.XF.BuildTasks.merged.dll" />
+	<UsingTask TaskName="XFGenerateCodeTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.XF.BuildTasks.merged.dll" />
+	<UsingTask TaskName="XFProcessResourceXamlTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.XF.BuildTasks.merged.dll" />
+	<UsingTask TaskName="ProcessAssemblyTask" AssemblyFile="$(MSBuildThisFileDirectory)CompiledBindings.XF.BuildTasks.merged.dll" />
 
-  <PropertyGroup>
-    <LocalAssemblyGenerated>false</LocalAssemblyGenerated>
+	<PropertyGroup>
+		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
 		<CompiledBindingsTargetDependsOn>$(CompiledBindingsTargetDependsOn);XamlG</CompiledBindingsTargetDependsOn>
 	</PropertyGroup>
 
-  <Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">
-    <MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />
-    <Csc Condition=" '$(LocalAssemblyGenerated)' == 'false' "
+	<Target Name="XFGenerateCode" AfterTargets="XamlG" Condition="'$(DesignTimeBuild)' != 'True'">
+		<MakeDir Directories="$(IntermediateOutputPath)intermediate\" Condition=" '$(LocalAssemblyGenerated)' == 'false' " />
+		<Csc Condition=" '$(LocalAssemblyGenerated)' == 'false' "
          AdditionalLibPaths="$(AdditionalLibPaths)"
          AddModules="@(AddModules)"
          AdditionalFiles="@(AdditionalFiles)"
@@ -73,14 +73,14 @@
          Win32Icon="$(ApplicationIcon)"
          Win32Manifest="$(Win32Manifest)"
          Win32Resource="$(Win32Resource)"/>
-    <PropertyGroup>
-      <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
-    </PropertyGroup>
+		<PropertyGroup>
+			<LocalAssemblyGenerated>true</LocalAssemblyGenerated>
+		</PropertyGroup>
 
-    <CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
-      <Output TaskParameter="Include" ItemName="XamlFiles" />
-    </CreateItem>
-    <XFGenerateCodeTask XamlFiles="@(XamlFiles)"
+		<CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
+			<Output TaskParameter="Include" ItemName="XamlFiles" />
+		</CreateItem>
+		<XFGenerateCodeTask XamlFiles="@(XamlFiles)"
                         ReferenceAssemblies="@(ReferencePath)"
                         LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)"
                         IntermediateOutputPath="$(IntermediateOutputPath)"
@@ -88,19 +88,19 @@
                         LangVersion="$(LangVersion)"
                         MSBuildVersion="$(MSBuildVersion)"
 												Nullable="$(Nullable)">
-      <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
-      <Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
-    </XFGenerateCodeTask>
-  </Target>
+			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
+			<Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
+		</XFGenerateCodeTask>
+	</Target>
 
-  <Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-    <XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)"
+	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
+		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)"
                                Assembly="$(IntermediateOutputPath)$(TargetFileName)" />
-  </Target>
+	</Target>
 
-  <Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-    <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
+	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
                          TargetAssembly="@(IntermediateAssembly)" />
-  </Target>
+	</Target>
 
 </Project>

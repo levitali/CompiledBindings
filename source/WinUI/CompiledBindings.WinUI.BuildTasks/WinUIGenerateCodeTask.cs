@@ -44,7 +44,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 
 	public required ITaskItem ApplicationDefinition { get; init; }
 
-	public bool EnableNullables { get; init; }
+	public string? Nullable { get; init; }
 
 	[Required]
 	public required ITaskItem[] Pages { get; init; }
@@ -69,7 +69,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 				System.Diagnostics.Debugger.Launch();
 			}
 
-			TypeInfo.EnableNullables = EnableNullables;
+			TypeInfo.EnableNullables = string.Compare(Nullable, "enable", true) == 0;
 
 			_cancellationTokenSource = new CancellationTokenSource();
 

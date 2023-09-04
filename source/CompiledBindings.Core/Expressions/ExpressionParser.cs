@@ -2,7 +2,7 @@
 
 public class ExpressionParser
 {
-	private static readonly Dictionary<string, Expression> _constractKeywords = new()
+	private static readonly Dictionary<string, Expression> _constantKeywords = new()
 	{
 		{ "true", new ConstantExpression(true) },
 		{ "false", new ConstantExpression(false) },
@@ -777,7 +777,7 @@ public class ExpressionParser
 			return _root;
 		}
 
-		if (_constractKeywords.TryGetValue(_token.text, out var value))
+		if (_constantKeywords.TryGetValue(_token.text, out var value))
 		{
 			NextToken();
 			return value;
