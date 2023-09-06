@@ -55,7 +55,7 @@ public class XFProcessResourceXamlTask : Task
 			using var assembly = AssemblyDefinition.ReadAssembly(Assembly, prm);
 
 			var helperTypeAssembly = TypeInfoUtils.Assemblies
-				.FirstOrDefault(a => a.MainModule.GetAllTypes().Any(t => t.FullName == "CompiledBindings.XF.CompiledBindingsHelper"))?
+				.FirstOrDefault(a => a.MainModule.GetAllTypes().Any(t => t.FullName == $"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper"))?
 				.Name.Name;
 
 			var assemblyTypes = assembly.MainModule.Types.ToDictionary(_ => _.FullName);
