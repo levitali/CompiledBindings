@@ -41,7 +41,7 @@
 		<CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
 			<Output TaskParameter="Include" ItemName="XamlFiles" />
 		</CreateItem>
-		<XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)" AttachDebugger="true">
+		<XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)" AttachDebugger="false">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 		</XFGenerateCodeTask>
 		<ItemGroup>

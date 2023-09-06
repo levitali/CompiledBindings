@@ -178,7 +178,7 @@
     <PropertyGroup>
       <LocalAssemblyGenerated>true</LocalAssemblyGenerated>
     </PropertyGroup>
-    <UWPGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" EnableNullables="$(EnableNullables)">
+    <UWPGenerateCodeTask ApplicationDefinition="@(ApplicationDefinition)" Pages="@(Page)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)">
       <Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
       <Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
       <Output ItemName="NewPages" TaskParameter="NewPages" />
