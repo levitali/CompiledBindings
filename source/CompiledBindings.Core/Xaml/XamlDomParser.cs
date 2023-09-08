@@ -334,7 +334,7 @@ public abstract class XamlDomParser
 				var staticNode = xamlNode.Children[0];
 				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces2, out var dummy);
 				includeNamespaces.UnionWith(includeNamespaces2.Select(ns => ns.ClrNamespace!));
-				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp.MemberType);
+				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 				CorrectMethod(objProp, value.StaticValue.Type);
 				obj.GenerateMember = true;
 			}
@@ -379,7 +379,7 @@ public abstract class XamlDomParser
 					{
 						if (bind.Converter == null)
 						{
-							bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp.MemberType);
+							bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp);
 						}
 						CorrectMethod(objProp, bind.SourceExpression.Type);
 					}
@@ -517,32 +517,36 @@ public abstract class XamlDomParser
 
 	protected virtual bool CanSetBindingTypeProperty => false;
 
-	private static Expression CorrectSourceExpression(Expression expression, TypeInfo? targetType)
+	private static Expression CorrectSourceExpression(Expression expression, XamlObjectProperty prop)
 	{
-		if (expression is not DefaultExpression &&
-			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
-			targetType?.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
+		if (prop.TargetEvent == null)
 		{
-			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
-			if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
+			var targetType = prop.MemberType;
+			if (expression is not DefaultExpression &&
+				!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
+				targetType.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
 			{
-				expression = new ParenExpression(expression);
+				var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
+				if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
+				{
+					expression = new ParenExpression(expression);
+				}
+				expression = new CallExpression(expression, method, Array.Empty<Expression>());
 			}
-			expression = new CallExpression(expression, method, Array.Empty<Expression>());
-		}
-		if (expression.IsNullable && targetType?.IsNullable == false)
-		{
-			Expression defaultExpr;
-			if (targetType.Reference.FullName == "System.String")
+			if (expression.IsNullable && !targetType.IsNullable)
 			{
-				defaultExpr = new ConstantExpression("");
-			}
-			else
-			{
-				defaultExpr = Expression.DefaultExpression;
-			}
+				Expression defaultExpr;
+				if (targetType.Reference.FullName == "System.String")
+				{
+					defaultExpr = new ConstantExpression("");
+				}
+				else
+				{
+					defaultExpr = Expression.DefaultExpression;
+				}
 
-			return new CoalesceExpression(expression, defaultExpr);
+				return new CoalesceExpression(expression, defaultExpr);
+			}
 		}
 		return expression;
 	}

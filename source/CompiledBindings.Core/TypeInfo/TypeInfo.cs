@@ -31,9 +31,9 @@ public class TypeInfo
 		Reference = typeReference;
 		_nullableContext = GetNullableContext(typeReference);
 		_nullableFlags = GetNullableFlags(typeReference);
-		var b = _nullableFlags?[0] ?? _nullableContext;
 		if (EnableNullables)
 		{
+			var b = _nullableFlags?[0] ?? _nullableContext;
 			_canBeNullable = b is null or 0 ? null : b == 2;
 		}
 	}
@@ -44,13 +44,13 @@ public class TypeInfo
 		_nullableContext = nullableContext;
 		_nullableFlags = nullabileFlags;
 
-		if (EnableNullables)
+		if (isNullable != null)
 		{
-			if (isNullable != null)
-			{
-				_canBeNullable = isNullable;
-			}
-			else
+			_canBeNullable = isNullable;
+		}
+		else
+		{
+			if (EnableNullables)
 			{
 				var b = _nullableFlags?[0] ?? _nullableContext;
 				_canBeNullable = b is null or 0 ? null : b == 2;
@@ -369,7 +369,7 @@ public class PropertyInfo : IMemberInfo
 	public PropertyDefinition Definition { get; }
 	public TypeInfo PropertyType { get; }
 
-	public bool IsReadOnly => _isReadOnly ??= 
+	public bool IsReadOnly => _isReadOnly ??=
 		Definition.GetMethod?.Body?.Instructions is var instructions &&
 			instructions != null &&
 			instructions.Count == 3 &&
