@@ -265,7 +265,21 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 		var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, a, KnownNamespaces);
 		if (xamlNode.Children.Count == 1)
 		{
-			return IsMemExtension(xamlNode.Children[0].Name);
+			var name = xamlNode.Children[0].Name;
+			var res = IsMemExtension(name);
+			if (res != null)
+			{
+				return res;
+			}
+			if (a.Name.Namespace == mNamespace && name.Namespace == xNamespace)
+			{
+				return name.LocalName switch
+				{
+					"Bind" or "BindExtension" => ExtenstionType.Bind,
+					"Set" or "SetExtension" => ExtenstionType.Set,
+					_ => null
+				};
+			}
 		}
 		return null;
 	}
