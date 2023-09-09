@@ -48,13 +48,10 @@ public class TypeInfo
 		{
 			_canBeNullable = isNullable;
 		}
-		else
+		else if (EnableNullables)
 		{
-			if (EnableNullables)
-			{
-				var b = _nullableFlags?[0] ?? _nullableContext;
-				_canBeNullable = b is null or 0 ? null : b == 2;
-			}
+			var b = _nullableFlags?[0] ?? _nullableContext;
+			_canBeNullable = b is null or 0 ? null : b == 2;
 		}
 	}
 
@@ -110,22 +107,14 @@ public class TypeInfo
 	public TypeInfo? GetElementType()
 	{
 		var elementType = Reference.GetElementType();
-		if (elementType == null)
-		{
-			return null;
-		}
-		return new TypeInfo(elementType, GetIsNullableSubElement(1), GetNullableFlags(elementType), GetNullableContext(elementType) ?? _nullableContext);
+		return elementType == null
+			? null
+			: new TypeInfo(elementType, GetIsNullableSubElement(1), GetNullableFlags(elementType), GetNullableContext(elementType) ?? _nullableContext);
 	}
 
 	public IList<TypeInfo>? GetGenericArguments()
 	{
-		var genericArguments = Reference.GetGenericArguments();
-		if (genericArguments == null)
-		{
-			return null;
-		}
-
-		return genericArguments
+		return Reference.GetGenericArguments()?
 			.Select((ga, i) => new TypeInfo(ga, GetIsNullableSubElement(i + 1), GetNullableFlags(ga), GetNullableContext(ga) ?? _nullableContext))
 			.ToList();
 	}
@@ -189,12 +178,7 @@ public class TypeInfo
 
 	public static TypeInfo GetTypeThrow(string typeName, bool ignoreCase = false)
 	{
-		var type = GetType(typeName, ignoreCase);
-		if (type == null)
-		{
-			throw new Exception($"Type not found: {typeName}");
-		}
-		return type;
+		return GetType(typeName, ignoreCase) ?? throw new Exception($"Type not found: {typeName}");
 	}
 
 	public static TypeInfo GetTypeThrow(Type type)
@@ -272,14 +256,9 @@ Label_Break1:
 		var attr = attributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
 		if (attr != null)
 		{
-			if (attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr)
-			{
-				nullableFlags = arr.Select(b => (byte)b.Value).ToArray();
-			}
-			else
-			{
-				nullableFlags = new[] { (byte)attr.ConstructorArguments[0].Value };
-			}
+			nullableFlags = attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr
+				? arr.Select(b => (byte)b.Value).ToArray()
+				: (new[] { (byte)attr.ConstructorArguments[0].Value });
 		}
 
 		byte? nullableContext = null;
@@ -316,30 +295,20 @@ Label_Break1:
 			type = type.GetElementType();
 		}
 
-		if (type.IsInterface())
-		{
-			return type.GetAllInterfaces();
-		}
-
-		return EnumerableExtensions.SelectSequence(type, t => t.GetBaseType(), true).Where(t => t != null).Select(t => t!);
+		return type.IsInterface()
+			? type.GetAllInterfaces()
+			: EnumerableExtensions.SelectSequence(type, t => t.GetBaseType(), true).Where(t => t != null).Select(t => t!);
 	}
 
 	private static byte[]? GetNullableFlags(TypeReference type)
 	{
 		var attrs = type.ResolveEx()?.CustomAttributes;
 		var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
-		if (attr != null)
-		{
-			if (attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr)
-			{
-				return arr.Select(b => (byte)b.Value).ToArray();
-			}
-			else
-			{
-				return new[] { (byte)attr.ConstructorArguments[0].Value };
-			}
-		}
-		return null;
+		return attr != null
+			? attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr
+				? arr.Select(b => (byte)b.Value).ToArray()
+				: (new[] { (byte)attr.ConstructorArguments[0].Value })
+			: null;
 	}
 
 	private static byte? GetNullableContext(TypeReference type)
@@ -435,11 +404,7 @@ public class EventInfo : IMemberInfo
 	public IEnumerable<TypeInfo> GetEventHandlerParameterTypes()
 	{
 		var invokeMethod = EventType.Methods.FirstOrDefault(m => m.Definition.Name == "Invoke");
-		if (invokeMethod == null)
-		{
-			return Enumerable.Empty<TypeInfo>();
-		}
-		return invokeMethod.Parameters.Select(p => p.ParameterType);
+		return invokeMethod?.Parameters.Select(p => p.ParameterType) ?? Enumerable.Empty<TypeInfo>();
 	}
 }
 
