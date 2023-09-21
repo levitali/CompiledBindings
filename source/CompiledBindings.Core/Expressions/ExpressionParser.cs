@@ -828,7 +828,7 @@ public class ExpressionParser
 		{
 			_parsingIs = true;
 			var savedExpectedType = _expectedType;
-			_expectedType = expression.Type;
+			_expectedType = GetNullableUnderlyingType(expression.Type);
 
 			expression = parse1();
 			if (expression is not ParenExpression)
@@ -1108,7 +1108,7 @@ Label_CreateMemberExpression:
 		var argList = new List<Expression>();
 		for (int i = 0; ; i++)
 		{
-			_expectedType = i < argumentTypes?.Count ? argumentTypes[i] : null;
+			_expectedType = i < argumentTypes?.Count ? GetNullableUnderlyingType(argumentTypes[i]) : null;
 			argList.Add(ParseExpression());
 			if (_token.id != TokenId.Comma)
 			{
