@@ -90,11 +90,11 @@ namespace XFTest.Views
 			{
 				var dataRoot = _targetRoot;
 #line (30, 13) - (30, 65) 30 "Page2.xml"
-				var value1 = dataRoot._viewModel.GetIcon();
+				var value1 = dataRoot._viewModel?.GetIcon();
 #line (30, 13) - (30, 65) 30 "Page2.xml"
-				_targetRoot.label9.FontFamily = value1.Item1;
+				_targetRoot.label9.FontFamily = value1?.Item1;
 #line (31, 13) - (31, 54) 31 "Page2.xml"
-				_targetRoot.label9.Text = value1.Item2;
+				_targetRoot.label9.Text = value1?.Item2;
 #line default
 				Update0(dataRoot._viewModel);
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot._viewModel);
@@ -113,7 +113,7 @@ namespace XFTest.Views
 			private void Update0_CurrentItem(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (21, 16) - (21, 62) 21 "Page2.xml"
-				var value1 = value.CurrentItem;
+				var value1 = value?.CurrentItem;
 #line default
 				Update1_GuidProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
@@ -122,7 +122,7 @@ namespace XFTest.Views
 			private void Update0_CurrentItem2(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (22, 16) - (22, 60) 22 "Page2.xml"
-				var value1 = value.CurrentItem2;
+				var value1 = value?.CurrentItem2;
 #line default
 				Update2_Prop1(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler2(value1);
@@ -131,28 +131,28 @@ namespace XFTest.Views
 			private void Update0_StringProp(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (23, 16) - (23, 141) 23 "Page2.xml"
-				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value.StringProp, typeof(global::System.String), value.DecimalProp + 1, null));
+				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value?.StringProp, typeof(global::System.String), value?.DecimalProp + 1, null));
 #line default
 			}
 
 			private void Update0_DecimalProp(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (23, 16) - (23, 141) 23 "Page2.xml"
-				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value.StringProp, typeof(global::System.String), value.DecimalProp + 1, null));
+				_targetRoot.label3.Text = ((global::System.String)_targetRoot.someConverter.Convert(value?.StringProp, typeof(global::System.String), value?.DecimalProp + 1, null));
 #line default
 			}
 
 			private void Update0_CalculateString(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (24, 16) - (24, 73) 24 "Page2.xml"
-				_targetRoot.label4.Text = value.CalculateString().TrimNumber();
+				_targetRoot.label4.Text = value?.CalculateString()?.TrimNumber();
 #line default
 			}
 
 			private void Update0_FuncProp(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (25, 16) - (25, 67) 25 "Page2.xml"
-				var value1 = value.FuncProp?.Invoke("test");
+				var value1 = value?.FuncProp?.Invoke("test");
 #line default
 				Update3_GuidProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler3(value1);
@@ -161,7 +161,7 @@ namespace XFTest.Views
 			private void Update0_Group(global::XFTest.ViewModels.Page2ViewModel value)
 			{
 #line (27, 16) - (27, 59) 27 "Page2.xml"
-				var value1 = value.Group?[0];
+				var value1 = value?.Group?[0];
 #line default
 				Update4_GuidProp(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler4(value1);

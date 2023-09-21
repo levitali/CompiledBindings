@@ -29,10 +29,10 @@ public class TypeInfo
 	private TypeInfo(TypeReference typeReference)
 	{
 		Reference = typeReference;
-		_nullableContext = GetNullableContext(typeReference);
-		_nullableFlags = GetNullableFlags(typeReference);
 		if (EnableNullables)
 		{
+			_nullableContext = GetNullableContext(typeReference);
+			_nullableFlags = GetNullableFlags(typeReference);
 			var b = _nullableFlags?[0] ?? _nullableContext;
 			_canBeNullable = b is null or 0 ? null : b == 2;
 		}
@@ -252,33 +252,35 @@ public class TypeInfo
 Label_Break1:
 
 		byte[]? nullableFlags = null;
-		var attributes = attributesHierarchy.First();
-		var attr = attributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
-		if (attr != null)
-		{
-			nullableFlags = attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr
-				? arr.Select(b => (byte)b.Value).ToArray()
-				: (new[] { (byte)attr.ConstructorArguments[0].Value });
-		}
-
 		byte? nullableContext = null;
-		foreach (var attributes2 in attributesHierarchy.Concat(
-			EnumerableExtensions.SelectSequence(declaringType, t => t.DeclaringType, true).Select(t => t.CustomAttributes)))
+		if (EnableNullables)
 		{
-			var attr2 = attributes2.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
-			if (attr2 != null)
+			var attributes = attributesHierarchy.First();
+			var attr = attributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+			if (attr != null)
 			{
-				nullableContext = (byte)attr2.ConstructorArguments[0].Value;
-				break;
+				nullableFlags = attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr
+					? arr.Select(b => (byte)b.Value).ToArray()
+					: (new[] { (byte)attr.ConstructorArguments[0].Value });
+			}
+
+			foreach (var attributes2 in attributesHierarchy.Concat(
+				EnumerableExtensions.SelectSequence(declaringType, t => t.DeclaringType, true).Select(t => t.CustomAttributes)))
+			{
+				var attr2 = attributes2.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute");
+				if (attr2 != null)
+				{
+					nullableContext = (byte)attr2.ConstructorArguments[0].Value;
+					break;
+				}
+			}
+
+			if (isNullable == null)
+			{
+				var b = nullableFlags?[0] ?? nullableContext;
+				isNullable = b is null or 0 ? null : b == 2;
 			}
 		}
-
-		if (isNullable == null)
-		{
-			var b = nullableFlags?[0] ?? nullableContext;
-			isNullable = b is null or 0 ? null : b == 2;
-		}
-
 		return new TypeInfo(type, isNullable, nullableFlags, nullableContext);
 	}
 
@@ -302,26 +304,38 @@ Label_Break1:
 
 	private static byte[]? GetNullableFlags(TypeReference type)
 	{
-		var attrs = type.ResolveEx()?.CustomAttributes;
-		var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
-		return attr != null
-			? attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr
-				? arr.Select(b => (byte)b.Value).ToArray()
-				: (new[] { (byte)attr.ConstructorArguments[0].Value })
-			: null;
+		if (EnableNullables)
+		{
+			var attrs = type.ResolveEx()?.CustomAttributes;
+			var attr = attrs?.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+			return attr != null
+				? attr.ConstructorArguments[0].Value is CustomAttributeArgument[] arr
+					? arr.Select(b => (byte)b.Value).ToArray()
+					: (new[] { (byte)attr.ConstructorArguments[0].Value })
+				: null;
+		}
+		return null;
 	}
 
 	private static byte? GetNullableContext(TypeReference type)
 	{
-		return (byte?)type.ResolveEx()?
-			.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute")?
-			.ConstructorArguments[0].Value;
+		if (EnableNullables)
+		{
+			return (byte?)type.ResolveEx()?
+				.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute")?
+				.ConstructorArguments[0].Value;
+		}
+		return null;
 	}
 
 	private bool? GetIsNullableSubElement(int index)
 	{
-		var b = _nullableFlags?.Length > index ? _nullableFlags[index] : _nullableContext;
-		return b is null or 0 ? null : b == 2;
+		if (EnableNullables)
+		{
+			var b = _nullableFlags?.Length > index ? _nullableFlags[index] : _nullableContext;
+			return b is null or 0 ? null : b == 2;
+		}
+		return null;
 	}
 }
 

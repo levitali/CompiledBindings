@@ -22,19 +22,19 @@ public class XFTests : IDisposable
 	[Test]
 	public void Page1()
 	{
-		TestCodeGeneration("Page1");
+		TestCodeGeneration("Page1", true);
 	}
 
 	[Test]
 	public void Page2()
 	{
-		TestCodeGeneration("Page2");
+		TestCodeGeneration("Page2", false);
 	}
 
 	[Test]
 	public void Page3()
 	{
-		TestCodeGeneration("Page3");
+		TestCodeGeneration("Page3", true);
 	}
 
 	[Test]
@@ -43,8 +43,10 @@ public class XFTests : IDisposable
 		TestProcessXaml("Page4");
 	}
 
-	private void TestCodeGeneration(string pageName)
+	private void TestCodeGeneration(string pageName, bool enableNullables)
 	{
+		TypeInfo.EnableNullables = enableNullables;
+
 		var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 		var xamlFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml");
 		var xdoc = XDocument.Load(xamlFile, LoadOptions.SetLineInfo);
