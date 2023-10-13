@@ -359,8 +359,9 @@ public class PropertyInfo : IMemberInfo
 			instructions[0].OpCode == OpCodes.Ldarg_0 &&
 			instructions[1].OpCode == OpCodes.Ldfld &&
 			instructions[2].OpCode == OpCodes.Ret &&
-			instructions[1].Operand is FieldDefinition fld &&
-			fld.IsInitOnly;
+			((instructions[1].Operand is FieldDefinition fld && fld.IsInitOnly) ||
+			 (instructions[1].Operand is FieldReference fldr && fldr.Resolve()?.IsInitOnly == true));
+
 
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => PropertyType;

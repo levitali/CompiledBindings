@@ -368,7 +368,7 @@ public static class BindingParser
 		// Create Update methods for notify sources and properties
 		foreach (var notifySource in notifySources)
 		{
-			// If the notify source has more than one propert<, the update method is needed
+			// If the notify source has more than one property, the update method is needed
 			// to update all properties for empty property name
 			if (notifySource.Properties.Count > 1 &&
 				iNotifyPropertyChangedType.IsAssignableFrom(notifySource.SourceExpression.Type))
