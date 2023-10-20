@@ -340,7 +340,7 @@ public abstract class XamlDomParser
 			}
 			catch (ParseException ex)
 			{
-				HandleParseException(ex);
+				handleParseException(ex);
 			}
 		}
 		else if (xamlNode.Children.Count == 1 &&
@@ -484,7 +484,7 @@ public abstract class XamlDomParser
 			}
 			catch (ParseException ex)
 			{
-				HandleParseException(ex);
+				handleParseException(ex);
 			}
 		}
 		else
@@ -505,7 +505,7 @@ public abstract class XamlDomParser
 
 		return value;
 
-		void HandleParseException(ParseException ex)
+		void handleParseException(ParseException ex)
 		{
 			var offset = objProp.MemberName.Length +
 					2 + // ="    Note, if there are spaces in between, they are not considered
