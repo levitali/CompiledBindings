@@ -5,8 +5,6 @@ using System.Windows.Data;
 using System.Windows.Media;
 using WPFTest.ViewModels;
 
-
-
 namespace WPFTest.Views;
 
 internal partial class Page1

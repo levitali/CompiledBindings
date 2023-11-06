@@ -703,13 +703,13 @@ $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 {ResetLineDirective(ref isLineDirective)}
 {a2}					if (value != null)
 {a2}					{{");
-				GenerateSetSource(memberExpr2.CSharpCode, a2 + '\t');
+				generateSetSource(memberExpr2.CSharpCode, a2 + '\t');
 				output.AppendLine(
 $@"{a2}					}}");
 			}
 			else
 			{
-				GenerateSetSource(expr.CSharpCode, a2);
+				generateSetSource(expr.CSharpCode, a2);
 			}
 			output.AppendLine(
 $@"{a2}				}}
@@ -722,7 +722,7 @@ $@"{a2}				}}
 $@"{a}				}}");
 			}
 
-			void GenerateSetSource(string expression, string? a)
+			void generateSetSource(string expression, string? a)
 			{
 				if (me?.Member is MethodInfo)
 				{

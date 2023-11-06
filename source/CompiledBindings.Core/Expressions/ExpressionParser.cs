@@ -52,7 +52,7 @@ public class ExpressionParser
 		return res;
 	}
 
-	// ?:, ??, as, is operators
+	// ?:, ?? operators
 	private Expression ParseExpression()
 	{
 		var expr = ParseAs();

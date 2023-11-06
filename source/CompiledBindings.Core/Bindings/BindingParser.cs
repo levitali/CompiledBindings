@@ -498,7 +498,7 @@ public static class BindingParser
 
 		bool? checkPropertyNotifiable(INotifiableExpression expr)
 		{
-			// Not notifiable if explicitley turn of with / operator
+			// Not notifiable if explicitley turned off with / operator
 			if (expr.IsNotifiable == false)
 			{
 				return false;
@@ -579,7 +579,7 @@ public static class BindingParser
 			}
 			else
 			{
-				// Notifications for elment access are active ony if explicitly enabled with \ operator
+				// Notifications for elment access are active only if explicitly enabled with \ operator
 				if (expr.IsNotifiable == true)
 				{
 					return isNotifyPropertyChangedType ? true : null;

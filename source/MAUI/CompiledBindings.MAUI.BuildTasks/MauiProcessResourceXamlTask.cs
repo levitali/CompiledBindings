@@ -1,6 +1,4 @@
-﻿
-
-namespace CompiledBindings;
+﻿namespace CompiledBindings;
 
 public class MauiProcessResourceXamlTask : XFProcessResourceXamlTask
 {

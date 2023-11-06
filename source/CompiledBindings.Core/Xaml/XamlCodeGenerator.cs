@@ -171,7 +171,7 @@ $@"{a2}			{attachRoot}{property.Object.Parent!.Name}.{property.TargetMethod.Defi
 			}
 			else
 			{
-				GenerateSet(true, ref localFuncIndex, ref isLineDirective, a2);
+				generateSet(true, ref localFuncIndex, ref isLineDirective, a2);
 			}
 			if (isTwoWayBinding)
 			{
@@ -220,10 +220,10 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 		}
 		else
 		{
-			GenerateSet(false, ref localFuncIndex, ref isLineDirective, a);
+			generateSet(false, ref localFuncIndex, ref isLineDirective, a);
 		}
 
-		void GenerateSet(bool isMethodCall, ref int localFuncIndex, ref bool isLineDirective, string? a)
+		void generateSet(bool isMethodCall, ref int localFuncIndex, ref bool isLineDirective, string? a)
 		{
 			if (isAsync)
 			{
