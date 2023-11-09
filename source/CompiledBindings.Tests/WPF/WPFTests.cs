@@ -23,16 +23,22 @@ public class WPFTests : IDisposable
 	[Test]
 	public void Page1()
 	{
-		TestPage("Page1");
+		TestPage("Page1", false);
 	}
 
 	[Test]
 	public void Page2()
 	{
-		TestPage("Page2");
+		TestPage("Page2", false);
 	}
 
-	private void TestPage(string pageName)
+	[Test]
+	public void Page3()
+	{
+		TestPage("Page3", true);
+	}
+
+	private void TestPage(string pageName, bool testXaml)
 	{
 		var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 		var xamlFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.xml");
@@ -48,6 +54,16 @@ public class WPFTests : IDisposable
 		var expectedCode = File.ReadAllText(csharpFile);
 
 		Assert.That(code.Equals(expectedCode));
+
+		if (testXaml)
+		{
+			WpfXamlProcessor.ProcessXaml(xdoc, parseResult!, null);
+			
+			var gFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.g.xml");
+			var expectedXaml = File.ReadAllText(gFile);
+
+			Assert.That(xdoc.ToString().Equals(expectedXaml));
+		}
 	}
 }
 

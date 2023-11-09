@@ -308,6 +308,7 @@ public static class BindingParser
 
 		return new Bind
 		{
+			SourceType = sourceType,
 			Property = prop,
 			DataType = dataType,
 			DataTypeSet = dataTypeSet,
@@ -796,6 +797,7 @@ public class TwoWayBindingData
 
 public class Bind
 {
+	public required TypeInfo SourceType { get; init; }
 	public required XamlObjectProperty Property { get; init; }
 	public Expression? Expression { get; init; }
 	public Expression? BindBackExpression { get; init; }

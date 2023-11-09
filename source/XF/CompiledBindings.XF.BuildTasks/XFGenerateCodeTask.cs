@@ -369,9 +369,9 @@ $@"	class {className}_{bind.Property.Object.Name}_{bind.Property.MemberName} : g
 			}
 
 			output.AppendLine(
-$@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.DataType!.Reference.GetCSharpFullName()}, global::{resultType}>(");
+$@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _binding = new global::{_platformConstants.BaseClrNamespace}.Internals.TypedBinding<global::{bind.SourceType.Reference.GetCSharpFullName()}, global::{resultType}>(");
 
-			var checkNull = bind.DataType.Reference.IsValueType ? null : "dataRoot == null ? (default, false) : ";
+			var checkNull = bind.SourceType.Reference.IsValueType ? null : "dataRoot == null ? (default, false) : ";
 			output.AppendLine(
 $@"			dataRoot => {checkNull}(
 {LineDirective(bind.Property.XamlNode, ref isLineDirective)}
@@ -394,7 +394,7 @@ $@"			new[]
 					foreach (var prop in source.Properties)
 					{
 						output.AppendLine(
-$@"				new global::System.Tuple<global::System.Func<global::{bind.DataType!.Reference.GetCSharpFullName()}, object>, string>(dataRoot =>
+$@"				new global::System.Tuple<global::System.Func<global::{bind.SourceType.Reference.GetCSharpFullName()}, object>, string>(dataRoot =>
 {LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 					{source.SourceExpression},
 {ResetLineDirective(ref isLineDirective)}

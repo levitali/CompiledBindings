@@ -5,6 +5,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 	public static readonly XNamespace mNamespace = "http://compiledbindings.com";
 	public static readonly XNamespace mxNamespace = "http://compiledbindings.com/x";
 	public static readonly XName mxDataType = mxNamespace + "DataType";
+	public static readonly XName mxDefaultBindMode = mxNamespace + "DefaultBindMode";
 
 	public static readonly XName NameAttr = XNamespace.None + "Name"; // WPF Name attribute
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
@@ -63,7 +64,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				DataType = dataType;
 			}
 
-			var obj = processElement(xroot, rootBindingScope, null, true, null);
+			var obj = processElement(xroot, rootBindingScope, true, null);
 			if (obj != null)
 			{
 				obj.IsRoot = true;
@@ -94,7 +95,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				XamlObjects = xamlObjects,
 			};
 
-			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? elementType, bool isSupportedParent, string? parentDescription)
+			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, bool isSupportedParent, string? parentDescription)
 			{
 				var savedDataType = DataType;
 
@@ -179,6 +180,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				}
 
 				XamlObject? obj = null;
+				TypeInfo? elementType = null;
 
 				if (attrs.Count > 0 ||
 					(dataTypeAttr != null && !isDataTemplateElement && xelement != xdoc.Root))
@@ -220,6 +222,11 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 					}
 				}
 
+				if (elementType != null)
+				{
+					DataType = elementType;
+				}
+
 				foreach (var child in xelement.Elements())
 				{
 					if (child.Name == DataTemplate ||
@@ -227,13 +234,13 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 						child.Name == ControlTemplate)
 					{
 						int index = dataTemplates.Count;
-						var dataTemplate = processRoot(child, elementType, null);
+						var dataTemplate = processRoot(child, elementType ?? DataType, null);
 						dataTemplates.Insert(index, dataTemplate);
 					}
 					else
 					{
 						var (isSupported, controlName) = IsElementSupported(child.Name);
-						processElement(child, currentBindingScope, elementType, isSupported && isSupportedParent, controlName ?? parentDescription);
+						processElement(child, currentBindingScope, isSupported && isSupportedParent, controlName ?? parentDescription);
 					}
 				}
 
@@ -313,6 +320,11 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 	}
 
 	public virtual bool IsDataContextSupported(TypeInfo type) => true;
+
+	protected override XAttribute GetDefaultBindModeAttribute(XElement element)
+	{
+		return base.GetDefaultBindModeAttribute(element) ?? element.Attribute(mxDefaultBindMode); ;
+	}
 }
 
 public enum ExtenstionType

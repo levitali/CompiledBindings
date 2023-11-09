@@ -11,8 +11,9 @@ namespace WPFTest.Views
 		{
 			InitializeComponent();
 
-			DataContext = _viewModel = new MainViewModel();
-		}
+			DataContext = _viewModel = new MainViewModel(); System.Windows.Media.Brush
+
+        }
 
 		public string InstanceFunction(int val1, int val2) => $"InstanceFunction({val1}, {val2})";
     }

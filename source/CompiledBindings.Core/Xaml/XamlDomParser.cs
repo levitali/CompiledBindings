@@ -356,21 +356,17 @@ public abstract class XamlDomParser
 				}
 
 				var defaultBindModeAttr =
-				EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
-					.Cast<XElement>()
-					.Select(e => e.Attribute(xDefaultBindMode))
-					.FirstOrDefault(a => a != null);
+					EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
+						.Cast<XElement>()
+						.Select(e => GetDefaultBindModeAttribute(e))
+						.FirstOrDefault(a => a != null);
 				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
 
 				var bind = BindingParser.Parse(objProp, DataType, TargetType, "dataRoot", defaultBindMode, this, includeNamespaces, throwIfBindWithoutDataType, ref _localVarIndex);
 
 				if (isPropertyTypeBinding)
 				{
-					if (bind.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
-					{
-						throw new GeneratorException($"TwoWay or OneWayToSource x:Binds are not supported if the property type is a standard Binding.", CurrentFile, xamlNode);
-					}
-
+					CheckBinding(bind, xamlNode);
 					value.BindingValue = bind;
 				}
 				else
@@ -515,7 +511,20 @@ public abstract class XamlDomParser
 		}
 	}
 
+	protected virtual XAttribute GetDefaultBindModeAttribute(XElement element)
+	{
+		return element.Attribute(xDefaultBindMode);
+	}
+
 	protected virtual bool CanSetBindingTypeProperty => false;
+
+	protected virtual void CheckBinding(Bind bind, XamlNode xamlNode)
+	{
+		if (bind.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
+		{
+			throw new GeneratorException($"TwoWay or OneWayToSource x:Binds are not supported if the property type is a standard Binding.", CurrentFile, xamlNode);
+		}
+	}
 
 	private static Expression CorrectSourceExpression(Expression expression, XamlObjectProperty prop)
 	{

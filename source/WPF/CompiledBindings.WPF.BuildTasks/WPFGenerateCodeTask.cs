@@ -150,67 +150,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							File.WriteAllText(sourceCodeTargetPath, code);
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
-							bool generateDataTemplates = parseResult.DataTemplates.Any(dt => dt.GenerateClass);
-
-							if (generateDataTemplates)
-							{
-								var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF";
-								if (helperTypeAssembly != null)
-								{
-									compiledBindingsNs += ";assembly=" + helperTypeAssembly;
-								}
-								var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
-
-								ensureNamespaceDeclared(compiledBindingsNs);
-								ensureNamespaceDeclared(localNs);
-
-								void ensureNamespaceDeclared(string searchedClrNs)
-								{
-									var attr = xdoc.Root.Attributes().FirstOrDefault(a => a.Name.Namespace == XNamespace.Xmlns && a.Value == searchedClrNs);
-									if (attr == null)
-									{
-										string classNsPrefix;
-										int nsIndex = 0;
-										do
-										{
-											classNsPrefix = "g" + nsIndex++;
-										}
-										while (xdoc.Root.Attributes().Any(a =>
-											a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == classNsPrefix));
-
-										xdoc.Root.Add(new XAttribute(XNamespace.Xmlns + classNsPrefix, searchedClrNs));
-									}
-								}
-
-								var mbui = (XNamespace)compiledBindingsNs;
-								var local = (XNamespace)localNs;
-
-								for (int i = 0; i < parseResult.DataTemplates.Count; i++)
-								{
-									var dataTemplate = parseResult.DataTemplates[i];
-									if (dataTemplate.GenerateClass)
-									{
-										var rootElement = dataTemplate.RootElement.Elements().First();
-
-										rootElement.Add(
-											new XElement(mbui + "CompiledBindingsHelper.Bindings",
-												new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
-													dataTemplate.EnumerateResources().Select(r => new XAttribute(r.name, $"{{StaticResource {r.name}}}")))));
-									}
-								}
-							}
-
-							foreach (var obj in parseResult.EnumerateAllObjects().Where(o => !o.NameExplicitlySet && o.Name != null))
-							{
-								((XElement)obj.XamlNode.Element).Add(new XAttribute(xamlDomParser.xNamespace + "Name", obj.Name));
-							}
-
-							foreach (var prop in parseResult.EnumerateAllProperties())
-							{
-								var prop2 = prop.XamlNode.Element.Parent.Attribute(prop.XamlNode.Name);
-								prop2?.Remove();
-							}
-
+							WpfXamlProcessor.ProcessXaml(xdoc, parseResult, helperTypeAssembly);
 							xdoc.Save(xamlFile);
 
 							newXaml = new TaskItem(xamlFile);
@@ -369,12 +309,11 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 public class WpfXamlDomParser : SimpleXamlDomParser
 {
-	private readonly static XNamespace xNs = "http://schemas.microsoft.com/winfx/2006/xaml";
 	private ILookup<string, string>? _nsMappings = null;
 
 	public WpfXamlDomParser()
 		: base("http://schemas.microsoft.com/winfx/2006/xaml/presentation",
-			   xNs,
+			   WpfConstants.xNs,
 			   TypeInfo.GetTypeThrow("System.Windows.Data.IValueConverter"),
 			   TypeInfo.GetTypeThrow("System.Windows.Data.BindingBase"),
 			   TypeInfo.GetTypeThrow("System.Windows.DependencyObject"),
@@ -399,7 +338,7 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 		var res = base.IsMemExtension(name);
 		if (res == null)
 		{
-			if (name.Namespace == xNs)
+			if (name.Namespace == WpfConstants.xNs)
 			{
 				res = name.LocalName switch
 				{
@@ -410,6 +349,16 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 			}
 		}
 		return res;
+	}
+
+	protected override bool CanSetBindingTypeProperty => true;
+
+	protected override void CheckBinding(Bind bind, XamlNode xamlNode)
+	{
+		if (bind.Mode != BindingMode.OneTime)
+		{
+			throw new GeneratorException($"Only OneTime Mode is supported if the property type is a standard Binding.", CurrentFile, xamlNode);
+		}
 	}
 }
 
@@ -432,6 +381,67 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 	protected override string CreateGetResourceCode(string resourceName, int varIndex)
 	{
 		return $@"this.Resources[""{resourceName}""] ?? global::System.Windows.Application.Current.Resources[""{resourceName}""] ?? throw new global::System.Exception(""Resource '{resourceName}' not found."")";
+	}
+
+	protected override void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)
+	{
+		foreach (var bind in parseResult.EnumerateBindings())
+		{
+			output.AppendLine();
+			output.AppendLine(
+$@"	class {className}_{bind.Property.Object.Name}_{bind.Property.MemberName} : global::System.Windows.Markup.MarkupExtension, global::System.Windows.Data.IValueConverter
+	{{");
+			output.AppendLine(
+$@"		public override object ProvideValue(global::System.IServiceProvider serviceProvider)
+		{{
+			return new global::System.Windows.Data.Binding
+			{{
+				Converter = this,
+				Mode = global::System.Windows.Data.BindingMode.OneTime
+			}};
+		}}");
+
+			output.AppendLine();
+			output.AppendLine(
+$@"		public object Convert(object value, global::System.Type targetType, object parameter, global::System.Globalization.CultureInfo culture)
+		{{");
+			if (bind.SourceType.Reference.FullName != "System.Object")
+			{
+				if (bind.SourceType.Reference.IsValueType)
+				{
+					output.AppendLine(
+$@"			{bind.SourceType.Reference.GetCSharpFullName()} dataRoot;
+			if (value is {bind.SourceType.Reference.GetCSharpFullName()})
+			{{
+				dataRoot = {bind.SourceType.Reference.GetCSharpFullName()};
+			}}
+			else
+			{{
+				return global::System.Windows.DependencyProperty.UnsetValue;
+			}}");
+				}
+				else
+				{
+					output.AppendLine(
+$@"			if (value is not {bind.SourceType.Reference.GetCSharpFullName()} dataRoot)
+			{{
+				return global::System.Windows.DependencyProperty.UnsetValue;
+			}}");
+				}
+			}
+			output.AppendLine(
+$@"			return {bind.SourceExpression!.ToString()};
+		}}");
+
+			output.AppendLine();
+			output.AppendLine(
+$@"		public object ConvertBack(object value, global::System.Type targetType, object parameter, global::System.Globalization.CultureInfo culture)
+		{{
+			throw new global::System.NotSupportedException();
+		}}");
+			output.AppendLine(
+$@"	}}");
+		}
 	}
 }
 
@@ -493,5 +503,99 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 								global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, typeof(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()}))
 							.RemoveValueChanged({cacheVar}, {methodName});");
 	}
+}
+
+public static class WpfXamlProcessor
+{
+	public static void ProcessXaml(XDocument xdoc, SimpleXamlDom parseResult, string? helperTypeAssembly)
+	{
+		var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
+		string? localPrefix = null;
+
+		bool generateDataTemplates = parseResult.DataTemplates.Any(dt => dt.GenerateClass);
+
+		if (generateDataTemplates)
+		{
+			var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF";
+			if (helperTypeAssembly != null)
+			{
+				compiledBindingsNs += ";assembly=" + helperTypeAssembly;
+			}
+
+			ensureNamespaceDeclared(compiledBindingsNs);
+			localPrefix = ensureNamespaceDeclared(localNs);
+
+			var mbui = (XNamespace)compiledBindingsNs;
+			var local = (XNamespace)localNs;
+
+			for (int i = 0; i < parseResult.DataTemplates.Count; i++)
+			{
+				var dataTemplate = parseResult.DataTemplates[i];
+				if (dataTemplate.GenerateClass)
+				{
+					var rootElement = dataTemplate.RootElement.Elements().First();
+
+					rootElement.Add(
+						new XElement(mbui + "CompiledBindingsHelper.Bindings",
+							new XElement(local + $"{parseResult.TargetType.Reference.Name}_DataTemplate{i}",
+								dataTemplate.EnumerateResources().Select(r => new XAttribute(r.name, $"{{StaticResource {r.name}}}")))));
+				}
+			}
+		}
+
+		replaceNativeBindings(parseResult.GeneratedClass, parseResult.TargetType.Reference.Name);
+		for (int i = 0; i < parseResult.DataTemplates.Count; i++)
+		{
+			replaceNativeBindings(parseResult.DataTemplates[i], parseResult.TargetType.Reference.Name + "_DataTemplate" + i);
+		}
+
+		foreach (var obj in parseResult.EnumerateAllObjects().Where(o => !o.NameExplicitlySet && o.Name != null))
+		{
+			((XElement)obj.XamlNode.Element).Add(new XAttribute(WpfConstants.xName, obj.Name));
+		}
+
+		foreach (var prop in parseResult.EnumerateAllProperties().Where(p => p.Value.BindingValue == null))
+		{
+			var prop2 = prop.XamlNode.Element.Parent.Attribute(prop.XamlNode.Name);
+			prop2?.Remove();
+		}
+
+		void replaceNativeBindings(GeneratedClass generatedClass, string className)
+		{
+			foreach (var bind in generatedClass.EnumerateBindings())
+			{
+				localPrefix ??= ensureNamespaceDeclared(localNs);
+				var name = $"{className}";
+				((XAttribute)bind.Property.XamlNode.Element).Value = $"{{{localPrefix}:{className}_{bind.Property.Object.Name}_{bind.Property.MemberName}}}";
+			}
+		}
+
+		string ensureNamespaceDeclared(string searchedClrNs)
+		{
+			var attr = xdoc.Root.Attributes().FirstOrDefault(a => a.Name.Namespace == XNamespace.Xmlns && a.Value == searchedClrNs);
+			if (attr == null)
+			{
+				string classNsPrefix;
+				int nsIndex = 0;
+				do
+				{
+					classNsPrefix = "g" + nsIndex++;
+				}
+				while (xdoc.Root.Attributes().Any(a =>
+					a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == classNsPrefix));
+
+				xdoc.Root.Add(new XAttribute(XNamespace.Xmlns + classNsPrefix, searchedClrNs));
+				return classNsPrefix;
+			}
+
+			return attr.Name.LocalName;
+		}
+	}
+}
+
+public static class WpfConstants
+{
+	public readonly static XNamespace xNs = "http://schemas.microsoft.com/winfx/2006/xaml";
+	public readonly static XName xName = xNs + "Name";
 }
 

@@ -94,6 +94,18 @@
             </Label>
 
             <TextBlock Text="{x:Bind DecimalProp, Converter={StaticResource TestConverter}}" />
+
+            <DataGrid
+                mx:DefaultBindMode="OneTime"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                ItemsSource="{x:Bind ListProp, IsItemsSource=True}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Binding="{x:Bind DecimalProp}"
+                        Header="Decimal" />
+                </DataGrid.Columns>
+            </DataGrid>
         </StackPanel>
     </ScrollViewer>
 
