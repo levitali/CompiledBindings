@@ -554,7 +554,8 @@ public static class WpfXamlProcessor
 			((XElement)obj.XamlNode.Element).Add(new XAttribute(WpfConstants.xName, obj.Name));
 		}
 
-		foreach (var prop in parseResult.EnumerateAllProperties().Where(p => p.Value.BindingValue == null))
+		foreach (var prop in parseResult.EnumerateAllProperties()
+			.Where(p => p.Value.BindingValue == null || ((XAttribute)p.XamlNode.Element).Name.Namespace != XNamespace.None))
 		{
 			var prop2 = prop.XamlNode.Element.Parent.Attribute(prop.XamlNode.Name);
 			prop2?.Remove();
@@ -566,7 +567,17 @@ public static class WpfXamlProcessor
 			{
 				localPrefix ??= ensureNamespaceDeclared(localNs);
 				var name = $"{className}";
-				((XAttribute)bind.Property.XamlNode.Element).Value = $"{{{localPrefix}:{className}_{bind.Property.Object.Name}_{bind.Property.MemberName}}}";
+				var value = $"{{{localPrefix}:{className}_{bind.Property.Object.Name}_{bind.Property.MemberName}}}";
+				var attr = (XAttribute)bind.Property.XamlNode.Element;
+				var element = attr.Parent;
+				if (attr.Name.Namespace == XNamespace.None)
+				{
+					attr.Value = value;
+				}
+				else
+				{
+					element.Add(new XAttribute(attr.Name.LocalName, value));
+				}
 			}
 		}
 

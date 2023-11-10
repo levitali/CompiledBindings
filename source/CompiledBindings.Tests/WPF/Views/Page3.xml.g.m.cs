@@ -90,4 +90,30 @@ namespace WPFTest.Views
 			throw new global::System.NotSupportedException();
 		}
 	}
+
+	class Page2_dataGridTextColumn2_Binding : global::System.Windows.Markup.MarkupExtension, global::System.Windows.Data.IValueConverter
+	{
+		public override object ProvideValue(global::System.IServiceProvider serviceProvider)
+		{
+			return new global::System.Windows.Data.Binding
+			{
+				Converter = this,
+				Mode = global::System.Windows.Data.BindingMode.OneTime
+			};
+		}
+
+		public object Convert(object value, global::System.Type targetType, object parameter, global::System.Globalization.CultureInfo culture)
+		{
+			if (value is not WPFTest.ViewModels.EntityViewModel dataRoot)
+			{
+				return global::System.Windows.DependencyProperty.UnsetValue;
+			}
+			return dataRoot.Model.CreateDate?.ToString("d");
+		}
+
+		public object ConvertBack(object value, global::System.Type targetType, object parameter, global::System.Globalization.CultureInfo culture)
+		{
+			throw new global::System.NotSupportedException();
+		}
+	}
 }

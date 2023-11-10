@@ -102,6 +102,8 @@ public class EntityModel : INotifyPropertyChanged
 {
 	public sbyte SByteProp { get; set; }
 
+	public DateTime? CreateDate = null;
+
 	public IList<EntityViewModel>? Children { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;

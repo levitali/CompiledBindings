@@ -17,6 +17,9 @@
                 <DataGridTextColumn
                     Binding="{x:Bind Title}"
                     Header="Col1" />
+							<DataGridTextColumn
+                    m:Binding="{x:Bind Model.CreateDate.ToString('d')}"
+                    Header="Col2" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
