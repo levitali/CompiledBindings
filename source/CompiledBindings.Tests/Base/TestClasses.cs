@@ -47,6 +47,11 @@ public class Class1
 	{
 		return false;
 	}
+
+	public static class Drawable
+	{
+		public const int Id1 = 0;
+	}
 }
 
 public class Class2

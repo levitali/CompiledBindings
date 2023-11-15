@@ -518,7 +518,7 @@ public static class BindingParser
 			if (!isDependencyType && !isNotifyPropertyChangedType)
 			{
 				// Check if the type can be potentally notifiable
-				if (!type!.Reference.IsInterface() && type.Reference.ResolveEx()?.IsSealed == true)
+				if (!type!.Reference.IsInterface() && type.Definition?.IsSealed == true)
 				{
 					return false;
 				}

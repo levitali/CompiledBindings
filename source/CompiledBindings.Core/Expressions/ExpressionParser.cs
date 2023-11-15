@@ -1060,6 +1060,12 @@ public class ExpressionParser
 						}
 					}
 
+					var nestedType = type.NestedTypes.FirstOrDefault(t => t.Reference.Name == id);
+					if (nestedType != null)
+					{
+						return new TypeExpression(nestedType);
+					}
+
 					throw new ParseException($"No property, field or method '{id}' exists in type '{type.Reference.FullName}'", errorPos, id.Length);
 				}
 			}

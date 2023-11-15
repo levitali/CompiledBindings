@@ -9,6 +9,7 @@ public class TypeInfo
 	private IList<MethodInfo>? _methods;
 	private IList<MethodInfo>? _constructors;
 	private IList<EventInfo>? _events;
+	private IList<TypeInfo>? _nestedTypes;
 	private readonly bool? _canBeNullable;
 	private readonly byte? _nullableContext;
 	private readonly byte[]? _nullableFlags;
@@ -61,6 +62,8 @@ public class TypeInfo
 
 	public TypeReference Reference { get; }
 
+	public TypeDefinition? Definition => Reference.ResolveEx();
+
 	public bool IsNullable => Reference.IsValueNullable() || (_canBeNullable != false && !Reference.IsValueType);
 
 	public IList<PropertyInfo> Properties => _properties ??=
@@ -91,7 +94,7 @@ public class TypeInfo
 			.ToList();
 
 	public IList<MethodInfo> Constructors => _constructors ??=
-		Reference.ResolveEx()!.GetConstructors()
+		Definition!.GetConstructors()
 			.Select(m => new MethodInfo(
 				m,
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSubElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
@@ -103,6 +106,11 @@ public class TypeInfo
 			.SelectMany(t => t.GetEvents())
 			.Select(e => new EventInfo(e, GetTypeSubElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 			.ToList();
+
+	public IList<TypeInfo> NestedTypes => _nestedTypes ??=
+		(Definition?.NestedTypes ?? Enumerable.Empty<TypeDefinition>())
+		.Select(t => new TypeInfo(t, GetIsNullableSubElement(1), GetNullableFlags(t), GetNullableContext(t) ?? _nullableContext))
+		.ToList();
 
 	public TypeInfo? GetElementType()
 	{

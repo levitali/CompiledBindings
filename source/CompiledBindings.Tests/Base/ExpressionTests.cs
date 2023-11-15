@@ -291,4 +291,13 @@ public class ExpressionTests : IDisposable
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
+
+	[Test]
+	public void NestedTypes()
+	{
+		var expression = "local:Class1.Drawable.Id1";
+		var expectedCode = "CompiledBindings.Tests.Class1.Drawable.Id1";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 }
