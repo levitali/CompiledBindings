@@ -2,8 +2,6 @@
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
-
-
 namespace CompiledBindings.Markup;
 
 [ContentProperty("Expression")]

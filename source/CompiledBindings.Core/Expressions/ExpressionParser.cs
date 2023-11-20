@@ -10,7 +10,7 @@ public class ExpressionParser
 	};
 	private readonly VariableExpression _root;
 	private readonly IList<XamlNamespace> _namespaces;
-	private readonly List<XamlNamespace> _includeNamespaces = new();
+	private readonly List<XamlNamespace> _includeNamespaces = [];
 	private readonly string _text;
 	private int _textPos;
 	private readonly int _textLen;
@@ -933,6 +933,10 @@ public class ExpressionParser
 
 		if (instance == null)
 		{
+			// The static members of an expected type have priority.
+			// If there a member of the data root type with the same name,
+			// it's possible to force using it by the "this" keyword.
+
 			if (_expectedType != null)
 			{
 				var staticFieldOrProp =
@@ -957,6 +961,8 @@ public class ExpressionParser
 
 		IMemberInfo member;
 		TypeInfo memberType;
+
+		// Try to find a property
 		var prop = type.Properties.FirstOrDefault(p => p.Definition.Name == id);
 		if (prop != null)
 		{
@@ -965,6 +971,7 @@ public class ExpressionParser
 		}
 		else
 		{
+			// Tryp to find a field
 			var field = type.Fields.FirstOrDefault(f => f.Definition.Name == id);
 			if (field != null)
 			{
@@ -973,53 +980,23 @@ public class ExpressionParser
 			}
 			else
 			{
+				// If the next token after the member name is the open paren,
+				// it must be a method call.
 				if (_token.id == TokenId.OpenParen)
 				{
-					var enumerator = EnumerateMethods(type, id).GetEnumerator();
-
-					MethodInfo method;
-					XamlNamespace? ns;
-
-					// Get the first method with the name in order to take argument types.
-					// Afterwards the more suitable member or extension method will be found.
-					GetNextMethod();
-
-					var argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
-					var args = ParseArgumentList(argumentTypes);
-
-					while (!CheckMethodApplicable(method, args, ns != null))
-					{
-						GetNextMethod();
-					}
-
-					if (ns != null)
-					{
-						_includeNamespaces.Add(ns);
-					}
-
-					CorrectCharParameters(method, args, ns != null, errorPos);
-					CorrectNotNullableParameters(method, args);
-
-					return new CallExpression(inst, method, args, isNotifiable);
-
-					void GetNextMethod()
-					{
-						if (!enumerator.MoveNext())
-						{
-							throw new ParseException($"No applicable method '{id}' exists in type '{type.Reference.FullName}'", errorPos, id.Length);
-						}
-						(method, ns) = enumerator.Current;
-					}
+					return ParseCall(inst, type, id, errorPos, isNotifiable);
 				}
 
-				var method2 = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
-				if (method2 != null)
+				// The expression can still be a method without parens (delegate).
+				var method = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
+				if (method != null)
 				{
-					member = method2;
+					member = method;
 					memberType = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Delegate)), false);
 				}
 				else
 				{
+					// If the type is a ValueTuple, try to find its elements by names
 					if (type.Reference.FullName.StartsWith("System.ValueTuple"))
 					{
 						var attrs = inst switch
@@ -1036,8 +1013,8 @@ public class ExpressionParser
 							var index = names.IndexOf(id);
 							if (index != -1)
 							{
-								var name = "Item" + (index + 1);
-								var field2 = type.Fields.FirstOrDefault(f => f.Definition.Name == name);
+								var itemName = "Item" + (index + 1);
+								var field2 = type.Fields.FirstOrDefault(f => f.Definition.Name == itemName);
 								if (field2 != null)
 								{
 									member = field2;
@@ -1050,20 +1027,31 @@ public class ExpressionParser
 
 					if (instance == null)
 					{
+						// If it's not a member access (instance is null),
+						// and the next token is colon,
+						// the id must be a namespace prefix.
 						if (_token.id == TokenId.Colon)
 						{
 							return ParseTypeExpression(id, errorPos);
 						}
+
+						// Allow using name of the expected type without namespace prefix.
+						// Note! For static properties and fields of the expected type
+						// the type name is optional.						
 						if (_expectedType?.Reference.Name == id)
 						{
 							return new TypeExpression(_expectedType);
 						}
 					}
 
-					var nestedType = type.NestedTypes.FirstOrDefault(t => t.Reference.Name == id);
-					if (nestedType != null)
+					// The id can be name of a nested type
+					else if (instance is TypeExpression)
 					{
-						return new TypeExpression(nestedType);
+						var nestedType = type.NestedTypes.FirstOrDefault(t => t.Reference.Name == id);
+						if (nestedType != null)
+						{
+							return new TypeExpression(nestedType);
+						}
 					}
 
 					throw new ParseException($"No property, field or method '{id}' exists in type '{type.Reference.FullName}'", errorPos, id.Length);
@@ -1072,6 +1060,45 @@ public class ExpressionParser
 		}
 Label_CreateMemberExpression:
 		return new MemberExpression(inst, member, memberType, isNotifiable);
+	}
+
+	private Expression ParseCall(Expression inst, TypeInfo type, string methodName, int errorPos, bool? isNotifiable)
+	{
+		var enumerator = EnumerateMethods(type, methodName).GetEnumerator();
+
+		MethodInfo method;
+		XamlNamespace? ns;
+
+		// Get the first method with the name in order to take argument types.
+		// Afterwards the more suitable member or extension method will be found.
+		getNextMethod();
+
+		var argumentTypes = method.Parameters.Select(p => p.ParameterType).ToList();
+		var args = ParseArgumentList(argumentTypes);
+
+		while (!CheckMethodApplicable(method, args, ns != null))
+		{
+			getNextMethod();
+		}
+
+		if (ns != null)
+		{
+			_includeNamespaces.Add(ns);
+		}
+
+		CorrectCharParameters(method, args, ns != null, errorPos);
+		CorrectNotNullableParameters(method, args);
+
+		return new CallExpression(inst, method, args, isNotifiable);
+
+		void getNextMethod()
+		{
+			if (!enumerator.MoveNext())
+			{
+				throw new ParseException($"No applicable method '{methodName}' exists in type '{type.Reference.FullName}'", errorPos, methodName.Length);
+			}
+			(method, ns) = enumerator.Current;
+		}
 	}
 
 	private TypeExpression ParseTypeExpression(string prefix, int errorPos)

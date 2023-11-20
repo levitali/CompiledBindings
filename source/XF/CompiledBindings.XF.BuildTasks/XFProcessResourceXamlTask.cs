@@ -404,6 +404,5 @@ public static class XFXamlProcessor
 		public required string Text;
 		public int RemovedTextOffset;
 	}
-
 }
 
