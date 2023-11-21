@@ -327,7 +327,7 @@ public static class BindingParser
 
 	public static BindingsData CreateBindingsData(IList<Bind> binds, TypeInfo? targetType, TypeInfo dataType, TypeInfo? dependencyObjectType = null)
 	{
-		// Set unique indexes used as ids for all binding in this binding scope
+		// Set unique indexes used as ids for all bindings in this binding scope
 		for (int i = 0; i < binds.Count; i++)
 		{
 			binds[i].Index = i;
@@ -499,7 +499,7 @@ public static class BindingParser
 
 		bool? checkPropertyNotifiable(INotifiableExpression expr)
 		{
-			// Not notifiable if explicitley turned off with / operator
+			// Not notifiable if explicitly turned off with / operator
 			if (expr.IsNotifiable == false)
 			{
 				return false;
