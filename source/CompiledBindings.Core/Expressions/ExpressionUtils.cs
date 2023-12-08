@@ -2,7 +2,7 @@
 
 public static class ExpressionUtils
 {
-	public static List<LocalVariable> GroupExpressions(IReadOnlyList<PropertySetExpression> setExpressions)
+	public static List<LocalVariable> GroupExpressions(IReadOnlyList<PropertySetData> setExpressions)
 	{
 		int localVarIndex = 1;
 		List<LocalVariable> localVars = new();
@@ -46,7 +46,7 @@ public static class ExpressionUtils
 
 	public static ExpressionGroup GroupExpressions(IEnumerable<XamlObjectProperty> properties)
 	{
-		var setExpressions = properties.Where(p => p.Value.StaticValue != null).Select(p => new PropertySetExpression(p, p.Value.StaticValue!)).ToList();
+		var setExpressions = properties.Where(p => p.Value.StaticValue != null).Select(p => new PropertySetData(p, p.Value.StaticValue!)).ToList();
 		var setProperties = properties.Where(p => p.Value.CSharpValue != null).ToList();
 
 		var localVars = GroupExpressions(setExpressions);
@@ -105,9 +105,9 @@ public static class ExpressionUtils
 	}
 }
 
-public class PropertySetExpression
+public class PropertySetData
 {
-	public PropertySetExpression(XamlObjectProperty property, Expression expression)
+	public PropertySetData(XamlObjectProperty property, Expression expression)
 	{
 		Property = property;
 		Expression = expression;
@@ -134,8 +134,7 @@ public class LocalVariable
 public class ExpressionGroup
 {
 	public required List<LocalVariable> LocalVariables { get; init; }
-	public required IReadOnlyList<PropertySetExpression> SetExpressions { get; init; }
-
+	public required IReadOnlyList<PropertySetData> SetExpressions { get; init; }
 	public List<XamlObjectProperty>? SetProperties { get; init; }
 
 	public bool IsEmpty => SetExpressions.Count == 0 && SetProperties?.Count is not > 0;

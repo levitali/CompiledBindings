@@ -668,19 +668,19 @@ public static class BindingParser
 		// - SetPropertyHandler methods
 
 		var props1 = bindings
-			.Select(b => new PropertySetExpression(b.Property, replace(b.SourceExpression!)))
+			.Select(b => new PropertySetData(b.Property, replace(b.SourceExpression!)))
 			.ToList();
 
 		var props2 = updateNotifySources
-			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
+			.Select(g => new PropertySetData(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
 			.ToList();
 
 		var props3 = updateMethodNotifyProps
-			.Select(p => new PropertySetExpression(p.Bindings[0].Property, replace(p.Parent.Expression)))
+			.Select(p => new PropertySetData(p.Bindings[0].Property, replace(p.Parent.Expression)))
 			.ToList();
 
 		var props4 = notifySources1
-			.Select(g => new PropertySetExpression(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
+			.Select(g => new PropertySetData(g.Properties[0].Bindings[0].Property, replace(g.Expression)))
 			.ToList();
 
 		var props5 = props1.Concat(props2).Concat(props3).Concat(props4).ToList();

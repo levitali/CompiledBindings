@@ -77,15 +77,18 @@ public class XamlObjectValue
 		{
 			return StaticValue.ToString();
 		}
-		if (BindValue != null)
+
+		var b = BindValue ?? BindingValue;
+		if (b != null)
 		{
-			var res = (BindValue.Expression ?? BindValue.BindBackExpression!).ToString();
+			var res = (b.SourceExpression ?? b.BindBackExpression!).ToString();
 			if (res.StartsWith("dataRoot."))
 			{
 				res = res.Substring("dataRoot.".Length);
 			}
 			return res;
 		}
+		
 		return CSharpValue!;
 	}
 }
