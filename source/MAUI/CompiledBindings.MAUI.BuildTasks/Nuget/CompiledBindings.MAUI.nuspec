@@ -15,6 +15,6 @@
 	<files>
 		<file src="..\Targets\CompiledBindings.MAUI.targets" target="build" />
 		<file src="..\..\..\..\bin\maui\build\netstandard2.0\CompiledBindings.MAUI.BuildTasks.merged.dll" target="build" />
-		<file src="..\..\..\..\bin\maui\lib\net6.0\CompiledBindings.MAUI.dll" target="lib\net6.0\" />
+		<file src="..\..\..\..\bin\maui\lib\net7.0\CompiledBindings.MAUI.dll" target="lib\net7.0\" />
 	</files>
 </package>
