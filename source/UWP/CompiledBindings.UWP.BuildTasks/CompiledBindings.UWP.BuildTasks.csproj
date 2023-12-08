@@ -16,8 +16,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="ilmerge" Version="3.0.41" />
-		<PackageReference Include="Microsoft.Build.Framework" Version="17.6.3" IncludeAssets="compile" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.6.3" IncludeAssets="compile" GeneratePathProperty="true" />
+		<PackageReference Include="Microsoft.Build.Framework" Version="17.8.3" IncludeAssets="compile" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" IncludeAssets="compile" GeneratePathProperty="true" />
 		<PackageReference Include="Mono.Cecil" Version="0.11.5" />
 	</ItemGroup>
 
