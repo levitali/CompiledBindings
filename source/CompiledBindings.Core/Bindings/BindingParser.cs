@@ -253,7 +253,8 @@ public static class BindingParser
 			}
 		}
 
-		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && (bindBackExpression ?? expression) is not (MemberExpression or CallExpression or ElementAccessExpression))
+		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && 
+			(bindBackExpression ?? expression) is not (MemberExpression or CallExpression or ElementAccessExpression))
 		{
 			throw new ParseException("The expression must be settable for TwoWay or OneWayToSource bindings.");
 		}
@@ -265,45 +266,48 @@ public static class BindingParser
 
 		var sourceExpression = expression;
 
-		if (sourceExpression != null && converter != null)
+		if (sourceExpression != null)
 		{
-			var convertMethod = xamlDomParser.ConverterType!.Methods.First(m => m.Definition.Name == "Convert");
-			sourceExpression = new CallExpression(converter, convertMethod, new Expression[]
+			if (converter != null)
 			{
-				sourceExpression,
-				new TypeofExpression(new TypeExpression(prop.MemberType)),
-				converterParameter ?? Expression.NullExpression,
-				Expression.NullExpression
-			});
-			if (prop.MemberType.Reference.FullName != "System.Object")
-			{
-				sourceExpression = new CastExpression(sourceExpression, prop.MemberType, false);
+				var convertMethod = xamlDomParser.ConverterType!.Methods.First(m => m.Definition.Name == "Convert");
+				sourceExpression = new CallExpression(converter, convertMethod,
+				[
+					sourceExpression,
+					new TypeofExpression(new TypeExpression(prop.MemberType)),
+					converterParameter ?? Expression.NullExpression,
+					Expression.NullExpression
+				]);
+				if (prop.MemberType.Reference.FullName != "System.Object")
+				{
+					sourceExpression = new CastExpression(sourceExpression, prop.MemberType, false);
+				}
 			}
-		}
 
-		if (sourceExpression != null && targetNullValue != null)
-		{
-			sourceExpression = new CoalesceExpression(sourceExpression, targetNullValue);
-		}
+			if (targetNullValue != null)
+			{
+				sourceExpression = new CoalesceExpression(sourceExpression, targetNullValue);
+			}
 
-		if (sourceExpression != null && fallbackValue != null)
-		{
-			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-			if (!taskType.IsAssignableFrom(sourceExpression.Type))
+			if (fallbackValue != null)
 			{
-				sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
+				var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+				if (!taskType.IsAssignableFrom(sourceExpression.Type))
+				{
+					sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
+				}
 			}
-		}
-		
-		if (sourceExpression != null && stringFormat != null)
-		{
-			var stringFormatSaved = stringFormat;
-			stringFormat = Regex.Replace(stringFormat, @"(.*)(\{)(0)(?:(\:.+))?(\})(.*)", "$\"$1{{{0}$4}}$6\"");
-			if (stringFormat == stringFormatSaved)
+
+			if (stringFormat != null)
 			{
-				stringFormat = $"$\"{{{{{{0}}:{stringFormat}}}}}\"";
+				var stringFormatSaved = stringFormat;
+				stringFormat = Regex.Replace(stringFormat, @"(.*)(\{)(0)(?:(\:.+))?(\})(.*)", "$\"$1{{{0}$4}}$6\"");
+				if (stringFormat == stringFormatSaved)
+				{
+					stringFormat = $"$\"{{{{{{0}}:{stringFormat}}}}}\"";
+				}
+				sourceExpression = new InterpolatedStringExpression(stringFormat, new[] { sourceExpression });
 			}
-			sourceExpression = new InterpolatedStringExpression(stringFormat, new[] { sourceExpression });
 		}
 
 		return new Bind

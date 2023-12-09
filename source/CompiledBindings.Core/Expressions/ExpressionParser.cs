@@ -844,13 +844,13 @@ public class ExpressionParser
 				NextToken();
 
 				Expression result = null!;
-				string? logicalOperand = null;
+				string logicalOperand = null!;
 
 				while (true)
 				{
 					var expr = parse2();
 
-					result = result == null ? expr : new BinaryExpression(result, expr, logicalOperand!);
+					result = result == null ? expr : new BinaryExpression(result, expr, logicalOperand);
 
 					if (_token.id != TokenId.DoubleAmphersand &&
 						 !ReplaceTokenIdentifier("and", TokenId.DoubleAmphersand) &&

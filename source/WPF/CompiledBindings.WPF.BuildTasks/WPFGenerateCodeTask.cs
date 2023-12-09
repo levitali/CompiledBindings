@@ -179,15 +179,18 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				}
 			}
 
-			if (generatedCodeFiles.Count > 0 && helperTypeAssembly == null)
+			if (result)
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.WPF.cs");
-				File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
-				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
-			}
+				if (generatedCodeFiles.Count > 0 && helperTypeAssembly == null)
+				{
+					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.WPF.cs");
+					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+					generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
+				}
 
-			GeneratedCodeFiles = generatedCodeFiles.ToArray();
-			NewPages = newPages.ToArray();
+				GeneratedCodeFiles = generatedCodeFiles.ToArray();
+				NewPages = newPages.ToArray();
+			}
 
 			foreach (var lrefFile in Directory.GetFiles(IntermediateOutputPath, "*.lref"))
 			{

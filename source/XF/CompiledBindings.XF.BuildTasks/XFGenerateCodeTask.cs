@@ -151,15 +151,18 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 				}
 			}
 
-			if (generatedCodeFiles.Count > 0 &&
-				!TypeInfoUtils.TryGetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper", out _))
+			if (result)
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
-				File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
-				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
-			}
+				if (generatedCodeFiles.Count > 0 &&
+					!TypeInfoUtils.TryGetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper", out _))
+				{
+					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
+					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+					generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
+				}
 
-			GeneratedCodeFiles = generatedCodeFiles.ToArray();
+				GeneratedCodeFiles = generatedCodeFiles.ToArray();
+			}
 
 			return result;
 		}

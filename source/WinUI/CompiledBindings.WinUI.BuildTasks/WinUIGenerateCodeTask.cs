@@ -244,16 +244,20 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 				}
 			}
 
-			if (generatedCodeFiles.Count > 0 && 
-				TypeInfo.GetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper") == null)
+			if (result)
 			{
-				var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
-				File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
-				generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
+				if (generatedCodeFiles.Count > 0 &&
+					TypeInfo.GetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper") == null)
+				{
+					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
+					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+					generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
+				}
+
+				GeneratedCodeFiles = generatedCodeFiles.ToArray();
+				NewPages = newPages.ToArray();
 			}
 
-			GeneratedCodeFiles = generatedCodeFiles.ToArray();
-			NewPages = newPages.ToArray();
 
 			return result;
 		}
