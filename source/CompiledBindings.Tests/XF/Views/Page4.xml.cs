@@ -2,7 +2,7 @@
 
 namespace XFTest.Views;
 
-partial class Page3
+partial class Page4
 {
 }
 

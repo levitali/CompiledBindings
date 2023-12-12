@@ -1,0 +1,47 @@
+﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:WPFTest" xmlns:m="http://compiledbindings.com" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mx="http://compiledbindings.com/x" xmlns:system="using:System" xmlns:ui="using:UI" xmlns:viewModels="using:WPFTest.ViewModels" xmlns:views="clr-namespace:WPFTest.Views" mc:Ignorable="d mx" x:Class="WPFTest.Views.Page1" mx:DataType="viewModels:Page1ViewModel" xmlns:g0="clr-namespace:CompiledBindings.WPF">
+  <Page.Resources>
+    <BooleanToVisibilityConverter x:Key="TrueToVisibleConverter" />
+    <views:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+    <DataTemplate x:Key="test1Template" DataType="viewModels:EntityViewModel">
+      <Grid>
+        <TextBlock x:Name="textBlock1" />
+        <TextBlock x:Name="textBlock2" />
+        <TextBlock x:Name="textBlock3" />
+        <Image x:Name="image1" />
+        <g0:CompiledBindingsHelper.Bindings>
+          <views:Page1_DataTemplate0 InverseBooleanConverter="{StaticResource InverseBooleanConverter}" />
+        </g0:CompiledBindingsHelper.Bindings>
+      </Grid>
+    </DataTemplate>
+    <HierarchicalDataTemplate x:Key="test2Template" DataType="viewModels:EntityViewModel" ItemsSource="{Binding Children}">
+      <TextBlock x:Name="textBlock4">
+        <g0:CompiledBindingsHelper.Bindings>
+          <views:Page1_DataTemplate1 />
+        </g0:CompiledBindingsHelper.Bindings>
+      </TextBlock>
+    </HierarchicalDataTemplate>
+  </Page.Resources>
+  <StackPanel>
+    <Image x:Name="image2" />
+    <TextBlock mx:DataType="{x:Null}" x:Name="textBlock5" />
+    <TextBlock Name="header1" />
+    <TextBlock x:Name="textBlock6" />
+    <TextBlock x:Name="textBlock7" />
+    <TextBox x:Name="textBox1" />
+    <TextBlock x:Name="textBlock8" />
+    <CheckBox x:Name="checkBox1" />
+    <ListView x:Name="listView" ItemTemplate="{StaticResource test1Template}" />
+    <TextBlock x:Name="textBlock9" />
+    <TextBlock x:Name="textBlock10" />
+    <TextBlock x:Name="textBlock11" />
+    <TextBlock x:Name="textBlock12" />
+    <Image x:Name="image3" />
+    <Button x:Name="button1" />
+    <TextBox x:Name="textBox2" />
+    <TextBox x:Name="textBox3" />
+    <TextBox x:Name="textBox4" />
+    <CheckBox x:Name="checkBox2" />
+    <TextBlock x:Name="textBlock13" />
+    <TextBlock x:Name="textBlock14" />
+  </StackPanel>
+</Page>

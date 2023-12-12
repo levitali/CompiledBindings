@@ -31,6 +31,7 @@
 		<Compile Remove="XF\Views\Page1.xml.g.m.cs" />
 		<Compile Remove="XF\Views\Page2.xml.g.m.cs" />
 		<Compile Remove="XF\Views\Page3.xml.g.m.cs" />
+		<Compile Remove="XF\Views\Page4.xml.g.m.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -82,6 +83,10 @@
 			<DependentUpon>Page3.xml</DependentUpon>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Include="XF\Views\Page4.xml.g.m.cs">
+			<DependentUpon>Page4.xml</DependentUpon>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -94,6 +99,14 @@
 		<None Update="WPF\Views\Page2.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="WPF\Views\Page1.g.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page1.xml</DependentUpon>
+		</None>
+		<None Update="WPF\Views\Page2.g.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page2.xml</DependentUpon>
+		</None>
 		<None Update="WPF\Views\Page3.g.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<DependentUpon>Page3.xml</DependentUpon>
@@ -101,17 +114,29 @@
 		<None Update="XF\Views\Page1.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="XF\Views\Page1.g.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page1.xml</DependentUpon>
+		</None>
 		<None Update="XF\Views\Page2.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="XF\Views\Page2.g.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page2.xml</DependentUpon>
+		</None>
+		<None Update="XF\Views\Page3.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="XF\Views\Page3.g.xml">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<DependentUpon>Page3.xml</DependentUpon>
+		</None>
 		<None Update="XF\Views\Page4.g.xml">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<DependentUpon>Page4.xml</DependentUpon>
 		</None>
 		<None Update="XF\Views\Page4.xml">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="XF\Views\Page3.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

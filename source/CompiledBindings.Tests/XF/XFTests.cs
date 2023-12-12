@@ -22,28 +22,28 @@ public class XFTests : IDisposable
 	[Test]
 	public void Page1()
 	{
-		TestCodeGeneration("Page1", true);
+		TestPage("Page1", true);
 	}
 
 	[Test]
 	public void Page2()
 	{
-		TestCodeGeneration("Page2", false);
+		TestPage("Page2", false);
 	}
 
 	[Test]
 	public void Page3()
 	{
-		TestCodeGeneration("Page3", true);
+		TestPage("Page3", true);
 	}
 
 	[Test]
 	public void Page4()
 	{
-		TestProcessXaml("Page4");
+		TestPage("Page4", true);
 	}
 
-	private void TestCodeGeneration(string pageName, bool enableNullables)
+	private void TestPage(string pageName, bool enableNullables)
 	{
 		TypeInfo.EnableNullables = enableNullables;
 
@@ -61,18 +61,12 @@ public class XFTests : IDisposable
 		var expectedCode = File.ReadAllText(csharpFile);
 
 		Assert.That(code.Equals(expectedCode));
-	}
-
-	private void TestProcessXaml(string pageName)
-	{
+		
 		using var assembly = AssemblyDefinition.ReadAssembly(Assembly.GetExecutingAssembly().Location);
 		var assemblyTypes = assembly.MainModule.Types.ToDictionary(_ => _.FullName);
 
-		var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
-		var xamlFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml");
 		var xaml = File.ReadAllText(xamlFile);
 
-		var xamlDomParser = new XFXamlDomParser(new PlatformConstants());
 		var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, new PlatformConstants(), assemblyTypes, null);
 		Assert.NotNull(newXaml);
 

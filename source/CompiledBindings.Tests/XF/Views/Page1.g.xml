@@ -1,0 +1,78 @@
+﻿<Page
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:c="using:CompiledBindings.Markup"
+    xmlns:local="clr-namespace:XFTest"
+    xmlns:m="http://compiledbindings.com"
+    xmlns:system="using:System"
+    xmlns:ui="using:UI"
+    xmlns:viewModels="using:XFTest.ViewModels"
+    xmlns:views="clr-namespace:XFTest.Views"
+    x:Name="pageRoot"
+    x:Class="XFTest.Views.Page1"
+    x:DataType="viewModels:Page1ViewModel"
+    >
+
+    <Page.Resources>
+        <DataTemplate
+            x:Key="test1Template"
+            x:DataType="viewModels:EntityViewModel">
+            <Grid>
+                <Label  x:Name="label1" />
+                <Label  x:Name="label2" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="testNestedDataTemplate">
+            <CollectionView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="viewModels:EntityViewModel">
+                        <Grid>
+                            <Label  x:Name="label3" />
+                            <Label  x:Name="label4" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </DataTemplate>
+    </Page.Resources>
+
+    <StackLayout>
+        <Label  x:Name="label5" />
+        <Label
+            
+             x:Name="label6" />
+        <Label  x:Name="label7" />
+        <Label  x:Name="label8" />
+        <Label  x:Name="label9" />
+        <Label  x:Name="label10" />
+        <Entry
+            
+            
+             x:Name="entry1" />
+        <Entry  x:Name="entry2" />
+        <ui:PickerEx  x:Name="pickerEx1" />
+        <CollectionView
+            x:Name="list"
+            
+            >
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Label  x:Name="label11" />
+                        <Label  x:Name="label12" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button
+            x:DataType="{x:Null}"
+            
+             x:Name="button1" />
+        <Label
+            
+             x:Name="label13" />
+    </StackLayout>
+
+</Page>

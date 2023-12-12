@@ -96,11 +96,10 @@
             <TextBlock Text="{x:Bind DecimalProp, Converter={StaticResource TestConverter}}" />
 
             <DataGrid
-                mx:DefaultBindMode="OneTime"
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
                 ItemsSource="{x:Bind ListProp, IsItemsSource=True}">
-                <DataGrid.Columns>
+                <DataGrid.Columns mx:DefaultBindMode="OneTime">
                     <DataGridTextColumn
                         Binding="{x:Bind DecimalProp}"
                         Header="Decimal" />
