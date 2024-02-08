@@ -161,7 +161,7 @@ public static class BindingParser
 				}
 
 				// Find end of string format. It can contain commas, escaped with \ symbol
-				match = Regex.Match(str, @"^(.*)(?<!\\),");
+				match = Regex.Match(str, @"^(.*?)(?<!\\),");
 				if (match.Success)
 				{
 					stringFormat = match.Groups[1].Value;
@@ -262,38 +262,44 @@ public static class BindingParser
 			throw new ParseException("IsItemsSource cannot be used for OneWayToSource bindings.");
 		}
 
-		var sourceExpression = expression;
+		Expression? sourceExpression = expression;
+		Expression? asyncSourceExpression = null;
 
 		if (sourceExpression != null)
 		{
+			Expression sourceExpression2;
+
+			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
+			bool isTask = taskType.IsAssignableFrom(sourceExpression.Type);
+			if (isTask)
+			{
+				var taskResultType = sourceExpression.Type.GetGenericArguments()![0];
+				sourceExpression2 = new VariableExpression(taskResultType, "result");
+			}
+			else
+			{				
+				sourceExpression2 = sourceExpression;
+			}
+
 			if (converter != null)
 			{
 				var convertMethod = xamlDomParser.ConverterType!.Methods.First(m => m.Definition.Name == "Convert");
-				sourceExpression = new CallExpression(converter, convertMethod,
+				sourceExpression2 = new CallExpression(converter, convertMethod,
 				[
-					sourceExpression,
+					sourceExpression2,
 					new TypeofExpression(new TypeExpression(prop.MemberType)),
 					converterParameter ?? Expression.NullExpression,
 					Expression.NullExpression
 				]);
 				if (prop.MemberType.Reference.FullName != "System.Object")
 				{
-					sourceExpression = new CastExpression(sourceExpression, prop.MemberType, false);
+					sourceExpression2 = new CastExpression(sourceExpression2, prop.MemberType, false);
 				}
 			}
 
 			if (targetNullValue != null)
 			{
-				sourceExpression = new CoalesceExpression(sourceExpression, targetNullValue);
-			}
-
-			if (fallbackValue != null)
-			{
-				var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-				if (!taskType.IsAssignableFrom(sourceExpression.Type))
-				{
-					sourceExpression = FallbackExpression.CreateFallbackExpression(sourceExpression, fallbackValue, ref localVarIndex);
-				}
+				sourceExpression2 = new CoalesceExpression(sourceExpression2, targetNullValue);
 			}
 
 			if (stringFormat != null)
@@ -304,7 +310,20 @@ public static class BindingParser
 				{
 					stringFormat = $"$\"{{{{{{0}}:{stringFormat}}}}}\"";
 				}
-				sourceExpression = new InterpolatedStringExpression(stringFormat, new[] { sourceExpression });
+				sourceExpression2 = new InterpolatedStringExpression(stringFormat, new[] { sourceExpression2 });
+			}
+
+			if (isTask)
+			{
+				asyncSourceExpression = sourceExpression2;
+			}
+			else
+			{
+				if (fallbackValue != null)
+				{
+					sourceExpression2 = FallbackExpression.CreateFallbackExpression(sourceExpression2, fallbackValue, ref localVarIndex);
+				}
+				sourceExpression = sourceExpression2;
 			}
 		}
 
@@ -323,6 +342,7 @@ public static class BindingParser
 			IsItemsSource = isItemsSource,
 			UpdateSourceEvents = targetChangedEvents,
 			SourceExpression = sourceExpression,
+			AsyncSourceExpression = asyncSourceExpression,
 		};
 	}
 
@@ -654,12 +674,20 @@ public static class BindingParser
 		while (notifProps.Count > 0)
 		{
 			var prop = notifProps[0];
-			updateMethodNotifyProps.Add(prop.Clone());
+			updateMethodNotifyProps.Add(prop);
 			prop.Bindings.ForEach(b => bindings.Remove(b));
 			notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
 			notifySources1 = notifySources1
 				.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
 				.ToList();
+			foreach (var ns in prop.DependentNotifySources.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifySources)))
+			{
+				var index = updateNotifySources.IndexOf(s => s.Index == ns.Index);
+				if (index != -1)
+				{
+					updateNotifySources.RemoveAt(index);
+				}
+			}
 		}
 
 		// Replace and group expressions of
@@ -773,11 +801,6 @@ public class NotifyProperty
 	public required List<Bind> SetBindings { get; init; }
 	public List<NotifySource> DependentNotifySources { get; } = new();
 	public UpdateMethodData? UpdateMethod { get; set; }
-
-	public NotifyProperty Clone()
-	{
-		return (NotifyProperty)MemberwiseClone();
-	}
 };
 
 public class UpdateMethodData
@@ -814,6 +837,7 @@ public class Bind
 	// The final source expression,
 	// including Converter, TargetNull, FallbackValue, StringFormat
 	public Expression? SourceExpression { get; set; }
+	public Expression? AsyncSourceExpression { get; set; }
 
 	public IMemberInfo? DependencyProperty { get; set; }
 	public int Index { get; set; }

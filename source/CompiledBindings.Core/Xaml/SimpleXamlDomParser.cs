@@ -354,7 +354,12 @@ public class GeneratedClass
 	{
 		return XamlObjects
 			.SelectMany(o => o.Properties)
-			.Select(p => p.Value.StaticValue ?? p.Value.BindValue?.SourceExpression)
+			.SelectMany(p => 
+				p.Value.StaticValue != null
+					? EnumerableExtensions.AsEnumerable(p.Value.StaticValue)
+					: p.Value.BindValue != null
+						? [ p.Value.BindValue.SourceExpression, p.Value.BindValue.AsyncSourceExpression, p.Value.BindValue.FallbackValue ]
+						: Enumerable.Empty<Expression?>())
 			.Where(e => e != null)
 			.SelectMany(e => e!.EnumerateTree())
 			.OfType<StaticResourceExpression>()

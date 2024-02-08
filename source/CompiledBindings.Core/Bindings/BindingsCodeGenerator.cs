@@ -67,7 +67,7 @@ $@"			bool _settingBinding{bind.Index};");
 		foreach (var bind in taskBindings)
 		{
 			output.AppendLine(
-$@"			global::System.Threading.CancellationTokenSource _cts{bind.Index} = new global::System.Threading.CancellationTokenSource();");
+$@"			global::System.Threading.CancellationTokenSource _cts{bind.Index};");
 		}
 
 		GenerateBindingsExtraFieldDeclarations(output, bindingsData);
@@ -180,7 +180,7 @@ $@"
 		foreach (var bind in taskBindings)
 		{
 			output.AppendLine(
-$@"					_cts{bind.Index}.Cancel();");
+$@"					_cts{bind.Index}?.Cancel();");
 		}
 
 		// Unset event handlers for two-way bindings

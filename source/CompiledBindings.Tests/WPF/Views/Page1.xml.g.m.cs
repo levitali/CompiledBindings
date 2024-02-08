@@ -279,9 +279,9 @@ namespace WPFTest.Views
 			bool _settingBinding20;
 			bool _settingBinding21;
 			bool _settingBinding23;
-			global::System.Threading.CancellationTokenSource _cts12 = new global::System.Threading.CancellationTokenSource();
-			global::System.Threading.CancellationTokenSource _cts14 = new global::System.Threading.CancellationTokenSource();
-			global::System.Threading.CancellationTokenSource _cts25 = new global::System.Threading.CancellationTokenSource();
+			global::System.Threading.CancellationTokenSource _cts12;
+			global::System.Threading.CancellationTokenSource _cts14;
+			global::System.Threading.CancellationTokenSource _cts25;
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
@@ -345,9 +345,9 @@ namespace WPFTest.Views
 			{
 				if (_targetRoot != null)
 				{
-					_cts12.Cancel();
-					_cts14.Cancel();
-					_cts25.Cancel();
+					_cts12?.Cancel();
+					_cts14?.Cancel();
+					_cts25?.Cancel();
 					_targetRoot.textBox4.GotFocus -= OnTargetChanged0;
 					_targetRoot.textBox4.LostFocus -= OnTargetChanged0;
 					global::System.ComponentModel.DependencyPropertyDescriptor
@@ -403,7 +403,7 @@ namespace WPFTest.Views
 #line (67, 20) - (67, 79) 67 "Page1.xml"
 				_targetRoot.textBlock12.Text = dataRoot.Calculate(new global::WPFTest.ViewModels.ParamClass("text"));
 #line default
-				_cts14.Cancel();
+				_cts14?.Cancel();
 				_cts14 = new System.Threading.CancellationTokenSource();
 				Set0(_cts14.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
@@ -605,7 +605,7 @@ namespace WPFTest.Views
 
 			private void Update0_TaskProp(global::WPFTest.ViewModels.Page1ViewModel value)
 			{
-				_cts12.Cancel();
+				_cts12?.Cancel();
 				_cts12 = new System.Threading.CancellationTokenSource();
 				Set0(_cts12.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
@@ -712,7 +712,7 @@ namespace WPFTest.Views
 
 			private void Update1_ModifyTaskProp(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
-				_cts25.Cancel();
+				_cts25?.Cancel();
 				_cts25 = new System.Threading.CancellationTokenSource();
 				Set0(_cts25.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)

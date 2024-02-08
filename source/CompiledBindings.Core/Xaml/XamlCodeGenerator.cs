@@ -236,7 +236,7 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 				{
 					ctsName = "_cts" + property.Value.BindValue.Index;
 					output.AppendLine(
-$@"{a}			{ctsName}.Cancel();
+$@"{a}			{ctsName}?.Cancel();
 				{ctsName} = new System.Threading.CancellationTokenSource();");
 				}
 				else
@@ -282,13 +282,16 @@ $@"{a}						if (task == null)
 $@"{a}					}}");
 					value = "task";
 				}
+
+				var resultExpr = property.Value.BindValue?.AsyncSourceExpression?.CSharpCode ?? "result";
+
 				output.AppendLine(
 $@"{LineDirective(property.XamlNode, ref isLineDirective)}
 {a}					var result = await {value};
 {ResetLineDirective(ref isLineDirective)}
 {a}					if (!cancellationToken.IsCancellationRequested)
 {a}					{{
-{a}						{setExpr}{(isMethodCall ? "(result)" : " = result")};
+{a}						{setExpr}{(isMethodCall ? $"({resultExpr})" : $" = {resultExpr}")};
 {a}					}}
 {a}				}}
 {a}				catch

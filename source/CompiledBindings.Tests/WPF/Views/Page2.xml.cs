@@ -1,7 +1,5 @@
 ﻿using System.Windows.Controls;
 
-
-
 namespace WPFTest.Views;
 
 internal partial class Page2 : Page, INotifyPropertyChanged
@@ -10,9 +8,9 @@ internal partial class Page2 : Page, INotifyPropertyChanged
 	{
 	}
 
-	public string Prop1 => "Hello";
+	public Class2? ObjProp => null;
 
-	public Task<string> Prop2 => Task.FromResult("Hello");
+	public Task<string?> Prop2 => Task.FromResult<string?>("Hello");
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -25,3 +23,11 @@ internal partial class Page2 : Page, INotifyPropertyChanged
 	}
 }
 
+public class Class2 : INotifyPropertyChanged
+{
+	public string? Prop1 => "Hello";
+
+	public Task<string?> Prop2 => Task.FromResult<string?>("Hello");
+
+	public event PropertyChangedEventHandler? PropertyChanged;
+}
