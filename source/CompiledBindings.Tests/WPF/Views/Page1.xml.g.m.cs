@@ -403,7 +403,9 @@ namespace WPFTest.Views
 #line (67, 20) - (67, 79) 67 "Page1.xml"
 				_targetRoot.textBlock12.Text = dataRoot.Calculate(new global::WPFTest.ViewModels.ParamClass("text"));
 #line default
-				Set0(_generatedCodeDisposed.Token);
+				_cts14.Cancel();
+				_cts14 = new System.Threading.CancellationTokenSource();
+				Set0(_cts14.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
@@ -603,7 +605,9 @@ namespace WPFTest.Views
 
 			private void Update0_TaskProp(global::WPFTest.ViewModels.Page1ViewModel value)
 			{
-				Set0(_generatedCodeDisposed.Token);
+				_cts12.Cancel();
+				_cts12 = new System.Threading.CancellationTokenSource();
+				Set0(_cts12.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
@@ -708,7 +712,9 @@ namespace WPFTest.Views
 
 			private void Update1_ModifyTaskProp(global::WPFTest.ViewModels.Page1ModifyViewModel value)
 			{
-				Set0(_generatedCodeDisposed.Token);
+				_cts25.Cancel();
+				_cts25 = new System.Threading.CancellationTokenSource();
+				Set0(_cts25.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
