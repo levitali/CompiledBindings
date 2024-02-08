@@ -126,7 +126,7 @@ public static class BindingParser
 					}
 					includeNamespaces.UnionWith(includeNamespaces2.Select(n => n.ClrNamespace!));
 				}
-				
+
 				if (name == "Path")
 				{
 					expression = expr;
@@ -160,8 +160,8 @@ public static class BindingParser
 					str = str.Substring(2);
 				}
 
-				//TODO: how to match optional comma?
-				match = Regex.Match(str, @"^(.+)(?<!\\),");
+				// Find end of string format. It can contain commas, escaped with \ symbol
+				match = Regex.Match(str, @"^(.*)(?<!\\),");
 				if (match.Success)
 				{
 					stringFormat = match.Groups[1].Value;
@@ -172,6 +172,7 @@ public static class BindingParser
 					stringFormat = str;
 					pos1 = stringFormat.Length;
 				}
+				stringFormat = stringFormat.Replace("\\,", ",");
 			}
 			else if (name is "Mode" or "UpdateSourceEventNames" or "DataType" or "IsItemsSource")
 			{
@@ -250,7 +251,7 @@ public static class BindingParser
 			}
 		}
 
-		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource && 
+		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
 			(bindBackExpression ?? expression) is not (MemberExpression or CallExpression or ElementAccessExpression))
 		{
 			throw new ParseException("The expression must be settable for TwoWay or OneWayToSource bindings.");
@@ -449,7 +450,7 @@ public static class BindingParser
 						b.SourceExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
 			.SelectMany(b => b.SourceExpression!
-			                 .EnumerateTree()
+							 .EnumerateTree()
 							 .OfType<INotifiableExpression>()
 							 .Select(e => (bind: b, expr: e, notif: checkPropertyNotifiable(e))))
 			.Where(e => e.notif != false)
