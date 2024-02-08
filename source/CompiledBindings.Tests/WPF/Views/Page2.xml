@@ -11,7 +11,7 @@
     x:Class="WPFTest.Views.Page2">
 
     <Grid>
-        <TextBlock Text="{x:Bind Prop1}" />
+        <TextBlock Text="{x:Bind Prop1, StringFormat={0}\, World, Mode=OneTime}" />
         <TextBlock Text="{x:Bind Prop2}" />
         <Button Click="{x:Bind OnClick1}" />
         <Button Click="{x:Set OnClick2}" />

@@ -61,13 +61,13 @@ $@"			global::{binding.Property.TargetEvent!.EventType.Reference.GetCSharpFullNa
 $@"			bool _settingBinding{bind.Index};");
 		}
 
+		// Generate CancellationTokenSources for cancelling asynchronous setting of properties
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		bool asyncFunctions = bindingsData.Bindings.Any(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type));
-
-		if (asyncFunctions)
+		var taskBindings = bindingsData.Bindings.Where(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type)).ToList();
+		foreach (var bind in taskBindings)
 		{
 			output.AppendLine(
-$@"			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;");
+$@"			global::System.Threading.CancellationTokenSource _cts{bind.Index} = new global::System.Threading.CancellationTokenSource();");
 		}
 
 		GenerateBindingsExtraFieldDeclarations(output, bindingsData);
@@ -93,12 +93,6 @@ $@"
 			public void Initialize({targetClassName} dataRoot)
 			{{
 				_targetRoot = dataRoot;");
-		}
-
-		if (asyncFunctions)
-		{
-			output.AppendLine(
-$@"				_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();");
 		}
 
 		if (bindingsData.NotifySources.Count > 0)
@@ -182,10 +176,11 @@ $@"
 				if (_targetRoot != null)
 				{{");
 
-		if (asyncFunctions)
+		// Cancel asynchronous bindings
+		foreach (var bind in taskBindings)
 		{
 			output.AppendLine(
-$@"					_generatedCodeDisposed.Cancel();");
+$@"					_cts{bind.Index}.Cancel();");
 		}
 
 		// Unset event handlers for two-way bindings

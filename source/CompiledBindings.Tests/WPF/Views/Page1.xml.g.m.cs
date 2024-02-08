@@ -279,13 +279,14 @@ namespace WPFTest.Views
 			bool _settingBinding20;
 			bool _settingBinding21;
 			bool _settingBinding23;
-			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;
+			global::System.Threading.CancellationTokenSource _cts12 = new global::System.Threading.CancellationTokenSource();
+			global::System.Threading.CancellationTokenSource _cts14 = new global::System.Threading.CancellationTokenSource();
+			global::System.Threading.CancellationTokenSource _cts25 = new global::System.Threading.CancellationTokenSource();
 
 			public void Initialize(Page1 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
-				_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
 				_bindingsTrackings = new Page1_BindingsTrackings_this(this);
 
 				Update();
@@ -344,7 +345,9 @@ namespace WPFTest.Views
 			{
 				if (_targetRoot != null)
 				{
-					_generatedCodeDisposed.Cancel();
+					_cts12.Cancel();
+					_cts14.Cancel();
+					_cts25.Cancel();
 					_targetRoot.textBox4.GotFocus -= OnTargetChanged0;
 					_targetRoot.textBox4.LostFocus -= OnTargetChanged0;
 					global::System.ComponentModel.DependencyPropertyDescriptor

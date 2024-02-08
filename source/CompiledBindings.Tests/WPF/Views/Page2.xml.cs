@@ -4,7 +4,7 @@
 
 namespace WPFTest.Views;
 
-internal partial class Page2 : Page
+internal partial class Page2 : Page, INotifyPropertyChanged
 {
 	~Page2()
 	{
@@ -13,6 +13,8 @@ internal partial class Page2 : Page
 	public string Prop1 => "Hello";
 
 	public Task<string> Prop2 => Task.FromResult("Hello");
+
+	public event PropertyChangedEventHandler? PropertyChanged;
 
 	public void OnClick1(object sender, EventArgs e)
 	{

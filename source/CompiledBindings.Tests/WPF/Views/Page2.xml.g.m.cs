@@ -26,13 +26,14 @@ namespace WPFTest.Views
 		class Page2_Bindings_
 		{
 			Page2 _targetRoot;
+			Page2_BindingsTrackings_ _bindingsTrackings;
 			global::System.Windows.RoutedEventHandler _eventHandler2;
-			global::System.Threading.CancellationTokenSource _generatedCodeDisposed;
+			global::System.Threading.CancellationTokenSource _cts1 = new global::System.Threading.CancellationTokenSource();
 
 			public void Initialize(Page2 dataRoot)
 			{
 				_targetRoot = dataRoot;
-				_generatedCodeDisposed = new global::System.Threading.CancellationTokenSource();
+				_bindingsTrackings = new Page2_BindingsTrackings_(this);
 
 				Update();
 
@@ -40,15 +41,18 @@ namespace WPFTest.Views
 				_eventHandler2 = dataRoot.OnClick1;
 #line default
 				_targetRoot.button1.Click += _eventHandler2;
+
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 			}
 
 			public void Cleanup()
 			{
 				if (_targetRoot != null)
 				{
-					_generatedCodeDisposed.Cancel();
+					_cts1.Cancel();
 					_targetRoot.button1.Click -= _eventHandler2;
 					_eventHandler2 = null;
+					_bindingsTrackings.Cleanup();
 					_targetRoot = null;
 				}
 			}
@@ -56,16 +60,23 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _targetRoot;
-#line (14, 20) - (14, 40) 14 "Page2.xml"
-				_targetRoot.textBlock1.Text = dataRoot.Prop1;
+#line (14, 20) - (14, 80) 14 "Page2.xml"
+				_targetRoot.textBlock1.Text = $"{dataRoot.Prop1}, World";
 #line default
-				Set0(_generatedCodeDisposed.Token);
+				Update0_Prop2(dataRoot);
+			}
+
+			private void Update0_Prop2(global::WPFTest.Views.Page2 value)
+			{
+				_cts1.Cancel();
+				_cts1 = new System.Threading.CancellationTokenSource();
+				Set0(_cts1.Token);
 				async void Set0(global::System.Threading.CancellationToken cancellationToken)
 				{
 					try
 					{
 #line (15, 20) - (15, 40) 15 "Page2.xml"
-						var result = await dataRoot.Prop2;
+						var result = await value.Prop2;
 #line default
 						if (!cancellationToken.IsCancellationRequested)
 						{
@@ -74,6 +85,42 @@ namespace WPFTest.Views
 					}
 					catch
 					{
+					}
+				}
+			}
+
+			class Page2_BindingsTrackings_
+			{
+				global::System.WeakReference _bindingsWeakRef;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+
+				public Page2_BindingsTrackings_(Page2_Bindings_ bindings)
+				{
+					_bindingsWeakRef = new global::System.WeakReference(bindings);
+				}
+
+				public void Cleanup()
+				{
+					SetPropertyChangedEventHandler0(null);
+				}
+
+				public void SetPropertyChangedEventHandler0(global::WPFTest.Views.Page2 value)
+				{
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+				}
+
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
+				{
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page2_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::WPFTest.Views.Page2)sender;
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "Prop2")
+					{
+						bindings.Update0_Prop2(typedSender);
 					}
 				}
 			}

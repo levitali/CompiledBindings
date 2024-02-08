@@ -58,9 +58,11 @@ public class XamlCodeGenerator
 		}
 
 		string value;
+		Expression? originalExpression = null;
 		if (property.Value.BindValue != null || property.Value.StaticValue != null)
 		{
 			value = expression!.CSharpCode;
+			originalExpression = property.Value.BindValue?.Expression ?? property.Value.StaticValue;
 		}
 		else if (property.Value.CSharpValue != null)
 		{
@@ -73,7 +75,7 @@ public class XamlCodeGenerator
 
 		bool isAsync = false;
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		if (expression != null && taskType.IsAssignableFrom(expression.Type))
+		if (originalExpression != null && taskType.IsAssignableFrom(originalExpression.Type))
 		{
 			isAsync = !taskType.IsAssignableFrom(property.MemberType);
 		}
@@ -228,8 +230,22 @@ $@"{a}			if (!object.Equals({setExpr}, {varName}))
 			if (isAsync)
 			{
 				ResetLineDirective(output, ref isLineDirective);
+
+				string ctsName;
+				if (property.Value.BindValue != null)
+				{
+					ctsName = "_cts" + property.Value.BindValue.Index;
+					output.AppendLine(
+$@"{a}			{ctsName}.Cancel();
+				{ctsName} = new System.Threading.CancellationTokenSource();");
+				}
+				else
+				{
+					ctsName = "_generatedCodeDisposed";
+				}
+
 				output.AppendLine(
-$@"{a}			Set{localFuncIndex}(_generatedCodeDisposed.Token);
+$@"{a}			Set{localFuncIndex}({ctsName}.Token);
 {a}			async void Set{localFuncIndex++}(global::System.Threading.CancellationToken cancellationToken)
 {a}			{{
 {a}				try
