@@ -69,7 +69,7 @@ public abstract class Expression
 	public static bool CheckEndExpressionNullable(Expression expression)
 	{
 		return
-			expression is not (TypeExpression or NewExpression) &&
+			expression is not (TypeExpression or NewExpression or StaticResourceExpression) &&
 			(expression.Type.IsNullable ||
 			 (expression.IsNullable && StripParenExpression(expression) is CastExpression && !expression.Type.IsNullable));
 	}

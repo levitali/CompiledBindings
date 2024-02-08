@@ -25,7 +25,6 @@ public static class BindingParser
 		BindingMode? mode = null;
 		bool isItemsSource = false;
 		List<EventInfo> targetChangedEvents = new();
-		List<(string name, TypeInfo type)> resources = new();
 
 		// Try to find DataType property in the binding before parsing any expression
 		// TODO: how to match optional comma and not include it in the group?
@@ -101,11 +100,8 @@ public static class BindingParser
 						"FallbackValue" or "TargetNullValue" => prop.MemberType,
 						_ => TypeInfo.GetTypeThrow(typeof(object))
 					};
-					resources.Add((resourceName, resourceType!));
 
-					var resourceField = new FieldInfo(new FieldDefinition(resourceName, FieldAttributes.Private, resourceType!.Reference), resourceType);
-					expr = new VariableExpression(targetType, "_targetRoot");
-					expr = new MemberExpression(expr, resourceField, new TypeInfo(resourceType, false));
+					expr = new StaticResourceExpression(resourceName, resourceType);
 
 					int pos2 = str.IndexOf(',');
 					if (pos2 == -1)
@@ -130,6 +126,7 @@ public static class BindingParser
 					}
 					includeNamespaces.UnionWith(includeNamespaces2.Select(n => n.ClrNamespace!));
 				}
+				
 				if (name == "Path")
 				{
 					expression = expr;
@@ -324,7 +321,6 @@ public static class BindingParser
 			Mode = mode ?? defaultBindMode,
 			IsItemsSource = isItemsSource,
 			UpdateSourceEvents = targetChangedEvents,
-			Resources = resources,
 			SourceExpression = sourceExpression,
 		};
 	}
@@ -813,7 +809,6 @@ public class Bind
 	public TypeInfo? DataType { get; init; }
 	public bool DataTypeSet { get; init; }
 	public required List<EventInfo> UpdateSourceEvents { get; init; }
-	public required List<(string name, TypeInfo type)> Resources { get; init; }
 
 	// The final source expression,
 	// including Converter, TargetNull, FallbackValue, StringFormat

@@ -354,17 +354,11 @@ public class GeneratedClass
 	{
 		return XamlObjects
 			.SelectMany(o => o.Properties)
-			.Select(p => p.Value.BindValue)
-			.Where(b => b != null)
-			.SelectMany(b => b!.Resources)
-			.Select(b => (b.name, b.type))
-			.Union(XamlObjects
-				.SelectMany(o => o.Properties)
-				.Select(p => p.Value.StaticValue ?? p.Value.BindValue?.SourceExpression)
-				.Where(e => e != null)
-				.SelectMany(e => e!.EnumerateTree())
-				.OfType<StaticResourceExpression>()
-				.Select(e => (name: e.Name, type: e.Type)))
+			.Select(p => p.Value.StaticValue ?? p.Value.BindValue?.SourceExpression)
+			.Where(e => e != null)
+			.SelectMany(e => e!.EnumerateTree())
+			.OfType<StaticResourceExpression>()
+			.Select(e => (name: e.Name, type: e.Type))
 			.Distinct(b => b.name);
 	}
 
