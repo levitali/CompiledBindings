@@ -13,7 +13,7 @@
 
     <Grid>
         <DataGrid ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
-            <DataGrid.Columns mx:DefaultBindMode="OneTime">
+            <DataGrid.Columns mx:DefaultBindMode="OneTime" mx:UseItemType="true">
                 <DataGridTextColumn
                     Binding="{x:Bind Title}"
                     Header="Col1" />

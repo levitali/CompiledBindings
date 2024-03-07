@@ -6,6 +6,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 	public static readonly XNamespace mxNamespace = "http://compiledbindings.com/x";
 	public static readonly XName mxDataType = mxNamespace + "DataType";
 	public static readonly XName mxDefaultBindMode = mxNamespace + "DefaultBindMode";
+	public static readonly XName mxUseItemType = mxNamespace + "UseItemType";
 
 	public static readonly XName NameAttr = XNamespace.None + "Name"; // WPF Name attribute
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
@@ -64,7 +65,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				DataType = dataType;
 			}
 
-			var obj = processElement(xroot, rootBindingScope, true, null);
+			var obj = processElement(xroot, rootBindingScope, null, true, null);
 			if (obj != null)
 			{
 				obj.IsRoot = true;
@@ -95,12 +96,12 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				XamlObjects = xamlObjects,
 			};
 
-			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, bool isSupportedParent, string? parentDescription)
+			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? itemType, bool isSupportedParent, string? parentDescription)
 			{
 				var savedDataType = DataType;
 
 				bool isDataTemplateElement = xelement.Name == DataTemplate ||
-					                         xelement.Name == HierarchicalDataTemplate ||
+											 xelement.Name == HierarchicalDataTemplate ||
 											 xelement.Name == ControlTemplate;
 
 				var attrs = xelement.Attributes().Where(a => isMemExtensionWrapper(a) != null).ToList();
@@ -180,7 +181,6 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				}
 
 				XamlObject? obj = null;
-				TypeInfo? elementType = null;
 
 				if (attrs.Count > 0 ||
 					(dataTypeAttr != null && !isDataTemplateElement && xelement != xdoc.Root))
@@ -198,7 +198,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 						try
 						{
 							var xamlNode = XamlParser.ParseAttribute(CurrentLineFile, attr, KnownNamespaces);
-							var prop = GetObjectProperty(obj, xamlNode, includeNamespaces, currentBindingScope, bindingScopes, ref elementType, xroot != xdoc.Root && currentBindingScope.DataType == null);
+							var prop = GetObjectProperty(obj, xamlNode, includeNamespaces, currentBindingScope, bindingScopes, ref itemType, xroot != xdoc.Root && currentBindingScope.DataType == null);
 							obj.Properties.Add(prop);
 						}
 						catch (GeneratorException ex)
@@ -222,25 +222,38 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 					}
 				}
 
-				if (elementType != null)
-				{
-					DataType = elementType;
-				}
-
 				foreach (var child in xelement.Elements())
 				{
+					bool? useItemType = null;
+					if (itemType != null)
+					{
+						var useItemTypeAttr = child.Attribute(mxUseItemType);
+						if (useItemTypeAttr != null)
+						{
+							if (!bool.TryParse(useItemTypeAttr.Value, out var useItemType2))
+							{
+								throw new GeneratorException($"Invalid boolean value: {useItemTypeAttr.Value}", CurrentFile, useItemTypeAttr);
+							}
+							useItemType = useItemType2;
+						}
+					}
+
 					if (child.Name == DataTemplate ||
 						child.Name == HierarchicalDataTemplate ||
 						child.Name == ControlTemplate)
 					{
 						int index = dataTemplates.Count;
-						var dataTemplate = processRoot(child, elementType ?? DataType, null);
+						var dataTemplate = processRoot(child, useItemType == false ? DataType : itemType, null);
 						dataTemplates.Insert(index, dataTemplate);
 					}
 					else
 					{
+						if (useItemType == true)
+						{
+							DataType = itemType!;
+						}
 						var (isSupported, controlName) = IsElementSupported(child.Name);
-						processElement(child, currentBindingScope, isSupported && isSupportedParent, controlName ?? parentDescription);
+						processElement(child, currentBindingScope, itemType, isSupported && isSupportedParent, controlName ?? parentDescription);
 					}
 				}
 
@@ -354,11 +367,11 @@ public class GeneratedClass
 	{
 		return XamlObjects
 			.SelectMany(o => o.Properties)
-			.SelectMany(p => 
+			.SelectMany(p =>
 				p.Value.StaticValue != null
 					? EnumerableExtensions.AsEnumerable(p.Value.StaticValue)
 					: p.Value.BindValue != null
-						? [ p.Value.BindValue.SourceExpression, p.Value.BindValue.AsyncSourceExpression, p.Value.BindValue.FallbackValue ]
+						? [p.Value.BindValue.SourceExpression, p.Value.BindValue.AsyncSourceExpression, p.Value.BindValue.FallbackValue]
 						: Enumerable.Empty<Expression?>())
 			.Where(e => e != null)
 			.SelectMany(e => e!.EnumerateTree())
