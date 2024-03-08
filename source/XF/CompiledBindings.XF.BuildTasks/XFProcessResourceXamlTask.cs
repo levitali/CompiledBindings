@@ -268,7 +268,7 @@ public static class XFXamlProcessor
 								{
 									textLine.RemovedTextOffset += textLine.Text.Length - startPos;
 									textLine.Text = textLine.Text.Substring(0, startPos) + attrCont;
-									remoteNextLines();
+									removeNextLines();
 								}
 
 								continue;
@@ -287,12 +287,12 @@ public static class XFXamlProcessor
 						{
 							textLine.RemovedTextOffset += textLine.Text.Length - startPos;
 							textLine.Text = textLine.Text.Substring(0, startPos);
-							remoteNextLines();
+							removeNextLines();
 						}
 
 						attr.Remove();
 
-						void remoteNextLines()
+						void removeNextLines()
 						{
 							for (int i = startLine + 1; i < endLine; i++)
 							{
