@@ -50,18 +50,7 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 									}
 									else
 									{
-										var firstInstruction = Instruction.Create(OpCodes.Ldarg_0);
-										instructions.Add(firstInstruction);
-										instructions.Add(Instruction.Create(OpCodes.Call, method));
-										instructions.Add(Instruction.Create(OpCodes.Ret));
-
-										for (int index = 0, n = instructions.Count - 3; index < n; index++)
-										{
-											if (instructions[index].OpCode == OpCodes.Ret)
-											{
-												instructions[index] = Instruction.Create(OpCodes.Leave, firstInstruction);
-											}
-										}
+										ImplementCallAtEnd(instructions, method);
 									}
 								}
 							}
@@ -71,21 +60,7 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 								var dtor = type.Methods.FirstOrDefault(m => m.Name == "Finalize");
 								if (dtor != null)
 								{
-									var body = dtor.Body;
-									var instructions = body.Instructions;
-									var firstInstruction = Instruction.Create(OpCodes.Ldarg_0);
-									instructions.Add(firstInstruction);
-									instructions.Add(Instruction.Create(OpCodes.Call, method));
-									instructions.Add(Instruction.Create(OpCodes.Ret));
-
-									for (int index = 0, n = instructions.Count - 3; index < n; index++)
-									{
-										var instruction = instructions[index];
-										if (instruction.OpCode == OpCodes.Ret)
-										{
-											instructions[index] = Instruction.Create(OpCodes.Leave, firstInstruction);
-										}
-									}
+									ImplementCallAtEnd(dtor.Body.Instructions, method);
 								}
 							}
 
@@ -115,6 +90,30 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 		finally
 		{
 			TypeInfoUtils.Cleanup();
+		}
+	}
+
+	private static void ImplementCallAtEnd(Mono.Collections.Generic.Collection<Instruction> instructions, MethodDefinition method)
+	{
+		var firstInstruction = Instruction.Create(OpCodes.Ldarg_0);
+		instructions.Add(firstInstruction);
+		instructions.Add(Instruction.Create(OpCodes.Call, method));
+		instructions.Add(Instruction.Create(OpCodes.Ret));
+
+		for (int i = 0, n = instructions.Count - 3; i < n; i++)
+		{
+			var retInstr = instructions[i];
+			if (retInstr.OpCode == OpCodes.Ret)
+			{
+				instructions[i] = Instruction.Create(OpCodes.Leave, firstInstruction);
+				for (int j = 0; j < n; j++)
+				{
+					if (instructions[j].Operand == retInstr)
+					{
+						instructions[j].Operand = firstInstruction;
+					}
+				}
+			}
 		}
 	}
 }

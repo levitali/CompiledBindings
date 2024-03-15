@@ -7,7 +7,7 @@
 		<LocalAssemblyGenerated>false</LocalAssemblyGenerated>
 	</PropertyGroup>
 
-	<Target Name="WPFGenerateCodeTask" BeforeTargets="MarkupCompilePass1"
+	<Target Name="WPFGenerateCode" BeforeTargets="MarkupCompilePass1"
 			Condition="'$(DesignTimeBuild)' != 'True' and ('@(Page)' != '' or '@(ApplicationDefinition)' != '')">
 
 		<!-- Use the MarkupCompilePass1 task for two purposes:
@@ -146,7 +146,7 @@
 		</ItemGroup>
 	</Target>
 
-	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
 							 TargetAssembly="@(IntermediateAssembly)"/>
 	</Target>
