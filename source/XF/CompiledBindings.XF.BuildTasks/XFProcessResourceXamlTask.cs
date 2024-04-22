@@ -351,7 +351,8 @@ public static class XFXamlProcessor
 					if (attr == null)
 					{
 						lineNumber = lineInfo.LineNumber - 1;
-						startPos = lineInfo.LinePosition - 1 + xelement.Name.LocalName.Length;
+						var prefix = xelement.GetPrefixOfNamespace(xelement.Name.Namespace)?.Length + 1 ?? 0;
+						startPos = lineInfo.LinePosition - 1 + prefix + xelement.Name.LocalName.Length;
 					}
 					else
 					{
