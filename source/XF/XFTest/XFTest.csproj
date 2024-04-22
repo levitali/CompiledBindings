@@ -16,7 +16,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
-		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2622" />
+		<PackageReference Include="Xamarin.Forms" Version="5.0.0.2662" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -52,10 +52,10 @@
 	</Target>
 
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="false" />
+		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="true" />
 	</Target>
 
-	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="false" />
 	</Target>
 </Project>

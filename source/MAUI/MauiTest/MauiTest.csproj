@@ -58,8 +58,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.6" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.6" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.20" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.20" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 	</ItemGroup>
 
@@ -92,10 +92,10 @@
 	</Target>
 
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-		<MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="false" />
+		<MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="true" />
 	</Target>
 
-	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" />
 	</Target>
 

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata>
     <id>CompiledBindings.WPF</id>
-    <version>1.0.17.10</version>
+    <version>1.0.18</version>
     <title>x:Bind Compiled Bindings for WPF</title>
     <authors>levitali</authors>
     <owners>levitali</owners>

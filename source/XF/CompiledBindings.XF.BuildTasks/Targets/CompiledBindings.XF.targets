@@ -98,7 +98,7 @@
                                Assembly="$(IntermediateOutputPath)$(TargetFileName)" />
 	</Target>
 
-	<Target Name="ProcessAssemblyTask" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
+	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
                          TargetAssembly="@(IntermediateAssembly)" />
 	</Target>

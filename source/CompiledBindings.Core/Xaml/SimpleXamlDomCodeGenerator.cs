@@ -183,18 +183,7 @@ $@"		private void {viewName}_{_bindingContextStart}ContextChanged(object sender,
 	{
 		if (isDataTemplate || _generateVariableInitialization)
 		{
-			IEnumerable<XamlObject> objects = parseResult.XamlObjects!;
-			if (!isDataTemplate)
-			{
-				objects = objects.Where(o => !o.NameExplicitlySet);
-			}
-
-			foreach (var obj in objects.Where(o => o.Name != null))
-			{
-				output.AppendLine(
-$@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCSharpFullName(), rootElement, obj.Name)};");
-			}
-			output.AppendLine();
+			GenerateVariablesInitializations(output, parseResult, rootElement, isDataTemplate);
 		}
 
 		if (!isDataTemplate)
@@ -228,6 +217,22 @@ $@"			{viewName}.{_bindingContextStart}ContextChanged += {viewName}_{_bindingCon
 			}}");
 			}
 		}
+	}
+
+	protected virtual void GenerateVariablesInitializations(StringBuilder output, GeneratedClass parseResult, string rootElement, bool isDataTemplate)
+	{
+		IEnumerable<XamlObject> objects = parseResult.XamlObjects!;
+		if (!isDataTemplate)
+		{
+			objects = objects.Where(o => !o.NameExplicitlySet);
+		}
+
+		foreach (var obj in objects.Where(o => o.Name != null))
+		{
+			output.AppendLine(
+$@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCSharpFullName(), rootElement, obj.Name)};");
+		}
+		output.AppendLine();
 	}
 
 	private void GenerateBindings(StringBuilder output, GeneratedClass parseResult, string className)

@@ -5,7 +5,7 @@
 		<RootNamespace>CompiledBindings</RootNamespace>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.17.10</Version>
+		<Version>1.0.18</Version>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
@@ -16,8 +16,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="ilmerge" Version="3.0.41" />
-		<PackageReference Include="Microsoft.Build.Framework" Version="17.8.3" IncludeAssets="compile" />
-		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" IncludeAssets="compile" GeneratePathProperty="true" />
+		<PackageReference Include="Microsoft.Build.Framework" Version="17.9.5" IncludeAssets="compile" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.9.5" IncludeAssets="compile" GeneratePathProperty="true" />
 		<PackageReference Include="Mono.Cecil" Version="0.11.5" />
 	</ItemGroup>
 
