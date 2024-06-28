@@ -562,7 +562,7 @@ public static class BindingParser
 					bool? readOnly = (bool?)attr?.ConstructorArguments[0].Value;
 					if (readOnly == true)
 					{
-						return isNotifyPropertyChangedType ? true : null;
+						return false;
 					}
 
 					// Check if the property is get-only

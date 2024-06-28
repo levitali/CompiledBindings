@@ -32,6 +32,9 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public string? StringProp { get; set; }
 
+	[ReadOnly(true)]
+	public bool ReadOnlyProp => DecimalProp == 0;
+
 	public enum Field
 	{
 		Field1,

@@ -72,6 +72,7 @@
              x:Name="button1" />
         <Label
             
+						
              x:Name="label13" />
     </StackLayout>
 

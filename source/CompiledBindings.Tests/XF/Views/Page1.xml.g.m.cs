@@ -220,6 +220,8 @@ namespace XFTest.Views
 				var value2 = value1[0];
 #line (58, 13) - (58, 63) 58 "Page1.xml"
 				_targetRoot.list.ItemsSource = value1;
+#line (75, 7) - (75, 39) 75 "Page1.xml"
+				_targetRoot.label13.IsVisible = dataRoot.ReadOnlyProp;
 #line default
 				Update0(dataRoot);
 				Update1_DecimalProp(value2);
@@ -265,7 +267,7 @@ namespace XFTest.Views
 				_targetRoot.label6.Text = value1.ToString();
 #line (45, 16) - (45, 46) 45 "Page1.xml"
 				_targetRoot.label7.Text = (value1 + 1).ToString();
-#line (75, 13) - (75, 138) 75 "Page1.xml"
+#line (76, 13) - (76, 138) 76 "Page1.xml"
 				_targetRoot.label13.Text = $"Decimal value: {value1:0.###}, Boolean value: {value.BooleanProp}, String value: {value.StringProp?.TrimStart('0')}";
 #line default
 			}
@@ -295,7 +297,7 @@ namespace XFTest.Views
 						_settingBinding7 = false;
 					}
 				}
-#line (75, 13) - (75, 138) 75 "Page1.xml"
+#line (76, 13) - (76, 138) 76 "Page1.xml"
 				_targetRoot.label13.Text = $"Decimal value: {value.DecimalProp:0.###}, Boolean value: {value1}, String value: {value.StringProp?.TrimStart('0')}";
 #line default
 			}
@@ -353,7 +355,7 @@ namespace XFTest.Views
 						_settingBinding10 = false;
 					}
 				}
-#line (75, 13) - (75, 138) 75 "Page1.xml"
+#line (76, 13) - (76, 138) 76 "Page1.xml"
 				_targetRoot.label13.Text = $"Decimal value: {value.DecimalProp:0.###}, Boolean value: {value.BooleanProp}, String value: {value1?.TrimStart('0')}";
 #line default
 			}
