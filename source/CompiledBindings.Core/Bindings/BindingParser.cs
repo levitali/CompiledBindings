@@ -418,7 +418,7 @@ public static class BindingParser
 		var twoWayEventHandlers1 = twoWayBinds
 			.Where(b => b.UpdateSourceEvents.Count > 0)
 			.SelectMany(b => b.UpdateSourceEvents.Select(e => (bind: b, evnt: e)))
-			.GroupBy(e => (e.bind.Property.Object, e.evnt.Signature))
+			.GroupBy(e => (e.bind, e.evnt.Signature))
 			.Select(g => new TwoWayBindingData
 			{
 				TargetChangedEvents = g.Select(_ => _.evnt).Distinct().ToList(),
