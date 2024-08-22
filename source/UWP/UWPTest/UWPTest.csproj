@@ -11,7 +11,7 @@
     <AssemblyName>UWPTest</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22000.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22621.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -158,7 +158,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CompiledBindings.UWP\CompiledBindings.UWP.csproj"  Private="False">
+    <ProjectReference Include="..\CompiledBindings.UWP\CompiledBindings.UWP.csproj" Private="False">
       <Project>{a08518bb-1d83-4c40-9bbc-7ee7c290195d}</Project>
       <Name>CompiledBindings.UWP</Name>
     </ProjectReference>
