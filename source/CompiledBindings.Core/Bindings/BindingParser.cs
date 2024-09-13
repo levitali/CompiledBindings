@@ -277,7 +277,7 @@ public static class BindingParser
 				sourceExpression2 = new VariableExpression(taskResultType, "result");
 			}
 			else
-			{				
+			{
 				sourceExpression2 = sourceExpression;
 			}
 
@@ -411,20 +411,22 @@ public static class BindingParser
 			.ToList();
 		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, null, iNotifyPropertyChangedType);
 
-		// Create data for two-way bindings
+		//*** Create data for two-way bindings
 
 		var twoWayBinds = binds.Where(b => b.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource);
 
+		// two-way bindings for which UpdateSourceEventNames are explicitely set
 		var twoWayEventHandlers1 = twoWayBinds
 			.Where(b => b.UpdateSourceEvents.Count > 0)
 			.SelectMany(b => b.UpdateSourceEvents.Select(e => (bind: b, evnt: e)))
-			.GroupBy(e => (e.bind.Property.Object, e.evnt.Signature))
+			.GroupBy(e => (e.bind, e.evnt.Signature))
 			.Select(g => new TwoWayBindingData
 			{
 				TargetChangedEvents = g.Select(_ => _.evnt).Distinct().ToList(),
 				Bindings = g.Select(_ => _.bind).Distinct().ToList(),
 			});
 
+		// two-way bindings for dependency properties
 		var twoWayEventHandlers2 = twoWayBinds
 			.Where(b => b.UpdateSourceEvents.Count == 0 && b.DependencyProperty != null)
 			.GroupBy(b => (b.Property.Object, b.DependencyProperty))
@@ -433,7 +435,19 @@ public static class BindingParser
 				Bindings = g.ToList(),
 			});
 
-		var twoWayEventHandlers = twoWayEventHandlers1.Concat(twoWayEventHandlers2).ToList();
+		// two-way bindings for objects implementing INotifyPropertyChanged
+		var twoWayEventHandlers3 = twoWayBinds
+			.Where(b => b.UpdateSourceEvents.Count == 0 &&
+			            b.DependencyProperty == null &&
+			            iNotifyPropertyChangedType.IsAssignableFrom(b.Property.Object.Type))
+			.GroupBy(b => b.Property.Object)
+			.Select(g => new TwoWayBindingData
+			{
+				TargetChangedEvents = [iNotifyPropertyChangedType.Events[0]],
+				Bindings = g.ToList(),
+			});
+
+		var twoWayEventHandlers = twoWayEventHandlers1.Concat(twoWayEventHandlers2).Concat(twoWayEventHandlers3).ToList();
 		for (int i = 0; i < twoWayEventHandlers.Count; i++)
 		{
 			twoWayEventHandlers[i].Index = i;

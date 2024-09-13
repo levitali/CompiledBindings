@@ -324,6 +324,8 @@ public abstract class XamlDomParser
 			xamlNode.Children.Count == 1 &&
 			XamlNamespace.GetClrNamespace(xamlNode.Children[0].Name.NamespaceName) == "CompiledBindings.Markup";
 
+		var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+
 		var propType = objProp.MemberType;
 		if (xamlNode.Children.Count == 1 &&
 			(xamlNode.Children[0].Name == xSet ||
@@ -418,7 +420,9 @@ public abstract class XamlDomParser
 					}
 
 					if (bind!.Mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-						bind.UpdateSourceEvents.Count == 0 && bind.DependencyProperty == null)
+						bind.UpdateSourceEvents.Count == 0 &&
+						bind.DependencyProperty == null &&
+						!iNotifyPropChanged.IsAssignableFrom(bind.Property.Object.Type))
 					{
 						ResolveTargetChangeEventCore(bind);
 						if (bind.UpdateSourceEvents.Count == 0)
@@ -586,14 +590,6 @@ public abstract class XamlDomParser
 
 	protected virtual void ResolveTargetChangeEventCore(Bind binding)
 	{
-		if (binding.UpdateSourceEvents.Count == 0)
-		{
-			var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
-			if (iNotifyPropChanged.IsAssignableFrom(binding.Property.Object.Type))
-			{
-				binding.UpdateSourceEvents.Add(iNotifyPropChanged.Events[0]);
-			}
-		}
 	}
 
 	private static class Res

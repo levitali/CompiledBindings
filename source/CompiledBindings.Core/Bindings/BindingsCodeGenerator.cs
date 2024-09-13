@@ -284,13 +284,12 @@ $@"			}}");
 		{
 			output.AppendLine();
 
-			var first = ev.Bindings[0];
 			if (ev.TargetChangedEvents != null)
 			{
 				output.AppendLine(
 $@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.TargetChangedEvents[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Reference.GetCSharpFullName()} p{i}"))})");
 			}
-			else if (first.DependencyProperty != null)
+			else if (ev.Bindings[0].DependencyProperty != null)
 			{
 				GenerateDependencyPropertyChangedCallback(output, $"OnTargetChanged{ev.Index}");
 			}
