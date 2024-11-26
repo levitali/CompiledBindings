@@ -25,7 +25,7 @@
          CheckForOverflowUnderflow="$(CheckForOverflowUnderflow)"
          CodeAnalysisRuleSet="$(ResolvedCodeAnalysisRuleSet)"
          CodePage="$(CodePage)"
-         DebugType="$(DebugType)"
+         DebugType="full"
          DefineConstants="$(DefineConstants)"
          DelaySign="$(DelaySign)"
          DisabledWarnings="$(NoWarn)"
@@ -104,7 +104,8 @@
 
 	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
 		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
-                         TargetAssembly="@(IntermediateAssembly)" />
+                         TargetAssembly="@(IntermediateAssembly)"
+												 DebugType="$(DebugType)" />
 	</Target>
 
 </Project>

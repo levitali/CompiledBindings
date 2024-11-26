@@ -22,7 +22,7 @@
              CheckForOverflowUnderflow="$(CheckForOverflowUnderflow)"
              CodeAnalysisRuleSet="$(ResolvedCodeAnalysisRuleSet)"
              CodePage="$(CodePage)"
-             DebugType="$(DebugType)"
+             DebugType="full"
              DefineConstants="$(DefineConstants)"
              DelaySign="$(DelaySign)"
              DisabledWarnings="$(NoWarn)"
@@ -94,12 +94,14 @@
 
     <Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
         <MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)"
-                                     Assembly="$(IntermediateOutputPath)$(TargetFileName)" />
+                                     Assembly="$(IntermediateOutputPath)$(TargetFileName)"
+																		 DebugType="$(DebugType)" />
     </Target>
 
     <Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
         <ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)"
-                             TargetAssembly="@(IntermediateAssembly)" />
+                             TargetAssembly="@(IntermediateAssembly)"
+														 DebugType="$(DebugType)" />
     </Target>
 
 </Project>

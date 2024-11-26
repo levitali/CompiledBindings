@@ -8,6 +8,9 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 	[Required]
 	public required string TargetAssembly { get; init; }
 
+	[Required]
+	public required string DebugType { get; init; }
+
 	public required bool AttachDebugger { get; init; }
 
 	public override bool Execute()
@@ -21,10 +24,12 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 
+			bool symbols = string.Compare(DebugType, "none", true) != 0;
+
 			var prm = new ReaderParameters(ReadingMode.Immediate)
 			{
 				ReadWrite = true,
-				ReadSymbols = true,
+				ReadSymbols = symbols,
 				AssemblyResolver = new TypeInfoUtils.AssemblyResolver(),
 			};
 
@@ -69,7 +74,7 @@ public class ProcessAssemblyTask : Microsoft.Build.Utilities.Task
 						}
 					}
 				}
-				assembly.Write(new WriterParameters { WriteSymbols = true });
+				assembly.Write(new WriterParameters { WriteSymbols = symbols });
 				return true;
 			}
 			finally

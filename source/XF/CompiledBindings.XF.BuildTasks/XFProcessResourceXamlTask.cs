@@ -30,6 +30,9 @@ public class XFProcessResourceXamlTask : Task
 	public required ITaskItem[] ReferenceAssemblies { get; init; }
 
 	[Required]
+	public required string DebugType { get; init; }
+
+	[Required]
 	public required string Assembly { get; init; }
 
 	public bool AttachDebugger { get; set; }
@@ -45,10 +48,12 @@ public class XFProcessResourceXamlTask : Task
 
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 
+			bool symbols = string.Compare(DebugType, "none", true) != 0;
+
 			var prm = new ReaderParameters(ReadingMode.Immediate)
 			{
 				ReadWrite = true,
-				ReadSymbols = true,
+				ReadSymbols = symbols,
 				AssemblyResolver = new TypeInfoUtils.AssemblyResolver(),
 			};
 
@@ -101,7 +106,7 @@ public class XFProcessResourceXamlTask : Task
 
 			if (assemblyModified)
 			{
-				assembly.Write(new WriterParameters { WriteSymbols = true });
+				assembly.Write(new WriterParameters { WriteSymbols = symbols });
 			}
 
 			return true;
