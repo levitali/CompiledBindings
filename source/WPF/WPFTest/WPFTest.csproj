@@ -61,7 +61,7 @@
 	</Target>
 
 	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" AttachDebugger="false" />
+		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" DebugType="$(DebugType)" AttachDebugger="false" />
 	</Target>
 
 </Project>

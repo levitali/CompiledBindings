@@ -21,6 +21,10 @@ internal partial class Page2 : Page, INotifyPropertyChanged
 	public void OnClick2()
 	{
 	}
+
+	public void Confirm(bool isFinal)
+	{
+	}
 }
 
 public class Class2 : INotifyPropertyChanged

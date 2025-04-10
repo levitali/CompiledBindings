@@ -10,6 +10,7 @@ public static class ExpressionUtils
 		while (true)
 		{
 			var group = setExpressions
+				.Where(p => p.Property.TargetEvent == null)
 				.SelectMany(p => p.Expression.EnumerateTree()
 					.Where(e => e is not (ConstantExpression or VariableExpression or TypeExpression or DefaultExpression or NewExpression) &&
 								(e is not MemberExpression me || (me.Member is not (MethodInfo or FieldInfo))))

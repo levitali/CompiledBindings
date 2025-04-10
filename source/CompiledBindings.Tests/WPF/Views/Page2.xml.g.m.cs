@@ -14,8 +14,12 @@ namespace WPFTest.Views
 
 			_generatedCodeInitialized = true;
 
-#line (17, 17) - (17, 40) 17 "Page2.xml"
-			button2.Click += (p1, p2) => this.OnClick2();
+#line (18, 17) - (18, 40) 18 "Page2.xml"
+			button3.Click += (p1, p2) => this.OnClick2();
+#line (19, 17) - (19, 46) 19 "Page2.xml"
+			button4.Click += (p1, p2) => this.Confirm(false);
+#line (20, 17) - (20, 46) 20 "Page2.xml"
+			button5.Click += (p1, p2) => this.Confirm(false);
 #line default
 
 			Bindings_.Initialize(this);
@@ -28,6 +32,7 @@ namespace WPFTest.Views
 			Page2 _targetRoot;
 			Page2_BindingsTrackings_ _bindingsTrackings;
 			global::System.Windows.RoutedEventHandler _eventHandler2;
+			global::System.Windows.RoutedEventHandler _eventHandler3;
 			global::System.Threading.CancellationTokenSource _cts1;
 
 			public void Initialize(Page2 dataRoot)
@@ -41,6 +46,10 @@ namespace WPFTest.Views
 				_eventHandler2 = dataRoot.OnClick1;
 #line default
 				_targetRoot.button1.Click += _eventHandler2;
+#line (17, 17) - (17, 41) 17 "Page2.xml"
+				_eventHandler3 = dataRoot.OnClick1;
+#line default
+				_targetRoot.button2.Click += _eventHandler3;
 
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 			}
@@ -52,6 +61,8 @@ namespace WPFTest.Views
 					_cts1?.Cancel();
 					_targetRoot.button1.Click -= _eventHandler2;
 					_eventHandler2 = null;
+					_targetRoot.button2.Click -= _eventHandler3;
+					_eventHandler3 = null;
 					_bindingsTrackings.Cleanup();
 					_targetRoot = null;
 				}

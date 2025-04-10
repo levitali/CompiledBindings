@@ -14,7 +14,10 @@
         <TextBlock Text="{x:Bind ObjProp.Prop1, StringFormat={0}\, World, TargetNullValue='Hi', FallbackValue='no text'}" />
         <TextBlock Text="{x:Bind ObjProp.Prop2, StringFormat={0}\, World, TargetNullValue='Hi', FallbackValue='loading...'}" />
         <Button Click="{x:Bind OnClick1}" />
+        <Button Click="{x:Bind OnClick1}" />
         <Button Click="{x:Set OnClick2}" />
+        <Button Click="{x:Set Confirm(false)}" />
+        <Button Click="{x:Set Confirm(false)}" />
     </Grid>
 
 </Page>

@@ -14,7 +14,7 @@
             x:Key="test1Template"
             x:DataType="vm:EntityViewModel">
             <StackLayout Orientation="Horizontal">
-                <Label                     
+                <Label              
                     Text
                        =
                        "
@@ -60,7 +60,7 @@
             ItemsSource="{x:Bind ListProp}" />
         <Button
             Text="Test set focus"
-            Clicked="TestSetFocus_Click" />
+            Clicked="{x:Bind FocusUserName}" />
 
         <Picker
             ItemDisplayBinding="{x:Bind Description, DataType=vm:PickItem}"

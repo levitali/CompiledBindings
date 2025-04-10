@@ -1,5 +1,4 @@
-﻿using System;
-using Xamarin.Forms;
+﻿using Xamarin.Forms;
 using XFTest.ViewModels;
 
 namespace XFTest;
@@ -13,10 +12,5 @@ public partial class MainPage : ContentPage
 		InitializeComponent();
 
 		BindingContext = _viewModel = new Page1ViewModel();
-	}
-
-	private void TestSetFocus_Click(object sender, EventArgs e)
-	{
-		_viewModel.FocusUserName();
 	}
 }

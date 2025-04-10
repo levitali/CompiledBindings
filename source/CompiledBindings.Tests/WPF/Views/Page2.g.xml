@@ -4,5 +4,8 @@
     <TextBlock x:Name="textBlock2" />
     <Button x:Name="button1" />
     <Button x:Name="button2" />
+    <Button x:Name="button3" />
+    <Button x:Name="button4" />
+    <Button x:Name="button5" />
   </Grid>
 </Page>
