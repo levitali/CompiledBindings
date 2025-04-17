@@ -76,9 +76,9 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
-			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBox"] = new HashSet<string> { "Text" };
-			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBlock"] = new HashSet<string> { "Text" };
-			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Documents.Run"] = new HashSet<string> { "Text" };
+			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBox"] = ["Text"];
+			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBlock"] = ["Text"];
+			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Documents.Run"] = ["Text"];
 
 			var xamlDomParser = new WinUIXamlDomParser(_platformConstants);
 
@@ -373,8 +373,7 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 
 		private readonly string[] _defaultClrNamespaces;
 
-		private PlatformConstants _platformConstants;
-
+		private readonly PlatformConstants _platformConstants;
 
 		public WinUIXamlDomParser(PlatformConstants platformConstants) : base(
 			_xmlns,
@@ -385,19 +384,18 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 			TypeInfo.GetTypeThrow($"{platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty"))
 		{
 			_platformConstants = platformConstants;
-			_defaultClrNamespaces = new string[]
-			{
+			_defaultClrNamespaces =
+			[
+				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Data",
 				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Documents",
 				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Controls",
 				$"{platformConstants.BaseClrNamespace}.UI.Xaml.Shapes",
-			};
+			];
 		}
 
 		protected override IEnumerable<string> GetClrNsFromXmlNs(string xmlNs)
 		{
-			if (xmlNs == _xmlns)
-				return _defaultClrNamespaces;
-			return Enumerable.Empty<string>();
+			return xmlNs == _xmlns ? _defaultClrNamespaces : Enumerable.Empty<string>();
 		}
 
 		public override bool IsDataContextSupported(TypeInfo type)
@@ -408,7 +406,7 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 
 	public class WinUICodeGenerator : SimpleXamlDomCodeGenerator
 	{
-		PlatformConstants _platformConstants;
+		private readonly PlatformConstants _platformConstants;
 
 		public WinUICodeGenerator(PlatformConstants platformConstants, string langVersion, string msbuildVersion)
 			: base(new WinUIBindingsCodeGenerator(platformConstants, langVersion, msbuildVersion),
@@ -433,7 +431,7 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 
 	public class WinUIBindingsCodeGenerator : BindingsCodeGenerator
 	{
-		PlatformConstants _platformConstants;
+		private readonly PlatformConstants _platformConstants;
 
 		public WinUIBindingsCodeGenerator(PlatformConstants platformConstants, string langVersion, string msbuildVersion) : base(platformConstants.FrameworkId, langVersion, msbuildVersion)
 		{
