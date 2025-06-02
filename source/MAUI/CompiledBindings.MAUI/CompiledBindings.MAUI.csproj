@@ -4,7 +4,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
-		<Version>1.0.18.5</Version>
+		<Version>1.0.19</Version>
 		<LangVersion>latest</LangVersion>
 		<OutputPath>..\..\..\bin\maui\lib</OutputPath>
 		<ImplicitUsings>enable</ImplicitUsings>
