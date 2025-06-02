@@ -15,6 +15,8 @@ public abstract class Expression
 
 	public TypeInfo Type { get; }
 
+	public virtual Expression TypeDefiningExpression => this;
+
 	public virtual bool IsNullable => Type.IsNullable || Enumerate().Any(e => e.IsNullable);
 
 	public virtual IEnumerable<Expression> Enumerate()
@@ -187,6 +189,8 @@ public class UnaryExpression : Expression
 
 	public string Operand { get; }
 
+	public override Expression TypeDefiningExpression => Expression.TypeDefiningExpression;
+
 	protected override string GetCSharpCode()
 	{
 		return $"{Operand}{Expression}";
@@ -217,6 +221,11 @@ public class BinaryExpression : Expression
 	public Expression Left { get; private set; }
 	public Expression Right { get; private set; }
 	public string Operand { get; private set; }
+
+	public override Expression TypeDefiningExpression =>
+		Type.Reference.FullName == "System.Boolean"
+		? base.TypeDefiningExpression
+		: Left.TypeDefiningExpression;
 
 	protected override string GetCSharpCode()
 	{
@@ -473,6 +482,8 @@ public class ParenExpression : Expression
 
 	public Expression Expression { get; private set; }
 
+	public override Expression TypeDefiningExpression => Expression.TypeDefiningExpression;
+
 	protected override string GetCSharpCode()
 	{
 		return $"({Expression})";
@@ -568,6 +579,8 @@ public class ConditionalExpression : Expression
 
 	public override bool IsNullable => IfTrue.IsNullable || IfFalse.IsNullable;
 
+	public override Expression TypeDefiningExpression => IfTrue.TypeDefiningExpression;
+
 	public override IEnumerable<Expression> Enumerate()
 	{
 		yield return Test;
@@ -595,6 +608,8 @@ public class CoalesceExpression : Expression
 
 	public Expression Left { get; private set; }
 	public Expression Right { get; private set; }
+
+	public override Expression TypeDefiningExpression => Right.TypeDefiningExpression;
 
 	protected override string GetCSharpCode()
 	{
@@ -658,6 +673,8 @@ public class FallbackExpression : Expression
 	public Expression NullableExpression { get; private set; }
 
 	public Expression Fallback { get; private set; }
+
+	public override Expression TypeDefiningExpression => Expression.TypeDefiningExpression;
 
 	public override bool IsNullable => Fallback.IsNullable;
 

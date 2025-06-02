@@ -289,7 +289,7 @@ public class ExpressionParser
 			return true;
 		}
 
-		if (expression is not ConstantExpression ce)
+		if (expression.TypeDefiningExpression is not ConstantExpression ce)
 		{
 			return false;
 		}
