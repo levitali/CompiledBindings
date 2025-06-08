@@ -392,8 +392,7 @@ public static class BindingParser
 		{
 			// If the notify source has more than one property, the update method is needed
 			// to update all properties for empty property name
-			if (notifySource.Properties.Count > 1 &&
-				iNotifyPropertyChangedType.IsAssignableFrom(notifySource.SourceExpression.Type))
+			if (notifySource.Properties.Count > 1 && notifySource.IsINotifyPropertyChanged)
 			{
 				var bindings = notifySource.Properties.SelectMany(_ => _.Bindings).Distinct().ToList();
 				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, notifySource.SourceExpression, iNotifyPropertyChangedType);
@@ -498,6 +497,7 @@ public static class BindingParser
 				{
 					Expression = expr1,
 					SourceExpression = expr1,
+					IsINotifyPropertyChanged = iNotifyPropertyChangedType.IsAssignableFrom(expr1.Type),
 					CheckINotifyPropertyChanged = f.notif == null,
 					Index = i,
 				};
@@ -642,7 +642,7 @@ public static class BindingParser
 		//Get the notify sources, for which UpdateXX methods are generated,
 		//ordered descending by number of bindings set in them.
 		var notifySources2 = notifySources1
-			.Where(s => s.Properties.Count > 1 && iNotifyPropertyChangedType.IsAssignableFrom(s.SourceExpression.Type))
+			.Where(s => s.Properties.Count > 1 && s.IsINotifyPropertyChanged)
 			.OrderByDescending(s => s.Properties.SelectMany(p => p.Bindings).Distinct().Count())
 			.ToList();
 
@@ -794,6 +794,7 @@ public class NotifySource
 	public required Expression SourceExpression { get; set; }
 	public List<NotifyProperty> Properties { get; set; } = null!;
 	public UpdateMethodData? UpdateMethod { get; set; }
+	public bool IsINotifyPropertyChanged { get; set; }
 	public bool CheckINotifyPropertyChanged { get; init; }
 	public int Index { get; init; }
 

@@ -11,7 +11,6 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 		bool isDiffDataRoot = bindingsData.DataType.Reference.FullName != bindingsData.TargetType?.Reference.FullName;
 		var rootGroup = bindingsData.NotifySources.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
 
-		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
 		bool isLineDirective = false;
 
 		#region Bindings Variable
@@ -356,7 +355,7 @@ $@"				global::System.WeakReference _bindingsWeakRef;");
 			// Generate _propertyChangeSourceXXX fields
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
+				if (notifySource.IsINotifyPropertyChanged || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
 $@"				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource{notifySource.Index};");
@@ -410,7 +409,7 @@ $@"				}}");
 				output.AppendLine(
 $@"				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()} value)
 				{{");
-				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
+				if (notifySource.IsINotifyPropertyChanged || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
 $@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, OnPropertyChanged{notifySource.Index});");
@@ -448,7 +447,7 @@ $@"				}}");
 
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				if (iNotifyPropertyChangedType.IsAssignableFrom(notifySource.Expression.Type) || notifySource.CheckINotifyPropertyChanged)
+				if (notifySource.IsINotifyPropertyChanged || notifySource.CheckINotifyPropertyChanged)
 				{
 					output.AppendLine(
 $@"
