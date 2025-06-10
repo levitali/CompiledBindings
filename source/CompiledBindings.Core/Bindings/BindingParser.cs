@@ -24,7 +24,7 @@ public static class BindingParser
 		bool dataTypeSet = false;
 		BindingMode? mode = null;
 		bool isItemsSource = false;
-		List<EventInfo> targetChangedEvents = new();
+		List<EventInfo> targetChangedEvents = [];
 
 		// Try to find DataType property in the binding before parsing any expression
 		// TODO: how to match optional comma and not include it in the group?
@@ -104,14 +104,7 @@ public static class BindingParser
 					expr = new StaticResourceExpression(resourceName, resourceType);
 
 					int pos2 = str.IndexOf(',');
-					if (pos2 == -1)
-					{
-						pos1 = pos2 = str.Length;
-					}
-					else
-					{
-						pos1 = pos2 + 1;
-					}
+					pos1 = pos2 == -1 ? (pos2 = str.Length) : pos2 + 1;
 				}
 				else
 				{
@@ -177,14 +170,7 @@ public static class BindingParser
 			else if (name is "Mode" or "UpdateSourceEventNames" or "DataType" or "IsItemsSource")
 			{
 				int pos2 = str.IndexOf(',');
-				if (pos2 == -1)
-				{
-					pos1 = pos2 = str.Length;
-				}
-				else
-				{
-					pos1 = pos2 + 1;
-				}
+				pos1 = pos2 == -1 ? (pos2 = str.Length) : pos2 + 1;
 
 				var value = str.Substring(0, pos2).Trim();
 
@@ -437,8 +423,8 @@ public static class BindingParser
 		// two-way bindings for objects implementing INotifyPropertyChanged
 		var twoWayEventHandlers3 = twoWayBinds
 			.Where(b => b.UpdateSourceEvents.Count == 0 &&
-			            b.DependencyProperty == null &&
-			            iNotifyPropertyChangedType.IsAssignableFrom(b.Property.Object.Type))
+						b.DependencyProperty == null &&
+						iNotifyPropertyChangedType.IsAssignableFrom(b.Property.Object.Type))
 			.GroupBy(b => b.Property.Object)
 			.Select(g => new TwoWayBindingData
 			{
@@ -491,14 +477,14 @@ public static class BindingParser
 			.OrderBy(g => g.Key)
 			.Select((g, i) =>
 			{
-				var f = g.First();
-				var expr1 = f.expr.Expression;
+				var (bind, expr, notif) = g.First();
+				var expr1 = expr.Expression;
 				var d = new NotifySource
 				{
 					Expression = expr1,
 					SourceExpression = expr1,
 					IsINotifyPropertyChanged = iNotifyPropertyChangedType.IsAssignableFrom(expr1.Type),
-					CheckINotifyPropertyChanged = f.notif == null,
+					CheckINotifyPropertyChanged = notif == null,
 					Index = i,
 				};
 				d.Properties = g.GroupBy(e => e.expr.Member?.Definition.Name).Select(g2 =>
@@ -627,7 +613,7 @@ public static class BindingParser
 
 	private static UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Expression? replacedExpression, TypeInfo iNotifyPropertyChangedType)
 	{
-		List<VariableExpression> parameters = new();
+		List<VariableExpression> parameters = [];
 
 		VariableExpression? valueExpression = null;
 		if (replacedExpression != null)
@@ -637,7 +623,7 @@ public static class BindingParser
 			parameters.Add(valueExpression);
 		}
 
-		var notifySources1 = (notifySources ?? Enumerable.Empty<NotifySource>()).ToList();
+		var notifySources1 = notifySources ?? [];
 
 		//Get the notify sources, for which UpdateXX methods are generated,
 		//ordered descending by number of bindings set in them.
@@ -669,16 +655,10 @@ public static class BindingParser
 		// Get UpdateXX_XX methods, which can be used in this Update
 		var updateMethodNotifyProps = new List<NotifyProperty>();
 
-		IEnumerable<NotifySource> notifySources3 = notifySources1;
-		if (notifySource != null)
-		{
-			notifySources3 = notifySources3.Append(notifySource);
-		}
-		else
-		{
-			notifySources3 = notifySources1.Except(updateNotifySources);
-		}
-
+		var notifySources3 = notifySource != null 
+			? notifySources1.Append(notifySource) 
+			: notifySources1.Except(updateNotifySources);
+		
 		var notifProps = notifySources3
 			.SelectMany(d => d.Properties)
 			.OrderByDescending(p => p.Bindings.Count)
@@ -814,7 +794,7 @@ public class NotifyProperty
 	public required Expression SourceExpression { get; set; }
 	public required ReadOnlyCollection<Bind> Bindings { get; init; }
 	public required List<Bind> SetBindings { get; init; }
-	public List<NotifySource> DependentNotifySources { get; } = new();
+	public List<NotifySource> DependentNotifySources { get; } = [];
 	public UpdateMethodData? UpdateMethod { get; set; }
 };
 
