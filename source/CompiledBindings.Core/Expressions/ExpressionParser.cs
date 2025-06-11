@@ -428,11 +428,13 @@ public class ExpressionParser
 				ParameterInfo pi;
 				if (i == 0 || !(pi = parameters[parameters.Count - 1]).Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute"))
 				{
-					throw new InvalidProgramException();
+					// Should never happen if the correct method was chosen.
+					return;
 				}
 				if (!pi.ParameterType.Reference.IsArray)
 				{
-					throw new InvalidProgramException();
+					// Should never happen if the correct method was chosen.
+					return;
 				}
 
 				bool isNullable = pi.ParameterType.GetElementType()!.IsNullable;
@@ -462,7 +464,8 @@ public class ExpressionParser
 			{
 				if (isParamsChar == null && prmIndex == method.Parameters.Count)
 				{
-					throw new InvalidProgramException();
+					// Should never happen if the correct method was chosen.
+					return;
 				}
 
 				if (prmIndex == method.Parameters.Count - 1)
@@ -472,7 +475,8 @@ public class ExpressionParser
 					{
 						if (!prm.ParameterType.Reference.IsArray)
 						{
-							throw new InvalidProgramException();
+							// Should never happen if the correct method was chosen.
+							return;
 						}
 
 						isParamsChar = prm.ParameterType.Reference.GetElementType().FullName == "System.Char";
