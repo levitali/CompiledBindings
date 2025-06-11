@@ -400,14 +400,16 @@ $@"				global::System.WeakReference _bindingsWeakRef;");
 			// Generate _propertyChangeSourceXXX fields
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				if (notifySource.IsINotifyPropertyChanged || notifySource.CheckINotifyPropertyChanged)
+				var type = notifySource.AnyINotifyPropertyChangedProperty && notifySource.AnyDependencyProperty
+					? "object"
+					: notifySource.AnyINotifyPropertyChangedProperty
+						? "global::System.ComponentModel.INotifyPropertyChanged"
+						: DependencyObjectType;
+				output.AppendLine(
+$@"				{type} _propertyChangeSource{notifySource.Index};");
+				if (notifySource.AnyDependencyProperty)
 				{
-					output.AppendLine(
-$@"				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource{notifySource.Index};");
-				}
-				else
-				{
-					GenerateDependencyPropertyChangeCacheVariables(output, notifySource);
+					GenerateDependencyPropertyChangeExtraVariables(output, notifySource);
 				}
 			}
 
@@ -454,7 +456,7 @@ $@"				}}");
 				output.AppendLine(
 $@"				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()} value)
 				{{");
-				if (notifySource.IsINotifyPropertyChanged || notifySource.CheckINotifyPropertyChanged)
+				if (!notifySource.AnyDependencyProperty)
 				{
 					output.AppendLine(
 $@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, OnPropertyChanged{notifySource.Index});");
@@ -464,7 +466,23 @@ $@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.SetPropert
 					output.AppendLine(
 $@"					if ({cacheVar} != null && !object.ReferenceEquals({cacheVar}, value))
 					{{");
-					foreach (var notifyProp in notifySource.Properties)
+					if (notifySource.AnyINotifyPropertyChangedProperty)
+					{
+						if (notifySource.IsINotifyPropertyChanged)
+						{
+							output.AppendLine(
+$@"						((global::System.ComponentModel.INotifyPropertyChanged){cacheVar}).PropertyChanged -= OnPropertyChanged{notifySource.Index};");
+						}
+						else
+						{
+							output.AppendLine(
+$@"						if ({cacheVar} is global::System.ComponentModel.INotifyPropertyChanged npc)
+						{{
+							npc.PropertyChanged -= OnPropertyChanged{notifySource.Index};
+						}}");
+						}
+					}
+					foreach (var notifyProp in notifySource.Properties.Where(p => p.IsDependencyProp))
 					{
 						GenerateUnregisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
 					}
@@ -475,7 +493,24 @@ $@"						{cacheVar} = null;
 					{{");
 					output.AppendLine(
 $@"						{cacheVar} = value;");
-					foreach (var notifyProp in notifySource.Properties)
+					if (notifySource.AnyINotifyPropertyChangedProperty)
+					{
+						if (notifySource.IsINotifyPropertyChanged)
+						{
+							output.AppendLine(
+$@"						((global::System.ComponentModel.INotifyPropertyChanged)value).PropertyChanged += OnPropertyChanged{notifySource.Index};");
+						}
+						else
+						{
+							output.AppendLine(
+$@"						if (value is global::System.ComponentModel.INotifyPropertyChanged npc)
+						{{
+							npc.PropertyChanged += OnPropertyChanged{notifySource.Index};
+						}}");
+						}
+					}
+
+					foreach (var notifyProp in notifySource.Properties.Where(p => p.IsDependencyProp))
 					{
 						GenerateRegisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
 					}
@@ -492,7 +527,7 @@ $@"				}}");
 
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				if (notifySource.IsINotifyPropertyChanged || notifySource.CheckINotifyPropertyChanged)
+				if (notifySource.AnyINotifyPropertyChangedProperty)
 				{
 					output.AppendLine(
 $@"
@@ -507,7 +542,7 @@ $@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHe
 
 					var typedSender = (global::{notifySource.Expression.Type.Reference.GetCSharpFullName()})sender;");
 
-					if (notifySource.Properties.Count > 1)
+					if (notifySource.ManyINotifyPropertyChangedProperties)
 					{
 						output.AppendLine(
 $@"					switch (e.PropertyName)
@@ -517,9 +552,8 @@ $@"					switch (e.PropertyName)
 							bindings.Update{notifySource.Index}(typedSender);
 							break;");
 
-						for (int i = 0; i < notifySource.Properties.Count; i++)
+						foreach (var prop in notifySource.INotifyPropChangedProperties)
 						{
-							var prop = notifySource.Properties[i];
 							foreach (var propName in prop.PropertyNames)
 							{
 								output.AppendLine(
@@ -534,7 +568,7 @@ $@"					}}");
 					}
 					else
 					{
-						var prop = notifySource.Properties[0];
+						var prop = notifySource.Properties.Single(p => !p.IsDependencyProp);
 						output.AppendLine(
 $@"					if (string.IsNullOrEmpty(e.PropertyName) || {string.Join(" || ", prop.PropertyNames.Select(n => $"e.PropertyName == \"{n}\""))})
 					{{
@@ -545,15 +579,13 @@ $@"					if (string.IsNullOrEmpty(e.PropertyName) || {string.Join(" || ", prop.Pr
 $@"				}}");
 
 				}
-				else
+				foreach (var prop in notifySource.Properties.Where(p => p.IsDependencyProp))
 				{
-					foreach (var prop in notifySource.Properties)
-					{
-						output.AppendLine();
-						GenerateDependencyPropertyChangedCallback(output, $"OnPropertyChanged{notifySource.Index}_{prop.PropertyCodeName}", "\t");
-						output.AppendLine(
+					output.AppendLine();
+					GenerateDependencyPropertyChangedCallback(output, $"OnPropertyChanged{notifySource.Index}_{prop.PropertyCodeName}", "\t");
+					output.AppendLine(
 $@"				{{");
-						output.AppendLine(
+					output.AppendLine(
 $@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
@@ -562,11 +594,10 @@ $@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHe
 
 					var typedSender = (global::{notifySource.Expression.Type.Reference.GetCSharpFullName()})sender;");
 
-						output = output.AppendLine(
+					output = output.AppendLine(
 $@"					bindings.Update{notifySource.Index}_{prop.PropertyCodeName}(typedSender);");
-						output.AppendLine(
+					output.AppendLine(
 $@"				}}");
-					}
 				}
 			}
 
@@ -794,7 +825,9 @@ $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 	{
 	}
 
-	protected virtual void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
+	protected virtual string DependencyObjectType => string.Empty;
+
+	protected virtual void GenerateDependencyPropertyChangeExtraVariables(StringBuilder output, NotifySource notifySource)
 	{
 	}
 

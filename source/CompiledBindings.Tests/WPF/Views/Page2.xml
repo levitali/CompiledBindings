@@ -18,6 +18,9 @@
         <Button Click="{x:Set OnClick2}" />
         <Button Click="{x:Set Confirm(false)}" />
         <Button Click="{x:Set Confirm(false)}" />
+        <TextBlock
+            Foreground="{x:Bind Foreground}"
+            Text="{x:Bind IntProp}" />
     </Grid>
 
 </Page>

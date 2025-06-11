@@ -1,9 +1,10 @@
-﻿using System.Windows;
+﻿using System.Collections.Specialized;
+using System.Windows;
 using WPFTest.ViewModels;
 
 namespace WPFTest.Views
 {
-	public partial class MainWindow : Window
+	public partial class MainWindow : Window, INotifyCollectionChanged
 	{
 		MainViewModel _viewModel;
 
@@ -13,6 +14,10 @@ namespace WPFTest.Views
 
 			DataContext = _viewModel = new MainViewModel();
         }
+
+		public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+		public int PageProp => 0;
 
 		public string InstanceFunction(int val1, int val2) => $"InstanceFunction({val1}, {val2})";
     }

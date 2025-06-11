@@ -378,7 +378,7 @@ public static class BindingParser
 		{
 			// If the notify source has more than one property, the update method is needed
 			// to update all properties for empty property name
-			if (notifySource.Properties.Count > 1 && notifySource.IsINotifyPropertyChanged)
+			if (notifySource.ManyINotifyPropertyChangedProperties)
 			{
 				var bindings = notifySource.Properties.SelectMany(_ => _.Bindings).Distinct().ToList();
 				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, notifySource.SourceExpression, iNotifyPropertyChangedType);
@@ -471,55 +471,58 @@ public static class BindingParser
 			.SelectMany(b => b.SourceExpression!
 							 .EnumerateTree()
 							 .OfType<INotifiableExpression>()
-							 .Select(e => (bind: b, expr: e, notif: checkPropertyNotifiable(e))))
+							 .Select(e => (bind: b, expr: e, notif: checkPropertyNotifiable(e, out var isDependencyProp), isDependencyProp)))
 			.Where(e => e.notif != false)
 			.GroupBy(e => e.expr.Expression.Key)
 			.OrderBy(g => g.Key)
 			.Select((g, i) =>
 			{
-				var (bind, expr, notif) = g.First();
-				var expr1 = expr.Expression;
+				var expr1 = g.First().expr.Expression;
 				var d = new NotifySource
 				{
 					Expression = expr1,
 					SourceExpression = expr1,
 					IsINotifyPropertyChanged = iNotifyPropertyChangedType.IsAssignableFrom(expr1.Type),
-					CheckINotifyPropertyChanged = notif == null,
 					Index = i,
 				};
-				d.Properties = g.GroupBy(e => e.expr.Member?.Definition.Name).Select(g2 =>
-				{
-					var expr2 = g2.First().expr;
-					var bindings = g2.Select(e => e.bind).Distinct().ToList();
-
-					string propertyCodeName = expr2.Member?.Definition.Name ?? "Item";
-					var propertyNames = new List<string> { propertyCodeName };
-					if (expr2 is ElementAccessExpression)
+				d.Properties = g
+					.GroupBy(e => e.expr.Member?.Definition.Name)
+					.Select(g2 =>
 					{
-						propertyNames.Add("Items[]");
-					}
+						var (_, expr2, _, isDependencyProp) = g2.First();
+						var bindings = g2.Select(e => e.bind).Distinct().ToList();
 
-					return new NotifyProperty
-					{
-						Parent = d,
-						Member = expr2.Member,
-						PropertyCodeName = propertyCodeName,
-						PropertyNames = propertyNames,
-						Expression = (Expression)expr2,
-						SourceExpression = (Expression)expr2,
-						Bindings = new ReadOnlyCollection<Bind>(bindings),
-						SetBindings = bindings.ToList(), // Make copy
-					};
-				})
-				.ToList();
+						string propertyCodeName = expr2.Member?.Definition.Name ?? "Item";
+						var propertyNames = new List<string> { propertyCodeName };
+						if (expr2 is ElementAccessExpression)
+						{
+							propertyNames.Add("Items[]");
+						}
+
+						return new NotifyProperty
+						{
+							Parent = d,
+							Member = expr2.Member,
+							PropertyCodeName = propertyCodeName,
+							PropertyNames = propertyNames,
+							IsDependencyProp = isDependencyProp,
+							Expression = (Expression)expr2,
+							SourceExpression = (Expression)expr2,
+							Bindings = new ReadOnlyCollection<Bind>(bindings),
+							SetBindings = bindings.ToList(), // Make copy
+						};
+					})
+					.ToList();
 				return d;
 			})
 			.ToList();
 
 		return notifySources;
 
-		bool? checkPropertyNotifiable(INotifiableExpression expr)
+		bool? checkPropertyNotifiable(INotifiableExpression expr, out bool isDependencyProp)
 		{
+			isDependencyProp = false;
+
 			// Not notifiable if explicitly turned off with / operator
 			if (expr.IsNotifiable == false)
 			{
@@ -589,10 +592,11 @@ public static class BindingParser
 					return null;
 				}
 
+				isDependencyProp = isDependencyType && type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == me.Member.Definition.Name + "Property");
+
 				// For dependency property check if there is the backing store field or property (WinCE/UWP).
 				// It must be named <PropertyName>Property
-				if (!isNotifyPropertyChangedType &&
-					!type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == me.Member.Definition.Name + "Property"))
+				if (!isNotifyPropertyChangedType &&	!isDependencyProp)
 				{
 					return false;
 				}
@@ -628,7 +632,7 @@ public static class BindingParser
 		//Get the notify sources, for which UpdateXX methods are generated,
 		//ordered descending by number of bindings set in them.
 		var notifySources2 = notifySources1
-			.Where(s => s.Properties.Count > 1 && s.IsINotifyPropertyChanged)
+			.Where(s => s.ManyINotifyPropertyChangedProperties)
 			.OrderByDescending(s => s.Properties.SelectMany(p => p.Bindings).Distinct().Count())
 			.ToList();
 
@@ -774,9 +778,13 @@ public class NotifySource
 	public required Expression SourceExpression { get; set; }
 	public List<NotifyProperty> Properties { get; set; } = null!;
 	public UpdateMethodData? UpdateMethod { get; set; }
-	public bool IsINotifyPropertyChanged { get; set; }
-	public bool CheckINotifyPropertyChanged { get; init; }
+	public bool IsINotifyPropertyChanged { get; init; }
 	public int Index { get; init; }
+
+	public bool AnyDependencyProperty => Properties.Any(p => p.IsDependencyProp);
+	public bool AnyINotifyPropertyChangedProperty => Properties.Any(p => !p.IsDependencyProp);
+	public bool ManyINotifyPropertyChangedProperties => INotifyPropChangedProperties.Take(2).Count() > 1;
+	public IEnumerable<NotifyProperty> INotifyPropChangedProperties => Properties.Where(p => !p.IsDependencyProp);
 
 	public NotifySource Clone()
 	{
@@ -788,6 +796,7 @@ public class NotifyProperty
 {
 	public required NotifySource Parent { get; init; }
 	public required IMemberInfo? Member { get; init; }
+	public required bool IsDependencyProp { get; init; }
 	public required IList<string> PropertyNames { get; init; }
 	public required string PropertyCodeName { get; init; }
 	public required Expression Expression { get; init; }

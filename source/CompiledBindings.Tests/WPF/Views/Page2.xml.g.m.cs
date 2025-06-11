@@ -71,7 +71,14 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _targetRoot;
-				Update0_ObjProp(dataRoot);
+				Update0(dataRoot);
+			}
+
+			private void Update0(global::WPFTest.Views.Page2 value)
+			{
+				Update0_ObjProp(value);
+				Update0_Foreground(value);
+				Update0_IntProp(value);
 			}
 
 			private void Update1(global::WPFTest.Views.Class2 value)
@@ -87,6 +94,20 @@ namespace WPFTest.Views
 #line default
 				Update1(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
+			}
+
+			private void Update0_Foreground(global::WPFTest.Views.Page2 value)
+			{
+#line (22, 13) - (22, 44) 22 "Page2.xml"
+				_targetRoot.textBlock3.Foreground = value.Foreground;
+#line default
+			}
+
+			private void Update0_IntProp(global::WPFTest.Views.Page2 value)
+			{
+#line (23, 13) - (23, 35) 23 "Page2.xml"
+				_targetRoot.textBlock3.Text = value.IntProp.ToString();
+#line default
 			}
 
 			private void Update1_Prop1(global::WPFTest.Views.Class2 value)
@@ -135,7 +156,7 @@ namespace WPFTest.Views
 			class Page2_BindingsTrackings_
 			{
 				global::System.WeakReference _bindingsWeakRef;
-				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+				object _propertyChangeSource0;
 				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource1;
 
 				public Page2_BindingsTrackings_(Page2_Bindings_ bindings)
@@ -151,7 +172,24 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler0(global::WPFTest.Views.Page2 value)
 				{
-					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+					if (_propertyChangeSource0 != null && !object.ReferenceEquals(_propertyChangeSource0, value))
+					{
+						((global::System.ComponentModel.INotifyPropertyChanged)_propertyChangeSource0).PropertyChanged -= OnPropertyChanged0;
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::WPFTest.Views.Page2.ForegroundProperty, typeof(global::WPFTest.Views.Page2))
+							.RemoveValueChanged(_propertyChangeSource0, OnPropertyChanged0_Foreground);
+						_propertyChangeSource0 = null;
+					}
+					if (_propertyChangeSource0 == null && value != null)
+					{
+						_propertyChangeSource0 = value;
+						((global::System.ComponentModel.INotifyPropertyChanged)value).PropertyChanged += OnPropertyChanged0;
+						global::System.ComponentModel.DependencyPropertyDescriptor
+							.FromProperty(
+								global::WPFTest.Views.Page2.ForegroundProperty, typeof(global::WPFTest.Views.Page2))
+							.AddValueChanged(_propertyChangeSource0, OnPropertyChanged0_Foreground);
+					}
 				}
 
 				public void SetPropertyChangedEventHandler1(global::WPFTest.Views.Class2 value)
@@ -168,10 +206,31 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::WPFTest.Views.Page2)sender;
-					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "ObjProp")
+					switch (e.PropertyName)
 					{
-						bindings.Update0_ObjProp(typedSender);
+						case null:
+						case "":
+							bindings.Update0(typedSender);
+							break;
+						case "ObjProp":
+							bindings.Update0_ObjProp(typedSender);
+							break;
+						case "IntProp":
+							bindings.Update0_IntProp(typedSender);
+							break;
 					}
+				}
+
+				private void OnPropertyChanged0_Foreground(object sender, global::System.EventArgs e)
+				{
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page2_Bindings_>(ref _bindingsWeakRef, Cleanup);
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::WPFTest.Views.Page2)sender;
+					bindings.Update0_Foreground(typedSender);
 				}
 
 				private void OnPropertyChanged1(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)

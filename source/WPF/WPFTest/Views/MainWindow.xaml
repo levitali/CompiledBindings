@@ -64,6 +64,10 @@
             <TextBlock
                 mx:DataType="{x:Null}"
                 m:Text="{x:Bind InstanceFunction(1, 2)}" />
+            <TextBlock
+                mx:DataType="{x:Null}"
+                Foreground="{x:Bind Foreground}"
+                Text="{x:Bind PageProp}" />
 
             <Image
                 Width="200"

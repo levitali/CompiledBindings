@@ -10,6 +10,8 @@ internal partial class Page2 : Page, INotifyPropertyChanged
 
 	public Class2? ObjProp => null;
 
+	public int IntProp => 0;
+
 	public Task<string?> Prop2 => Task.FromResult<string?>("Hello");
 
 	public event PropertyChangedEventHandler? PropertyChanged;

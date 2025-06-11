@@ -7,5 +7,6 @@
     <Button x:Name="button3" />
     <Button x:Name="button4" />
     <Button x:Name="button5" />
+    <TextBlock x:Name="textBlock3" />
   </Grid>
 </Page>

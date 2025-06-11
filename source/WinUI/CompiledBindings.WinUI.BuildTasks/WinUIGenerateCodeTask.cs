@@ -396,6 +396,8 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 			_platformConstants = platformConstants;
 		}
 
+		protected override string DependencyObjectType => $"global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject";
+
 		protected override void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)
 		{
 			// Generate _callbackTokenXXX fields for dependency property notifications
@@ -426,10 +428,8 @@ $@"					{targetExpr}.UnregisterPropertyChangedCallback({first.Property.Object.Ty
 $@"{a}			private void {methodName}(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject sender, {_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty dp)");
 		}
 
-		protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
+		protected override void GenerateDependencyPropertyChangeExtraVariables(StringBuilder output, NotifySource notifySource)
 		{
-			output.AppendLine(
-$@"				global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject _propertyChangeSource{notifySource.Index};");
 			foreach (var notifyProp in notifySource.Properties)
 			{
 				output.AppendLine(
@@ -439,12 +439,20 @@ $@"				long _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definit
 
 		protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 		{
+			if (notifySource.AnyINotifyPropertyChangedProperty)
+			{
+				cacheVar = $"((global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject){cacheVar})";
+			}
 			output.AppendLine(
 $@"						_sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name} = {cacheVar}.RegisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, {methodName});");
 		}
 
 		protected override void GenerateUnregisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)
 		{
+			if (notifySource.AnyINotifyPropertyChangedProperty)
+			{
+				cacheVar = $"((global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject){cacheVar})";
+			}
 			output.AppendLine(
 $@"						{cacheVar}.UnregisterPropertyChangedCallback({notifySource.SourceExpression.Type.Reference.GetCSharpFullName()}.{notifyProp.Member!.Definition.Name}Property, _sourceCallbackToken{notifySource.Index}_{notifyProp.Member!.Definition.Name});");
 		}

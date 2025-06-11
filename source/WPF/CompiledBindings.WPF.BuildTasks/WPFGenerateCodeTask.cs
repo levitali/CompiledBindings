@@ -413,6 +413,8 @@ public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 	{
 	}
 
+	protected override string DependencyObjectType => "global::System.Windows.DependencyObject";
+
 	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
 	{
 		var dp = ev.Bindings[0].DependencyProperty!;
@@ -439,12 +441,6 @@ $@"					global::System.ComponentModel.DependencyPropertyDescriptor
 	{
 		output.AppendLine(
 $@"{a}			private void {methodName}(object sender, global::System.EventArgs e)");
-	}
-
-	protected override void GenerateDependencyPropertyChangeCacheVariables(StringBuilder output, NotifySource notifySource)
-	{
-		output.AppendLine(
-$@"				global::System.Windows.DependencyObject _propertyChangeSource{notifySource.Index};");
 	}
 
 	protected override void GenerateRegisterDependencyPropertyChangeEvent(StringBuilder output, NotifySource notifySource, NotifyProperty notifyProp, string cacheVar, string methodName)

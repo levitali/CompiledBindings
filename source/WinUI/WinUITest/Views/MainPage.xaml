@@ -56,6 +56,11 @@
             <TextBlock Text="{c:Bind Class1.Prop2}" />
             <TextBlock Text="{c:Bind Class1.Prop2}" />
 
+            <TextBlock
+                mx:DataType="{x:Null}"
+                Foreground="{c:Bind Foreground}"
+                Text="{c:Bind PageProp}" />
+
             <TextBox Text="{c:Bind StringInput, Mode=TwoWay, Converter={StaticResource testConverter}}" />
             <TextBox Text="{c:Bind InputProp1, Mode=TwoWay}" />
 
