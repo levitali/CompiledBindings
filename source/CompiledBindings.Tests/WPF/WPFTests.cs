@@ -55,7 +55,7 @@ public class WPFTests : IDisposable
 
 		Assert.That(code.Equals(expectedCode));
 
-		WpfXamlProcessor.ProcessXaml(xdoc, parseResult!, null);
+		WpfXamlProcessor.ProcessXaml(xdoc, parseResult!);
 
 		var gFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.g.xml");
 		var expectedXaml = File.ReadAllText(gFile);

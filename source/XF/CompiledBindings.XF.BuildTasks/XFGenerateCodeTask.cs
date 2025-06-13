@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -153,8 +154,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 
 			if (result)
 			{
-				if (generatedCodeFiles.Count > 0 &&
-					!TypeInfoUtils.TryGetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper", out _))
+				if (generatedCodeFiles.Count > 0)
 				{
 					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
 					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
@@ -187,7 +187,7 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 		return
 $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 {{
-	public class CompiledBindingsHelper
+	internal class CompiledBindingsHelper
 	{{
 {BindingsCodeGenerator.CompiledBindingsHelperBaseCode}
 
@@ -315,6 +315,7 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	protected override void GenerateAdditionalClassCode(StringBuilder output, GeneratedClass parseResult, string className)
 	{
 		var iNotifyPropertyChangedType = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+		var iNotifyCollectionChangedType = TypeInfo.GetTypeThrow(typeof(INotifyCollectionChanged));
 		bool isLineDirective = false;
 
 		foreach (var bind in parseResult.EnumerateBindings())
@@ -343,7 +344,7 @@ $@"			dataRoot => {checkNull}(
 			output.AppendLine(
 $@"			null,");
 
-			var notifySources = BindingParser.GetNotifySources(new[] { bind }, iNotifyPropertyChangedType, null);
+			var notifySources = BindingParser.GetNotifySources([bind], iNotifyPropertyChangedType, iNotifyCollectionChangedType, null);
 			if (notifySources.Count > 0)
 			{
 				output.AppendLine(

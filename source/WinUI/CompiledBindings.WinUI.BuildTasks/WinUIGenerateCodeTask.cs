@@ -246,8 +246,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 
 			if (result)
 			{
-				if (generatedCodeFiles.Count > 0 &&
-					TypeInfo.GetType($"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper") == null)
+				if (generatedCodeFiles.Count > 0)
 				{
 					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
 					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
@@ -282,7 +281,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 		return
 $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 {{
-	public class CompiledBindingsHelper
+	internal class CompiledBindingsHelper
 	{{
 {BindingsCodeGenerator.CompiledBindingsHelperBaseCode}
 

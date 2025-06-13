@@ -31,6 +31,20 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 			}
 		}
 
+		public static void SetCollectionChangedEventHandler(ref global::System.Collections.Specialized.INotifyCollectionChanged? cache, global::System.Collections.Specialized.INotifyCollectionChanged? source, global::System.Collections.Specialized.NotifyCollectionChangedEventHandler handler)
+		{
+			if (cache != null && !object.ReferenceEquals(cache, source))
+			{
+				cache.CollectionChanged -= handler;
+				cache = null;
+			}
+			if (cache == null && source != null)
+			{
+				cache = source;
+				cache.CollectionChanged += handler;
+			}
+		}
+
 		public static T? TryGetBindings<T>(ref global::System.WeakReference? bindingsWeakReference, global::System.Action cleanup)
 			where T : class
 		{
@@ -45,6 +59,31 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 				}
 			}
 			return bindings;
+		}
+
+		public static bool IsCollectionChangedAtIndex(NotifyCollectionChangedEventArgs args, int index)
+		{
+			if (args.Action == NotifyCollectionChangedAction.Add)
+			{
+				return index >= args.NewStartingIndex && index < args.NewStartingIndex + args.NewItems.Count;
+			}
+			if (args.Action == NotifyCollectionChangedAction.Remove)
+			{
+				return index >= args.OldStartingIndex && index < args.OldStartingIndex + args.OldItems.Count;
+			}
+			if (args.Action == NotifyCollectionChangedAction.Replace)
+			{
+				return index >= args.NewStartingIndex && 
+					((index < args.NewStartingIndex + args.NewItems.Count) ||
+					 (index < args.OldStartingIndex + args.OldItems.Count));
+			}
+			if (args.Action == NotifyCollectionChangedAction.Move)
+			{
+				return 
+					(index >= args.NewStartingIndex && index < args.NewStartingIndex + args.NewItems.Count) ||
+					(index >= args.OldStartingIndex && index < args.OldStartingIndex + args.OldItems.Count);
+			}
+			return true;
 		}";
 
 	public BindingsCodeGenerator(string frameworkId, string langVersion, string msbuildVersion) : base(frameworkId, langVersion, msbuildVersion)
@@ -400,11 +439,13 @@ $@"				global::System.WeakReference _bindingsWeakRef;");
 			// Generate _propertyChangeSourceXXX fields
 			foreach (var notifySource in bindingsData.NotifySources)
 			{
-				var type = notifySource.AnyINotifyPropertyChangedProperty && notifySource.AnyDependencyProperty
+				var type = getDiffTypesCount(notifySource) > 1
 					? "object"
 					: notifySource.AnyINotifyPropertyChangedProperty
 						? "global::System.ComponentModel.INotifyPropertyChanged"
-						: DependencyObjectType;
+						: notifySource.AnyCollectionChangedElementAccess
+							? "global::System.Collections.Specialized.INotifyCollectionChanged"
+							: DependencyObjectType;
 				output.AppendLine(
 $@"				{type} _propertyChangeSource{notifySource.Index};");
 				if (notifySource.AnyDependencyProperty)
@@ -456,10 +497,21 @@ $@"				}}");
 				output.AppendLine(
 $@"				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{notifySource.Expression.Type.Reference.GetCSharpFullName()} value)
 				{{");
-				if (!notifySource.AnyDependencyProperty)
+				if (!notifySource.AnyDependencyProperty && getDiffTypesCount(notifySource) == 1)
 				{
+					string method, handler;
+					if (notifySource.AnyINotifyPropertyChangedProperty)
+					{
+						method = "SetPropertyChangedEventHandler";
+						handler = $"OnPropertyChanged{notifySource.Index}";
+					}
+					else
+					{
+						method = "SetCollectionChangedEventHandler";
+						handler = $"OnCollectionChanged{notifySource.Index}";
+					}
 					output.AppendLine(
-$@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref {cacheVar}, value, OnPropertyChanged{notifySource.Index});");
+$@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.{method}(ref {cacheVar}, value, {handler});");
 				}
 				else
 				{
@@ -482,6 +534,13 @@ $@"						if ({cacheVar} is global::System.ComponentModel.INotifyPropertyChanged 
 						}}");
 						}
 					}
+
+					if (notifySource.AnyCollectionChangedElementAccess)
+					{
+						output.AppendLine(
+$@"						((global::System.Collections.Specialized.INotifyCollectionChanged){cacheVar}).CollectionChanged -= OnCollectionChanged{notifySource.Index};");
+					}
+
 					foreach (var notifyProp in notifySource.Properties.Where(p => p.IsDependencyProp))
 					{
 						GenerateUnregisterDependencyPropertyChangeEvent(output, notifySource, notifyProp, cacheVar, $"OnPropertyChanged{notifySource.Index}_{notifyProp.PropertyCodeName}");
@@ -508,6 +567,12 @@ $@"						if (value is global::System.ComponentModel.INotifyPropertyChanged npc)
 							npc.PropertyChanged += OnPropertyChanged{notifySource.Index};
 						}}");
 						}
+					}
+
+					if (notifySource.AnyCollectionChangedElementAccess)
+					{
+						output.AppendLine(
+$@"						((global::System.Collections.Specialized.INotifyCollectionChanged)value).CollectionChanged += OnCollectionChanged{notifySource.Index};");
 					}
 
 					foreach (var notifyProp in notifySource.Properties.Where(p => p.IsDependencyProp))
@@ -579,6 +644,45 @@ $@"					if (string.IsNullOrEmpty(e.PropertyName) || {string.Join(" || ", prop.Pr
 $@"				}}");
 
 				}
+
+				if (notifySource.AnyCollectionChangedElementAccess)
+				{
+					output.AppendLine(
+$@"
+				private void OnCollectionChanged{notifySource.Index}(object sender, global::System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+				{{");
+					output.AppendLine(
+$@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
+					if (bindings == null)
+					{{
+						return;
+					}}
+
+					var typedSender = (global::{notifySource.Expression.Type.Reference.GetCSharpFullName()})sender;");
+
+					string @else = "";
+					foreach (var prop in notifySource.Properties
+						.Where(p => p.IsCollectionChangedElementAccess && p.PropertyCodeName != "Item"))
+					{
+						var index = ((ElementAccessExpression)prop.Expression).Parameters[0].CSharpCode;
+						output.AppendLine(
+$@"					{@else}if (global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, {index}))
+					{{
+						bindings.Update{notifySource.Index}_{prop.PropertyCodeName}(typedSender);
+					}}");
+						@else = "else ";
+					}
+
+					if (notifySource.Properties.Any(p => p.IsCollectionChangedElementAccess && p.PropertyCodeName == "Item"))
+					{
+						output.AppendLine(
+$@"					bindings.Update{notifySource.Index}_Item(typedSender);");
+					}
+
+					output.AppendLine(
+$@"				}}");
+				}
+
 				foreach (var prop in notifySource.Properties.Where(p => p.IsDependencyProp))
 				{
 					output.AppendLine();
@@ -620,6 +724,18 @@ $@"		}}");
 		#endregion
 
 		#region Local Functions
+
+		static int getDiffTypesCount(NotifySource notifySource)
+		{
+			int diffTypes = 0;
+			if (notifySource.AnyINotifyPropertyChangedProperty)
+				diffTypes++;
+			if (notifySource.AnyCollectionChangedElementAccess)
+				diffTypes++;
+			if (notifySource.AnyDependencyProperty)
+				diffTypes++;
+			return diffTypes;
+		}
 
 		void generateUpdateMethod(UpdateMethodData updateMethod, string name)
 		{

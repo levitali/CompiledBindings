@@ -6,5 +6,8 @@
         <DataGridTextColumn Header="Col2" Binding="{views:Page2_dataGridTextColumn2_Binding}" x:Name="dataGridTextColumn2" />
       </DataGrid.Columns>
     </DataGrid>
+    <TextBlock x:Name="textBlock1" />
+    <TextBlock x:Name="textBlock2" />
+    <TextBlock x:Name="textBlock3" />
   </Grid>
 </Page>

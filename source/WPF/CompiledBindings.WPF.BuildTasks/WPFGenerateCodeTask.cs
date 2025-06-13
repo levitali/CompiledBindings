@@ -66,10 +66,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 
-			var helperTypeAssembly = TypeInfoUtils.Assemblies
-				.FirstOrDefault(a => a.MainModule.GetAllTypes().Any(t => t.FullName == "CompiledBindings.WPF.CompiledBindingsHelper"))?
-				.Name.Name;
-
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
 			var xamlDomParser = new WpfXamlDomParser();
@@ -150,7 +146,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							File.WriteAllText(sourceCodeTargetPath, code);
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
-							WpfXamlProcessor.ProcessXaml(xdoc, parseResult, helperTypeAssembly);
+							WpfXamlProcessor.ProcessXaml(xdoc, parseResult);
 							xdoc.Save(xamlFile);
 
 							newXaml = new TaskItem(xamlFile);
@@ -181,7 +177,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 			if (result)
 			{
-				if (generatedCodeFiles.Count > 0 && helperTypeAssembly == null)
+				if (generatedCodeFiles.Count > 0)
 				{
 					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.WPF.cs");
 					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
@@ -224,7 +220,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 		return
 $@"namespace CompiledBindings.WPF
 {{
-	public class CompiledBindingsHelper
+	internal class CompiledBindingsHelper
 	{{
 {BindingsCodeGenerator.CompiledBindingsHelperBaseCode}		
 
@@ -464,7 +460,7 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 
 public static class WpfXamlProcessor
 {
-	public static void ProcessXaml(XDocument xdoc, SimpleXamlDom parseResult, string? helperTypeAssembly)
+	public static void ProcessXaml(XDocument xdoc, SimpleXamlDom parseResult)
 	{
 		var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
 		string? localPrefix = null;
@@ -474,10 +470,6 @@ public static class WpfXamlProcessor
 		if (generateDataTemplates)
 		{
 			var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF";
-			if (helperTypeAssembly != null)
-			{
-				compiledBindingsNs += ";assembly=" + helperTypeAssembly;
-			}
 
 			ensureNamespaceDeclared(compiledBindingsNs);
 			localPrefix = ensureNamespaceDeclared(localNs);

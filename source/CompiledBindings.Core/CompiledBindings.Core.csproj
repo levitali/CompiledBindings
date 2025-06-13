@@ -23,6 +23,7 @@
 	<ItemGroup>
 		<Using Include="System" />
 		<Using Include="System.Collections.ObjectModel" />
+		<Using Include="System.Collections.Specialized"/>
 		<Using Include="System.ComponentModel" />
 		<Using Include="System.Diagnostics" />
 		<Using Include="System.Globalization" />

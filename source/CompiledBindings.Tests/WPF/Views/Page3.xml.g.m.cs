@@ -37,19 +37,24 @@ namespace WPFTest.Views
 		{
 			Page2 _targetRoot;
 			global::WPFTest.ViewModels.Page1ViewModel _dataRoot;
+			Page2_BindingsTrackings_this _bindingsTrackings;
 
 			public void Initialize(Page2 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
+				_bindingsTrackings = new Page2_BindingsTrackings_this(this);
 
 				Update();
+
+				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 			}
 
 			public void Cleanup()
 			{
 				if (_targetRoot != null)
 				{
+					_bindingsTrackings.Cleanup();
 					_dataRoot = null;
 					_targetRoot = null;
 				}
@@ -58,9 +63,107 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
+#line (28, 20) - (28, 62) 28 "Page3.xml"
+				var value1 = dataRoot.ObservableCollectionProp;
 #line (15, 19) - (15, 69) 15 "Page3.xml"
 				_targetRoot.dataGrid1.ItemsSource = dataRoot.ListProp;
 #line default
+				Update0_IntProp(dataRoot);
+				Update1_Item0(value1);
+				Update1_Item1(value1);
+				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
+			}
+
+			private void Update0_IntProp(global::WPFTest.ViewModels.Page1ViewModel value)
+			{
+#line (30, 20) - (30, 68) 30 "Page3.xml"
+				_targetRoot.textBlock3.Text = value.ObservableCollectionProp[value.IntProp];
+#line default
+			}
+
+			private void Update1_Item0(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
+			{
+#line (28, 20) - (28, 62) 28 "Page3.xml"
+				_targetRoot.textBlock1.Text = value[0];
+#line default
+			}
+
+			private void Update1_Item1(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
+			{
+#line (29, 20) - (29, 62) 29 "Page3.xml"
+				_targetRoot.textBlock2.Text = value[1];
+#line default
+			}
+
+			private void Update1_Item(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
+			{
+				var dataRoot = _dataRoot;
+#line (30, 20) - (30, 68) 30 "Page3.xml"
+				_targetRoot.textBlock3.Text = value[dataRoot.IntProp];
+#line default
+			}
+
+			class Page2_BindingsTrackings_this
+			{
+				global::System.WeakReference _bindingsWeakRef;
+				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
+				global::System.Collections.Specialized.INotifyCollectionChanged _propertyChangeSource1;
+
+				public Page2_BindingsTrackings_this(Page2_Bindings_this bindings)
+				{
+					_bindingsWeakRef = new global::System.WeakReference(bindings);
+				}
+
+				public void Cleanup()
+				{
+					SetPropertyChangedEventHandler0(null);
+					SetPropertyChangedEventHandler1(null);
+				}
+
+				public void SetPropertyChangedEventHandler0(global::WPFTest.ViewModels.Page1ViewModel value)
+				{
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource0, value, OnPropertyChanged0);
+				}
+
+				public void SetPropertyChangedEventHandler1(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
+				{
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
+				}
+
+				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
+				{
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page2_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::WPFTest.ViewModels.Page1ViewModel)sender;
+					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "IntProp")
+					{
+						bindings.Update0_IntProp(typedSender);
+					}
+				}
+
+				private void OnCollectionChanged1(object sender, global::System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+				{
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page2_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					if (bindings == null)
+					{
+						return;
+					}
+
+					var typedSender = (global::System.Collections.ObjectModel.ObservableCollection<global::System.String>)sender;
+					if (global::CompiledBindings.WPF.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, 0))
+					{
+						bindings.Update1_Item0(typedSender);
+					}
+					if (global::CompiledBindings.WPF.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, 1))
+					{
+						bindings.Update1_Item1(typedSender);
+					}
+					bindings.Update1_Item(typedSender);
+				}
 			}
 		}
 	}

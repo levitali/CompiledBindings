@@ -13,15 +13,21 @@
 
     <Grid>
         <DataGrid ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
-            <DataGrid.Columns mx:DefaultBindMode="OneTime" mx:UseItemType="true">
+            <DataGrid.Columns
+                mx:DefaultBindMode="OneTime"
+                mx:UseItemType="true">
                 <DataGridTextColumn
                     Binding="{x:Bind Title}"
                     Header="Col1" />
-							<DataGridTextColumn
-                    m:Binding="{x:Bind Model.CreateDate.ToString('d')}"
-                    Header="Col2" />
+                <DataGridTextColumn
+                    Header="Col2"
+                    m:Binding="{x:Bind Model.CreateDate.ToString('d')}" />
             </DataGrid.Columns>
         </DataGrid>
+
+        <TextBlock Text="{x:Bind ObservableCollectionProp[0]}" />
+        <TextBlock Text="{x:Bind ObservableCollectionProp[1]}" />
+        <TextBlock Text="{x:Bind ObservableCollectionProp[IntProp]}" />
     </Grid>
 
 </Page>

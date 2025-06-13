@@ -2,13 +2,11 @@
 
 public abstract class SimpleXamlDomParser : XamlDomParser
 {
-	public static readonly XNamespace mNamespace = "http://compiledbindings.com";
 	public static readonly XNamespace mxNamespace = "http://compiledbindings.com/x";
 	public static readonly XName mxDataType = mxNamespace + "DataType";
 	public static readonly XName mxDefaultBindMode = mxNamespace + "DefaultBindMode";
 	public static readonly XName mxUseItemType = mxNamespace + "UseItemType";
 
-	public static readonly XName NameAttr = XNamespace.None + "Name"; // WPF Name attribute
 	public static readonly XName DataTypeAttr = XNamespace.None + "DataType"; // WPF DataType attribute
 
 	public XName HierarchicalDataTemplate { get; } // WPF

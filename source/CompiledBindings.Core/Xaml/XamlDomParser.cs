@@ -2,7 +2,8 @@
 
 public abstract class XamlDomParser
 {
-	private static readonly XName NameAttr = XNamespace.None + "Name";
+	public static readonly XNamespace mNamespace = "http://compiledbindings.com";
+	public static readonly XName NameAttr = XNamespace.None + "Name";
 
 	public readonly XName DataTemplate;
 	public readonly XName Style;
@@ -211,7 +212,11 @@ public abstract class XamlDomParser
 			if (index != -1)
 			{
 				string typeName = memberName.Substring(0, index);
-				attachedClassName = (xamlNode.Name.Namespace is var n && n == XNamespace.None ? DefaultNamespace : n) + typeName;
+				attachedClassName = 
+					(xamlNode.Name.Namespace is var n && (n == XNamespace.None || n == mNamespace)
+						? DefaultNamespace 
+						: n) 
+					+ typeName;
 				attachedPropertyName = memberName.Substring(index + 1);
 
 				var attachPropertyOwnerType = FindType(attachedClassName, xamlNode.Element);

@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using System.Windows.Media;
 using UI;
 
@@ -22,12 +23,11 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public Page1ModifyViewModel? ModifyViewModel { get; set; }
 
-	public IList<EntityViewModel> ListProp { get; } = new List<EntityViewModel>
-	{
-		new EntityViewModel { DecimalProp = 1, BooleanProp = true },
-	};
+	public IList<EntityViewModel> ListProp { get; } = [];
+	
+	public int[] ArrayProp { get; set; } = [];
 
-	public int[] ArrayProp { get; set; } = new int[0];
+	public ObservableCollection<string> ObservableCollectionProp { get; } = [];
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
