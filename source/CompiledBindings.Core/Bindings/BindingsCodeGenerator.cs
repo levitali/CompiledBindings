@@ -737,7 +737,7 @@ $@"		}}");
 			return diffTypes;
 		}
 
-		void generateUpdateMethod(UpdateMethodData updateMethod, string name)
+		void generateUpdateMethod(UpdateMethod updateMethod, string name)
 		{
 			output.AppendLine();
 			output.AppendLine(
@@ -748,7 +748,7 @@ $@"			private void {name}({string.Join(", ", updateMethod.Parameters.Select(p =>
 $@"			}}");
 		}
 
-		void generateUpdateMethodBody(UpdateMethodData updateMethod)
+		void generateUpdateMethodBody(UpdateMethod updateMethod)
 		{
 			if (updateMethod!.Expressions.SetExpressions.Select(d => d.Expression)
 				.Concat(updateMethod!.Expressions.LocalVariables.Select(v => v.Expression))

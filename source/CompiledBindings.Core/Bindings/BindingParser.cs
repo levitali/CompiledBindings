@@ -382,12 +382,12 @@ public static class BindingParser
 			if (notifySource.ManyINotifyPropertyChangedProperties)
 			{
 				var bindings = notifySource.INotifyPropChangedProperties.SelectMany(_ => _.Bindings).Distinct().ToList();
-				notifySource.UpdateMethod = CreateUpdateMethodData(bindings, null, notifySource, notifySource.SourceExpression);
+				notifySource.UpdateMethod = CreateUpdateMethod(bindings, null, notifySource, notifySource.SourceExpression);
 			}
 
 			foreach (var prop in notifySource.Properties)
 			{
-				prop.UpdateMethod = CreateUpdateMethodData(prop.SetBindings, prop.DependentNotifySources, null, notifySource.Expression);
+				prop.UpdateMethod = CreateUpdateMethod(prop.SetBindings, prop.DependentNotifySources, null, notifySource.Expression);
 			}
 		}
 
@@ -395,7 +395,7 @@ public static class BindingParser
 		var binds1 = binds
 			.Where(b => b.Property.TargetEvent == null && b.Mode != BindingMode.OneWayToSource)
 			.ToList();
-		var updateMethod = CreateUpdateMethodData(binds1, notifySources, null, null);
+		var updateMethod = CreateUpdateMethod(binds1, notifySources, null, null);
 
 		//*** Create data for two-way bindings
 
@@ -632,7 +632,7 @@ public static class BindingParser
 		}
 	}
 
-	private static UpdateMethodData CreateUpdateMethodData(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Expression? replacedExpression)
+	private static UpdateMethod CreateUpdateMethod(IList<Bind> bindings, List<NotifySource>? notifySources, NotifySource? notifySource, Expression? replacedExpression)
 	{
 		List<VariableExpression> parameters = [];
 
@@ -752,7 +752,7 @@ public static class BindingParser
 			SetExpressions = props1
 		};
 
-		return new UpdateMethodData
+		return new UpdateMethod
 		{
 			Parameters = parameters,
 			UpdateNotifySources = updateNotifySources,
@@ -786,7 +786,7 @@ public class BindingsData
 	public required IList<Bind> Bindings { get; init; }
 	public required List<NotifySource> NotifySources { get; init; }
 	public required List<TwoWayBindingData> TwoWayEvents { get; init; }
-	public required UpdateMethodData UpdateMethod { get; init; }
+	public required UpdateMethod UpdateMethod { get; init; }
 };
 
 public class NotifySource
@@ -794,7 +794,7 @@ public class NotifySource
 	public required Expression Expression { get; init; }
 	public required Expression SourceExpression { get; set; }
 	public List<NotifyProperty> Properties { get; set; } = null!;
-	public UpdateMethodData? UpdateMethod { get; set; }
+	public UpdateMethod? UpdateMethod { get; set; }
 	public bool IsINotifyPropertyChanged { get; init; }
 	public int Index { get; init; }
 
@@ -829,10 +829,10 @@ public class NotifyProperty
 	public required ReadOnlyCollection<Bind> Bindings { get; init; }
 	public required List<Bind> SetBindings { get; init; }
 	public List<NotifySource> DependentNotifySources { get; } = [];
-	public UpdateMethodData? UpdateMethod { get; set; }
+	public UpdateMethod? UpdateMethod { get; set; }
 };
 
-public class UpdateMethodData
+public class UpdateMethod
 {
 	public required List<VariableExpression> Parameters { get; init; }
 	public required ExpressionGroup Expressions { get; init; }

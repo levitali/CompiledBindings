@@ -18,6 +18,6 @@
     <file src="..\..\..\..\bin\wpf\build\netstandard2.0\CompiledBindings.WPF.BuildTasks.merged.dll" target="build" />
 
     <file src="..\..\..\..\bin\wpf\lib\net40\CompiledBindings.WPF.dll" target="lib\net40\" />
-    <file src="..\..\..\..\bin\wpf\lib\net8.0\CompiledBindings.WPF.dll" target="lib\net8.0\" />
+    <file src="..\..\..\..\bin\wpf\lib\netcoreapp3.0\CompiledBindings.WPF.dll" target="lib\netcoreapp3.0\" />
   </files>
 </package>

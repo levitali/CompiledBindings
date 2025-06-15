@@ -127,7 +127,7 @@ namespace WPFTest.Views
 
 				public void SetPropertyChangedEventHandler1(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
 				{
-					global::CompiledBindings.WPF.CompiledBindingsHelper.SetPropertyChangedEventHandler(ref _propertyChangeSource1, value, OnPropertyChanged1);
+					global::CompiledBindings.WPF.CompiledBindingsHelper.SetCollectionChangedEventHandler(ref _propertyChangeSource1, value, OnCollectionChanged1);
 				}
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
@@ -158,7 +158,7 @@ namespace WPFTest.Views
 					{
 						bindings.Update1_Item0(typedSender);
 					}
-					if (global::CompiledBindings.WPF.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, 1))
+					else if (global::CompiledBindings.WPF.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, 1))
 					{
 						bindings.Update1_Item1(typedSender);
 					}
