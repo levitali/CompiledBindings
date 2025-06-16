@@ -81,6 +81,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Documents.Run"] = ["Text"];
 
 			var xamlDomParser = new WinUIXamlDomParser(_platformConstants);
+			var codeGenerator = new WinUICodeGenerator(_platformConstants, LangVersion, MSBuildVersion);
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
@@ -148,7 +149,6 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 						}
 						else if (parseResult.GenerateCode)
 						{
-							var codeGenerator = new WinUICodeGenerator(_platformConstants, LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
 
 							var targetDir = Path.Combine(IntermediateOutputPath, Path.GetDirectoryName(targetRelativePath));
@@ -249,7 +249,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 				if (generatedCodeFiles.Count > 0)
 				{
 					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, $"CompiledBindingsHelper.{_platformConstants.FrameworkId}.cs");
-					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+					File.WriteAllText(dataTemplateBindingsFile, codeGenerator.GenerateCompiledBindingsHelper());
 					generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 				}
 
@@ -274,49 +274,6 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 		{
 			TypeInfoUtils.Cleanup();
 		}
-	}
-
-	private string GenerateCompiledBindingsHelper()
-	{
-		return
-$@"namespace CompiledBindings.{_platformConstants.FrameworkId}
-{{
-	internal class CompiledBindingsHelper
-	{{
-{BindingsCodeGenerator.CompiledBindingsHelperBaseCode}
-
-		public static readonly global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty BindingsProperty =
-				global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(CompiledBindingsHelper), new global::{_platformConstants.BaseClrNamespace}.UI.Xaml.PropertyMetadata(null, BindingsChanged));
-
-		public static IGeneratedDataTemplate GetBindings(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject @object)
-		{{
-			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
-		}}
-
-		public static void SetBindings(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject @object, IGeneratedDataTemplate value)
-		{{
-			@object.SetValue(BindingsProperty, value);
-		}}
-
-		static void BindingsChanged(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject d, global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyPropertyChangedEventArgs e)
-		{{
-			if (e.OldValue != null)
-			{{
-				((IGeneratedDataTemplate)e.OldValue).Cleanup((global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement)d);
-			}}
-			if (e.NewValue != null)
-			{{
-				((IGeneratedDataTemplate)e.NewValue).Initialize((global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement)d);
-			}}
-		}}
-	}}
-
-	public interface IGeneratedDataTemplate
-	{{
-		void Initialize(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
-		void Cleanup(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
-	}}
-}}";
 	}
 
 	void ICancelableTask.Cancel()
@@ -378,6 +335,51 @@ $@"namespace CompiledBindings.{_platformConstants.FrameworkId}
 				   msbuildVersion)
 		{
 			_platformConstants = platformConstants;
+		}
+
+		public string GenerateCompiledBindingsHelper()
+		{
+			return
+$@"{GenerateFileHeader()}
+
+namespace CompiledBindings.{_platformConstants.FrameworkId}
+{{
+	internal class CompiledBindingsHelper
+	{{
+{BindingsCodeGenerator.CompiledBindingsHelperBaseCode}
+
+		public static readonly global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty BindingsProperty =
+				global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(CompiledBindingsHelper), new global::{_platformConstants.BaseClrNamespace}.UI.Xaml.PropertyMetadata(null, BindingsChanged));
+
+		public static IGeneratedDataTemplate GetBindings(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject @object)
+		{{
+			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
+		}}
+
+		public static void SetBindings(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject @object, IGeneratedDataTemplate value)
+		{{
+			@object.SetValue(BindingsProperty, value);
+		}}
+
+		static void BindingsChanged(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject d, global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyPropertyChangedEventArgs e)
+		{{
+			if (e.OldValue != null)
+			{{
+				((IGeneratedDataTemplate)e.OldValue).Cleanup((global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement)d);
+			}}
+			if (e.NewValue != null)
+			{{
+				((IGeneratedDataTemplate)e.NewValue).Initialize((global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement)d);
+			}}
+		}}
+	}}
+
+	public interface IGeneratedDataTemplate
+	{{
+		void Initialize(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
+		void Cleanup(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
+	}}
+}}";
 		}
 
 		protected override string CreateGetResourceCode(string resourceName, int varIndex)
