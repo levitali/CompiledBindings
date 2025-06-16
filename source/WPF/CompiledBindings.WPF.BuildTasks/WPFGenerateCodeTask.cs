@@ -69,6 +69,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
 			var xamlDomParser = new WpfXamlDomParser();
+			var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
@@ -135,10 +136,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 						}
 						else if (parseResult.GenerateCode)
 						{
-							var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
 							string code = codeGenerator.GenerateCode(parseResult);
-
-							code = GenerateUtils.GeneratedCodeHeader + Environment.NewLine + code;
 
 							var dirInfo = new DirectoryInfo(targetDir);
 							dirInfo.Create();
@@ -180,7 +178,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 				if (generatedCodeFiles.Count > 0)
 				{
 					var dataTemplateBindingsFile = Path.Combine(IntermediateOutputPath, "CompiledBindingsHelper.WPF.cs");
-					File.WriteAllText(dataTemplateBindingsFile, GenerateCompiledBindingsHelper());
+					File.WriteAllText(dataTemplateBindingsFile, codeGenerator.GenerateCompiledBindingsHelper());
 					generatedCodeFiles.Add(new TaskItem(dataTemplateBindingsFile));
 				}
 
@@ -213,49 +211,6 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 		{
 			TypeInfoUtils.Cleanup();
 		}
-	}
-
-	private static string GenerateCompiledBindingsHelper()
-	{
-		return
-$@"namespace CompiledBindings.WPF
-{{
-	internal class CompiledBindingsHelper
-	{{
-{BindingsCodeGenerator.CompiledBindingsHelperBaseCode}		
-
-		public static readonly global::System.Windows.DependencyProperty BindingsProperty =
-			global::System.Windows.DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(CompiledBindingsHelper), new global::System.Windows.PropertyMetadata(BindingsChanged));
-
-		public static IGeneratedDataTemplate GetBindings(global::System.Windows.DependencyObject @object)
-		{{
-			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
-		}}
-
-		public static void SetBindings(global::System.Windows.DependencyObject @object, IGeneratedDataTemplate value)
-		{{
-			@object.SetValue(BindingsProperty, value);
-		}}
-
-		static void BindingsChanged(global::System.Windows.DependencyObject d, global::System.Windows.DependencyPropertyChangedEventArgs e)
-		{{
-			if (e.OldValue != null)
-			{{
-				((IGeneratedDataTemplate)e.OldValue).Cleanup((global::System.Windows.FrameworkElement)d);
-			}}
-			if (e.NewValue != null)
-			{{
-				((IGeneratedDataTemplate)e.NewValue).Initialize((global::System.Windows.FrameworkElement)d);
-			}}
-		}}
-	}}
-
-	public interface IGeneratedDataTemplate
-	{{
-		void Initialize(global::System.Windows.FrameworkElement rootElement);
-		void Cleanup(global::System.Windows.FrameworkElement rootElement);
-	}}
-}}";
 	}
 
 	void ICancelableTask.Cancel()
@@ -334,6 +289,52 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 			   msbuildVersion)
 	{
 	}
+
+	public string GenerateCompiledBindingsHelper()
+	{
+		return
+$@"{GenerateFileHeader()}
+
+namespace CompiledBindings.WPF
+{{
+	internal class CompiledBindingsHelper
+	{{
+{BindingsCodeGenerator.CompiledBindingsHelperBaseCode}		
+
+		public static readonly global::System.Windows.DependencyProperty BindingsProperty =
+			global::System.Windows.DependencyProperty.RegisterAttached(""Bindings"", typeof(IGeneratedDataTemplate), typeof(CompiledBindingsHelper), new global::System.Windows.PropertyMetadata(BindingsChanged));
+
+		public static IGeneratedDataTemplate GetBindings(global::System.Windows.DependencyObject @object)
+		{{
+			return (IGeneratedDataTemplate)@object.GetValue(BindingsProperty);
+		}}
+
+		public static void SetBindings(global::System.Windows.DependencyObject @object, IGeneratedDataTemplate value)
+		{{
+			@object.SetValue(BindingsProperty, value);
+		}}
+
+		static void BindingsChanged(global::System.Windows.DependencyObject d, global::System.Windows.DependencyPropertyChangedEventArgs e)
+		{{
+			if (e.OldValue != null)
+			{{
+				((IGeneratedDataTemplate)e.OldValue).Cleanup((global::System.Windows.FrameworkElement)d);
+			}}
+			if (e.NewValue != null)
+			{{
+				((IGeneratedDataTemplate)e.NewValue).Initialize((global::System.Windows.FrameworkElement)d);
+			}}
+		}}
+	}}
+
+	public interface IGeneratedDataTemplate
+	{{
+		void Initialize(global::System.Windows.FrameworkElement rootElement);
+		void Cleanup(global::System.Windows.FrameworkElement rootElement);
+	}}
+}}";
+	}
+
 
 	protected override string CreateGetResourceCode(string resourceName, int varIndex)
 	{

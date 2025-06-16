@@ -3,7 +3,7 @@
 public class BindingsCodeGenerator : XamlCodeGenerator
 {
 	public const string CompiledBindingsHelperBaseCode =
-@"		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged? cache, global::System.ComponentModel.INotifyPropertyChanged? source, global::System.ComponentModel.PropertyChangedEventHandler handler)
+@"		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged cache, global::System.ComponentModel.INotifyPropertyChanged source, global::System.ComponentModel.PropertyChangedEventHandler handler)
 		{
 			if (cache != null && !object.ReferenceEquals(cache, source))
 			{
@@ -17,7 +17,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 			}
 		}
 
-		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged? cache, object? source, global::System.ComponentModel.PropertyChangedEventHandler handler)
+		public static void SetPropertyChangedEventHandler(ref global::System.ComponentModel.INotifyPropertyChanged cache, object source, global::System.ComponentModel.PropertyChangedEventHandler handler)
 		{
 			if (cache != null && !object.ReferenceEquals(cache, source))
 			{
@@ -31,7 +31,7 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 			}
 		}
 
-		public static void SetCollectionChangedEventHandler(ref global::System.Collections.Specialized.INotifyCollectionChanged? cache, global::System.Collections.Specialized.INotifyCollectionChanged? source, global::System.Collections.Specialized.NotifyCollectionChangedEventHandler handler)
+		public static void SetCollectionChangedEventHandler(ref global::System.Collections.Specialized.INotifyCollectionChanged cache, global::System.Collections.Specialized.INotifyCollectionChanged source, global::System.Collections.Specialized.NotifyCollectionChangedEventHandler handler)
 		{
 			if (cache != null && !object.ReferenceEquals(cache, source))
 			{
@@ -45,13 +45,13 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 			}
 		}
 
-		public static T? TryGetBindings<T>(ref global::System.WeakReference? bindingsWeakReference, global::System.Action cleanup)
+		public static T TryGetBindings<T>(ref global::System.WeakReference bindingsWeakReference, global::System.Action cleanup)
 			where T : class
 		{
-			T? bindings = null;
+			T bindings = null;
 			if (bindingsWeakReference != null)
 			{
-				bindings = (T?)bindingsWeakReference.Target;
+				bindings = (T)bindingsWeakReference.Target;
 				if (bindings == null)
 				{
 					bindingsWeakReference = null;
@@ -61,23 +61,23 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 			return bindings;
 		}
 
-		public static bool IsCollectionChangedAtIndex(NotifyCollectionChangedEventArgs args, int index)
+		public static bool IsCollectionChangedAtIndex(global::System.Collections.Specialized.NotifyCollectionChangedEventArgs args, int index)
 		{
-			if (args.Action == NotifyCollectionChangedAction.Add)
+			if (args.Action == global::System.Collections.Specialized.NotifyCollectionChangedAction.Add)
 			{
 				return index >= args.NewStartingIndex && index < args.NewStartingIndex + args.NewItems.Count;
 			}
-			if (args.Action == NotifyCollectionChangedAction.Remove)
+			if (args.Action == global::System.Collections.Specialized.NotifyCollectionChangedAction.Remove)
 			{
 				return index >= args.OldStartingIndex && index < args.OldStartingIndex + args.OldItems.Count;
 			}
-			if (args.Action == NotifyCollectionChangedAction.Replace)
+			if (args.Action == global::System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
 			{
 				return index >= args.NewStartingIndex && 
 					((index < args.NewStartingIndex + args.NewItems.Count) ||
 					 (index < args.OldStartingIndex + args.OldItems.Count));
 			}
-			if (args.Action == NotifyCollectionChangedAction.Move)
+			if (args.Action == global::System.Collections.Specialized.NotifyCollectionChangedAction.Move)
 			{
 				return 
 					(index >= args.NewStartingIndex && index < args.NewStartingIndex + args.NewItems.Count) ||

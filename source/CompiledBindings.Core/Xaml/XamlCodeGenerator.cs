@@ -27,10 +27,19 @@ public class XamlCodeGenerator
 
 	public string FrameworkId { get; }
 
-
 	public float LangVersion { get; }
 
 	public bool LangNullables { get; }
+
+	public string GenerateFileHeader()
+	{
+		var header = GenerateUtils.GeneratedCodeHeader;
+		if (LangNullables)
+		{
+			header += Environment.NewLine + "#nullable disable";
+		}
+		return header;
+	}
 
 	public void GenerateSetValue(StringBuilder output, XamlObjectProperty property, Expression? expression, string? targetRootVariable, ref int localVarIndex, ref int localFuncIndex, ref bool isLineDirective, string? a)
 	{

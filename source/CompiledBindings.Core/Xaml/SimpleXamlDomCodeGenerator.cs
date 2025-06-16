@@ -36,6 +36,9 @@ public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	{
 		var output = new StringBuilder();
 
+		output.AppendLine(GenerateFileHeader());
+		output.AppendLine();
+
 		if (parseResult.TargetType.Reference.Namespace != null)
 		{
 			output.AppendLine(
@@ -53,17 +56,10 @@ $@"	using {ns};");
 			output.AppendLine();
 		}
 
-		if (LangNullables)
-		{
-			output.AppendLine(
-$@"#nullable disable");
-		}
-
 		if (parseResult.GeneratedClass.GenerateClass)
 		{
 			output.AppendLine(
-$@"
-	[global::System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
+$@"	[global::System.CodeDom.Compiler.GeneratedCode(""CompiledBindings"", null)]
 	partial class {parseResult.TargetType.Reference.Name}
 	{{");
 			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
