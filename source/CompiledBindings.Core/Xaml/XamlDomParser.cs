@@ -135,8 +135,8 @@ public abstract class XamlDomParser
 		XamlObject obj,
 		XamlNode xamlNode,
 		HashSet<string> includeNamespaces,
-		BindingScope currentBindingScope,
-		List<BindingScope> bindingScopes,
+		ViewBindingScope currentBindingScope,
+		List<ViewBindingScope> bindingScopes,
 		ref TypeInfo? elementType,
 		bool throwIfBindWithoutDataType)
 	{
@@ -194,8 +194,8 @@ public abstract class XamlDomParser
 		string memberName,
 		XamlNode xamlNode,
 		HashSet<string> includeNamespaces,
-		BindingScope currentBindingScope,
-		List<BindingScope> bindingScopes,
+		ViewBindingScope currentBindingScope,
+		List<ViewBindingScope> bindingScopes,
 		ref TypeInfo? elementType,
 		bool throwIfBindWithoutDataType)
 	{
@@ -318,8 +318,8 @@ public abstract class XamlDomParser
 		XamlObjectProperty objProp,
 		XamlNode xamlNode,
 		HashSet<string> includeNamespaces,
-		BindingScope currentBindingScope,
-		List<BindingScope> bindingScopes,
+		ViewBindingScope currentBindingScope,
+		List<ViewBindingScope> bindingScopes,
 		ref TypeInfo? elementType,
 		bool throwIfBindWithoutDataType)
 	{
@@ -438,7 +438,7 @@ public abstract class XamlDomParser
 
 					if (bind.DataTypeSet)
 					{
-						BindingScope? scope = null;
+						ViewBindingScope? scope = null;
 						if (bind.DataType == null)
 						{
 							scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
@@ -449,7 +449,7 @@ public abstract class XamlDomParser
 						}
 						else
 						{
-							scope = new BindingScope
+							scope = new ViewBindingScope
 							{
 								DataType = bind.DataType,
 								ViewName = obj.Name,

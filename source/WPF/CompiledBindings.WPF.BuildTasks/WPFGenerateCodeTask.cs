@@ -412,7 +412,7 @@ public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 
 	protected override string DependencyObjectType => "global::System.Windows.DependencyObject";
 
-	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
+	protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBinding ev, string targetExpr)
 	{
 		var dp = ev.Bindings[0].DependencyProperty!;
 		output.AppendLine(
@@ -423,7 +423,7 @@ $@"				global::System.ComponentModel.DependencyPropertyDescriptor
 					.AddValueChanged({targetExpr}, OnTargetChanged{ev.Index});");
 	}
 
-	protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
+	protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBinding ev, string targetExpr)
 	{
 		var dp = ev.Bindings[0].DependencyProperty!;
 		output.AppendLine(

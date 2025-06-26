@@ -93,10 +93,10 @@ public class XamlObjectValue
 	}
 }
 
-public class BindingScope
+public class ViewBindingScope
 {
 	public string? ViewName { get; set; }
 	public required TypeInfo? DataType { get; init; }
 	public List<Bind> Bindings { get; } = new();
-	public BindingsData BindingsData { get; set; } = null!;
+	public BindingsClass BindingsData { get; set; } = null!;
 }

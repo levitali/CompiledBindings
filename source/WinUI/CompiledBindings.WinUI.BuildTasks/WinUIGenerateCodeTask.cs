@@ -399,7 +399,7 @@ namespace CompiledBindings.{_platformConstants.FrameworkId}
 
 		protected override string DependencyObjectType => $"global::{_platformConstants.BaseClrNamespace}.UI.Xaml.DependencyObject";
 
-		protected override void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)
+		protected override void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsClass bindingsData)
 		{
 			// Generate _callbackTokenXXX fields for dependency property notifications
 			foreach (var ev in bindingsData.TwoWayEvents.Where(e => e.Bindings[0].DependencyProperty != null))
@@ -409,14 +409,14 @@ $@"			private long _targetCallbackToken{ev.Index};");
 			}
 		}
 
-		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
+		protected override void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBinding ev, string targetExpr)
 		{
 			var first = ev.Bindings[0];
 			output.AppendLine(
 $@"				_targetCallbackToken{ev.Index} = {targetExpr}.RegisterPropertyChangedCallback({first.Property.Object.Type.Reference.FullName}.{first.Property.MemberName}Property, OnTargetChanged{ev.Index});");
 		}
 
-		protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
+		protected override void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBinding ev, string targetExpr)
 		{
 			var first = ev.Bindings[0];
 			output.AppendLine(

@@ -53,8 +53,8 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 
 		GeneratedClass processRoot(XElement xroot, TypeInfo? dataType, TypeInfo? targetType)
 		{
-			var rootBindingScope = new BindingScope { DataType = dataType };
-			var bindingScopes = new List<BindingScope> { rootBindingScope };
+			var rootBindingScope = new ViewBindingScope { DataType = dataType };
+			var bindingScopes = new List<ViewBindingScope> { rootBindingScope };
 			var xamlObjects = new List<XamlObject>();
 
 			var savedDataType = DataType;
@@ -78,7 +78,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				else
 				{
 					var s = bindingScopes[i];
-					s.BindingsData = BindingParser.CreateBindingsData(s.Bindings, targetType, s.DataType ?? targetType!, DependencyObjectType);
+					s.BindingsData = BindingParser.CreateBindingsClass(s.Bindings, targetType, s.DataType ?? targetType!, DependencyObjectType);
 				}
 			}
 
@@ -94,7 +94,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 				XamlObjects = xamlObjects,
 			};
 
-			XamlObject? processElement(XElement xelement, BindingScope currentBindingScope, TypeInfo? itemType, bool isSupportedParent, string? parentDescription)
+			XamlObject? processElement(XElement xelement, ViewBindingScope currentBindingScope, TypeInfo? itemType, bool isSupportedParent, string? parentDescription)
 			{
 				var savedDataType = DataType;
 
@@ -161,14 +161,14 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 					if (currentBindingScope.DataType?.Reference.FullName != dataType?.Reference.FullName)
 					{
 						DataType = dataType ?? targetType!;
-						BindingScope bs;
+						ViewBindingScope bs;
 						if (dataType == null && (bs = bindingScopes.FirstOrDefault(s => s.DataType == null)) != null)
 						{
 							currentBindingScope = bs;
 						}
 						else
 						{
-							currentBindingScope = new BindingScope
+							currentBindingScope = new ViewBindingScope
 							{
 								DataType = dataType,
 								ViewName = viewName
@@ -347,7 +347,7 @@ public enum ExtenstionType
 public class GeneratedClass
 {
 	public required XElement RootElement { get; init; }
-	public required List<BindingScope> BindingScopes { get; init; }
+	public required List<ViewBindingScope> BindingScopes { get; init; }
 	public required List<XamlObject> XamlObjects { get; init; }
 	public required ExpressionGroup UpdateMethod { get; init; }
 

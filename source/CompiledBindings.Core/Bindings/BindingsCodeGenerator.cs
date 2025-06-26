@@ -90,10 +90,10 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 	{
 	}
 
-	public void GenerateBindingsClass(StringBuilder output, BindingsData bindingsData, string? targetClassName, string? nameSuffix = null)
+	public void GenerateBindingsClass(StringBuilder output, BindingsClass bindingsClass, string? targetClassName, string? nameSuffix = null)
 	{
-		bool isDiffDataRoot = bindingsData.DataType.Reference.FullName != bindingsData.TargetType?.Reference.FullName;
-		var rootGroup = bindingsData.NotifySources.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
+		bool isDiffDataRoot = bindingsClass.DataType.Reference.FullName != bindingsClass.TargetType?.Reference.FullName;
+		var rootNotifySource = bindingsClass.NotifySources.SingleOrDefault(g => g.Expression is VariableExpression pe && pe.Name == "dataRoot");
 
 		bool isLineDirective = false;
 
@@ -121,24 +121,24 @@ $@"			{targetClassName} _targetRoot;");
 		if (isDiffDataRoot)
 		{
 			output.AppendLine(
-$@"			global::{bindingsData.DataType.Reference.GetCSharpFullName()} _dataRoot;");
+$@"			global::{bindingsClass.DataType.Reference.GetCSharpFullName()} _dataRoot;");
 		}
 
-		if (bindingsData.NotifySources.Count > 0)
+		if (bindingsClass.NotifySources.Count > 0)
 		{
 			output.AppendLine(
 $@"			{targetClassName}_BindingsTrackings{nameSuffix} _bindingsTrackings;");
 		}
 
 		// Generate _eventHandlerXXX fields for event bindings
-		foreach (var binding in bindingsData.Bindings.Where(b => b.Property.TargetEvent != null))
+		foreach (var binding in bindingsClass.Bindings.Where(b => b.Property.TargetEvent != null))
 		{
 			output.AppendLine(
 $@"			global::{binding.Property.TargetEvent!.EventType.Reference.GetCSharpFullName()} _eventHandler{binding.Index};");
 		}
 
 		// Generate flags for two-way bindings
-		foreach (var bind in bindingsData.Bindings.Where(b => b.Mode == BindingMode.TwoWay))
+		foreach (var bind in bindingsClass.Bindings.Where(b => b.Mode == BindingMode.TwoWay))
 		{
 			output.AppendLine(
 $@"			bool _settingBinding{bind.Index};");
@@ -146,14 +146,14 @@ $@"			bool _settingBinding{bind.Index};");
 
 		// Generate CancellationTokenSources for cancelling asynchronous setting of properties
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		var taskBindings = bindingsData.Bindings.Where(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type)).ToList();
+		var taskBindings = bindingsClass.Bindings.Where(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type)).ToList();
 		foreach (var bind in taskBindings)
 		{
 			output.AppendLine(
 $@"			global::System.Threading.CancellationTokenSource _cts{bind.Index};");
 		}
 
-		GenerateBindingsExtraFieldDeclarations(output, bindingsData);
+		GenerateBindingsExtraFieldDeclarations(output, bindingsClass);
 
 		#endregion // Fields declaration
 
@@ -164,7 +164,7 @@ $@"			global::System.Threading.CancellationTokenSource _cts{bind.Index};");
 		{
 			output.AppendLine(
 $@"
-			public void Initialize({targetClassName} targetRoot, global::{bindingsData.DataType.Reference.GetCSharpFullName()} dataRoot)
+			public void Initialize({targetClassName} targetRoot, global::{bindingsClass.DataType.Reference.GetCSharpFullName()} dataRoot)
 			{{
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;");
@@ -178,7 +178,7 @@ $@"
 				_targetRoot = dataRoot;");
 		}
 
-		if (bindingsData.NotifySources.Count > 0)
+		if (bindingsClass.NotifySources.Count > 0)
 		{
 			output.AppendLine(
 $@"				_bindingsTrackings = new {targetClassName}_BindingsTrackings{nameSuffix}(this);");
@@ -189,7 +189,7 @@ $@"
 				Update();");
 
 		// Generate code of event bindings
-		var eventBindings = bindingsData.Bindings.Where(b => b.Property.TargetEvent != null).ToList();
+		var eventBindings = bindingsClass.Bindings.Where(b => b.Property.TargetEvent != null).ToList();
 		if (eventBindings.Count > 0)
 		{
 			int dummyLocalVar = 0, dummyLocalFunc = 0;
@@ -202,19 +202,19 @@ $@"
 		}
 
 		// Generate setting PropertyChanged event handler for data root
-		if (rootGroup != null)
+		if (rootNotifySource != null)
 		{
-			int index = bindingsData.NotifySources.IndexOf(rootGroup);
+			int index = bindingsClass.NotifySources.IndexOf(rootNotifySource);
 			output.AppendLine(
 $@"
 				_bindingsTrackings.SetPropertyChangedEventHandler{index}(dataRoot);");
 		}
 
 		// Set event handlers for two-way bindings
-		if (bindingsData.TwoWayEvents.Count > 0)
+		if (bindingsClass.TwoWayEvents.Count > 0)
 		{
 			output.AppendLine();
-			foreach (var ev in bindingsData.TwoWayEvents)
+			foreach (var ev in bindingsClass.TwoWayEvents)
 			{
 				var first = ev.Bindings[0];
 				string targetExpr = "_targetRoot";
@@ -267,7 +267,7 @@ $@"					_cts{bind.Index}?.Cancel();");
 		}
 
 		// Unset event handlers for two-way bindings
-		foreach (var ev in bindingsData.TwoWayEvents)
+		foreach (var ev in bindingsClass.TwoWayEvents)
 		{
 			var first = ev.Bindings[0];
 			string targetExpr = "_targetRoot";
@@ -296,7 +296,7 @@ $@"					{targetExpr2} -= OnTargetChanged{ev.Index};");
 		}
 
 		// Unset event handlers for event bindings
-		foreach (var binding in bindingsData.Bindings.Where(b => b.Property.TargetEvent != null))
+		foreach (var binding in bindingsClass.Bindings.Where(b => b.Property.TargetEvent != null))
 		{
 			string targetExpr = "_targetRoot";
 			if (binding.Property.Object.Name != null)
@@ -309,13 +309,13 @@ $@"					{targetExpr} -= _eventHandler{binding.Index};
 					_eventHandler{binding.Index} = null;");
 		}
 
-		if (bindingsData.NotifySources.Count > 0)
+		if (bindingsClass.NotifySources.Count > 0)
 		{
 			output.AppendLine(
 $@"					_bindingsTrackings.Cleanup();");
 		}
 
-		if (isDiffDataRoot && bindingsData.DataType.Reference.IsNullable())
+		if (isDiffDataRoot && bindingsClass.DataType.Reference.IsNullable())
 		{
 			output.AppendLine(
 $@"					_dataRoot = null;");
@@ -334,7 +334,7 @@ $@"					_targetRoot = null;
 $@"
 			public void Update()
 			{{");
-		generateUpdateMethodBody(bindingsData.UpdateMethod);
+		generateUpdateMethodBody(bindingsClass.UpdateMethod);
 		output.AppendLine(
 $@"			}}");
 
@@ -342,7 +342,7 @@ $@"			}}");
 
 		#region UpateXX Methods
 
-		foreach (var notifySource in bindingsData.NotifySources.Where(s => s.UpdateMethod != null))
+		foreach (var notifySource in bindingsClass.NotifySources.Where(s => s.UpdateMethod != null))
 		{
 			generateUpdateMethod(notifySource.UpdateMethod!, $"Update{notifySource.Index}");
 		}
@@ -351,7 +351,7 @@ $@"			}}");
 
 		#region UpdateXX_XXX Methods
 
-		foreach (var notifySource in bindingsData.NotifySources)
+		foreach (var notifySource in bindingsClass.NotifySources)
 		{
 			foreach (var prop in notifySource.Properties.Where(_ => _.UpdateMethod != null))
 			{
@@ -363,7 +363,7 @@ $@"			}}");
 
 		#region OnTargetChanged methods
 
-		foreach (var ev in bindingsData.TwoWayEvents)
+		foreach (var ev in bindingsClass.TwoWayEvents)
 		{
 			output.AppendLine();
 
@@ -420,7 +420,7 @@ $@"			}}");
 
 		#region Trackings Class
 
-		if (bindingsData.NotifySources.Count > 0)
+		if (bindingsClass.NotifySources.Count > 0)
 		{
 			#region Tracking Class Begin
 
@@ -437,7 +437,7 @@ $@"
 $@"				global::System.WeakReference _bindingsWeakRef;");
 
 			// Generate _propertyChangeSourceXXX fields
-			foreach (var notifySource in bindingsData.NotifySources)
+			foreach (var notifySource in bindingsClass.NotifySources)
 			{
 				var type = getDiffTypesCount(notifySource) > 1
 					? "object"
@@ -475,7 +475,7 @@ $@"
 				{{");
 
 			// Unset property changed event handlers
-			foreach (var group in bindingsData.NotifySources)
+			foreach (var group in bindingsClass.NotifySources)
 			{
 				output.AppendLine(
 $@"					SetPropertyChangedEventHandler{group.Index}(null);");
@@ -489,7 +489,7 @@ $@"				}}");
 
 			#region SetPropertyChangedEventHandler methods
 
-			foreach (var notifySource in bindingsData.NotifySources)
+			foreach (var notifySource in bindingsClass.NotifySources)
 			{
 				string cacheVar = "_propertyChangeSource" + notifySource.Index;
 
@@ -590,7 +590,7 @@ $@"				}}");
 
 			#region OnPropertyChange methods
 
-			foreach (var notifySource in bindingsData.NotifySources)
+			foreach (var notifySource in bindingsClass.NotifySources)
 			{
 				if (notifySource.AnyINotifyPropertyChangedProperty)
 				{
@@ -776,7 +776,7 @@ $@"				Update{notifSource.Index}({notifSource.SourceExpression});");
 $@"				Update{propUpdate.Parent.Index}_{propUpdate.PropertyCodeName}({propUpdate.SourceExpression});");
 			}
 
-			foreach (var group in updateMethod.SetEventHandlers.Where(g => g != rootGroup))
+			foreach (var group in updateMethod.SetEventHandlers.Where(g => g != rootNotifySource))
 			{
 				output.AppendLine(
 $@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
@@ -929,15 +929,15 @@ $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 		#endregion
 	}
 
-	protected virtual void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsData bindingsData)
+	protected virtual void GenerateBindingsExtraFieldDeclarations(StringBuilder output, BindingsClass bindingsData)
 	{
 	}
 
-	protected virtual void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
+	protected virtual void GenerateSetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBinding binding, string targetExpr)
 	{
 	}
 
-	protected virtual void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBindingData ev, string targetExpr)
+	protected virtual void GenerateUnsetDependencyPropertyChangedCallback(StringBuilder output, TwoWayBinding binding, string targetExpr)
 	{
 	}
 

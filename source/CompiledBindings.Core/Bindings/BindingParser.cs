@@ -332,7 +332,7 @@ public static class BindingParser
 		};
 	}
 
-	public static BindingsData CreateBindingsData(IList<Bind> binds, TypeInfo? targetType, TypeInfo dataType, TypeInfo? dependencyObjectType = null)
+	public static BindingsClass CreateBindingsClass(IList<Bind> binds, TypeInfo? targetType, TypeInfo dataType, TypeInfo? dependencyObjectType = null)
 	{
 		// Set unique indexes used as ids for all bindings in this binding scope
 		for (int i = 0; i < binds.Count; i++)
@@ -406,7 +406,7 @@ public static class BindingParser
 			.Where(b => b.UpdateSourceEvents.Count > 0)
 			.SelectMany(b => b.UpdateSourceEvents.Select(e => (bind: b, evnt: e)))
 			.GroupBy(e => (e.bind, e.evnt.Signature))
-			.Select(g => new TwoWayBindingData
+			.Select(g => new TwoWayBinding
 			{
 				TargetChangedEvents = g.Select(_ => _.evnt).Distinct().ToList(),
 				Bindings = g.Select(_ => _.bind).Distinct().ToList(),
@@ -416,7 +416,7 @@ public static class BindingParser
 		var twoWayEventHandlers2 = twoWayBinds
 			.Where(b => b.UpdateSourceEvents.Count == 0 && b.DependencyProperty != null)
 			.GroupBy(b => (b.Property.Object, b.DependencyProperty))
-			.Select(g => new TwoWayBindingData
+			.Select(g => new TwoWayBinding
 			{
 				Bindings = g.ToList(),
 			});
@@ -427,7 +427,7 @@ public static class BindingParser
 						b.DependencyProperty == null &&
 						iNotifyPropertyChangedType.IsAssignableFrom(b.Property.Object.Type))
 			.GroupBy(b => b.Property.Object)
-			.Select(g => new TwoWayBindingData
+			.Select(g => new TwoWayBinding
 			{
 				TargetChangedEvents = [iNotifyPropertyChangedType.Events[0]],
 				Bindings = g.ToList(),
@@ -439,7 +439,7 @@ public static class BindingParser
 			twoWayEventHandlers[i].Index = i;
 		}
 
-		return new BindingsData
+		return new BindingsClass
 		{
 			DataType = dataType,
 			TargetType = targetType,
@@ -779,13 +779,13 @@ public static class BindingParser
 	}
 }
 
-public class BindingsData
+public class BindingsClass
 {
 	public required TypeInfo? TargetType { get; init; }
 	public required TypeInfo DataType { get; init; }
 	public required IList<Bind> Bindings { get; init; }
 	public required List<NotifySource> NotifySources { get; init; }
-	public required List<TwoWayBindingData> TwoWayEvents { get; init; }
+	public required List<TwoWayBinding> TwoWayEvents { get; init; }
 	public required UpdateMethod UpdateMethod { get; init; }
 };
 
@@ -841,7 +841,7 @@ public class UpdateMethod
 	public required List<NotifySource> SetEventHandlers { get; init; }
 }
 
-public class TwoWayBindingData
+public class TwoWayBinding
 {
 	public required List<Bind> Bindings { get; init; }
 	public List<EventInfo>? TargetChangedEvents { get; init; }
