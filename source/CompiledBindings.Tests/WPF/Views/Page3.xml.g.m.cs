@@ -11,6 +11,7 @@
 
 namespace WPFTest.Views
 {
+
 	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page2
 	{
@@ -77,16 +78,29 @@ namespace WPFTest.Views
 #line (15, 19) - (15, 69) 15 "Page3.xml"
 				_targetRoot.dataGrid1.ItemsSource = dataRoot.ListProp;
 #line default
-				Update0_IntProp(dataRoot);
+				Update0(dataRoot);
 				Update1_Item0(value1);
 				Update1_Item1(value1);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(value1);
 			}
 
+			private void Update0(global::WPFTest.ViewModels.Page1ViewModel value)
+			{
+				Update0_IntProp(value);
+				Update0_BooleanProp(value);
+			}
+
 			private void Update0_IntProp(global::WPFTest.ViewModels.Page1ViewModel value)
 			{
-#line (30, 20) - (30, 68) 30 "Page3.xml"
+#line (31, 13) - (31, 61) 31 "Page3.xml"
 				_targetRoot.textBlock3.Text = value.ObservableCollectionProp[value.IntProp];
+#line default
+			}
+
+			private void Update0_BooleanProp(global::WPFTest.ViewModels.Page1ViewModel value)
+			{
+#line (32, 13) - (32, 47) 32 "Page3.xml"
+				_targetRoot.textBlock3.SetVisible(value.BooleanProp);
 #line default
 			}
 
@@ -107,7 +121,7 @@ namespace WPFTest.Views
 			private void Update1_Item(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
 			{
 				var dataRoot = _dataRoot;
-#line (30, 20) - (30, 68) 30 "Page3.xml"
+#line (31, 13) - (31, 61) 31 "Page3.xml"
 				_targetRoot.textBlock3.Text = value[dataRoot.IntProp];
 #line default
 			}
@@ -148,9 +162,18 @@ namespace WPFTest.Views
 					}
 
 					var typedSender = (global::WPFTest.ViewModels.Page1ViewModel)sender;
-					if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "IntProp")
+					switch (e.PropertyName)
 					{
-						bindings.Update0_IntProp(typedSender);
+						case null:
+						case "":
+							bindings.Update0(typedSender);
+							break;
+						case "IntProp":
+							bindings.Update0_IntProp(typedSender);
+							break;
+						case "BooleanProp":
+							bindings.Update0_BooleanProp(typedSender);
+							break;
 					}
 				}
 

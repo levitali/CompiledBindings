@@ -690,18 +690,25 @@ public static class BindingParser
 		while (notifProps.Count > 0)
 		{
 			var prop = notifProps[0];
-			updateMethodNotifyProps.Add(prop);
-			prop.Bindings.ForEach(b => bindings.Remove(b));
-			notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
-			notifySources1 = notifySources1
-				.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
-				.ToList();
-			foreach (var ns in prop.DependentNotifySources.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifySources)))
+			if (prop.Bindings.Any(b => updateNotifySources.SelectMany(s => s.Properties).SelectMany(p => p.Bindings).Contains(b)))
 			{
-				var index = updateNotifySources.IndexOf(s => s.Index == ns.Index);
-				if (index != -1)
+				notifProps.RemoveAt(0);
+			}
+			else
+			{
+				updateMethodNotifyProps.Add(prop);
+				prop.Bindings.ForEach(b => bindings.Remove(b));
+				notifProps = notifProps.Where(p => !p.Bindings.Intersect(prop.Bindings).Any()).ToList();
+				notifySources1 = notifySources1
+					.Except(prop.DependentNotifySources.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources)), f => f.Index)
+					.ToList();
+				foreach (var ns in prop.DependentNotifySources.SelectTree(p2 => p2.Properties.SelectMany(p3 => p3.DependentNotifySources)))
 				{
-					updateNotifySources.RemoveAt(index);
+					var index = updateNotifySources.IndexOf(s => s.Index == ns.Index);
+					if (index != -1)
+					{
+						updateNotifySources.RemoveAt(index);
+					}
 				}
 			}
 		}

@@ -27,7 +27,9 @@
 
         <TextBlock Text="{x:Bind ObservableCollectionProp[0]}" />
         <TextBlock Text="{x:Bind ObservableCollectionProp[1]}" />
-        <TextBlock Text="{x:Bind ObservableCollectionProp[IntProp]}" />
+        <TextBlock
+            Text="{x:Bind ObservableCollectionProp[IntProp]}"
+            m:SetVisible="{x:Bind BooleanProp}" />
     </Grid>
 
 </Page>
