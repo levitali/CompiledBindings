@@ -10,6 +10,9 @@ public class TypeInfo
 	private IList<MethodInfo>? _constructors;
 	private IList<EventInfo>? _events;
 	private IList<TypeInfo>? _nestedTypes;
+	private LazyLoadCollection<TypeInfo>? _extensionTypes;
+	private LazyLoadCollection<PropertyInfo>? _extensionProperties;
+	private LazyLoadCollection<MethodInfo>? _extensionMethods;
 	private readonly bool? _canBeNullable;
 	private readonly byte? _nullableContext;
 	private readonly byte[]? _nullableFlags;
@@ -66,8 +69,14 @@ public class TypeInfo
 
 	public bool IsNullable => Reference.IsValueNullable() || (_canBeNullable != false && !Reference.IsValueType);
 
+	public IEnumerable<TypeInfo> ExtensionTypes => (_extensionTypes ??=
+		new(TypeInfoUtils.ExtensionTypes
+			.Where(t => t.ExtendedType.FullName == Reference.FullName)
+			.Select(t => new TypeInfo(t.TypeDefinition))))
+		.Enumerate();
+
 	public IList<PropertyInfo> Properties => _properties ??=
-		EnumerateTypeAndSubTypes()
+		EnumerateTypeAndBaseTypes()
 			.SelectMany(t => t.GetProperties())
 			.Select(p =>
 			{
@@ -77,14 +86,17 @@ public class TypeInfo
 			})
 			.ToList();
 
+	public IEnumerable<PropertyInfo> AllProperties =>
+		Properties.Concat((_extensionProperties ??= new(ExtensionTypes.SelectMany(t => t.Properties))).Enumerate());
+
 	public IList<FieldInfo> Fields => _fields ??=
-		EnumerateTypeAndSubTypes()
+		EnumerateTypeAndBaseTypes()
 			.SelectMany(t => t.GetFields())
 			.Select(f => new FieldInfo(f, GetTypeSubElement(f.FieldType, f.DeclaringType, null, f.CustomAttributes)))
 			.ToList();
 
 	public IList<MethodInfo> Methods => _methods ??=
-		EnumerateTypeAndSubTypes()
+		EnumerateTypeAndBaseTypes()
 			.SelectMany(t => t.GetMethods())
 			.Where(m => !m.IsConstructor)
 			.Select(m => new MethodInfo(
@@ -92,6 +104,9 @@ public class TypeInfo
 				m.Parameters.Select(p => new ParameterInfo(p, GetTypeSubElement(p.ParameterType, m.DeclaringType, null, p.CustomAttributes, m.CustomAttributes))).ToList(),
 				GetTypeSubElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 			.ToList();
+
+	public IEnumerable<MethodInfo> AllMethods =>
+		Methods.Concat((_extensionMethods ??= new(ExtensionTypes.SelectMany(t => t.Methods))).Enumerate());
 
 	public IList<MethodInfo> Constructors => _constructors ??=
 		Definition!.GetConstructors()
@@ -102,7 +117,7 @@ public class TypeInfo
 			.ToList();
 
 	public IList<EventInfo> Events => _events ??=
-		EnumerateTypeAndSubTypes()
+		EnumerateTypeAndBaseTypes()
 			.SelectMany(t => t.GetEvents())
 			.Select(e => new EventInfo(e, GetTypeSubElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 			.ToList();
@@ -292,7 +307,7 @@ Label_Break1:
 		return new TypeInfo(type, isNullable, nullableFlags, nullableContext);
 	}
 
-	private IEnumerable<TypeReference> EnumerateTypeAndSubTypes()
+	private IEnumerable<TypeReference> EnumerateTypeAndBaseTypes()
 	{
 		var type = Reference;
 		if (type.IsArray)

@@ -384,7 +384,7 @@ public class ExpressionParser
 	{
 		type = GetNullableUnderlyingType(type);
 
-		return type.Methods
+		return type.AllMethods
 			.Where(m => m.Definition.Name == methodName)
 			.Select(m => (m, (XamlNamespace?)null))
 			.Concat(
@@ -946,7 +946,7 @@ public class ExpressionParser
 				var staticFieldOrProp =
 					_expectedType.Fields.Where(f => f.Definition.IsStatic).Cast<IMemberInfo>()
 					.Concat(
-						_expectedType.Properties.Where(p => p.Definition.IsStatic()))
+						_expectedType.AllProperties.Where(p => p.Definition.IsStatic()))
 					.FirstOrDefault(m => m.Definition.Name == id);
 				if (staticFieldOrProp != null)
 				{
@@ -967,7 +967,7 @@ public class ExpressionParser
 		TypeInfo memberType;
 
 		// Try to find a property
-		var prop = type.Properties.FirstOrDefault(p => p.Definition.Name == id);
+		var prop = type.AllProperties.FirstOrDefault(p => p.Definition.Name == id);
 		if (prop != null)
 		{
 			member = prop;
@@ -992,7 +992,7 @@ public class ExpressionParser
 				}
 
 				// The expression can still be a method without parens (delegate).
-				var method = type.Methods.FirstOrDefault(m => m.Definition.Name == id);
+				var method = type.AllMethods.FirstOrDefault(m => m.Definition.Name == id);
 				if (method != null)
 				{
 					member = method;

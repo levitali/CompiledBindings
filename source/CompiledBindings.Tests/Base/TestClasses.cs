@@ -100,6 +100,22 @@ public enum TestMode
 	Mode3,
 }
 
+public static class Extensions
+{
+	public static int ExtensionMethod1(this Class1 page1ViewModel)
+	{
+		return 0;
+	}
+
+	extension(Class1 page1ViewModel)
+	{
+		public int ExtensionProperty => 0;
+		public static int ExtensionStaticProperty => 0;
+		public string? ExtensionMethod2() => null;
+		public static double ExtensionStaticMethod() => 0;
+	}
+}
+
 #nullable disable
 
 public class NullableDisabledBaseClass

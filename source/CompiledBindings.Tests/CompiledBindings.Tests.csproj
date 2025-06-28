@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
-		<LangVersion>latest</LangVersion>
+		<LangVersion>preview</LangVersion>
 		<IsPackable>false</IsPackable>
 		<UseWPF>true</UseWPF>
 	</PropertyGroup>

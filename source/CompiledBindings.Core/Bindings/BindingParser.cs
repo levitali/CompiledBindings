@@ -609,7 +609,8 @@ public static class BindingParser
 					return null;
 				}
 
-				isDependencyProp = isDependencyType && type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == me.Member.Definition.Name + "Property");
+				var dependencyPropertyName = me.Member.Definition.Name + "Property";
+				isDependencyProp = isDependencyType && type.Fields.Cast<IMemberInfo>().Concat(type.Properties).Any(m => m.Definition.Name == dependencyPropertyName);
 
 				// For dependency property check if there is the backing store field or property (WinCE/UWP).
 				// It must be named <PropertyName>Property

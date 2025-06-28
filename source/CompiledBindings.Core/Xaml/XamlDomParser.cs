@@ -246,7 +246,7 @@ public abstract class XamlDomParser
 			else
 			{
 				var typeInfo = obj.Type;
-				var pi = typeInfo.Properties.FirstOrDefault(p => p.Definition.Name == memberName);
+				var pi = typeInfo.AllProperties.FirstOrDefault(p => p.Definition.Name == memberName);
 				if (pi != null)
 				{
 					targetProperty = pi;
@@ -260,7 +260,7 @@ public abstract class XamlDomParser
 					}
 					else
 					{
-						var method = typeInfo.Methods.FirstOrDefault(e => e.Definition.Name == memberName);
+						var method = typeInfo.AllMethods.FirstOrDefault(e => e.Definition.Name == memberName);
 						if (method == null)
 						{
 							foreach (var ns in GetNamespaces(xamlNode))
@@ -586,7 +586,7 @@ public abstract class XamlDomParser
 
 	private static MethodInfo FindBestSuitableTargetMethod(TypeInfo type, string methodName, TypeInfo targetType, IEnumerable<string> namespaces)
 	{
-		return type.Methods
+		return type.AllMethods
 			.Where(m => m.Definition.Name == methodName && m.Parameters.Count == 1)
 			.Concat(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName, type)
 											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))

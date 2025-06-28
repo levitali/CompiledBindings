@@ -300,4 +300,33 @@ public class ExpressionTests : IDisposable
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
+
+	[Test]
+	public void Extensions()
+	{
+		var expression = "ExtensionMethod1()";
+		var expectedCode = "dataRoot.ExtensionMethod1()";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "ExtensionMethod2()";
+		expectedCode = "dataRoot.ExtensionMethod2()";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "local:Class1.ExtensionStaticMethod()";
+		expectedCode = "CompiledBindings.Tests.Class1.ExtensionStaticMethod()";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "ExtensionProperty";
+		expectedCode = "dataRoot.ExtensionProperty";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "ExtensionStaticProperty";
+		expectedCode = "dataRoot.ExtensionStaticProperty";
+		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 }

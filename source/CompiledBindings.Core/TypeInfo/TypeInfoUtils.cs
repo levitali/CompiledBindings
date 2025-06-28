@@ -6,6 +6,7 @@ public static class TypeInfoUtils
 	private static Dictionary<string, TypeDefinition>? _allTypes;
 	private static readonly Dictionary<TypeReference, TypeDefinition> _resolveCache = new();
 	private static readonly Dictionary<TypeReference, TypeReference> _baseTypeCache = new();
+	private static LazyLoadCollection<ExtensionType>? _extensionTypes;
 
 	public static IList<AssemblyDefinition>? Assemblies => _assemblies;
 
@@ -60,6 +61,23 @@ public static class TypeInfoUtils
 	{
 		return _assemblies.SelectMany(a => a.MainModule.GetAllTypes());
 	}
+
+	public static IEnumerable<ExtensionType> ExtensionTypes => (_extensionTypes ??= new(
+		EnumerateAllTypes()
+			.Where(t => t.IsStatic())
+			.SelectMany(t => t.NestedTypes)
+			.Where(t => t.IsSealed)
+			.Select(t => (t, m: t.Methods.FirstOrDefault(m =>
+				m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute") &&
+				m.IsStatic && m.IsPrivate && !m.IsGetter && !m.IsSetter)))
+			.Where(e => e.m != null)
+			.Select(e => new ExtensionType
+			{
+				TypeDefinition = e.t,
+				ExtendedType = e.m.Parameters[0].ParameterType
+			})
+		))
+		.Enumerate();
 
 	public static TypeDefinition? ResolveEx(this TypeReference type)
 	{
@@ -334,3 +352,8 @@ public static class TypeInfoUtils
 	}
 }
 
+public class ExtensionType
+{
+	public required TypeDefinition TypeDefinition { get; init; }
+	public required TypeReference ExtendedType { get; init; }
+}
