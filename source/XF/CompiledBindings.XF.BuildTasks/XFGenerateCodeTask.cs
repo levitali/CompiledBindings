@@ -265,7 +265,9 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 	public string GenerateCompiledBindingsHelper()
 	{
 		return
-$@"namespace CompiledBindings.{_platformConstants.FrameworkId}
+$@"{GenerateFileHeader()}
+
+namespace CompiledBindings.{_platformConstants.FrameworkId}
 {{
 	internal class CompiledBindingsHelper
 	{{

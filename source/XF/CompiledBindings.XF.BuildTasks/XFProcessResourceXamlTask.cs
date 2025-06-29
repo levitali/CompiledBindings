@@ -59,10 +59,6 @@ public class XFProcessResourceXamlTask : Task
 
 			using var assembly = AssemblyDefinition.ReadAssembly(Assembly, prm);
 
-			var helperTypeAssembly = TypeInfoUtils.Assemblies
-				.FirstOrDefault(a => a.MainModule.GetAllTypes().Any(t => t.FullName == $"CompiledBindings.{_platformConstants.FrameworkId}.CompiledBindingsHelper"))?
-				.Name.Name;
-
 			var assemblyTypes = assembly.MainModule.Types.ToDictionary(_ => _.FullName);
 
 			var xamlDomParser = new XFXamlDomParser(_platformConstants);
@@ -85,7 +81,7 @@ public class XFProcessResourceXamlTask : Task
 						xaml = streamReader.ReadToEnd();
 					}
 
-					var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, _platformConstants, assemblyTypes, helperTypeAssembly);
+					var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, _platformConstants, assemblyTypes);
 					if (newXaml != null)
 					{
 						var newResource = new EmbeddedResource(resource.Name, resource.Attributes, Encoding.UTF8.GetBytes(newXaml));
@@ -130,7 +126,7 @@ public class XFProcessResourceXamlTask : Task
 
 public static class XFXamlProcessor
 {
-	public static string? ProcessXaml(string xaml, XFXamlDomParser xamlDomParser, PlatformConstants platformConstants, Dictionary<string, TypeDefinition> assemblyTypes, string? helperTypeAssembly)
+	public static string? ProcessXaml(string xaml, XFXamlDomParser xamlDomParser, PlatformConstants platformConstants, Dictionary<string, TypeDefinition> assemblyTypes)
 	{
 		XDocument xdoc;
 		try
@@ -218,8 +214,8 @@ public static class XFXamlProcessor
 
 						if (compiledBindingsNsPrefix == null)
 						{
-							compiledBindingsNsPrefix = searchNsPrefix($"CompiledBindings.{platformConstants.FrameworkId}", helperTypeAssembly);
-							classNsPrefix = searchNsPrefix(classNs, null);
+							compiledBindingsNsPrefix = searchNsPrefix($"CompiledBindings.{platformConstants.FrameworkId}");
+							classNsPrefix = searchNsPrefix(classNs);
 						}
 
 						var propInitializers = string.Join(", ", dataTemplateType.Properties.Select(p => $"{p.Name}={{StaticResource {p.Name}}}"));
@@ -255,7 +251,7 @@ public static class XFXamlProcessor
 
 								if (classNsPrefix == null)
 								{
-									classNsPrefix = searchNsPrefix(classNs, null);
+									classNsPrefix = searchNsPrefix(classNs);
 								}
 
 								int nameEnd = textLine.Text.IndexOf('=', startPos);
@@ -314,7 +310,7 @@ public static class XFXamlProcessor
 
 				return string.Join("\n", lines.Select(l => l.Text));
 				
-				string searchNsPrefix(string clrNs, string? assembly)
+				string searchNsPrefix(string clrNs)
 				{
 					var searchedUsingNs = "using:" + clrNs;
 					var searchedClrNs = "clr-namespace:" + clrNs;
@@ -337,10 +333,6 @@ public static class XFXamlProcessor
 							a.Name.Namespace == XNamespace.Xmlns && a.Name.LocalName == prefix));
 
 						var ns = $"clr-namespace:{clrNs}";
-						if (assembly != null)
-						{
-							ns += ";assembly=" + assembly;
-						}
 						insertAtEnd(xdoc.Root, $" xmlns:{prefix}=\"{ns}\"");
 					}
 
