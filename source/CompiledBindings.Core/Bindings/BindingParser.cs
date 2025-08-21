@@ -350,25 +350,25 @@ public static class BindingParser
 		// Set dependencies between notify sources
 		foreach (var notifySource in notifySources.OrderByDescending(d => getSourceExpr(d.Expression).Key))
 		{
-			foreach (var prop in notifySource.Properties)
+			foreach (var notifyProp in notifySource.Properties)
 			{
-				var expr = prop.Expression.Key;
-				foreach (var notifPropData2 in notifySources
+				var expr = notifyProp.Expression.Key;
+				foreach (var notifySource2 in notifySources
 					.Where(g => g != notifySource && getSourceExpr(g.Expression).EnumerateTree().Any(e => e.Key.Equals(expr))))
 				{
 					// Skip the notification source, if it's already added to some child
-					if (!prop.DependentNotifySources
+					if (!notifyProp.DependentNotifySources
 						.SelectTree(p => p.Properties.SelectMany(p2 => p2.DependentNotifySources))
-						.Any(d => d.Index == notifPropData2.Index))
+						.Any(d => d.Index == notifySource2.Index))
 					{
-						var notifPropData2Clone = notifPropData2.Clone();
-						prop.DependentNotifySources.Add(notifPropData2Clone);
+						var notifPropData2Clone = notifySource2.Clone();
+						notifyProp.DependentNotifySources.Add(notifPropData2Clone);
 					}
 
 					// The bindings are set in the "child" UpdateXX_XX method.
-					foreach (var b in notifPropData2.Properties.SelectMany(p => p.Bindings))
+					foreach (var b in notifySource2.Properties.SelectMany(p => p.Bindings))
 					{
-						prop.SetBindings.Remove(b);
+						notifyProp.SetBindings.Remove(b);
 					}
 				}
 			}
@@ -710,6 +710,21 @@ public static class BindingParser
 						updateNotifySources.RemoveAt(index);
 					}
 				}
+			}
+		}
+
+		// Get notify sources in the bindings set directly in this Update method,
+		// for which event handlers must be set.
+		var notifySources4 = notifySources ?? [notifySource!];
+		foreach (var expr in bindings
+			.SelectMany(b => b.SourceExpression!.EnumerateTree())
+			.OfType<INotifiableExpression>())
+		{
+			var expr2 = expr.Expression;
+			var notifySource2 = notifySources4.SelectTree(_ => _.Properties.SelectMany(_ => _.DependentNotifySources)).FirstOrDefault(s => s.SourceExpression == expr2);
+			if (notifySource2 != null && notifySource2 != notifySource && !notifySources1.Any(s => s.Index == notifySource2.Index))
+			{
+				notifySources1.Add(notifySource2.Clone());
 			}
 		}
 

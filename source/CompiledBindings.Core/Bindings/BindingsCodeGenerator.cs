@@ -770,16 +770,16 @@ $@"				var dataRoot = {(isDiffDataRoot ? "_dataRoot" : "_targetRoot")};");
 $@"				Update{notifSource.Index}({notifSource.SourceExpression});");
 			}
 
-			foreach (var propUpdate in updateMethod.UpdateNotifyProperties)
+			foreach (var notifProp in updateMethod.UpdateNotifyProperties)
 			{
 				output.AppendLine(
-$@"				Update{propUpdate.Parent.Index}_{propUpdate.PropertyCodeName}({propUpdate.SourceExpression});");
+$@"				Update{notifProp.Parent.Index}_{notifProp.PropertyCodeName}({notifProp.SourceExpression});");
 			}
 
-			foreach (var group in updateMethod.SetEventHandlers.Where(g => g != rootNotifySource))
+			foreach (var notifSource in updateMethod.SetEventHandlers.Where(g => g != rootNotifySource))
 			{
 				output.AppendLine(
-$@"				_bindingsTrackings.SetPropertyChangedEventHandler{group.Index}({group.SourceExpression});");
+$@"				_bindingsTrackings.SetPropertyChangedEventHandler{notifSource.Index}({notifSource.SourceExpression});");
 			}
 		}
 

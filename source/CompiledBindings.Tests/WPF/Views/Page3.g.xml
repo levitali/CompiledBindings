@@ -1,9 +1,9 @@
-﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:WPFTest" xmlns:m="http://compiledbindings.com" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mx="http://compiledbindings.com/x" xmlns:viewModels="using:WPFTest.ViewModels" xmlns:views="clr-namespace:WPFTest.Views" mc:Ignorable="b mx" x:Class="WPFTest.Views.Page2" mx:DataType="viewModels:Page1ViewModel">
+﻿<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:WPFTest" xmlns:m="http://compiledbindings.com" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mx="http://compiledbindings.com/x" xmlns:viewModels="using:WPFTest.ViewModels" xmlns:views="clr-namespace:WPFTest.Views" mc:Ignorable="b mx" x:Class="WPFTest.Views.Page3" mx:DataType="viewModels:Page1ViewModel">
   <Grid>
     <DataGrid x:Name="dataGrid1">
       <DataGrid.Columns mx:DefaultBindMode="OneTime" mx:UseItemType="true">
-        <DataGridTextColumn Binding="{views:Page2_dataGridTextColumn1_Binding}" Header="Col1" x:Name="dataGridTextColumn1" />
-        <DataGridTextColumn Header="Col2" Binding="{views:Page2_dataGridTextColumn2_Binding}" x:Name="dataGridTextColumn2" />
+        <DataGridTextColumn Binding="{views:Page3_dataGridTextColumn1_Binding}" Header="Col1" x:Name="dataGridTextColumn1" />
+        <DataGridTextColumn Header="Col2" Binding="{views:Page3_dataGridTextColumn2_Binding}" x:Name="dataGridTextColumn2" />
       </DataGrid.Columns>
     </DataGrid>
     <TextBlock x:Name="textBlock1" />

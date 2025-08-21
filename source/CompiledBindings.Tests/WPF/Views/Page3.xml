@@ -8,7 +8,7 @@
     xmlns:viewModels="using:WPFTest.ViewModels"
     xmlns:views="clr-namespace:WPFTest.Views"
     mc:Ignorable="b mx"
-    x:Class="WPFTest.Views.Page2"
+    x:Class="WPFTest.Views.Page3"
     mx:DataType="viewModels:Page1ViewModel">
 
     <Grid>

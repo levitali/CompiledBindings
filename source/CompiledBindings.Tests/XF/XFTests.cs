@@ -67,7 +67,7 @@ public class XFTests : IDisposable
 
 		var xaml = File.ReadAllText(xamlFile);
 
-		var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, new PlatformConstants(), assemblyTypes, null);
+		var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, new PlatformConstants(), assemblyTypes);
 		Assert.NotNull(newXaml);
 
 		var processedFile = Path.Combine(dir, "XF", "Views", $"{pageName}.g.xml");

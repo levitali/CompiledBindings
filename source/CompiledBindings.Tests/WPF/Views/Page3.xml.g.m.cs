@@ -13,7 +13,7 @@ namespace WPFTest.Views
 {
 
 	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
-	partial class Page2
+	partial class Page3
 	{
 		private bool _generatedCodeInitialized;
 
@@ -41,19 +41,19 @@ namespace WPFTest.Views
 			}
 		}
 
-		Page2_Bindings_this Bindings_this = new Page2_Bindings_this();
+		Page3_Bindings_this Bindings_this = new Page3_Bindings_this();
 
-		class Page2_Bindings_this
+		class Page3_Bindings_this
 		{
-			Page2 _targetRoot;
+			Page3 _targetRoot;
 			global::WPFTest.ViewModels.Page1ViewModel _dataRoot;
-			Page2_BindingsTrackings_this _bindingsTrackings;
+			Page3_BindingsTrackings_this _bindingsTrackings;
 
-			public void Initialize(Page2 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
+			public void Initialize(Page3 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
 				_targetRoot = targetRoot;
 				_dataRoot = dataRoot;
-				_bindingsTrackings = new Page2_BindingsTrackings_this(this);
+				_bindingsTrackings = new Page3_BindingsTrackings_this(this);
 
 				Update();
 
@@ -126,13 +126,13 @@ namespace WPFTest.Views
 #line default
 			}
 
-			class Page2_BindingsTrackings_this
+			class Page3_BindingsTrackings_this
 			{
 				global::System.WeakReference _bindingsWeakRef;
 				global::System.ComponentModel.INotifyPropertyChanged _propertyChangeSource0;
 				global::System.Collections.Specialized.INotifyCollectionChanged _propertyChangeSource1;
 
-				public Page2_BindingsTrackings_this(Page2_Bindings_this bindings)
+				public Page3_BindingsTrackings_this(Page3_Bindings_this bindings)
 				{
 					_bindingsWeakRef = new global::System.WeakReference(bindings);
 				}
@@ -155,7 +155,7 @@ namespace WPFTest.Views
 
 				private void OnPropertyChanged0(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page2_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -179,7 +179,7 @@ namespace WPFTest.Views
 
 				private void OnCollectionChanged1(object sender, global::System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 				{
-					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page2_Bindings_this>(ref _bindingsWeakRef, Cleanup);
+					var bindings = global::CompiledBindings.WPF.CompiledBindingsHelper.TryGetBindings<Page3_Bindings_this>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{
 						return;
@@ -200,7 +200,7 @@ namespace WPFTest.Views
 		}
 	}
 
-	class Page2_dataGridTextColumn1_Binding : global::System.Windows.Markup.MarkupExtension, global::System.Windows.Data.IValueConverter
+	class Page3_dataGridTextColumn1_Binding : global::System.Windows.Markup.MarkupExtension, global::System.Windows.Data.IValueConverter
 	{
 		public override object ProvideValue(global::System.IServiceProvider serviceProvider)
 		{
@@ -226,7 +226,7 @@ namespace WPFTest.Views
 		}
 	}
 
-	class Page2_dataGridTextColumn2_Binding : global::System.Windows.Markup.MarkupExtension, global::System.Windows.Data.IValueConverter
+	class Page3_dataGridTextColumn2_Binding : global::System.Windows.Markup.MarkupExtension, global::System.Windows.Data.IValueConverter
 	{
 		public override object ProvideValue(global::System.IServiceProvider serviceProvider)
 		{

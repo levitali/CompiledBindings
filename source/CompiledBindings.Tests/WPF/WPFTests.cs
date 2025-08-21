@@ -38,6 +38,12 @@ public class WPFTests : IDisposable
 		TestPage("Page3");
 	}
 
+	[Test]
+	public void Page4()
+	{
+		TestPage("Page4");
+	}
+
 	private void TestPage(string pageName)
 	{
 		var dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;

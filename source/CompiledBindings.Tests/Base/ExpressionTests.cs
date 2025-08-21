@@ -324,8 +324,8 @@ public class ExpressionTests : IDisposable
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
-		expression = "ExtensionStaticProperty";
-		expectedCode = "dataRoot.ExtensionStaticProperty";
+		expression = "local:Class1.ExtensionStaticProperty";
+		expectedCode = "CompiledBindings.Tests.Class1.ExtensionStaticProperty";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
