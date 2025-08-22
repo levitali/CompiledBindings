@@ -42,6 +42,12 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 	[Required]
 	public required string IntermediateOutputPath { get; init; }
 
+	[Required]
+	public required string RootNamespace { get; init; }
+
+	[Required]
+	public required string AssemblyName { get; init; }
+
 	public required ITaskItem ApplicationDefinition { get; init; }
 
 	public string? Nullable { get; init; }
@@ -80,8 +86,10 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Controls.TextBlock"] = ["Text"];
 			TypeInfo.NotNullableProperties[$"{_platformConstants.BaseClrNamespace}.UI.Xaml.Documents.Run"] = ["Text"];
 
+			var compiledBindingsHelperNs = GenerateUtils.GenerateCompiledBindingsHelperNs(RootNamespace, AssemblyName, _platformConstants.FrameworkId);
+
 			var xamlDomParser = new WinUIXamlDomParser(_platformConstants);
-			var codeGenerator = new WinUICodeGenerator(_platformConstants, LangVersion, MSBuildVersion);
+			var codeGenerator = new WinUICodeGenerator(_platformConstants, compiledBindingsHelperNs, LangVersion, MSBuildVersion);
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
@@ -164,7 +172,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 
 							if (generateDataTemplates)
 							{
-								var compiledBindingsNs = $"using:CompiledBindings.{_platformConstants.FrameworkId}";
+								var compiledBindingsNs = $"using:{compiledBindingsHelperNs}";
 								var localNs = "using:" + parseResult.TargetType!.Reference.Namespace;
 
 								EnsureNamespaceDeclared(compiledBindingsNs);
@@ -321,20 +329,22 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 	public class WinUICodeGenerator : SimpleXamlDomCodeGenerator
 	{
 		private readonly PlatformConstants _platformConstants;
+		private readonly string _compiledBindingsHelperNs;
 
-		public WinUICodeGenerator(PlatformConstants platformConstants, string langVersion, string msbuildVersion)
-			: base(new WinUIBindingsCodeGenerator(platformConstants, langVersion, msbuildVersion),
+		public WinUICodeGenerator(PlatformConstants platformConstants, string compiledBindingsHelperNs, string langVersion, string msbuildVersion)
+			: base(new WinUIBindingsCodeGenerator(platformConstants, compiledBindingsHelperNs, langVersion, msbuildVersion),
+				   compiledBindingsHelperNs,
 				   "Data",
 				   $"{platformConstants.BaseClrNamespace}.UI.Xaml.DataContextChangedEventArgs",
 				   $"{platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement",
 				   "(global::{0}){1}.FindName(\"{2}\")",
 				   true,
 				   false,
-				   platformConstants.FrameworkId,
 				   langVersion,
 				   msbuildVersion)
 		{
 			_platformConstants = platformConstants;
+			_compiledBindingsHelperNs = compiledBindingsHelperNs;
 		}
 
 		public string GenerateCompiledBindingsHelper()
@@ -342,7 +352,7 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 			return
 $@"{GenerateFileHeader()}
 
-namespace CompiledBindings.{_platformConstants.FrameworkId}
+namespace {_compiledBindingsHelperNs}
 {{
 	internal class CompiledBindingsHelper
 	{{
@@ -374,7 +384,7 @@ namespace CompiledBindings.{_platformConstants.FrameworkId}
 		}}
 	}}
 
-	public interface IGeneratedDataTemplate
+	internal interface IGeneratedDataTemplate
 	{{
 		void Initialize(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
 		void Cleanup(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
@@ -392,7 +402,8 @@ namespace CompiledBindings.{_platformConstants.FrameworkId}
 	{
 		private readonly PlatformConstants _platformConstants;
 
-		public WinUIBindingsCodeGenerator(PlatformConstants platformConstants, string langVersion, string msbuildVersion) : base(platformConstants.FrameworkId, langVersion, msbuildVersion)
+		public WinUIBindingsCodeGenerator(PlatformConstants platformConstants, string compiledBindingsHelperNs, string langVersion, string msbuildVersion) 
+			: base(compiledBindingsHelperNs, langVersion, msbuildVersion)
 		{
 			_platformConstants = platformConstants;
 		}

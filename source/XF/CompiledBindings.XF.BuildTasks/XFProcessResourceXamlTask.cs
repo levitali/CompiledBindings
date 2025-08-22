@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Mono.Cecil;
-using Mono.Cecil.Rocks;
 
 namespace CompiledBindings;
 
@@ -34,6 +34,12 @@ public class XFProcessResourceXamlTask : Task
 
 	[Required]
 	public required string Assembly { get; init; }
+
+	[Required]
+	public required string RootNamespace { get; init; }
+
+	[Required]
+	public required string AssemblyName { get; init; }
 
 	public bool AttachDebugger { get; set; }
 
@@ -61,6 +67,8 @@ public class XFProcessResourceXamlTask : Task
 
 			var assemblyTypes = assembly.MainModule.Types.ToDictionary(_ => _.FullName);
 
+			var compiledBindingsHelperNs = GenerateUtils.GenerateCompiledBindingsHelperNs(RootNamespace, AssemblyName, _platformConstants.FrameworkId);
+
 			var xamlDomParser = new XFXamlDomParser(_platformConstants);
 
 			bool assemblyModified = false;
@@ -81,7 +89,7 @@ public class XFProcessResourceXamlTask : Task
 						xaml = streamReader.ReadToEnd();
 					}
 
-					var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, _platformConstants, assemblyTypes);
+					var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, _platformConstants, compiledBindingsHelperNs, assemblyTypes);
 					if (newXaml != null)
 					{
 						var newResource = new EmbeddedResource(resource.Name, resource.Attributes, Encoding.UTF8.GetBytes(newXaml));
@@ -126,7 +134,7 @@ public class XFProcessResourceXamlTask : Task
 
 public static class XFXamlProcessor
 {
-	public static string? ProcessXaml(string xaml, XFXamlDomParser xamlDomParser, PlatformConstants platformConstants, Dictionary<string, TypeDefinition> assemblyTypes)
+	public static string? ProcessXaml(string xaml, XFXamlDomParser xamlDomParser, PlatformConstants platformConstants, string compiledBindingsHelperNs, Dictionary<string, TypeDefinition> assemblyTypes)
 	{
 		XDocument xdoc;
 		try
@@ -214,7 +222,7 @@ public static class XFXamlProcessor
 
 						if (compiledBindingsNsPrefix == null)
 						{
-							compiledBindingsNsPrefix = searchNsPrefix($"CompiledBindings.{platformConstants.FrameworkId}");
+							compiledBindingsNsPrefix = searchNsPrefix(compiledBindingsHelperNs);
 							classNsPrefix = searchNsPrefix(classNs);
 						}
 

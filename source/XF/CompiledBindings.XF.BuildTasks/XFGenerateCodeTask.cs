@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -45,6 +46,12 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	public required string IntermediateOutputPath { get; init; }
 
 	[Required]
+	public required string RootNamespace { get; init; }
+
+	[Required]
+	public required string AssemblyName { get; init; }
+
+	[Required]
 	public required ITaskItem[] XamlFiles { get; init; }
 
 	[Output]
@@ -70,8 +77,10 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 			TypeInfoUtils.LoadReferences(ReferenceAssemblies.Select(a => a.ItemSpec));
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
+			var compiledBindingsHelperNs = GenerateUtils.GenerateCompiledBindingsHelperNs(RootNamespace, AssemblyName, _platformConstants.FrameworkId);
+
 			var xamlDomParser = new XFXamlDomParser(_platformConstants);
-			var codeGenerator = new XFCodeGenerator(LangVersion, MSBuildVersion, _platformConstants);
+			var codeGenerator = new XFCodeGenerator(compiledBindingsHelperNs, LangVersion, MSBuildVersion, _platformConstants);
 
 			var generatedCodeFiles = new List<TaskItem>();
 			bool result = true;
@@ -246,20 +255,22 @@ public class XFXamlDomParser : SimpleXamlDomParser
 public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 {
 	private readonly PlatformConstants _platformConstants;
+	private readonly string _compiledBindingsHelperNs;
 
-	public XFCodeGenerator(string langVersion, string msbuildVersion, PlatformConstants platformConstants)
-		: base(new BindingsCodeGenerator(platformConstants.FrameworkId, langVersion, msbuildVersion),
+	public XFCodeGenerator(string compiledBindingsHelperNs, string langVersion, string msbuildVersion, PlatformConstants platformConstants)
+		: base(new BindingsCodeGenerator(compiledBindingsHelperNs, langVersion, msbuildVersion),
+			   compiledBindingsHelperNs,
 			   "Binding",
 			   "System.EventArgs",
 			   $"{platformConstants.BaseClrNamespace}.Element",
 			   "global::" + platformConstants.BaseClrNamespace + ".NameScopeExtensions.FindByName<global::{0}>({1}, \"{2}\")",
 			   true,
 			   true,
-			   platformConstants.FrameworkId,
 			   langVersion,
 			   msbuildVersion)
 	{
 		_platformConstants = platformConstants;
+		_compiledBindingsHelperNs = compiledBindingsHelperNs;
 	}
 
 	public string GenerateCompiledBindingsHelper()
@@ -267,7 +278,7 @@ public class XFCodeGenerator : SimpleXamlDomCodeGenerator
 		return
 $@"{GenerateFileHeader()}
 
-namespace CompiledBindings.{_platformConstants.FrameworkId}
+namespace {_compiledBindingsHelperNs}
 {{
 	internal class CompiledBindingsHelper
 	{{
@@ -299,7 +310,7 @@ namespace CompiledBindings.{_platformConstants.FrameworkId}
 		}}
 	}}
 
-	public interface IGeneratedDataTemplate
+	internal interface IGeneratedDataTemplate
 	{{
 		void Initialize(global::{_platformConstants.BaseClrNamespace}.Element rootElement);
 		void Cleanup(global::{_platformConstants.BaseClrNamespace}.Element rootElement);

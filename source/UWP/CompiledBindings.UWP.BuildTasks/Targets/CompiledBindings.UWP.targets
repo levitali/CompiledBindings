@@ -87,7 +87,9 @@
                          IntermediateOutputPath="$(IntermediateOutputPath)"
                          LangVersion="$(LangVersion)"
                          MSBuildVersion="$(MSBuildVersion)"
-											   Nullable="$(Nullable)">
+											   Nullable="$(Nullable)"
+											   AssemblyName="$(AssemblyName)"
+											   RootNamespace="$(RootNamespace)">
 			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
 			<Output ItemName="NewPages" TaskParameter="NewPages" />

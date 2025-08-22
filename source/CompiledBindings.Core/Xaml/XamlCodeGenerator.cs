@@ -2,7 +2,7 @@
 
 public class XamlCodeGenerator
 {
-	public XamlCodeGenerator(string frameworkId, string langVersion, string msbuildVersion)
+	public XamlCodeGenerator(string langVersion, string msbuildVersion)
 	{
 		var msbuildVersionParts = msbuildVersion.Split('.');
 		if (!int.TryParse(msbuildVersionParts[0], out var buildVersionNum))
@@ -22,10 +22,7 @@ public class XamlCodeGenerator
 		}
 		LangVersion = langVersionNum;
 		LangNullables = LangVersion >= 8;
-		FrameworkId = frameworkId;
 	}
-
-	public string FrameworkId { get; }
 
 	public float LangVersion { get; }
 

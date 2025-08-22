@@ -86,7 +86,9 @@
                         IntermediateOutputPath="$(IntermediateOutputPath)"
                         ProjectPath="$(MSBuildProjectDirectory)"
                         LangVersion="$(LangVersion)"
-                        MSBuildVersion="$(MSBuildVersion)"
+											  MSBuildVersion="$(MSBuildVersion)"
+											  AssemblyName="$(AssemblyName)"
+											  RootNamespace="$(RootNamespace)"
 												Nullable="$(Nullable)">
 			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
@@ -96,7 +98,9 @@
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
 		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)"
                                Assembly="$(IntermediateOutputPath)$(TargetFileName)"
-															 DebugType="$(DebugType)" />
+															 DebugType="$(DebugType)"
+														   AssemblyName="$(AssemblyName)"
+											         RootNamespace="$(RootNamespace)"/>
 	</Target>
 
 	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">

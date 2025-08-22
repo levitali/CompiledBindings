@@ -7,7 +7,6 @@ using System.Threading;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Mono.Cecil.Rocks;
 
 namespace CompiledBindings;
 
@@ -32,6 +31,12 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 	[Required]
 	public required string IntermediateOutputPath { get; init; }
+
+	[Required]
+	public required string RootNamespace { get; init; }
+
+	[Required]
+	public required string AssemblyName { get; init; }
 
 	public required ITaskItem ApplicationDefinition { get; init; }
 
@@ -68,8 +73,10 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 
 			var localAssembly = TypeInfoUtils.LoadLocalAssembly(LocalAssembly);
 
+			var compiledBindingsHelperNs = GenerateUtils.GenerateCompiledBindingsHelperNs(RootNamespace, AssemblyName, "WPF");
+
 			var xamlDomParser = new WpfXamlDomParser();
-			var codeGenerator = new WpfCodeGenerator(LangVersion, MSBuildVersion);
+			var codeGenerator = new WpfCodeGenerator(compiledBindingsHelperNs, LangVersion, MSBuildVersion);
 
 			var generatedCodeFiles = new List<ITaskItem>();
 			var newPages = new List<ITaskItem>();
@@ -144,7 +151,7 @@ public class WPFGenerateCodeTask : Task, ICancelableTask
 							File.WriteAllText(sourceCodeTargetPath, code);
 							generatedCodeFiles.Add(new TaskItem(sourceCodeTargetPath));
 
-							WpfXamlProcessor.ProcessXaml(xdoc, parseResult);
+							WpfXamlProcessor.ProcessXaml(xdoc, parseResult, compiledBindingsHelperNs);
 							xdoc.Save(xamlFile);
 
 							newXaml = new TaskItem(xamlFile);
@@ -276,18 +283,21 @@ public class WpfXamlDomParser : SimpleXamlDomParser
 
 public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 {
-	public WpfCodeGenerator(string langVersion, string msbuildVersion)
-		: base(new WpfBindingsCodeGenerator(langVersion, msbuildVersion),
+	private readonly string _compiledBindingsHelperNs;
+
+	public WpfCodeGenerator(string compiledBindingsHelperNs, string langVersion, string msbuildVersion)
+		: base(new WpfBindingsCodeGenerator(compiledBindingsHelperNs, langVersion, msbuildVersion),
+			   compiledBindingsHelperNs,
 			   "Data",
 			   "System.Windows.DependencyPropertyChangedEventArgs",
 			   "System.Windows.FrameworkElement",
 			   "(global::{0}){1}.FindName(\"{2}\")",
 			   false,
 			   false,
-			   "WPF",
 			   langVersion,
 			   msbuildVersion)
 	{
+		_compiledBindingsHelperNs = compiledBindingsHelperNs;
 	}
 
 	public string GenerateCompiledBindingsHelper()
@@ -295,7 +305,7 @@ public class WpfCodeGenerator : SimpleXamlDomCodeGenerator
 		return
 $@"{GenerateFileHeader()}
 
-namespace CompiledBindings.WPF
+namespace {_compiledBindingsHelperNs}
 {{
 	internal class CompiledBindingsHelper
 	{{
@@ -327,7 +337,7 @@ namespace CompiledBindings.WPF
 		}}
 	}}
 
-	public interface IGeneratedDataTemplate
+	internal interface IGeneratedDataTemplate
 	{{
 		void Initialize(global::System.Windows.FrameworkElement rootElement);
 		void Cleanup(global::System.Windows.FrameworkElement rootElement);
@@ -405,8 +415,8 @@ $@"	}}");
 
 public class WpfBindingsCodeGenerator : BindingsCodeGenerator
 {
-	public WpfBindingsCodeGenerator(string langVersion, string msbuildVersion)
-		: base("WPF", langVersion, msbuildVersion)
+	public WpfBindingsCodeGenerator(string compiledBindingsHelperNs, string langVersion, string msbuildVersion)
+		: base(compiledBindingsHelperNs, langVersion, msbuildVersion)
 	{
 	}
 
@@ -461,7 +471,7 @@ $@"						global::System.ComponentModel.DependencyPropertyDescriptor
 
 public static class WpfXamlProcessor
 {
-	public static void ProcessXaml(XDocument xdoc, SimpleXamlDom parseResult)
+	public static void ProcessXaml(XDocument xdoc, SimpleXamlDom parseResult, string compiledBindingsHelperNs)
 	{
 		var localNs = "clr-namespace:" + parseResult.TargetType!.Reference.Namespace;
 		string? localPrefix = null;
@@ -470,7 +480,7 @@ public static class WpfXamlProcessor
 
 		if (generateDataTemplates)
 		{
-			var compiledBindingsNs = "clr-namespace:CompiledBindings.WPF";
+			var compiledBindingsNs = $"clr-namespace:{compiledBindingsHelperNs}";
 
 			ensureNamespaceDeclared(compiledBindingsNs);
 			localPrefix = ensureNamespaceDeclared(localNs);

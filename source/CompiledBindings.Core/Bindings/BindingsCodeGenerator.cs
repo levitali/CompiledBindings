@@ -86,8 +86,11 @@ public class BindingsCodeGenerator : XamlCodeGenerator
 			return true;
 		}";
 
-	public BindingsCodeGenerator(string frameworkId, string langVersion, string msbuildVersion) : base(frameworkId, langVersion, msbuildVersion)
+	private readonly string _compileBindingsHelderNs;
+
+	public BindingsCodeGenerator(string compileBindingsHelderNs, string langVersion, string msbuildVersion) : base(langVersion, msbuildVersion)
 	{
+		_compileBindingsHelderNs = compileBindingsHelderNs;
 	}
 
 	public void GenerateBindingsClass(StringBuilder output, BindingsClass bindingsClass, string? targetClassName, string? nameSuffix = null)
@@ -511,7 +514,7 @@ $@"				public void SetPropertyChangedEventHandler{notifySource.Index}(global::{n
 						handler = $"OnCollectionChanged{notifySource.Index}";
 					}
 					output.AppendLine(
-$@"					global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.{method}(ref {cacheVar}, value, {handler});");
+$@"					global::{_compileBindingsHelderNs}.CompiledBindingsHelper.{method}(ref {cacheVar}, value, {handler});");
 				}
 				else
 				{
@@ -599,7 +602,7 @@ $@"
 				private void OnPropertyChanged{notifySource.Index}(object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 				{{");
 					output.AppendLine(
-$@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
+$@"					var bindings = global::{_compileBindingsHelderNs}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;
@@ -652,7 +655,7 @@ $@"
 				private void OnCollectionChanged{notifySource.Index}(object sender, global::System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 				{{");
 					output.AppendLine(
-$@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
+$@"					var bindings = global::{_compileBindingsHelderNs}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;
@@ -666,7 +669,7 @@ $@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHe
 					{
 						var index = ((ElementAccessExpression)prop.Expression).Parameters[0].CSharpCode;
 						output.AppendLine(
-$@"					{@else}if (global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, {index}))
+$@"					{@else}if (global::{_compileBindingsHelderNs}.CompiledBindingsHelper.IsCollectionChangedAtIndex(e, {index}))
 					{{
 						bindings.Update{notifySource.Index}_{prop.PropertyCodeName}(typedSender);
 					}}");
@@ -690,7 +693,7 @@ $@"				}}");
 					output.AppendLine(
 $@"				{{");
 					output.AppendLine(
-$@"					var bindings = global::CompiledBindings.{FrameworkId}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
+$@"					var bindings = global::{_compileBindingsHelderNs}.CompiledBindingsHelper.TryGetBindings<{targetClassName}_Bindings{nameSuffix}>(ref _bindingsWeakRef, Cleanup);
 					if (bindings == null)
 					{{
 						return;

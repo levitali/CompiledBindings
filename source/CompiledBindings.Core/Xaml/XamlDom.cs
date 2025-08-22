@@ -3,7 +3,7 @@
 public class XamlDomBase
 {
 	public required TypeInfo TargetType { get; init; }
-	public required HashSet<string> IncludeNamespaces { get; init; }
+	public required IList<string> IncludeNamespaces { get; init; }
 }
 
 public class XamlObject

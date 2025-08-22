@@ -83,18 +83,26 @@
 		<CreateItem Include="@(MauiXaml)" Condition="'%(Extension)' == '.xaml'">
 			<Output TaskParameter="Include" ItemName="XamlFiles" />
 		</CreateItem>
-		<MauiGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" ProjectPath="$(MSBuildProjectDirectory)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)" AttachDebugger="false">
+		<MauiGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" ProjectPath="$(MSBuildProjectDirectory)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)"
+		                      AssemblyName="$(AssemblyName)"
+												  RootNamespace="$(RootNamespace)"
+		                      AttachDebugger="false">
 			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
 		</MauiGenerateCodeTask>
 	</Target>
 
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-		<MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AttachDebugger="true" />
+		<MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)"
+		                             Assembly="$(IntermediateOutputPath)$(TargetFileName)"
+		                             AssemblyName="$(AssemblyName)"
+												         RootNamespace="$(RootNamespace)"
+		                             DebugType="$(DebugType)"
+		                             AttachDebugger="true" />
 	</Target>
 
 	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
-		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" />
+		<ProcessAssemblyTask ReferenceAssemblies="@(ReferencePath)" TargetAssembly="@(IntermediateAssembly)" DebugType="$(DebugType)" />
 	</Target>
 
 </Project>

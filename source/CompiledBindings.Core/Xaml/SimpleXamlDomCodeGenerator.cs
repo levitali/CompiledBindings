@@ -7,27 +7,29 @@ public abstract class SimpleXamlDomCodeGenerator : XamlCodeGenerator
 	private readonly string _bindingConextArgs;
 	private readonly string _bindableObject;
 	private readonly string _findByNameFormat;
+	private readonly string _compiledBindingsHelperNs;
 	private readonly bool _generateVariableDeclarations;
 	private readonly bool _generateVariableInitialization;
 
 	public SimpleXamlDomCodeGenerator(
 		BindingsCodeGenerator bindingsCodeGenerator,
+		string compiledBindingsHelperNs,
 		string bindingContextStart,
 		string bindingConextArgs,
 		string bindableObject,
 		string findByNameFormat,
 		bool generateVariableDeclarations,
 		bool generateVariableInitialization,
-		string frameworkId,
 		string langVersion,
 		string msbuildVersion)
-		: base(frameworkId, langVersion, msbuildVersion)
+		: base(langVersion, msbuildVersion)
 	{
 		_bindingsCodeGenerator = bindingsCodeGenerator;
 		_bindingContextStart = bindingContextStart;
 		_bindingConextArgs = bindingConextArgs;
 		_bindableObject = bindableObject;
 		_findByNameFormat = findByNameFormat;
+		_compiledBindingsHelperNs = compiledBindingsHelperNs;
 		_generateVariableDeclarations = generateVariableDeclarations;
 		_generateVariableInitialization = generateVariableInitialization;
 	}
@@ -48,7 +50,7 @@ $@"namespace {parseResult.TargetType.Reference.Namespace}
 
 		if (parseResult.IncludeNamespaces.Count > 0)
 		{
-			foreach (string ns in parseResult.IncludeNamespaces.Where(n => n != parseResult.TargetType.Reference.Namespace))
+			foreach (string ns in parseResult.IncludeNamespaces)
 			{
 				output.AppendLine(
 $@"	using {ns};");
@@ -261,7 +263,7 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCShar
 		{
 			output.AppendLine(
 $@"
-	class {dataTemplateClassName} : global::CompiledBindings.{FrameworkId}.IGeneratedDataTemplate
+	class {dataTemplateClassName} : global::{_compiledBindingsHelperNs}.IGeneratedDataTemplate
 	{{");
 
 			GenerateVariablesDeclarations(output, parseResult, false);

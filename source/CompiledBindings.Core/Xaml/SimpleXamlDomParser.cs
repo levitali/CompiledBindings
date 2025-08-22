@@ -34,7 +34,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 		CurrentFile = file;
 		CurrentLineFile = lineFile;
 
-		UsedNames = new HashSet<string>(xdoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct());
+		UsedNames = [..xdoc.Descendants().Select(e => e.Attribute(xName)).Where(a => a != null).Select(a => a.Value).Distinct()];
 
 		TargetType = DataType = GetRootType(xdoc.Root);
 
@@ -43,11 +43,28 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 
 		var generationRoot = processRoot(xdoc.Root, null, TargetType);
 
+		var includeNamespaces2 = includeNamespaces
+			.Where(n => !TargetType.Reference.Namespace.StartsWith(n))
+			.OrderBy(n => n)
+			.ToList();
+		for (int i = 0; i < includeNamespaces2.Count; i++)
+		{
+			var ns = includeNamespaces2[i];
+			for (int j = i + 1; j < includeNamespaces2.Count; j++)
+			{
+				if (includeNamespaces2[j].StartsWith(ns))
+				{
+					includeNamespaces2.RemoveAt(j);
+					j--;
+				}
+			}
+		}
+
 		return errors ? null : new SimpleXamlDom
 		{
 			TargetType = TargetType,
 			GeneratedClass = generationRoot,
-			IncludeNamespaces = includeNamespaces,
+			IncludeNamespaces = includeNamespaces2,
 			DataTemplates = dataTemplates,
 		};
 

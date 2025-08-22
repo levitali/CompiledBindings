@@ -54,7 +54,7 @@ public class XFTests : IDisposable
 		var xamlDomParser = new XFXamlDomParser(new PlatformConstants());
 		var parseResult = xamlDomParser.Parse(xamlFile, Path.GetFileName(xamlFile), xdoc, null!);
 
-		var codeGenerator = new XFCodeGenerator("latest", "17.0.0", new PlatformConstants());
+		var codeGenerator = new XFCodeGenerator("CompiledBindings.XF", "latest", "17.0.0", new PlatformConstants());
 		var code = codeGenerator.GenerateCode(parseResult!);
 
 		var csharpFile = Path.Combine(dir, "XF", "Views", $"{pageName}.xml.g.m.cs");
@@ -67,7 +67,7 @@ public class XFTests : IDisposable
 
 		var xaml = File.ReadAllText(xamlFile);
 
-		var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, new PlatformConstants(), assemblyTypes);
+		var newXaml = XFXamlProcessor.ProcessXaml(xaml, xamlDomParser, new PlatformConstants(), "CompiledBindings.XF", assemblyTypes);
 		Assert.NotNull(newXaml);
 
 		var processedFile = Path.Combine(dir, "XF", "Views", $"{pageName}.g.xml");

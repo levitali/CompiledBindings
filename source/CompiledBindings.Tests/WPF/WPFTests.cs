@@ -53,7 +53,7 @@ public class WPFTests : IDisposable
 		var xamlDomParser = new WpfXamlDomParser();
 		var parseResult = xamlDomParser.Parse(xamlFile, Path.GetFileName(xamlFile), xdoc, null!);
 
-		var codeGenerator = new WpfCodeGenerator("latest", "17.0.0");
+		var codeGenerator = new WpfCodeGenerator("CompiledBindings.WPF", "latest", "17.0.0");
 		var code = codeGenerator.GenerateCode(parseResult!);
 
 		var csharpFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.xml.g.m.cs");
@@ -61,7 +61,7 @@ public class WPFTests : IDisposable
 
 		Assert.That(code.Equals(expectedCode));
 
-		WpfXamlProcessor.ProcessXaml(xdoc, parseResult!);
+		WpfXamlProcessor.ProcessXaml(xdoc, parseResult!, "CompiledBindings.WPF");
 
 		var gFile = Path.Combine(dir, "WPF", "Views", $"{pageName}.g.xml");
 		var expectedXaml = File.ReadAllText(gFile);

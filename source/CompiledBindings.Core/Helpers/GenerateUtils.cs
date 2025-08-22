@@ -12,4 +12,15 @@ $@"//---------------------------------------------------------------------------
 // </auto-generated>
 //------------------------------------------------------------------------------
 ";
+
+	public static string GenerateCompiledBindingsHelperNs(string rootNamespace, string assemblyName, string frameworkId)
+	{
+		var rgx = new Regex(@"[^a-zA-Z0-9]");
+		assemblyName = rgx.Replace(assemblyName, "_");
+		if (assemblyName.StartsWith("_"))
+		{
+			assemblyName = assemblyName.Substring(1);
+		}
+		return $"{rootNamespace}.{assemblyName}_{frameworkId}";
+	}
 }

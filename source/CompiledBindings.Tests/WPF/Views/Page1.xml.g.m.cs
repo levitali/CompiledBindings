@@ -11,7 +11,6 @@
 
 namespace WPFTest.Views
 {
-
 	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page1
 	{

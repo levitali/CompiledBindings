@@ -41,7 +41,7 @@
 		<CreateItem Include="@(EmbeddedResource)" Condition="'%(Extension)' == '.xaml'">
 			<Output TaskParameter="Include" ItemName="XamlFiles" />
 		</CreateItem>
-		<XFGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" ProjectPath="$(MSBuildProjectDirectory)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)" AttachDebugger="false">
+		<XFGenerateCodeTask AssemblyName="$(AssemblyName)" IntermediateOutputPath="$(IntermediateOutputPath)" LangVersion="$(LangVersion)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)" ProjectPath="$(MSBuildProjectDirectory)" ReferenceAssemblies="@(ReferencePath)" RootNamespace="$(RootNamespace)" XamlFiles="@(XamlFiles)" AttachDebugger="false">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 		</XFGenerateCodeTask>
 		<ItemGroup>
@@ -52,7 +52,7 @@
 	</Target>
 
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-		<XFProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" DebugType="$(DebugType)" AttachDebugger="false" />
+		<XFProcessResourceXamlTask Assembly="$(IntermediateOutputPath)$(TargetFileName)" AssemblyName="$(AssemblyName)" DebugType="$(DebugType)" ReferenceAssemblies="@(ReferencePath)" RootNamespace="$(RootNamespace)" AttachDebugger="false" />
 	</Target>
 
 	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">
