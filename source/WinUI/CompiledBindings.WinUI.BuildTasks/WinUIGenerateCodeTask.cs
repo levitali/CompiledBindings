@@ -349,12 +349,16 @@ public class WinUIGenerateCodeTask : Task, ICancelableTask
 
 		public string GenerateCompiledBindingsHelper()
 		{
+			//Note!
+			//The CompiledBindingsHelper class must be public!
+			//Internal class works in DEBUG build, but not in RELEASE
+
 			return
 $@"{GenerateFileHeader()}
 
 namespace {_compiledBindingsHelperNs}
 {{
-	internal class CompiledBindingsHelper
+	public class CompiledBindingsHelper
 	{{
 {BindingsCodeGenerator.CompiledBindingsHelperBaseCode}
 
@@ -384,7 +388,7 @@ namespace {_compiledBindingsHelperNs}
 		}}
 	}}
 
-	internal interface IGeneratedDataTemplate
+	public interface IGeneratedDataTemplate
 	{{
 		void Initialize(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
 		void Cleanup(global::{_platformConstants.BaseClrNamespace}.UI.Xaml.FrameworkElement rootElement);
