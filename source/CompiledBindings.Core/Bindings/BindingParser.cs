@@ -108,7 +108,7 @@ public static class BindingParser
 				}
 				else
 				{
-					IList<XamlNamespace> includeNamespaces2;
+					ICollection<string> includeNamespaces2;
 					try
 					{
 						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1);
@@ -117,7 +117,7 @@ public static class BindingParser
 					{
 						throw new ParseException(ex.Message, currentPos + ex.Position, ex.Length);
 					}
-					includeNamespaces.UnionWith(includeNamespaces2.Select(n => n.ClrNamespace!));
+					includeNamespaces.UnionWith(includeNamespaces2);
 				}
 
 				if (name == "Path")

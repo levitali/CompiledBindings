@@ -10,7 +10,7 @@ public class ExpressionParser
 	};
 	private readonly VariableExpression _root;
 	private readonly IList<XamlNamespace> _namespaces;
-	private readonly List<XamlNamespace> _includeNamespaces = [];
+	private readonly HashSet<string> _includeNamespaces = [];
 	private readonly string _text;
 	private int _textPos;
 	private readonly int _textLen;
@@ -31,7 +31,7 @@ public class ExpressionParser
 		NextToken();
 	}
 
-	public static Expression Parse(TypeInfo dataType, string member, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out IList<XamlNamespace> includeNamespaces, out int textPos)
+	public static Expression Parse(TypeInfo dataType, string member, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
@@ -1087,7 +1087,7 @@ Label_CreateMemberExpression:
 
 		if (ns != null)
 		{
-			_includeNamespaces.Add(ns);
+			_includeNamespaces.Add(ns.ClrNamespace!);
 		}
 
 		CorrectCharParameters(method, args, ns != null, errorPos);

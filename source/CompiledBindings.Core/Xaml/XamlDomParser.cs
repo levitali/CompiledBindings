@@ -340,7 +340,7 @@ public abstract class XamlDomParser
 			{
 				var staticNode = xamlNode.Children[0];
 				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces2, out var dummy);
-				includeNamespaces.UnionWith(includeNamespaces2.Select(ns => ns.ClrNamespace!));
+				includeNamespaces.UnionWith(includeNamespaces2);
 				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 				CorrectMethod(objProp, value.StaticValue.Type);
 				obj.GenerateMember = true;
