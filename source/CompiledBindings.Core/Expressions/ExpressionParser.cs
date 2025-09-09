@@ -10,6 +10,7 @@ public class ExpressionParser
 	};
 	private readonly VariableExpression _root;
 	private readonly IList<XamlNamespace> _namespaces;
+	private readonly HashSet<string> _clrNamespaces;
 	private readonly HashSet<string> _includeNamespaces = [];
 	private readonly string _text;
 	private int _textPos;
@@ -24,6 +25,7 @@ public class ExpressionParser
 	{
 		_root = root;
 		_namespaces = namespaces;
+		_clrNamespaces = [.. EnumerableExtensions.AsEnumerable(root.Type.Reference.Namespace).Union(namespaces.Select(n => n.ClrNamespace!))];
 		_text = expression;
 		_textLen = _text.Length;
 		_expectedType = resultType;
@@ -380,17 +382,10 @@ public class ExpressionParser
 		return true;
 	}
 
-	private IEnumerable<(MethodInfo method, XamlNamespace? ns)> EnumerateMethods(TypeInfo type, string methodName)
+	private IEnumerable<(MethodInfo method, string? ns)> EnumerateMethods(TypeInfo type, string methodName, bool isStatic)
 	{
 		type = GetNullableUnderlyingType(type);
-
-		return type.AllMethods
-			.Where(m => m.Definition.Name == methodName)
-			.Select(m => (m, (XamlNamespace?)null))
-			.Concat(
-				_namespaces.SelectMany(ns =>
-					TypeInfo.FindExtensionMethods(ns.ClrNamespace!, methodName, type)
-					.Select(m => (m, (XamlNamespace?)ns))));
+		return type.EnumerateAllMethods(methodName, isStatic, _clrNamespaces);
 	}
 
 	private Expression ParseInvoke(Expression expr)
@@ -913,16 +908,11 @@ public class ExpressionParser
 				}
 
 				var right = ParseComparison();
-				if (right is TypeExpression te)
-				{
-					if (isComparisonToken)
-					{
-						throw new ParseException("Comparison operator cannot be used for type checking.", errPos);
-					}
-					return new IsExpression(expression, te);
-				}
-
-				return new BinaryExpression(expression, right, GetComparisonOperand(op));
+				return right is TypeExpression te
+					? isComparisonToken
+						? throw new ParseException("Comparison operator cannot be used for type checking.", errPos)
+						: new IsExpression(expression, te)
+					: new BinaryExpression(expression, right, GetComparisonOperand(op));
 			}
 
 		}
@@ -943,11 +933,17 @@ public class ExpressionParser
 
 			if (_expectedType != null)
 			{
-				var staticFieldOrProp =
-					_expectedType.Fields.Where(f => f.Definition.IsStatic).Cast<IMemberInfo>()
-					.Concat(
-						_expectedType.AllProperties.Where(p => p.Definition.IsStatic()))
-					.FirstOrDefault(m => m.Definition.Name == id);
+				IMemberInfo? staticFieldOrProp =
+					_expectedType.Fields.FirstOrDefault(f => f.Definition.Name == id && f.Definition.IsStatic);
+				if (staticFieldOrProp == null)
+				{
+					var (prop2, ns2) = _expectedType.FindProperty(id, true, _clrNamespaces);
+					if (ns2 != null)
+					{
+						_includeNamespaces.Add(ns2);
+					}
+					staticFieldOrProp = prop2;
+				}
 				if (staticFieldOrProp != null)
 				{
 					return new MemberExpression(new TypeExpression(_expectedType), staticFieldOrProp, staticFieldOrProp.MemberType);
@@ -956,6 +952,7 @@ public class ExpressionParser
 		}
 
 		var inst = instance ?? _root;
+		var isStatic = instance is TypeExpression;
 
 		var type = inst.Type;
 		if (type.Reference.IsValueNullable())
@@ -967,11 +964,15 @@ public class ExpressionParser
 		TypeInfo memberType;
 
 		// Try to find a property
-		var prop = type.AllProperties.FirstOrDefault(p => p.Definition.Name == id);
+		var (prop, ns) = type.FindProperty(id, isStatic, _clrNamespaces);
 		if (prop != null)
 		{
 			member = prop;
 			memberType = prop.PropertyType;
+			if (ns != null)
+			{
+				_includeNamespaces.Add(ns);
+			}
 		}
 		else
 		{
@@ -992,11 +993,15 @@ public class ExpressionParser
 				}
 
 				// The expression can still be a method without parens (delegate).
-				var method = type.AllMethods.FirstOrDefault(m => m.Definition.Name == id);
+				(var method, ns) = type.EnumerateAllMethods(id, isStatic, _clrNamespaces).FirstOrDefault();
 				if (method != null)
 				{
 					member = method;
 					memberType = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Delegate)), false);
+					if (ns != null)
+					{
+						_includeNamespaces.Add(ns);
+					}
 				}
 				else
 				{
@@ -1068,10 +1073,11 @@ Label_CreateMemberExpression:
 
 	private Expression ParseCall(Expression inst, TypeInfo type, string methodName, int errorPos, bool? isNotifiable)
 	{
-		var enumerator = EnumerateMethods(type, methodName).GetEnumerator();
+		bool isStatic = inst is TypeExpression;
+		var enumerator = EnumerateMethods(type, methodName, isStatic).GetEnumerator();
 
 		MethodInfo method;
-		XamlNamespace? ns;
+		string? ns;
 
 		// Get the first method with the name in order to take argument types.
 		// Afterwards the more suitable member or extension method will be found.
@@ -1087,7 +1093,7 @@ Label_CreateMemberExpression:
 
 		if (ns != null)
 		{
-			_includeNamespaces.Add(ns.ClrNamespace!);
+			_includeNamespaces.Add(ns);
 		}
 
 		CorrectCharParameters(method, args, ns != null, errorPos);

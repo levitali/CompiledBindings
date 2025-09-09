@@ -7,12 +7,11 @@ public class TypeInfo
 	private IList<PropertyInfo>? _properties;
 	private IList<FieldInfo>? _fields;
 	private IList<MethodInfo>? _methods;
-	private IList<MethodInfo>? _constructors;
 	private IList<EventInfo>? _events;
-	private IList<TypeInfo>? _nestedTypes;
 	private LazyLoadCollection<TypeInfo>? _extensionTypes;
 	private LazyLoadCollection<PropertyInfo>? _extensionProperties;
-	private LazyLoadCollection<MethodInfo>? _extensionMethods;
+	private LazyLoadCollection<MethodInfo>? _newExtensionMethods;
+	private LazyLoadCollection<MethodInfo>? _oldExtensionMethods;
 	private readonly bool? _canBeNullable;
 	private readonly byte? _nullableContext;
 	private readonly byte[]? _nullableFlags;
@@ -61,7 +60,7 @@ public class TypeInfo
 
 	public static bool EnableNullables { get; set; } = true;
 
-	public static Dictionary<string, HashSet<string>> NotNullableProperties { get; } = new Dictionary<string, HashSet<string>>();
+	public static Dictionary<string, HashSet<string>> NotNullableProperties { get; } = [];
 
 	public TypeReference Reference { get; }
 
@@ -86,8 +85,7 @@ public class TypeInfo
 			})
 			.ToList();
 
-	public IEnumerable<PropertyInfo> AllProperties =>
-		Properties.Concat((_extensionProperties ??= new(ExtensionTypes.SelectMany(t => t.Properties))).Enumerate());
+	public IEnumerable<PropertyInfo> ExtensionProperties => (_extensionProperties ??= new(ExtensionTypes.SelectMany(t => t.Properties))).Enumerate();
 
 	public IList<FieldInfo> Fields => _fields ??=
 		EnumerateTypeAndBaseTypes()
@@ -105,10 +103,13 @@ public class TypeInfo
 				GetTypeSubElement(m.ReturnType, m.DeclaringType, null, m.MethodReturnType.CustomAttributes, m.CustomAttributes)))
 			.ToList();
 
-	public IEnumerable<MethodInfo> AllMethods =>
-		Methods.Concat((_extensionMethods ??= new(ExtensionTypes.SelectMany(t => t.Methods))).Enumerate());
+	public IEnumerable<MethodInfo> NewExtensionMethods =>
+		(_newExtensionMethods ??= new(ExtensionTypes.SelectMany(t => t.Methods.Where(m => m.Definition.DeclaringType.FullName != "System.Object")))).Enumerate();
 
-	public IList<MethodInfo> Constructors => _constructors ??=
+	public IEnumerable<MethodInfo> OldExtensionMethods =>
+		(_oldExtensionMethods ??= new(EnumerateOldExtensionMethods())).Enumerate();
+
+	public IList<MethodInfo> Constructors => field ??=
 		Definition!.GetConstructors()
 			.Select(m => new MethodInfo(
 				m,
@@ -122,10 +123,45 @@ public class TypeInfo
 			.Select(e => new EventInfo(e, GetTypeSubElement(e.EventType, e.DeclaringType, null, e.CustomAttributes)))
 			.ToList();
 
-	public IList<TypeInfo> NestedTypes => _nestedTypes ??=
+	public IList<TypeInfo> NestedTypes => field ??=
 		(Definition?.NestedTypes ?? Enumerable.Empty<TypeDefinition>())
 		.Select(t => new TypeInfo(t, GetIsNullableSubElement(1), GetNullableFlags(t), GetNullableContext(t) ?? _nullableContext))
 		.ToList();
+
+	public (PropertyInfo? property, string? ns) FindProperty(string name, bool isStatic, HashSet<string> namespaces)
+	{
+		var property = Properties.FirstOrDefault(p => p.Definition.Name == name && p.Definition.IsStatic() == isStatic);
+		if (property != null)
+		{
+			return (property, null);
+		}
+		property = ExtensionProperties.FirstOrDefault(p => p.Definition.Name == name &&
+													  p.Definition.IsStatic() == isStatic && namespaces.Contains(p.Definition.DeclaringType.DeclaringType.Namespace));
+		return (property, property?.Definition.DeclaringType.DeclaringType.Namespace);
+	}
+
+	public IEnumerable<(MethodInfo method, string? ns)> EnumerateAllMethods(string name, bool isStatic, HashSet<string> namespaces)
+	{
+		foreach (var method in Methods.Where(m => m.Definition.Name == name && m.Definition.IsStatic == isStatic))
+		{
+			yield return (method, null);
+		}
+
+		var extensionMethods = NewExtensionMethods
+			.Where(m => m.Definition.IsStatic == isStatic && m.Definition.DeclaringType.DeclaringType?.Namespace != null)
+			.Select(m => (m, ns: m.Definition.DeclaringType.DeclaringType.Namespace));
+
+		if (!isStatic)
+		{
+			extensionMethods = extensionMethods.Concat(OldExtensionMethods.Select(m => (m, ns: m.Definition.DeclaringType.Namespace)));
+		}
+
+		foreach (var (method, ns) in extensionMethods
+			.Where(e => e.m.Definition.Name == name && namespaces.Contains(e.ns)))
+		{
+			yield return (method, ns);
+		}
+	}
 
 	public TypeInfo? GetElementType()
 	{
@@ -212,25 +248,6 @@ public class TypeInfo
 	public static void Cleanup()
 	{
 		_typeCache.Clear();
-	}
-
-	public static IEnumerable<MethodInfo> FindExtensionMethods(string ns, string name, TypeInfo type)
-	{
-		foreach (var refTyp in TypeInfoUtils.AllTypes.Values.Where(t => t.Namespace == ns))
-		{
-			if (refTyp.IsSealed && refTyp.IsAbstract)
-			{
-				foreach (var method in refTyp.Methods.Where(m =>
-					m.Name == name &&
-					m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute") &&
-					m.Parameters.Count > 0 &&
-					m.Parameters[0].ParameterType.IsAssignableFrom(type.Reference)))
-				{
-					var typeInfo = GetTypeThrow(refTyp.FullName);
-					yield return typeInfo.Methods.First(m => m.Definition == method);
-				}
-			}
-		}
 	}
 
 	public TypeInfo MakeGenericInstanceType(params TypeInfo[] arguments)
@@ -342,13 +359,11 @@ Label_Break1:
 
 	private static byte? GetNullableContext(TypeReference type)
 	{
-		if (EnableNullables)
-		{
-			return (byte?)type.ResolveEx()?
+		return EnableNullables
+			? (byte?)type.ResolveEx()?
 				.CustomAttributes.FirstOrDefault(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.NullableContextAttribute")?
-				.ConstructorArguments[0].Value;
-		}
-		return null;
+				.ConstructorArguments[0].Value
+			: null;
 	}
 
 	private bool? GetIsNullableSubElement(int index)
@@ -359,6 +374,24 @@ Label_Break1:
 			return b is null or 0 ? null : b == 2;
 		}
 		return null;
+	}
+
+	private IEnumerable<MethodInfo> EnumerateOldExtensionMethods()
+	{
+		foreach (var refTyp in TypeInfoUtils.AllTypes.Values)
+		{
+			if (refTyp.IsSealed && refTyp.IsAbstract)
+			{
+				foreach (var method in refTyp.Methods.Where(m =>
+					m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute") &&
+					m.Parameters.Count > 0 &&
+					m.Parameters[0].ParameterType.IsAssignableFrom(Reference)))
+				{
+					var typeInfo = GetTypeThrow(refTyp.FullName);
+					yield return typeInfo.Methods.First(m => m.Definition == method);
+				}
+			}
+		}
 	}
 }
 
@@ -417,6 +450,8 @@ public class MethodInfo : IMemberInfo
 	public MethodDefinition Definition { get; }
 	public IList<ParameterInfo> Parameters { get; }
 	public TypeInfo ReturnType { get; }
+
+	public bool IsOldExtension => Definition.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute");
 
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => ReturnType;

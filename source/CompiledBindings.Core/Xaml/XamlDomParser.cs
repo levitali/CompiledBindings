@@ -66,9 +66,7 @@ public abstract class XamlDomParser
 		var xClassAttr = root.Attribute(xClass);
 		try
 		{
-			//xClassAttr.Remove();
 			return new TypeInfo(TypeInfo.GetTypeThrow(xClassAttr.Value), false);
-
 		}
 		catch (Exception ex)
 		{
@@ -90,20 +88,16 @@ public abstract class XamlDomParser
 			{
 				return null;
 			}
-			else if (xamlNode.Name == xType)
-			{
-				value = xamlNode.Value!;
-			}
 			else
 			{
-				throw new GeneratorException($"Unexpected markup extension {xamlNode.Name}", CurrentFile, attr);
+				value = xamlNode.Name == xType
+					? xamlNode.Value!
+					: throw new GeneratorException($"Unexpected markup extension {xamlNode.Name}", CurrentFile, attr);
 			}
 		}
-		if (value == null)
-		{
-			throw new GeneratorException($"Missing type.", CurrentFile, attr);
-		}
-		return XamlParser.GetTypeName(value, attr.Parent, KnownNamespaces);
+		return value == null
+			? throw new GeneratorException($"Missing type.", CurrentFile, attr)
+			: XamlParser.GetTypeName(value, attr.Parent, KnownNamespaces);
 	}
 
 	public TypeInfo? FindTypeFromAttribute(XAttribute attr)
@@ -114,11 +108,7 @@ public abstract class XamlDomParser
 	public TypeInfo? FindType(string value, XAttribute attr)
 	{
 		var typeName = GetTypeNameFromAttribute(value, attr);
-		if (typeName == null)
-		{
-			return null;
-		}
-		return FindType(typeName, attr);
+		return typeName == null ? null : FindType(typeName, attr);
 	}
 
 	public IEnumerable<XamlNamespace> GetNamespaces(XamlNode xamlNode)
@@ -129,6 +119,16 @@ public abstract class XamlDomParser
 			namespaces = namespaces.Union(KnownNamespaces, n => n.Prefix);
 		}
 		return namespaces;
+	}
+
+	public HashSet<string> GetClrNamespaces(XamlNode xamlNode)
+	{
+		var namespaces = XamlNamespace.GetClrNamespaces(xamlNode.Element);
+		if (KnownNamespaces != null)
+		{
+			namespaces = namespaces.Union(KnownNamespaces, n => n.Prefix);
+		}
+		return [.. EnumerableExtensions.AsEnumerable(TargetType.Reference.Namespace).Union(namespaces.Select(n => n.ClrNamespace!))];
 	}
 
 	public XamlObjectProperty GetObjectProperty(
@@ -207,15 +207,16 @@ public abstract class XamlDomParser
 			bool isAttached = false;
 			XName? attachedClassName = null;
 			string? attachedPropertyName = null;
+			var clrNamespaces = GetClrNamespaces(xamlNode);
 
 			int index = memberName.IndexOf('.');
 			if (index != -1)
 			{
 				string typeName = memberName.Substring(0, index);
-				attachedClassName = 
+				attachedClassName =
 					(xamlNode.Name.Namespace is var n && (n == XNamespace.None || n == mNamespace)
-						? DefaultNamespace 
-						: n) 
+						? DefaultNamespace
+						: n)
 					+ typeName;
 				attachedPropertyName = memberName.Substring(index + 1);
 
@@ -246,10 +247,14 @@ public abstract class XamlDomParser
 			else
 			{
 				var typeInfo = obj.Type;
-				var pi = typeInfo.AllProperties.FirstOrDefault(p => p.Definition.Name == memberName);
+				var (pi, ns) = typeInfo.FindProperty(memberName, false, clrNamespaces);
 				if (pi != null)
 				{
 					targetProperty = pi;
+					if (ns != null)
+					{
+						includeNamespaces.Add(ns);
+					}
 				}
 				else
 				{
@@ -260,28 +265,19 @@ public abstract class XamlDomParser
 					}
 					else
 					{
-						var method = typeInfo.AllMethods.FirstOrDefault(e => e.Definition.Name == memberName);
+						(var method, ns) = typeInfo.EnumerateAllMethods(memberName, false, clrNamespaces).FirstOrDefault();
 						if (method == null)
 						{
-							foreach (var ns in GetNamespaces(xamlNode))
-							{
-								var clrNs = ns.ClrNamespace!;
-								method = TypeInfo.FindExtensionMethods(clrNs, memberName, typeInfo)
-										.FirstOrDefault(m => m.Parameters.Count == 2 && m.Parameters[0].ParameterType.IsAssignableFrom(obj.Type));
-								if (method != null)
-								{
-									includeNamespaces.Add(clrNs);
-									break;
-								}
-							}
-							if (method == null)
-							{
-								throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
-							}
+							throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
 						}
-						else if (method.Parameters.Count != 1)
+						else if (method.Parameters.Count != (method.IsOldExtension ? 2 : 1))
 						{
 							throw new GeneratorException($"Cannot bind to method {obj.Type.Reference.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
+						}
+
+						if (ns != null)
+						{
+							includeNamespaces.Add(ns);
 						}
 
 						targetMethod = method;
@@ -330,11 +326,12 @@ public abstract class XamlDomParser
 			XamlNamespace.GetClrNamespace(xamlNode.Children[0].Name.NamespaceName) == "CompiledBindings.Markup";
 
 		var iNotifyPropChanged = TypeInfo.GetTypeThrow(typeof(INotifyPropertyChanged));
+		var clrNamespaces = GetClrNamespaces(xamlNode);
 
 		var propType = objProp.MemberType;
 		if (xamlNode.Children.Count == 1 &&
 			(xamlNode.Children[0].Name == xSet ||
-				isCompiledBindingsNs && xamlNode.Children[0].Name.LocalName is "Set" or "SetExtension"))
+				(isCompiledBindingsNs && xamlNode.Children[0].Name.LocalName is "Set" or "SetExtension")))
 		{
 			try
 			{
@@ -342,7 +339,7 @@ public abstract class XamlDomParser
 				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces2, out var dummy);
 				includeNamespaces.UnionWith(includeNamespaces2);
 				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
-				CorrectMethod(objProp, value.StaticValue.Type);
+				CorrectMethod(objProp, value.StaticValue.Type, clrNamespaces, includeNamespaces);
 				obj.GenerateMember = true;
 			}
 			catch (ParseException ex)
@@ -365,7 +362,7 @@ public abstract class XamlDomParser
 				var defaultBindModeAttr =
 					EnumerableExtensions.SelectSequence(xamlNode.Element, e => e.Parent, xamlNode.Element is XElement)
 						.Cast<XElement>()
-						.Select(e => GetDefaultBindModeAttribute(e))
+						.Select(GetDefaultBindModeAttribute)
 						.FirstOrDefault(a => a != null);
 				var defaultBindMode = defaultBindModeAttr != null ? (BindingMode)Enum.Parse(typeof(BindingMode), defaultBindModeAttr.Value) : BindingMode.OneWay;
 
@@ -384,7 +381,7 @@ public abstract class XamlDomParser
 						{
 							bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp);
 						}
-						CorrectMethod(objProp, bind.SourceExpression.Type);
+						CorrectMethod(objProp, bind.SourceExpression.Type, clrNamespaces, includeNamespaces);
 					}
 
 					if (DependencyPropertyType != null)
@@ -553,30 +550,23 @@ public abstract class XamlDomParser
 			}
 			if (expression.IsNullable && !targetType.IsNullable)
 			{
-				Expression defaultExpr;
-				if (targetType.Reference.FullName == "System.String")
-				{
-					defaultExpr = new ConstantExpression("");
-				}
-				else
-				{
-					defaultExpr = Expression.DefaultExpression;
-				}
-
+				Expression defaultExpr = targetType.Reference.FullName == "System.String"
+					? new ConstantExpression("")
+					: Expression.DefaultExpression;
 				return new CoalesceExpression(expression, defaultExpr);
 			}
 		}
 		return expression;
 	}
 
-	private void CorrectMethod(XamlObjectProperty prop, TypeInfo type)
+	private void CorrectMethod(XamlObjectProperty prop, TypeInfo type, HashSet<string> namespaces, HashSet<string> includeNamespaces)
 	{
 		if (prop.TargetMethod != null && !prop.IsAttached)
 		{
 			// Try to find best suitable method.
 			// Note! So far TypeInfoUtils.IsAssignableFrom method does not handle all cases.
 			// So it can be, that the method is not found.
-			var method = FindBestSuitableTargetMethod(prop.Object.Type, prop.TargetMethod.Definition.Name, type, GetNamespaces(prop.Object.XamlNode).Select(n => n.ClrNamespace!));
+			var method = FindBestSuitableTargetMethod(prop.Object.Type, prop.TargetMethod.Definition.Name, type, namespaces, includeNamespaces);
 			if (method != null)
 			{
 				prop.TargetMethod = method;
@@ -584,13 +574,21 @@ public abstract class XamlDomParser
 		}
 	}
 
-	private static MethodInfo FindBestSuitableTargetMethod(TypeInfo type, string methodName, TypeInfo targetType, IEnumerable<string> namespaces)
+	private static MethodInfo? FindBestSuitableTargetMethod(TypeInfo type, string methodName, TypeInfo targetType, HashSet<string> namespaces, HashSet<string> includeNamespaces)
 	{
-		return type.AllMethods
-			.Where(m => m.Definition.Name == methodName && m.Parameters.Count == 1)
-			.Concat(namespaces.SelectMany(n => TypeInfo.FindExtensionMethods(n, methodName, type)
-											  .Where(m => m.Parameters.Count == 2 || (m.Parameters.Count > 2 && m.Parameters[2].Definition.IsOptional))))
-			.FirstOrDefault(m => m.Parameters[m.Parameters.Count == 1 ? 0 : 1].ParameterType.IsAssignableFrom(targetType));
+		var (method, ns) = type
+			.EnumerateAllMethods(methodName, false, namespaces)
+			.FirstOrDefault(e =>
+			{
+				var paramsCount = e.method.IsOldExtension ? 2 : 1;
+				return e.method.Parameters.Count >= paramsCount &&
+					(e.method.Parameters.Count <= paramsCount || e.method.Parameters[paramsCount + 1].Definition.IsOptional) && e.method.Parameters[paramsCount - 1].ParameterType.IsAssignableFrom(targetType);
+			});
+		if (ns != null)
+		{
+			includeNamespaces.Add(ns);
+		}
+		return method;
 	}
 
 	protected virtual void ResolveTargetChangeEventCore(Bind binding)

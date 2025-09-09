@@ -48,9 +48,10 @@ $@"namespace {parseResult.TargetType.Reference.Namespace}
 {{");
 		}
 
-		if (parseResult.IncludeNamespaces.Count > 0)
+		var includeNamespaces = parseResult.IncludeNamespaces.Where(n => n != parseResult.TargetType.Reference.Namespace).ToList();
+		if (includeNamespaces.Count > 0)
 		{
-			foreach (string ns in parseResult.IncludeNamespaces)
+			foreach (string ns in includeNamespaces)
 			{
 				output.AppendLine(
 $@"	using {ns};");
