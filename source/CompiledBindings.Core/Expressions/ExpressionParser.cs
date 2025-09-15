@@ -9,9 +9,11 @@ public class ExpressionParser
 		{ "null", Expression.NullExpression },
 	};
 	private readonly VariableExpression _root;
+	private readonly ValueExpression? _valueExpression;
 	private readonly IList<XamlNamespace> _namespaces;
 	private readonly HashSet<string> _clrNamespaces;
 	private readonly HashSet<string> _includeNamespaces = [];
+	private readonly TypeInfo _resultType;
 	private readonly string _text;
 	private int _textPos;
 	private readonly int _textLen;
@@ -21,26 +23,31 @@ public class ExpressionParser
 	private bool _parsingInterpolatedString;
 	private bool _parsingIs;
 
-	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces)
+	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces, bool useValueExpression)
 	{
 		_root = root;
+		if (useValueExpression)
+		{
+			_valueExpression = new(resultType);
+		}
 		_namespaces = namespaces;
 		_clrNamespaces = [.. EnumerableExtensions.AsEnumerable(root.Type.Reference.Namespace).Union(namespaces.Select(n => n.ClrNamespace!))];
 		_text = expression;
 		_textLen = _text.Length;
-		_expectedType = resultType;
+		_expectedType = _resultType = resultType;
 		_ch = _text[0];
+		
 		NextToken();
 	}
 
-	public static Expression Parse(TypeInfo dataType, string member, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos)
+	public static Expression Parse(TypeInfo dataType, string member, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos, bool useValueExpression = false)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
 			throw new ParseException(Res.EmptyExpression);
 		}
 
-		var parser = new ExpressionParser(new VariableExpression(dataType, member), expression, resultType, namespaces);
+		var parser = new ExpressionParser(new VariableExpression(dataType, member), expression, resultType, namespaces, useValueExpression);
 
 		var res = parser.ParseExpression();
 		if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))
@@ -774,6 +781,12 @@ public class ExpressionParser
 		{
 			NextToken();
 			return _root;
+		}
+
+		if (_token.text == "value" && _valueExpression != null)
+		{
+			NextToken();
+			return _valueExpression;
 		}
 
 		if (_constantKeywords.TryGetValue(_token.text, out var value))

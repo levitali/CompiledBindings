@@ -43,5 +43,10 @@
     <CheckBox x:Name="checkBox2" />
     <TextBlock x:Name="textBlock13" />
     <TextBlock x:Name="textBlock14" />
+    <StackPanel Orientation="Horizontal">
+      <RadioButton x:Name="radioButton1" />
+      <RadioButton x:Name="radioButton2" />
+      <RadioButton x:Name="radioButton3" />
+    </StackPanel>
   </StackPanel>
 </Page>

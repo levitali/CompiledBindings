@@ -45,6 +45,16 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public FocusState<Field> FocusedField { get; private set; } = new FocusState<Field>();
 
+	public QualityState QualityState { get; set; }
+
+	public void SetQualityState(QualityState qualityState, bool set)
+	{
+		if (set)
+		{
+			QualityState = qualityState;
+		}
+	}
+
 	public enum Field
 	{
 		Field1,
@@ -122,5 +132,12 @@ public class ParamClass
 	public ParamClass(string str) : this(str, 0)
 	{
 	}
+}
+
+public enum QualityState
+{
+	Bad,
+	Middle,
+	Good,
 }
 

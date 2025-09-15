@@ -90,6 +90,11 @@
             Foreground="{x:Bind BooleanProp? $colorBrush1 : $colorBrush2}"
             Text="{x:Bind ModifyViewModel.ModifyTaskProp, FallbackValue='Loading...'}" />
         <TextBlock Text="{x:Bind listView.ActualWidth, DataType={x:Null}}" />
+        <StackPanel Orientation="Horizontal">
+            <RadioButton IsChecked="{x:Bind QualityState eq Bad, BindBack=SetQualityState(Bad, value)}" />
+            <RadioButton IsChecked="{x:Bind QualityState eq Middle, BindBack=SetQualityState(Middle, value)}" />
+            <RadioButton IsChecked="{x:Bind QualityState eq Good, BindBack=SetQualityState(Good, value)}" />
+        </StackPanel>
     </StackPanel>
 
 </Page>

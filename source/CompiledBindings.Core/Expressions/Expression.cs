@@ -135,6 +135,18 @@ public class VariableExpression : Expression
 	}
 }
 
+public class ValueExpression : Expression
+{
+	public ValueExpression(TypeInfo type) : base(type)
+	{
+	}
+
+	protected override string GetCSharpCode()
+	{
+		return "value";
+	}
+}
+
 public class MemberExpression : Expression, INotifiableExpression
 {
 	public MemberExpression(Expression expression, IMemberInfo member, TypeInfo type, bool? isNotifiable = null) : base(type)

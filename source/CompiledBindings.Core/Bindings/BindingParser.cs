@@ -111,7 +111,7 @@ public static class BindingParser
 					ICollection<string> includeNamespaces2;
 					try
 					{
-						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1);
+						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1, name == "BindBack");
 					}
 					catch (ParseException ex)
 					{
@@ -126,6 +126,17 @@ public static class BindingParser
 				}
 				else if (name == "BindBack")
 				{
+					if (!expr.EnumerateTree().Any(e => e is ValueExpression))
+					{
+						if (expr is MemberExpression me && me.Member is MethodInfo method && prop.MemberType.Reference.FullName != "System.Delegate")
+						{	
+							expr = new CallExpression(me.Expression, method, [new ValueExpression(prop.MemberType)]);
+						}
+						else
+						{
+							throw new ParseException("Invalid BindBack expression.", currentPos);
+						}
+					}
 					bindBackExpression = expr;
 					mode ??= BindingMode.TwoWay;
 				}

@@ -287,6 +287,9 @@ namespace WPFTest.Views
 			bool _settingBinding20;
 			bool _settingBinding21;
 			bool _settingBinding23;
+			bool _settingBinding26;
+			bool _settingBinding27;
+			bool _settingBinding28;
 			global::System.Threading.CancellationTokenSource _cts12;
 			global::System.Threading.CancellationTokenSource _cts14;
 			global::System.Threading.CancellationTokenSource _cts25;
@@ -347,6 +350,21 @@ namespace WPFTest.Views
 						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
 					.AddValueChanged(_targetRoot.checkBox2, OnTargetChanged7);
+				global::System.ComponentModel.DependencyPropertyDescriptor
+					.FromProperty(
+						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+					.AddValueChanged(_targetRoot.radioButton1, OnTargetChanged8);
+				global::System.ComponentModel.DependencyPropertyDescriptor
+					.FromProperty(
+						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+					.AddValueChanged(_targetRoot.radioButton2, OnTargetChanged9);
+				global::System.ComponentModel.DependencyPropertyDescriptor
+					.FromProperty(
+						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+					.AddValueChanged(_targetRoot.radioButton3, OnTargetChanged10);
 			}
 
 			public void Cleanup()
@@ -393,6 +411,21 @@ namespace WPFTest.Views
 							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
 						.RemoveValueChanged(_targetRoot.checkBox2, OnTargetChanged7);
+					global::System.ComponentModel.DependencyPropertyDescriptor
+						.FromProperty(
+							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+						.RemoveValueChanged(_targetRoot.radioButton1, OnTargetChanged8);
+					global::System.ComponentModel.DependencyPropertyDescriptor
+						.FromProperty(
+							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+						.RemoveValueChanged(_targetRoot.radioButton2, OnTargetChanged9);
+					global::System.ComponentModel.DependencyPropertyDescriptor
+						.FromProperty(
+							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
+							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
+						.RemoveValueChanged(_targetRoot.radioButton3, OnTargetChanged10);
 					_targetRoot.listView.SelectionChanged -= _eventHandler8;
 					_eventHandler8 = null;
 					_targetRoot.button1.Click -= _eventHandler15;
@@ -460,6 +493,7 @@ namespace WPFTest.Views
 #line default
 				Update0_ModifyViewModel(value);
 				Update0_BooleanProp(value);
+				Update0_QualityState(value);
 				Update0_ArrayProp(value);
 				Update0_OrderInput(value);
 				Update0_TaskProp(value);
@@ -655,6 +689,63 @@ namespace WPFTest.Views
 				finally
 				{
 					_settingBinding20 = false;
+				}
+			}
+
+			private void Update0_QualityState(global::WPFTest.ViewModels.Page1ViewModel value)
+			{
+#line (94, 26) - (94, 103) 94 "Page1.xml"
+				var value1 = value.QualityState;
+#line (94, 26) - (94, 103) 94 "Page1.xml"
+				var value2 = value1 == WPFTest.ViewModels.QualityState.Bad;
+#line default
+				if (!object.Equals(_targetRoot.radioButton1.IsChecked, value2))
+				{
+					_settingBinding26 = true;
+					try
+					{
+#line (94, 26) - (94, 103) 94 "Page1.xml"
+						_targetRoot.radioButton1.IsChecked = value2;
+#line default
+					}
+					finally
+					{
+						_settingBinding26 = false;
+					}
+				}
+#line (95, 26) - (95, 109) 95 "Page1.xml"
+				var value3 = value1 == WPFTest.ViewModels.QualityState.Middle;
+#line default
+				if (!object.Equals(_targetRoot.radioButton2.IsChecked, value3))
+				{
+					_settingBinding27 = true;
+					try
+					{
+#line (95, 26) - (95, 109) 95 "Page1.xml"
+						_targetRoot.radioButton2.IsChecked = value3;
+#line default
+					}
+					finally
+					{
+						_settingBinding27 = false;
+					}
+				}
+#line (96, 26) - (96, 105) 96 "Page1.xml"
+				var value4 = value1 == WPFTest.ViewModels.QualityState.Good;
+#line default
+				if (!object.Equals(_targetRoot.radioButton3.IsChecked, value4))
+				{
+					_settingBinding28 = true;
+					try
+					{
+#line (96, 26) - (96, 105) 96 "Page1.xml"
+						_targetRoot.radioButton3.IsChecked = value4;
+#line default
+					}
+					finally
+					{
+						_settingBinding28 = false;
+					}
 				}
 			}
 
@@ -956,6 +1047,57 @@ namespace WPFTest.Views
 				}
 			}
 
+			private void OnTargetChanged8(object sender, global::System.EventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				if (!_settingBinding26)
+				{
+					try
+					{
+#line (94, 26) - (94, 103) 94 "Page1.xml"
+						dataRoot.SetQualityState(WPFTest.ViewModels.QualityState.Bad, _targetRoot.radioButton1.IsChecked ?? default);
+#line default
+					}
+					catch
+					{
+					}
+				}
+			}
+
+			private void OnTargetChanged9(object sender, global::System.EventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				if (!_settingBinding27)
+				{
+					try
+					{
+#line (95, 26) - (95, 109) 95 "Page1.xml"
+						dataRoot.SetQualityState(WPFTest.ViewModels.QualityState.Middle, _targetRoot.radioButton2.IsChecked ?? default);
+#line default
+					}
+					catch
+					{
+					}
+				}
+			}
+
+			private void OnTargetChanged10(object sender, global::System.EventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				if (!_settingBinding28)
+				{
+					try
+					{
+#line (96, 26) - (96, 105) 96 "Page1.xml"
+						dataRoot.SetQualityState(WPFTest.ViewModels.QualityState.Good, _targetRoot.radioButton3.IsChecked ?? default);
+#line default
+					}
+					catch
+					{
+					}
+				}
+			}
+
 			class Page1_BindingsTrackings_this
 			{
 				global::System.WeakReference _bindingsWeakRef;
@@ -1031,6 +1173,9 @@ namespace WPFTest.Views
 							break;
 						case "FocusedField":
 							bindings.Update0_FocusedField(typedSender);
+							break;
+						case "QualityState":
+							bindings.Update0_QualityState(typedSender);
 							break;
 					}
 				}
