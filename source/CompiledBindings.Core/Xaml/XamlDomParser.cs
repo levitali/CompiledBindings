@@ -536,25 +536,7 @@ public abstract class XamlDomParser
 	{
 		if (prop.TargetEvent == null)
 		{
-			var targetType = prop.MemberType;
-			if (expression is not DefaultExpression &&
-				!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
-				targetType.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
-			{
-				var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
-				if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
-				{
-					expression = new ParenExpression(expression);
-				}
-				expression = new CallExpression(expression, method, Array.Empty<Expression>());
-			}
-			if (expression.IsNullable && !targetType.IsNullable)
-			{
-				Expression defaultExpr = targetType.Reference.FullName == "System.String"
-					? new ConstantExpression("")
-					: Expression.DefaultExpression;
-				return new CoalesceExpression(expression, defaultExpr);
-			}
+			expression = Expression.Convert(expression, prop.MemberType);
 		}
 		return expression;
 	}

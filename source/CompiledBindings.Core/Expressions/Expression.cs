@@ -75,6 +75,29 @@ public abstract class Expression
 			(expression.Type.IsNullable ||
 			 (expression.IsNullable && StripParenExpression(expression) is CastExpression && !expression.Type.IsNullable));
 	}
+
+	public static Expression Convert(Expression expression, TypeInfo targetType)
+	{
+		if (expression is not CompiledBindings.DefaultExpression &&
+			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
+			targetType.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
+		{
+			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
+			if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
+			{
+				expression = new ParenExpression(expression);
+			}
+			expression = new CallExpression(expression, method, Array.Empty<Expression>());
+		}
+		if (expression.IsNullable && !targetType.IsNullable)
+		{
+			Expression defaultExpr = targetType.Reference.FullName == "System.String"
+				? new ConstantExpression("")
+				: Expression.DefaultExpression;
+			return new CoalesceExpression(expression, defaultExpr);
+		}
+		return expression;
+	}
 }
 
 public class ConstantExpression : Expression
@@ -94,7 +117,7 @@ public class ConstantExpression : Expression
 			string str => $"\"{str}\"",
 			bool b => b ? "true" : "false",
 			char c => $"'{c}'",
-			_ => Convert.ToString(Value, CultureInfo.InvariantCulture),
+			_ => System.Convert.ToString(Value, CultureInfo.InvariantCulture),
 		};
 	}
 

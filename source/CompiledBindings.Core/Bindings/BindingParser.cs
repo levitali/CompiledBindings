@@ -128,9 +128,15 @@ public static class BindingParser
 				{
 					if (!expr.EnumerateTree().Any(e => e is ValueExpression))
 					{
-						if (expr is MemberExpression me && me.Member is MethodInfo method && prop.MemberType.Reference.FullName != "System.Delegate")
-						{	
-							expr = new CallExpression(me.Expression, method, [new ValueExpression(prop.MemberType)]);
+						if (expr is MemberExpression me && me.Member is MethodInfo method)
+						{
+							if (prop.MemberType.Reference.FullName != "System.Delegate")
+							{
+								var targetType2 = method.Parameters.Last().ParameterType;
+								Expression valueExpr = new ValueExpression(prop.MemberType);
+								valueExpr = Expression.Convert(valueExpr, targetType2);
+								expr = new CallExpression(me.Expression, method, [valueExpr]);
+							}
 						}
 						else
 						{

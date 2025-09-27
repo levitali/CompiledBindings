@@ -24,7 +24,7 @@ public class Page1ViewModel : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	public void SetValue(string value)
+	public void SetValue(string? value)
 	{
 	}
 
