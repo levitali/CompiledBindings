@@ -386,7 +386,7 @@ public class GeneratedClass
 				p.Value.StaticValue != null
 					? EnumerableExtensions.AsEnumerable(p.Value.StaticValue)
 					: p.Value.BindValue != null
-						? [p.Value.BindValue.SourceExpression, p.Value.BindValue.AsyncSourceExpression, p.Value.BindValue.FallbackValue]
+						? [p.Value.BindValue.BindExpression, p.Value.BindValue.AsyncBindExpression, p.Value.BindValue.FallbackValue]
 						: Enumerable.Empty<Expression?>())
 			.Where(e => e != null)
 			.SelectMany(e => e!.EnumerateTree())

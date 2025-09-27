@@ -398,7 +398,7 @@ $@"			if (value is not {bind.SourceType.Reference.GetCSharpFullName()} dataRoot)
 				}
 			}
 			output.AppendLine(
-$@"			return {bind.SourceExpression!.ToString()};
+$@"			return {bind.BindExpression!.ToString()};
 		}}");
 
 			output.AppendLine();

@@ -81,7 +81,7 @@ public class XamlObjectValue
 		var b = BindValue ?? BindingValue;
 		if (b != null)
 		{
-			var res = (b.SourceExpression ?? b.BindBackExpression!).ToString();
+			var res = (b.BindExpression ?? b.BindBackExpression!).ToString();
 			if (res.StartsWith("dataRoot."))
 			{
 				res = res.Substring("dataRoot.".Length);

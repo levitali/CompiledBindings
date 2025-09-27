@@ -13,8 +13,8 @@ public static class BindingParser
 
 		var namespaces = xamlDomParser.GetNamespaces(prop.XamlNode).ToList();
 
-		Expression? expression = null;
-		Expression? bindBackExpression = null;
+		Expression? path = null;
+		Expression? bindBack = null;
 		Expression? converter = null;
 		Expression? converterParameter = null;
 		Expression? fallbackValue = null;
@@ -71,14 +71,14 @@ public static class BindingParser
 			{
 				name = match.Groups[1].Value;
 
-				if (name == "Path" && expression != null)
+				if (name == "Path" && path != null)
 				{
 					throw new ParseException(Res.SyntaxError);
 				}
 
 				str = match.Groups[2].Value;
 			}
-			else if (expression == null)
+			else if (path == null)
 			{
 				name = "Path";
 			}
@@ -122,28 +122,11 @@ public static class BindingParser
 
 				if (name == "Path")
 				{
-					expression = expr;
+					path = expr;
 				}
 				else if (name == "BindBack")
-				{
-					if (!expr.EnumerateTree().Any(e => e is ValueExpression))
-					{
-						if (expr is MemberExpression me && me.Member is MethodInfo method)
-						{
-							if (prop.MemberType.Reference.FullName != "System.Delegate")
-							{
-								var targetType2 = method.Parameters.Last().ParameterType;
-								Expression valueExpr = new ValueExpression(prop.MemberType);
-								valueExpr = Expression.Convert(valueExpr, targetType2);
-								expr = new CallExpression(me.Expression, method, [valueExpr]);
-							}
-						}
-						else
-						{
-							throw new ParseException("Invalid BindBack expression.", currentPos);
-						}
-					}
-					bindBackExpression = expr;
+				{					
+					bindBack = expr;
 					mode ??= BindingMode.TwoWay;
 				}
 				else if (name == "FallbackValue")
@@ -200,7 +183,7 @@ public static class BindingParser
 					else
 					{
 						var msg = $"Mode is invalid: {value}.";
-						if (expression == null)
+						if (path == null)
 						{
 							msg += " Use 'eq' instead of '=' to compare 'Mode' in expression.";
 						}
@@ -238,9 +221,9 @@ public static class BindingParser
 			}
 		}
 
-		if (expression == null)
+		if (path == null)
 		{
-			if (bindBackExpression == null)
+			if (bindBack == null)
 			{
 				throw new ParseException("Missing Path or BindBack expression.");
 			}
@@ -255,54 +238,54 @@ public static class BindingParser
 		}
 
 		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource &&
-			(bindBackExpression ?? expression) is not (MemberExpression or CallExpression or ElementAccessExpression))
+			(bindBack ?? path) is not (MemberExpression or CallExpression or ElementAccessExpression))
 		{
 			throw new ParseException("The expression must be settable for TwoWay or OneWayToSource bindings.");
 		}
 
-		if (isItemsSource && expression == null)
+		if (isItemsSource && path == null)
 		{
 			throw new ParseException("IsItemsSource cannot be used for OneWayToSource bindings.");
 		}
 
-		Expression? sourceExpression = expression;
-		Expression? asyncSourceExpression = null;
+		Expression? bindExpression = path;
+		Expression? asyncBindExpression = null;
 
-		if (sourceExpression != null)
+		if (bindExpression != null)
 		{
-			Expression sourceExpression2;
+			Expression bindExpression2;
 
 			var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-			bool isTask = taskType.IsAssignableFrom(sourceExpression.Type);
+			bool isTask = taskType.IsAssignableFrom(bindExpression.Type);
 			if (isTask)
 			{
-				var taskResultType = sourceExpression.Type.GetGenericArguments()![0];
-				sourceExpression2 = new VariableExpression(taskResultType, "result");
+				var taskResultType = bindExpression.Type.GetGenericArguments()![0];
+				bindExpression2 = new VariableExpression(taskResultType, "result");
 			}
 			else
 			{
-				sourceExpression2 = sourceExpression;
+				bindExpression2 = bindExpression;
 			}
 
 			if (converter != null)
 			{
 				var convertMethod = xamlDomParser.ConverterType!.Methods.First(m => m.Definition.Name == "Convert");
-				sourceExpression2 = new CallExpression(converter, convertMethod,
+				bindExpression2 = new CallExpression(converter, convertMethod,
 				[
-					sourceExpression2,
+					bindExpression2,
 					new TypeofExpression(new TypeExpression(prop.MemberType)),
 					converterParameter ?? Expression.NullExpression,
 					Expression.NullExpression
 				]);
 				if (prop.MemberType.Reference.FullName != "System.Object")
 				{
-					sourceExpression2 = new CastExpression(sourceExpression2, prop.MemberType, false);
+					bindExpression2 = new CastExpression(bindExpression2, prop.MemberType, false);
 				}
 			}
 
 			if (targetNullValue != null)
 			{
-				sourceExpression2 = new CoalesceExpression(sourceExpression2, targetNullValue);
+				bindExpression2 = new CoalesceExpression(bindExpression2, targetNullValue);
 			}
 
 			if (stringFormat != null)
@@ -313,20 +296,51 @@ public static class BindingParser
 				{
 					stringFormat = $"$\"{{{{{{0}}:{stringFormat}}}}}\"";
 				}
-				sourceExpression2 = new InterpolatedStringExpression(stringFormat, new[] { sourceExpression2 });
+				bindExpression2 = new InterpolatedStringExpression(stringFormat, new[] { bindExpression2 });
 			}
 
 			if (isTask)
 			{
-				asyncSourceExpression = sourceExpression2;
+				asyncBindExpression = bindExpression2;
 			}
 			else
 			{
 				if (fallbackValue != null)
 				{
-					sourceExpression2 = FallbackExpression.CreateFallbackExpression(sourceExpression2, fallbackValue, ref localVarIndex);
+					bindExpression2 = FallbackExpression.CreateFallbackExpression(bindExpression2, fallbackValue, ref localVarIndex);
 				}
-				sourceExpression = sourceExpression2;
+				bindExpression = bindExpression2;
+			}
+		}
+
+		Expression? bindBackExpression = null;
+
+		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
+		{
+			if (bindBack != null)
+			{
+				bindBackExpression = bindBack;
+				if (!bindBackExpression.EnumerateTree().Any(e => e is ValueExpression))
+				{
+					if (bindBackExpression is MemberExpression me && me.Member is MethodInfo method)
+					{
+						if (prop.MemberType.Reference.FullName != "System.Delegate")
+						{
+							var targetType2 = method.Parameters.Last().ParameterType;
+							Expression valueExpr = new ValueExpression(prop.MemberType);
+							valueExpr = Expression.Convert(valueExpr, targetType2);
+							bindBackExpression = new CallExpression(me.Expression, method, [valueExpr]);
+						}
+					}
+					else
+					{
+						throw new ParseException("Invalid BindBack expression.");
+					}
+				}
+			}
+			else
+			{
+				bindBackExpression = path!;
 			}
 		}
 
@@ -336,16 +350,17 @@ public static class BindingParser
 			Property = prop,
 			DataType = dataType,
 			DataTypeSet = dataTypeSet,
-			Expression = expression,
-			BindBackExpression = bindBackExpression,
+			Path = path,
+			BindBack = bindBack,
 			Converter = converter,
 			ConverterParameter = converterParameter,
 			FallbackValue = fallbackValue,
 			Mode = mode ?? defaultBindMode,
 			IsItemsSource = isItemsSource,
 			UpdateSourceEvents = targetChangedEvents,
-			SourceExpression = sourceExpression,
-			AsyncSourceExpression = asyncSourceExpression,
+			BindExpression = bindExpression,
+			AsyncBindExpression = asyncBindExpression,
+			BindBackExpression = bindBackExpression,
 		};
 	}
 
@@ -484,9 +499,9 @@ public static class BindingParser
 	{
 		var notifySources = binds
 			.Where(b => b.Property.TargetEvent == null &&
-						b.SourceExpression != null &&
+						b.BindExpression != null &&
 						b.Mode is not (BindingMode.OneTime or BindingMode.OneWayToSource))
-			.SelectMany(b => b.SourceExpression!
+			.SelectMany(b => b.BindExpression!
 							 .EnumerateTree()
 							 .OfType<INotifiableExpression>()
 							 .Select(e => (bind: b, expr: e, notif: checkPropertyNotifiable(e, out var isDependencyProp, out var isCollectionChanged), isDependencyProp, isCollectionChanged)))
@@ -734,7 +749,7 @@ public static class BindingParser
 		// for which event handlers must be set.
 		var notifySources4 = notifySources ?? [notifySource!];
 		foreach (var expr in bindings
-			.SelectMany(b => b.SourceExpression!.EnumerateTree())
+			.SelectMany(b => b.BindExpression!.EnumerateTree())
 			.OfType<INotifiableExpression>())
 		{
 			var expr2 = expr.Expression;
@@ -752,7 +767,7 @@ public static class BindingParser
 		// - SetPropertyHandler methods
 
 		var props1 = bindings
-			.Select(b => new PropertySetData(b.Property, replace(b.SourceExpression!)))
+			.Select(b => new PropertySetData(b.Property, replace(b.BindExpression!)))
 			.ToList();
 
 		var props2 = updateNotifySources
@@ -890,10 +905,8 @@ public class TwoWayBinding
 
 public class Bind
 {
-	public required TypeInfo SourceType { get; init; }
-	public required XamlObjectProperty Property { get; init; }
-	public Expression? Expression { get; init; }
-	public Expression? BindBackExpression { get; init; }
+	public Expression? Path { get; init; }
+	public Expression? BindBack { get; init; }
 	public BindingMode Mode { get; init; }
 	public bool IsItemsSource { get; init; }
 	public Expression? Converter { get; init; }
@@ -903,10 +916,14 @@ public class Bind
 	public bool DataTypeSet { get; init; }
 	public required List<EventInfo> UpdateSourceEvents { get; init; }
 
+	public required TypeInfo SourceType { get; init; }
+	public required XamlObjectProperty Property { get; init; }
+	
 	// The final source expression,
 	// including Converter, TargetNull, FallbackValue, StringFormat
-	public Expression? SourceExpression { get; set; }
-	public Expression? AsyncSourceExpression { get; set; }
+	public Expression? BindExpression { get; set; }
+	public Expression? AsyncBindExpression { get; set; }
+	public Expression? BindBackExpression { get; init; }
 
 	public IMemberInfo? DependencyProperty { get; set; }
 	public int Index { get; set; }

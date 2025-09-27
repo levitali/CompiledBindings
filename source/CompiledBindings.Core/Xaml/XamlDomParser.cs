@@ -375,13 +375,13 @@ public abstract class XamlDomParser
 				}
 				else
 				{
-					if (bind.SourceExpression != null)
+					if (bind.BindExpression != null)
 					{
 						if (bind.Converter == null)
 						{
-							bind.SourceExpression = CorrectSourceExpression(bind.SourceExpression, objProp);
+							bind.BindExpression = CorrectSourceExpression(bind.BindExpression, objProp);
 						}
-						CorrectMethod(objProp, bind.SourceExpression.Type, clrNamespaces, includeNamespaces);
+						CorrectMethod(objProp, bind.BindExpression.Type, clrNamespaces, includeNamespaces);
 					}
 
 					if (DependencyPropertyType != null)
@@ -465,10 +465,10 @@ public abstract class XamlDomParser
 						{
 							throw new ParseException(Res.IsItemsSourceAlreadySet);
 						}
-						elementType = bind.Expression!.Type.GetItemType();
+						elementType = bind.Path!.Type.GetItemType();
 						if (elementType == null)
 						{
-							var expr = Expression.StripParenExpression(bind.Expression);
+							var expr = Expression.StripParenExpression(bind.Path);
 							if (expr is CastExpression cast)
 							{
 								elementType = cast.Expression.Type.GetItemType();
@@ -496,7 +496,7 @@ public abstract class XamlDomParser
 
 		if (objProp.TargetEvent != null)
 		{
-			var expr = value.BindValue?.Expression ?? value.StaticValue;
+			var expr = value.BindValue?.Path ?? value.StaticValue;
 			if (expr != null &&
 				(expr is not MemberExpression me || me.Member is not MethodInfo) &&
 				(expr is not (CallExpression or InvokeExpression)))

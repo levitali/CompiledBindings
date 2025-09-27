@@ -335,8 +335,8 @@ namespace {_compiledBindingsHelperNs}
 			output.AppendLine(
 $@"	class {className}_{bind.Property.Object.Name}_{bind.Property.MemberName} : global::{_platformConstants.BaseClrNamespace}.Xaml.IMarkupExtension
 	{{");
-			var resultType = bind.Expression!.Type.Reference.GetCSharpFullName();
-			if (bind.Expression!.Type.Reference.IsValueType && bind.Expression.IsNullable)
+			var resultType = bind.Path!.Type.Reference.GetCSharpFullName();
+			if (bind.Path!.Type.Reference.IsValueType && bind.Path.IsNullable)
 			{
 				resultType += '?';
 			}
@@ -348,7 +348,7 @@ $@"		global::{_platformConstants.BaseClrNamespace}.Internals.TypedBindingBase _b
 			output.AppendLine(
 $@"			dataRoot => {checkNull}(
 {LineDirective(bind.Property.XamlNode, ref isLineDirective)}
-				{bind.SourceExpression!.CSharpCode},
+				{bind.BindExpression!.CSharpCode},
 {ResetLineDirective(ref isLineDirective)}
 				true),");
 

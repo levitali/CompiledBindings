@@ -68,7 +68,7 @@ public class XamlCodeGenerator
 		if (property.Value.BindValue != null || property.Value.StaticValue != null)
 		{
 			value = expression!.CSharpCode;
-			originalExpression = property.Value.BindValue?.Expression ?? property.Value.StaticValue;
+			originalExpression = property.Value.BindValue?.Path ?? property.Value.StaticValue;
 		}
 		else if (property.Value.CSharpValue != null)
 		{
@@ -289,7 +289,7 @@ $@"{a}					}}");
 					value = "task";
 				}
 
-				var resultExpr = property.Value.BindValue?.AsyncSourceExpression?.CSharpCode ?? "result";
+				var resultExpr = property.Value.BindValue?.AsyncBindExpression?.CSharpCode ?? "result";
 
 				output.AppendLine(
 $@"{LineDirective(property.XamlNode, ref isLineDirective)}

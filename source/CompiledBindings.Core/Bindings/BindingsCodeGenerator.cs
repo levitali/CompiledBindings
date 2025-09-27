@@ -149,7 +149,7 @@ $@"			bool _settingBinding{bind.Index};");
 
 		// Generate CancellationTokenSources for cancelling asynchronous setting of properties
 		var taskType = TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task));
-		var taskBindings = bindingsClass.Bindings.Where(b => b.Expression != null && taskType.IsAssignableFrom(b.Expression.Type)).ToList();
+		var taskBindings = bindingsClass.Bindings.Where(b => b.Path != null && taskType.IsAssignableFrom(b.Path.Type)).ToList();
 		foreach (var bind in taskBindings)
 		{
 			output.AppendLine(
@@ -199,7 +199,7 @@ $@"
 			output.AppendLine();
 			foreach (var binding in eventBindings)
 			{
-				GenerateSetValue(output, binding.Property, binding.Expression, "_targetRoot", ref dummyLocalVar, ref dummyLocalFunc, ref isLineDirective, "\t");
+				GenerateSetValue(output, binding.Property, binding.Path, "_targetRoot", ref dummyLocalVar, ref dummyLocalFunc, ref isLineDirective, "\t");
 			}
 			ResetLineDirective(output, ref isLineDirective);
 		}
@@ -811,37 +811,28 @@ $@"				_bindingsTrackings.SetPropertyChangedEventHandler{notifSource.Index}({not
 				setExpr = $"{memberExpr}.{bind.Property.MemberName}";
 			}
 
-			var expr = bind.BindBackExpression ?? bind.Expression!;
-			var me = expr as MemberExpression;
+			var expr = bind.BindBackExpression!;
 
-			if (bind.BindBackExpression != null)
+			if (bind.BindBack != null)
 			{
-				var valueExpr = bind.BindBackExpression.EnumerateTree().First(e => e is ValueExpression);
+				var valueExpr = bind.BindBackExpression!.EnumerateTree().First(e => e is ValueExpression);
 				expr = expr.CloneReplace(valueExpr, new VariableExpression(valueExpr.Type, setExpr));
 			}
 
 			var ae = expr.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 
-			TypeInfo sourceType;
-			if (me?.Member is MethodInfo mi)
+			if (bind.BindBack == null)
 			{
-				sourceType = mi.Parameters.Last().ParameterType;
-			}
-			else
-			{
-				sourceType = expr.Type;
-			}
+				var sourceType = expr.Type;
 
-			if (bind.Converter != null)
-			{
-				string sourceTypeFullName = sourceType.Reference.GetCSharpFullName();
-				string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
-				string parameter = bind.ConverterParameter?.CSharpCode ?? "null";
-				setExpr = GenerateConvertBackCall(bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
-			}
-			else if (bind.BindBackExpression == null)
-			{
-				if (sourceType.Reference.FullName == "System.String" && bind.Property.MemberType.Reference.FullName != "System.String")
+				if (bind.Converter != null)
+				{
+					string sourceTypeFullName = sourceType.Reference.GetCSharpFullName();
+					string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
+					string parameter = bind.ConverterParameter?.CSharpCode ?? "null";
+					setExpr = GenerateConvertBackCall(bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
+				}
+				else if (sourceType.Reference.FullName == "System.String" && bind.Property.MemberType.Reference.FullName != "System.String")
 				{
 					if (bind.Property.MemberType.IsNullable)
 					{
@@ -925,15 +916,10 @@ $@"{a}				}}");
 			{
 				output.AppendLine(
 $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}");
-				if (bind.BindBackExpression != null)
+				if (bind.BindBack != null)
 				{
 					output.AppendLine(
 $@"{a}					{expression};");
-				}
-				else if (me?.Member is MethodInfo)
-				{
-					output.AppendLine(
-$@"{a}					{expression}({setExpr});");
 				}
 				else
 				{
