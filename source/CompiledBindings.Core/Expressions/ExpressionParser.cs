@@ -130,7 +130,7 @@ public class ExpressionParser
 		return left;
 	}
 
-	private bool IsCompasionToken()
+	private bool IsComparisonToken()
 	{
 		return _token.id is TokenId.DoubleEqual or TokenId.ExclamationEqual or TokenId.LessGreater
 			 or TokenId.GreaterThan or TokenId.GreaterThanEqual or TokenId.LessThan or TokenId.LessThanEqual ||
@@ -156,7 +156,7 @@ public class ExpressionParser
 	private Expression ParseComparison()
 	{
 		var left = ParseAdditive();
-		while (IsCompasionToken())
+		while (IsComparisonToken())
 		{
 			var savedExpectedType = _expectedType;
 			_expectedType = GetNullableUnderlyingType(left.Type);
@@ -910,7 +910,7 @@ public class ExpressionParser
 				var errPos = _token.pos;
 				bool isComparisonToken;
 				TokenId op;
-				if (isComparisonToken = IsCompasionToken())
+				if (isComparisonToken = IsComparisonToken())
 				{
 					op = _token.id;
 					NextToken();
