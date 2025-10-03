@@ -169,7 +169,7 @@ public abstract class SimpleXamlDomParser : XamlDomParser
 					try
 					{
 						var type = FindTypeFromAttribute(dataTypeAttr);
-						dataType = type == null ? null : new TypeInfo(type, false);
+						dataType = type == null ? null : type.ToNotNullable();
 					}
 					catch (Exception ex)
 					{

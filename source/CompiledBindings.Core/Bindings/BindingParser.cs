@@ -38,7 +38,7 @@ public static class BindingParser
 				typeExpr = typeExpr.Substring(0, pos);
 			}
 			var type = xamlDomParser.FindType(typeExpr, (XAttribute)prop.XamlNode.Element);
-			dataType = type == null ? null : new TypeInfo(type, false);
+			dataType = type == null ? null : type.ToNotNullable();
 			dataTypeSet = true;
 
 			sourceType = dataType ?? targetType;
@@ -125,7 +125,7 @@ public static class BindingParser
 					path = expr;
 				}
 				else if (name == "BindBack")
-				{					
+				{
 					bindBack = expr;
 					mode ??= BindingMode.TwoWay;
 				}
@@ -340,7 +340,90 @@ public static class BindingParser
 			}
 			else
 			{
-				bindBackExpression = path!;
+				var targetType2 = path!.Type;
+				var valueExpr = new ValueExpression(prop.MemberType);
+				bindBackExpression = valueExpr;
+
+				if (converter != null)
+				{
+					var convertBackMethod = xamlDomParser.ConverterType!.Methods.First(m => m.Definition.Name == "ConvertBack");
+					bindBackExpression = new CallExpression(converter, convertBackMethod,
+					[
+						bindBackExpression,
+						new TypeofExpression(new TypeExpression(targetType2)),
+						converterParameter ?? Expression.NullExpression,
+						Expression.NullExpression
+					]);
+					if (path.Type.Reference.FullName != "System.Object")
+					{
+						bindBackExpression = new CastExpression(bindBackExpression, targetType2, false);
+					}
+				}
+				else
+				{
+					bindBackExpression = Expression.Convert(bindBackExpression, path!.Type);
+					if (bindBackExpression == valueExpr && !path.Type.IsAssignableFrom(bindBackExpression.Type))
+					{
+						var convertType = TypeInfo.GetTypeThrow(typeof(Convert));
+						var convertMethod = convertType.Methods.First(m => m.Definition.Name == nameof(Convert.ChangeType));
+						var convertTypeExpr = new TypeExpression(convertType);
+
+						if (targetType2.Reference.IsValueNullable())
+						{
+							targetType2 = targetType2.GetGenericArguments()![0];
+						}
+
+						var convertExpression = new CastExpression(
+							new CallExpression(
+								convertTypeExpr,
+								convertMethod,
+								[
+									valueExpr,
+										new TypeofExpression(new TypeExpression(targetType2)),
+										Expression.NullExpression
+								]),
+							targetType2);
+
+						if (prop.MemberType.Reference.IsNullable() || prop.MemberType.Reference.FullName == "System.String")
+						{
+							var localVarName = "v" + localVarIndex++;
+							var localVarExpr = new VariableExpression(prop.MemberType, localVarName);
+							
+							Expression? check;							
+							if (prop.MemberType.Reference.FullName == "System.String")
+							{
+								//!string.IsNullOrEmpty(v)"
+								var stringType = TypeInfo.GetTypeThrow(typeof(string));
+								check = new UnaryExpression(
+									new CallExpression(
+										new TypeExpression(stringType),
+										stringType.Methods.First(m => m.Definition.Name == nameof(string.IsNullOrEmpty)),
+										[localVarExpr]),
+									"!");
+							}
+							else
+							{
+								// Set to null to create v != null expression
+								check = null;
+							}
+							
+							var @default = sourceType.Reference.IsNullable() ? (Expression)Expression.NullExpression : Expression.DefaultExpression;
+							
+							bindBackExpression = new FallbackExpression(
+								convertExpression,
+								valueExpr,
+								@default,
+								localVarExpr,
+								check);
+						}
+						else
+						{
+							bindBackExpression = convertExpression;
+						}
+					}
+				}
+
+				bindBackExpression = new AssignExpression(path!, bindBackExpression);
 			}
 		}
 
@@ -918,7 +1001,7 @@ public class Bind
 
 	public required TypeInfo SourceType { get; init; }
 	public required XamlObjectProperty Property { get; init; }
-	
+
 	// The final source expression,
 	// including Converter, TargetNull, FallbackValue, StringFormat
 	public Expression? BindExpression { get; set; }

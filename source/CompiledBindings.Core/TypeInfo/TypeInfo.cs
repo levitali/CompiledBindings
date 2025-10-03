@@ -257,6 +257,11 @@ public class TypeInfo
 		return typeInfo;
 	}
 
+	public TypeInfo ToNotNullable()
+	{
+		return IsNullable ? new TypeInfo(this, false) : this;
+	}
+
 	public override string ToString()
 	{
 		return Reference.ToString();

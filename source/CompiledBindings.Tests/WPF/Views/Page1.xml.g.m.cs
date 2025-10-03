@@ -929,7 +929,7 @@ namespace WPFTest.Views
 					try
 					{
 #line (57, 19) - (57, 154) 57 "Page1.xml"
-						dataRoot.BoolInput = (global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null);
+						dataRoot.BoolInput = ((global::System.Boolean)_targetRoot.InverseBooleanConverter.ConvertBack(_targetRoot.checkBox1.IsChecked, typeof(global::System.Boolean), dataRoot.ArrayProp.Length > 0, null));
 #line default
 					}
 					catch
@@ -1014,7 +1014,7 @@ namespace WPFTest.Views
 						if (value != null)
 						{
 #line (83, 13) - (83, 86) 83 "Page1.xml"
-							value.BoolInput = _targetRoot.textBox4.Text is var t21 && string.IsNullOrEmpty(t21) ? null : (global::System.Boolean?)global::System.Convert.ChangeType(t21, typeof(global::System.Boolean), null);
+							value.BoolInput = _targetRoot.textBox4.Text is var v5 && !System.String.IsNullOrEmpty(v5) ? ((global::System.Boolean?)System.Convert.ChangeType(v5, typeof(global::System.Boolean), null)) : null;
 #line default
 						}
 					}

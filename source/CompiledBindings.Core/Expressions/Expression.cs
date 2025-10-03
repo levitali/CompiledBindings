@@ -96,6 +96,10 @@ public abstract class Expression
 				: Expression.DefaultExpression;
 			return new CoalesceExpression(expression, defaultExpr);
 		}
+		if (expression.Type.Reference.FullName == "System.Object")
+		{
+			return new CastExpression(expression, targetType);
+		}
 		return expression;
 	}
 }
@@ -156,17 +160,25 @@ public class VariableExpression : Expression
 	{
 		return Name;
 	}
+
+	public VariableExpression ToNotNullable(string? name = null)
+	{
+		return Type.IsNullable ? new VariableExpression(Type.ToNotNullable(), name ?? Name) : this;
+	}
 }
 
 public class ValueExpression : Expression
 {
-	public ValueExpression(TypeInfo type) : base(type)
+	private string _value;
+
+	public ValueExpression(TypeInfo type, string? value = null) : base(type)
 	{
+		_value = value ?? "value";
 	}
 
 	protected override string GetCSharpCode()
 	{
-		return "value";
+		return _value;
 	}
 }
 
@@ -692,22 +704,23 @@ public class TypeofExpression : Expression
 
 public class FallbackExpression : Expression
 {
-	private readonly string _localVarName;
 	private Expression? _notNull;
 	private string? _key;
 
-	public FallbackExpression(Expression expression, Expression nullableExpression, Expression fallbackExpression, string localVarName) : base(expression.Type)
+	public FallbackExpression(Expression expression, Expression nullableExpression, Expression fallbackExpression, VariableExpression localVarExpression, Expression? check = null) : base(expression.Type)
 	{
 		Expression = expression;
 		NullableExpression = nullableExpression;
 		Fallback = fallbackExpression;
-		_localVarName = localVarName;
+		LocalVarExpression = localVarExpression;
+		Check = check ?? new BinaryExpression(localVarExpression, Expression.NullExpression, "!=");
 	}
 
 	public Expression Expression { get; private set; }
 	public Expression NullableExpression { get; private set; }
-
 	public Expression Fallback { get; private set; }
+	public Expression Check { get; private set; }
+	public VariableExpression LocalVarExpression { get; private set; }
 
 	public override Expression TypeDefiningExpression => Expression.TypeDefiningExpression;
 
@@ -721,14 +734,17 @@ public class FallbackExpression : Expression
 		{
 			return expression;
 		}
-		var localVarName = "v" + localVarIndex++;
+
 		var nullableExpr = expr.Expression;
+
+		var localVarName = "v" + localVarIndex++;
+		var localVarExpr = new VariableExpression(nullableExpr.Type, localVarName);
 
 		return new FallbackExpression(
 			expression,
 			nullableExpr,
 			fallbackValue,
-			localVarName);
+			localVarExpr);
 	}
 
 	public override IEnumerable<Expression> Enumerate()
@@ -745,9 +761,12 @@ public class FallbackExpression : Expression
 
 		if (nullableExpr is VariableExpression ve)
 		{
+			var check = Check.CloneReplace(LocalVarExpression, ve);
+
+			var newVar = ve.ToNotNullable();
 			return new ConditionalExpression(
-				new BinaryExpression(ve, Expression.NullExpression, "!="),
-				Expression.CloneReplace(NullableExpression, new VariableExpression(new TypeInfo(ve.Type, false), ve.Name)),
+				check,
+				Expression.CloneReplace(NullableExpression, newVar),
 				fallback);
 		}
 
@@ -757,6 +776,8 @@ public class FallbackExpression : Expression
 		clone.Expression = expression;
 		clone.NullableExpression = nullableExpr;
 		clone.Fallback = fallback;
+		clone.Check = Check;
+		clone.LocalVarExpression = LocalVarExpression;
 		clone._notNull = null;
 		clone._key = null;
 		return clone;
@@ -764,12 +785,12 @@ public class FallbackExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"{NullableExpression} is var {_localVarName} && {_localVarName} != null ? {NotNull} : {Fallback}";
+		return $"{NullableExpression} is var {LocalVarExpression} && {Check} ? {NotNull} : {Fallback}";
 	}
 
-	public override string Key => _key ??= $"{NullableExpression} is var v && v != null ? {NotNull} : {Fallback}";
+	public override string Key => _key ??= $"{NullableExpression} is var v && {Check.CloneReplace(LocalVarExpression, new VariableExpression(LocalVarExpression.Type, "v"))} ? {NotNull.CloneReplace(LocalVarExpression, LocalVarExpression.ToNotNullable("v"))} : {Fallback}";
 
-	private Expression NotNull => _notNull ??= Expression.CloneReplace(NullableExpression, new VariableExpression(new TypeInfo(Expression.Type, false), _localVarName));
+	private Expression NotNull => _notNull ??= Expression.CloneReplace(NullableExpression, LocalVarExpression.ToNotNullable());
 }
 
 public class InterpolatedStringExpression : Expression
@@ -885,6 +906,37 @@ public class StaticResourceExpression : Expression
 	{
 		return $"_targetRoot.{Name}";
 	}
+}
+
+public class AssignExpression : Expression
+{
+	public AssignExpression(Expression left, Expression right) : base(left.Type)
+	{
+		Left = left;
+		Right = right;
+	}
+
+	public Expression Left { get; }
+
+	public Expression Right { get; }
+
+	protected override string GetCSharpCode()
+	{
+		return $"{Left} = {Right}";
+	}
+
+	protected override Expression CloneReplaceCore(Expression current, Expression replace)
+	{
+		return new AssignExpression(Left.CloneReplace(current, replace), Right.CloneReplace(current, replace));
+	}
+
+	public override IEnumerable<Expression> Enumerate()
+	{
+		yield return Left;
+		yield return Right;
+	}
+
+	public override bool IsNullable => Left.IsNullable;
 }
 
 public interface IAccessExpression

@@ -1010,7 +1010,7 @@ public class ExpressionParser
 				if (method != null)
 				{
 					member = method;
-					memberType = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Delegate)), false);
+					memberType = TypeInfo.GetTypeThrow(typeof(Delegate)).ToNotNullable();
 					if (ns != null)
 					{
 						_includeNamespaces.Add(ns);

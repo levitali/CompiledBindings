@@ -813,65 +813,10 @@ $@"				_bindingsTrackings.SetPropertyChangedEventHandler{notifSource.Index}({not
 
 			var expr = bind.BindBackExpression!;
 
-			if (bind.BindBack != null)
-			{
-				var valueExpr = bind.BindBackExpression!.EnumerateTree().First(e => e is ValueExpression);
-				expr = expr.CloneReplace(valueExpr, new VariableExpression(valueExpr.Type, setExpr));
-			}
+			expr = expr.CloneReplace(new ValueExpression(bind.Property.MemberType), new ValueExpression(bind.Property.MemberType, setExpr));
 
-			var ae = expr.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
-
-			if (bind.BindBack == null)
-			{
-				var sourceType = expr.Type;
-
-				if (bind.Converter != null)
-				{
-					string sourceTypeFullName = sourceType.Reference.GetCSharpFullName();
-					string? cast = sourceTypeFullName == "System.Object" ? null : $"(global::{sourceTypeFullName})";
-					string parameter = bind.ConverterParameter?.CSharpCode ?? "null";
-					setExpr = GenerateConvertBackCall(bind.Converter, setExpr, sourceTypeFullName, parameter, cast);
-				}
-				else if (sourceType.Reference.FullName == "System.String" && bind.Property.MemberType.Reference.FullName != "System.String")
-				{
-					if (bind.Property.MemberType.IsNullable)
-					{
-						setExpr += "?";
-					}
-					setExpr += ".ToString()";
-				}
-				else if (!sourceType.IsAssignableFrom(bind.Property.MemberType))
-				{
-					var sourceType2 = sourceType.Reference;
-					var targetType = bind.Property.MemberType.Reference;
-					if (targetType.FullName == "System.Object")
-					{
-						setExpr = $"(global::{sourceType2.GetCSharpFullName()}){setExpr}";
-					}
-					else if (targetType.IsValueNullable() && targetType.GetGenericArguments()[0].FullName == sourceType2.FullName)
-					{
-						setExpr = $"{setExpr} ?? default";
-					}
-					else
-					{
-						if (sourceType2.IsValueNullable())
-						{
-							sourceType2 = sourceType2.GetGenericArguments()[0];
-						}
-
-						if (bind.Property.MemberType.Reference.IsNullable())
-						{
-							var checkNull = bind.Property.MemberType.Reference.FullName == "System.String" ? $"string.IsNullOrEmpty(t{bind.Index})" : $"t{bind.Index} == null";
-							var @default = sourceType.Reference.IsNullable() ? "null" : "default";
-							setExpr = $"{setExpr} is var t{bind.Index} && {checkNull} ? {@default} : (global::{sourceType.Reference.GetCSharpFullName()})global::System.Convert.ChangeType(t{bind.Index}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
-						}
-						else
-						{
-							setExpr = $"(global::{sourceType.Reference.GetCSharpFullName()})global::System.Convert.ChangeType({setExpr}, typeof(global::{sourceType2.GetCSharpFullName()}), null)";
-						}
-					}
-				}
-			}
+			var expr2 = expr is AssignExpression assign ? assign.Left : expr;
+			var ae = expr2.EnumerateTree().OrderByDescending(e => e.CSharpCode.Length).OfType<IAccessExpression>().FirstOrDefault(e => e.Expression.IsNullable);
 
 			string? a2 = a;
 			if (bind.Mode == BindingMode.TwoWay)
@@ -886,7 +831,7 @@ $@"{a2}				try
 {a2}				{{");
 			if (ae != null)
 			{
-				var memberExpr2 = expr.CloneReplace(ae.Expression, new VariableExpression(new TypeInfo(ae.Expression.Type, false), "value"));
+				var memberExpr2 = expr.CloneReplace(ae.Expression, new VariableExpression(ae.Expression.Type.ToNotNullable(), "value"));
 				output.AppendLine(
 $@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
 {a2}					var value = {ae!.Expression};
@@ -915,19 +860,9 @@ $@"{a}				}}");
 			void generateSetSource(string expression, string? a)
 			{
 				output.AppendLine(
-$@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}");
-				if (bind.BindBack != null)
-				{
-					output.AppendLine(
-$@"{a}					{expression};");
-				}
-				else
-				{
-					output.AppendLine(
-$@"{a}					{expression} = {setExpr};");
-				}
-				output.AppendLine(
-$@"{ResetLineDirective(ref isLineDirective)}");
+$@"{LineDirective(bind.Property.XamlNode, ref isLineDirective)}
+{a}					{expression};
+{ResetLineDirective(ref isLineDirective)}");
 			}
 		}
 
@@ -962,11 +897,6 @@ $@"{ResetLineDirective(ref isLineDirective)}");
 
 	protected virtual void GenerateDependencyPropertyChangedCallback(StringBuilder output, string methodName, string? a = null)
 	{
-	}
-
-	protected virtual string GenerateConvertBackCall(Expression converter, string value, string targetType, string parameter, string? cast)
-	{
-		return $"{cast}{converter}.ConvertBack({value}, typeof(global::{targetType}), {parameter}, null)";
 	}
 }
 

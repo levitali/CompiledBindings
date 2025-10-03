@@ -66,7 +66,7 @@ public abstract class XamlDomParser
 		var xClassAttr = root.Attribute(xClass);
 		try
 		{
-			return new TypeInfo(TypeInfo.GetTypeThrow(xClassAttr.Value), false);
+			return TypeInfo.GetTypeThrow(xClassAttr.Value).ToNotNullable();
 		}
 		catch (Exception ex)
 		{

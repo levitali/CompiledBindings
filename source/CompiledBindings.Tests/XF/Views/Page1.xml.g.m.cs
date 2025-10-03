@@ -427,7 +427,7 @@ namespace XFTest.Views
 							try
 							{
 #line (53, 16) - (53, 59) 53 "Page1.xml"
-								dataRoot.NullableIntProp = _targetRoot.entry2.Text is var t9 && string.IsNullOrEmpty(t9) ? null : (global::System.Int32?)global::System.Convert.ChangeType(t9, typeof(global::System.Int32), null);
+								dataRoot.NullableIntProp = _targetRoot.entry2.Text is var v0 && !System.String.IsNullOrEmpty(v0) ? ((global::System.Int32?)System.Convert.ChangeType(v0, typeof(global::System.Int32), null)) : null;
 #line default
 							}
 							catch

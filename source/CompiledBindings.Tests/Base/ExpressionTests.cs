@@ -2,29 +2,29 @@
 
 public class ExpressionTests : IDisposable
 {
-	TypeInfo class1Type;
-	TypeInfo stringType;
-	TypeInfo intType;
-	XamlNamespace[] ns;
-	int localVarIndex;
+	private readonly TypeInfo class1Type;
+	private readonly TypeInfo stringType;
+	private readonly TypeInfo intType;
+	private readonly XamlNamespace[] ns;
+	private int localVarIndex;
 
 	public ExpressionTests()
 	{
-		TypeInfoUtils.LoadReferences(new string[]
-		{
+		TypeInfoUtils.LoadReferences(
+		[
 			typeof(string).Assembly.Location,
 			Assembly.GetExecutingAssembly().Location
-		});
+		]);
 
-		class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
+		class1Type = TypeInfo.GetTypeThrow(typeof(Class1)).ToNotNullable();
 		stringType = TypeInfo.GetTypeThrow(typeof(string));
 		intType = TypeInfo.GetTypeThrow(typeof(int));
 
-		ns = new[]
-		{
+		ns =
+		[
 			new XamlNamespace("system", "using:System"),
 			new XamlNamespace("local", "using:CompiledBindings.Tests")
-		};
+		];
 	}
 
 	public void Dispose()
@@ -85,9 +85,8 @@ public class ExpressionTests : IDisposable
 	[Test]
 	public void TestIsExpression()
 	{
-		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
+		var class1Type = TypeInfo.GetTypeThrow(typeof(Class1)).ToNotNullable();
 		var stringType = TypeInfo.GetTypeThrow(typeof(string));
-		var intType = TypeInfo.GetTypeThrow(typeof(int));
 
 		var ns = new[]
 		{
@@ -97,7 +96,7 @@ public class ExpressionTests : IDisposable
 
 		string expression, expectedCode;
 		Expression result;
-		
+
 		expression = "IntProp is 0 or 1";
 		expectedCode = "(dataRoot.IntProp == 0 || dataRoot.IntProp == 1)";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
@@ -159,9 +158,8 @@ public class ExpressionTests : IDisposable
 	[Test]
 	public void ExpectedTypeAsMember()
 	{
-		var class1Type = new TypeInfo(TypeInfo.GetTypeThrow(typeof(Class1)), false);
+		var class1Type = TypeInfo.GetTypeThrow(typeof(Class1)).ToNotNullable();
 		var stringType = TypeInfo.GetTypeThrow(typeof(string));
-		var intType = TypeInfo.GetTypeThrow(typeof(int));
 
 		var ns = new[]
 		{
