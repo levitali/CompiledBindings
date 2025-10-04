@@ -34,7 +34,7 @@ namespace WPFTest.Views
 			colorBrush2 = (global::System.Windows.Media.Brush)(this.Resources["colorBrush2"] ?? global::System.Windows.Application.Current.Resources["colorBrush2"] ?? throw new global::System.Exception("Resource 'colorBrush2' not found."));
 
 #line (15, 5) - (15, 50) 15 "Page1.xml"
-			var value1 = WPFTest.Strings.Instance;
+			var value1 = global::WPFTest.Strings.Instance;
 #line (15, 5) - (15, 50) 15 "Page1.xml"
 			Title = value1.Title;
 #line default
@@ -520,7 +520,7 @@ namespace WPFTest.Views
 #line (50, 13) - (50, 67) 50 "Page1.xml"
 				var value1 = value.BooleanProp;
 #line (50, 13) - (50, 67) 50 "Page1.xml"
-				_targetRoot.header1.Visibility = (value1 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed);
+				_targetRoot.header1.Visibility = (value1 ? global::System.Windows.Visibility.Visible : global::System.Windows.Visibility.Collapsed);
 #line (53, 13) - (53, 101) 53 "Page1.xml"
 				_targetRoot.textBlock6.Visibility = ((global::System.Windows.Visibility)_targetRoot.TrueToVisibleConverter.Convert(value1, typeof(global::System.Windows.Visibility), null, null));
 #line (90, 13) - (90, 74) 90 "Page1.xml"
@@ -683,7 +683,7 @@ namespace WPFTest.Views
 				try
 				{
 #line (81, 13) - (81, 110) 81 "Page1.xml"
-					global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value.FocusedField[WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
+					global::UI.FocusManager.SetFocused(_targetRoot.textBox4, value.FocusedField[global::WPFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line default
 				}
 				finally
@@ -697,7 +697,7 @@ namespace WPFTest.Views
 #line (94, 26) - (94, 103) 94 "Page1.xml"
 				var value1 = value.QualityState;
 #line (94, 26) - (94, 103) 94 "Page1.xml"
-				var value2 = value1 == WPFTest.ViewModels.QualityState.Bad;
+				var value2 = value1 == global::WPFTest.ViewModels.QualityState.Bad;
 #line default
 				if (!object.Equals(_targetRoot.radioButton1.IsChecked, value2))
 				{
@@ -714,7 +714,7 @@ namespace WPFTest.Views
 					}
 				}
 #line (95, 26) - (95, 109) 95 "Page1.xml"
-				var value3 = value1 == WPFTest.ViewModels.QualityState.Middle;
+				var value3 = value1 == global::WPFTest.ViewModels.QualityState.Middle;
 #line default
 				if (!object.Equals(_targetRoot.radioButton2.IsChecked, value3))
 				{
@@ -731,7 +731,7 @@ namespace WPFTest.Views
 					}
 				}
 #line (96, 26) - (96, 105) 96 "Page1.xml"
-				var value4 = value1 == WPFTest.ViewModels.QualityState.Good;
+				var value4 = value1 == global::WPFTest.ViewModels.QualityState.Good;
 #line default
 				if (!object.Equals(_targetRoot.radioButton3.IsChecked, value4))
 				{
@@ -895,7 +895,7 @@ namespace WPFTest.Views
 					try
 					{
 #line (81, 13) - (81, 110) 81 "Page1.xml"
-						dataRoot.FocusedField[WPFTest.ViewModels.Page1ViewModel.Field.Field1] = global::UI.FocusManager.GetFocused(_targetRoot.textBox4);
+						dataRoot.FocusedField[global::WPFTest.ViewModels.Page1ViewModel.Field.Field1] = global::UI.FocusManager.GetFocused(_targetRoot.textBox4);
 #line default
 					}
 					catch
@@ -1014,7 +1014,7 @@ namespace WPFTest.Views
 						if (value != null)
 						{
 #line (83, 13) - (83, 86) 83 "Page1.xml"
-							value.BoolInput = _targetRoot.textBox4.Text is var v5 && !System.String.IsNullOrEmpty(v5) ? ((global::System.Boolean?)System.Convert.ChangeType(v5, typeof(global::System.Boolean), null)) : null;
+							value.BoolInput = _targetRoot.textBox4.Text is var v5 && !global::System.String.IsNullOrEmpty(v5) ? ((global::System.Boolean?)global::System.Convert.ChangeType(v5, typeof(global::System.Boolean), null)) : null;
 #line default
 						}
 					}
@@ -1055,7 +1055,7 @@ namespace WPFTest.Views
 					try
 					{
 #line (94, 26) - (94, 103) 94 "Page1.xml"
-						dataRoot.SetQualityState(WPFTest.ViewModels.QualityState.Bad, _targetRoot.radioButton1.IsChecked ?? default);
+						dataRoot.SetQualityState(global::WPFTest.ViewModels.QualityState.Bad, _targetRoot.radioButton1.IsChecked ?? default);
 #line default
 					}
 					catch
@@ -1072,7 +1072,7 @@ namespace WPFTest.Views
 					try
 					{
 #line (95, 26) - (95, 109) 95 "Page1.xml"
-						dataRoot.SetQualityState(WPFTest.ViewModels.QualityState.Middle, _targetRoot.radioButton2.IsChecked ?? default);
+						dataRoot.SetQualityState(global::WPFTest.ViewModels.QualityState.Middle, _targetRoot.radioButton2.IsChecked ?? default);
 #line default
 					}
 					catch
@@ -1089,7 +1089,7 @@ namespace WPFTest.Views
 					try
 					{
 #line (96, 26) - (96, 105) 96 "Page1.xml"
-						dataRoot.SetQualityState(WPFTest.ViewModels.QualityState.Good, _targetRoot.radioButton3.IsChecked ?? default);
+						dataRoot.SetQualityState(global::WPFTest.ViewModels.QualityState.Good, _targetRoot.radioButton3.IsChecked ?? default);
 #line default
 					}
 					catch
@@ -1263,7 +1263,7 @@ namespace WPFTest.Views
 				try
 				{
 #line (30, 24) - (30, 68) 30 "Page1.xml"
-					var result = await WPFTest.Utils.LoadImageAsync();
+					var result = await global::WPFTest.Utils.LoadImageAsync();
 #line default
 					if (!cancellationToken.IsCancellationRequested)
 					{
@@ -1345,7 +1345,7 @@ namespace WPFTest.Views
 #line (27, 21) - (27, 47) 27 "Page1.xml"
 				_targetRoot.textBlock2.Text = value1.ToString();
 #line (28, 21) - (28, 84) 28 "Page1.xml"
-				_targetRoot.textBlock2.Visibility = WPFTest.Views.XamlUtils.TrueToVisible(value1);
+				_targetRoot.textBlock2.Visibility = global::WPFTest.Views.XamlUtils.TrueToVisible(value1);
 #line (29, 28) - (29, 111) 29 "Page1.xml"
 				_targetRoot.textBlock3.IsEnabled = ((global::System.Boolean)_targetRoot.InverseBooleanConverter.Convert(value1, typeof(global::System.Boolean), null, null));
 #line default

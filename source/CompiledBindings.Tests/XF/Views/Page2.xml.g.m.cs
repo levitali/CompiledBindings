@@ -50,7 +50,7 @@ namespace XFTest.Views
 			someConverter = (global::Xamarin.Forms.IValueConverter)(this.Resources.TryGetValue("someConverter", out var r0) || global::Xamarin.Forms.Application.Current.Resources.TryGetValue("someConverter", out r0) ? r0 : throw new global::System.Exception("Resource 'someConverter' not found."));
 
 #line (28, 16) - (28, 80) 28 "Page2.xml"
-			label8.Text = Test.BarcodeKeys.HU + "," + Test.BarcodeKeys.Batch;
+			label8.Text = global::Test.BarcodeKeys.HU + "," + global::Test.BarcodeKeys.Batch;
 #line (33, 17) - (33, 43) 33 "Page2.xml"
 			button1.Clicked += this.OnClicked;
 #line default

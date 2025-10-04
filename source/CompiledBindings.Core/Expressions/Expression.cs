@@ -449,7 +449,7 @@ public class NewExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"new global::{TypeExpression}({string.Join(", ", Args.Select(a => a.CSharpCode))})";
+		return $"new {TypeExpression}({string.Join(", ", Args.Select(a => a.CSharpCode))})";
 	}
 
 	public override IEnumerable<Expression> Enumerate()
@@ -479,7 +479,7 @@ public class TypeExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return Type.Reference.GetCSharpFullName();
+		return $"global::{Type.Reference.GetCSharpFullName()}";
 	}
 
 	public override bool IsNullable => false;
@@ -696,7 +696,7 @@ public class TypeofExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"typeof(global::{ThisType})";
+		return $"typeof({ThisType})";
 	}
 
 	public override bool IsNullable => false;
@@ -841,7 +841,7 @@ public class AsExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"({Expression} as global::{AsType})";
+		return $"({Expression} as {AsType})";
 	}
 
 	public override IEnumerable<Expression> Enumerate()
@@ -873,7 +873,7 @@ public class IsExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"{Expression} is global::{IsType}";
+		return $"{Expression} is {IsType}";
 	}
 
 	public override IEnumerable<Expression> Enumerate()

@@ -49,7 +49,7 @@ namespace XFTest.Views
 			label13 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label13");
 
 #line (14, 5) - (14, 48) 14 "Page1.xml"
-			var value1 = XFTest.Strings.Instance;
+			var value1 = global::XFTest.Strings.Instance;
 #line (14, 5) - (14, 48) 14 "Page1.xml"
 			Title = value1.Title;
 #line (41, 16) - (41, 60) 41 "Page1.xml"
@@ -286,7 +286,7 @@ namespace XFTest.Views
 #line (44, 13) - (44, 58) 44 "Page1.xml"
 				var value1 = value.BooleanProp;
 #line (44, 13) - (44, 58) 44 "Page1.xml"
-				_targetRoot.label6.TextColor = (value1 ? Xamarin.Forms.Color.Green : Xamarin.Forms.Color.Red);
+				_targetRoot.label6.TextColor = (value1 ? global::Xamarin.Forms.Color.Green : global::Xamarin.Forms.Color.Red);
 #line (47, 16) - (47, 46) 47 "Page1.xml"
 				_targetRoot.label9.Text = (!value1).ToString();
 #line (51, 13) - (51, 58) 51 "Page1.xml"
@@ -342,7 +342,7 @@ namespace XFTest.Views
 			private void Update0_FocusedField(global::XFTest.ViewModels.Page1ViewModel value)
 			{
 #line (52, 13) - (52, 56) 52 "Page1.xml"
-				_targetRoot.entry1.SetFocused(value.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1]);
+				_targetRoot.entry1.SetFocused(value.FocusedField[global::XFTest.ViewModels.Page1ViewModel.Field.Field1]);
 #line default
 			}
 
@@ -392,7 +392,7 @@ namespace XFTest.Views
 						try
 						{
 #line (50, 13) - (50, 74) 50 "Page1.xml"
-							dataRoot.FocusedField[XFTest.ViewModels.Page1ViewModel.Field.Field1] = _targetRoot.entry1.IsFocused;
+							dataRoot.FocusedField[global::XFTest.ViewModels.Page1ViewModel.Field.Field1] = _targetRoot.entry1.IsFocused;
 #line default
 						}
 						catch
@@ -427,7 +427,7 @@ namespace XFTest.Views
 							try
 							{
 #line (53, 16) - (53, 59) 53 "Page1.xml"
-								dataRoot.NullableIntProp = _targetRoot.entry2.Text is var v0 && !System.String.IsNullOrEmpty(v0) ? ((global::System.Int32?)System.Convert.ChangeType(v0, typeof(global::System.Int32), null)) : null;
+								dataRoot.NullableIntProp = _targetRoot.entry2.Text is var v0 && !global::System.String.IsNullOrEmpty(v0) ? ((global::System.Int32?)global::System.Convert.ChangeType(v0, typeof(global::System.Int32), null)) : null;
 #line default
 							}
 							catch

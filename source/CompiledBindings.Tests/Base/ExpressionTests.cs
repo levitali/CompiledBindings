@@ -124,7 +124,7 @@ public class ExpressionTests : IDisposable
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "(Mode is Mode1 or Mode2) and RefProp.DecimalProp ne 4";
-		expectedCode = "((dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode1 || dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode2)) && dataRoot.RefProp?.DecimalProp != 4";
+		expectedCode = "((dataRoot.Mode == global::CompiledBindings.Tests.TestMode.Mode1 || dataRoot.Mode == global::CompiledBindings.Tests.TestMode.Mode2)) && dataRoot.RefProp?.DecimalProp != 4";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
@@ -171,7 +171,7 @@ public class ExpressionTests : IDisposable
 		Expression result;
 
 		expression = "Mode eq Mode3";
-		expectedCode = "dataRoot.Mode == CompiledBindings.Tests.TestMode.Mode3";
+		expectedCode = "dataRoot.Mode == global::CompiledBindings.Tests.TestMode.Mode3";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
@@ -199,7 +199,7 @@ public class ExpressionTests : IDisposable
 	public void MethodCall_NotNullableExpression()
 	{
 		var expression = "local:Class1.Instance.Method1(null).ToString()";
-		var expectedCode = "CompiledBindings.Tests.Class1.Instance.Method1(null).ToString()";
+		var expectedCode = "global::CompiledBindings.Tests.Class1.Instance.Method1(null).ToString()";
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, stringType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
@@ -217,7 +217,7 @@ public class ExpressionTests : IDisposable
 	public void StaticProperty()
 	{
 		var expression = "local:Class1.Instance.StringProp";
-		var expectedCode = "CompiledBindings.Tests.Class1.Instance.StringProp";
+		var expectedCode = "global::CompiledBindings.Tests.Class1.Instance.StringProp";
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
@@ -262,7 +262,7 @@ public class ExpressionTests : IDisposable
 	public void Typeof()
 	{
 		var expression = "local:Class1.Method1(typeof(local:Class2))";
-		var expectedCode = "CompiledBindings.Tests.Class1.Method1(typeof(global::CompiledBindings.Tests.Class2))";
+		var expectedCode = "global::CompiledBindings.Tests.Class1.Method1(typeof(global::CompiledBindings.Tests.Class2))";
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
@@ -294,7 +294,7 @@ public class ExpressionTests : IDisposable
 	public void NestedTypes()
 	{
 		var expression = "local:Class1.Drawable.Id1";
-		var expectedCode = "CompiledBindings.Tests.Class1.Drawable.Id1";
+		var expectedCode = "global::CompiledBindings.Tests.Class1.Drawable.Id1";
 		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
@@ -313,7 +313,7 @@ public class ExpressionTests : IDisposable
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "local:Class1.ExtensionStaticMethod()";
-		expectedCode = "CompiledBindings.Tests.Class1.ExtensionStaticMethod()";
+		expectedCode = "global::CompiledBindings.Tests.Class1.ExtensionStaticMethod()";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
@@ -323,7 +323,7 @@ public class ExpressionTests : IDisposable
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 
 		expression = "local:Class1.ExtensionStaticProperty";
-		expectedCode = "CompiledBindings.Tests.Class1.ExtensionStaticProperty";
+		expectedCode = "global::CompiledBindings.Tests.Class1.ExtensionStaticProperty";
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}

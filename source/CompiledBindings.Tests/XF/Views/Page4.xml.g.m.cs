@@ -194,7 +194,7 @@ namespace XFTest.Views
 							try
 							{
 #line (51, 13) - (51, 74) 51 "Page4.xml"
-								dataRoot.QuantityInput = _targetRoot.entry1.Text is var v0 && !System.String.IsNullOrEmpty(v0) ? ((global::System.Decimal?)System.Convert.ChangeType(v0, typeof(global::System.Decimal), null)) : null;
+								dataRoot.QuantityInput = _targetRoot.entry1.Text is var v0 && !global::System.String.IsNullOrEmpty(v0) ? ((global::System.Decimal?)global::System.Convert.ChangeType(v0, typeof(global::System.Decimal), null)) : null;
 #line default
 							}
 							catch
