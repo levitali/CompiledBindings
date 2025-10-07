@@ -332,9 +332,9 @@ public static class BindingParser
 							bindBackExpression = new CallExpression(me.Expression, method, [valueExpr]);
 						}
 					}
-					else
+					else if (bindBackExpression is not CallExpression)
 					{
-						throw new ParseException("Invalid BindBack expression.");
+						bindBackExpression = new AssignExpression(new ValueExpression(prop.MemberType), bindBackExpression);
 					}
 				}
 			}
