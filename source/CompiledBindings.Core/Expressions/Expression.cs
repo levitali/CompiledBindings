@@ -19,6 +19,55 @@ public abstract class Expression
 
 	public virtual bool IsNullable => Type.IsNullable || Enumerate().Any(e => e.IsNullable);
 
+	public bool IsAssignableTo(TypeInfo type)
+	{
+		if (type.IsAssignableFrom(Type))
+		{
+			return true;
+		}
+
+		if (Type.Reference.IsValueNullable() &&
+			Type.Reference.GetGenericArguments()![0].FullName == type.Reference.FullName)
+		{
+			return true;
+		}
+
+		if (TypeDefiningExpression is not ConstantExpression ce)
+		{
+			return false;
+		}
+
+		if (type.IsNullable && ce.Value == null)
+		{
+			return true;
+		}
+
+		switch ((type.Reference.FullName, ce.Value))
+		{
+			case ("System.Char", string v1) when v1.Length == 1:
+			case ("System.Int8", long v2) when v2 >= sbyte.MinValue:
+			case ("System.Int8", ulong v22) when v22 <= (ulong)sbyte.MaxValue:
+			case ("System.UInt8", ulong v3) when v3 <= byte.MaxValue:
+			case ("System.Int16", long v4) when v4 >= short.MinValue:
+			case ("System.Int16", ulong v44) when v44 <= (ulong)short.MaxValue:
+			case ("System.UInt16", ulong v5) when v5 <= ushort.MaxValue:
+			case ("System.Int32", long v6) when v6 >= int.MinValue:
+			case ("System.Int32", ulong v66) when v66 <= int.MaxValue:
+			case ("System.UInt32", ulong v7) when v7 <= uint.MaxValue:
+			case ("System.Decimal", long v8) when v8 >= decimal.MinValue:
+			case ("System.Decimal", ulong v9) when v9 <= decimal.MaxValue:
+			case ("System.Decimal", double v10) when v10 is >= ((double)decimal.MinValue) and <= ((double)decimal.MaxValue):
+			case ("System.Single", long v11) when v11 >= float.MinValue:
+			case ("System.Single", ulong v12) when v12 <= float.MaxValue:
+			case ("System.Single", double v13) when v13 is >= float.MinValue and <= float.MaxValue:
+			case ("System.Double", long v14) when v14 >= double.MinValue:
+			case ("System.Double", ulong v15) when v15 <= double.MaxValue:
+				return true;
+		}
+
+		return false;
+	}
+
 	public virtual IEnumerable<Expression> Enumerate()
 	{
 		return Enumerable.Empty<Expression>();
@@ -78,27 +127,37 @@ public abstract class Expression
 
 	public static Expression Convert(Expression expression, TypeInfo targetType)
 	{
-		if (expression is not CompiledBindings.DefaultExpression &&
-			!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
-			targetType.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
+		var targetType2 = targetType;
+		
+		if (targetType2.Reference.IsValueNullable())
 		{
-			var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
-			if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
-			{
-				expression = new ParenExpression(expression);
-			}
-			expression = new CallExpression(expression, method, Array.Empty<Expression>());
+			targetType2 = targetType2.GetGenericArguments()![0];
 		}
-		if (expression.IsNullable && !targetType.IsNullable)
+
+		if (!expression.IsAssignableTo(targetType2))
+		{
+			if (expression is not CompiledBindings.DefaultExpression &&
+				!TypeInfo.GetTypeThrow(typeof(System.Threading.Tasks.Task)).IsAssignableFrom(expression.Type) &&
+				targetType.Reference.FullName == "System.String" && expression.Type.Reference.FullName != "System.String")
+			{
+				var method = TypeInfo.GetTypeThrow(typeof(object)).Methods.First(m => m.Definition.Name == "ToString");
+				if (expression is UnaryExpression or BinaryExpression or CoalesceExpression)
+				{
+					expression = new ParenExpression(expression);
+				}
+				expression = new CallExpression(expression, method, Array.Empty<Expression>());
+			}			
+			if (expression.Type.Reference.FullName == "System.Object")
+			{
+				return new CastExpression(expression, targetType);
+			}
+		}
+		else if (expression.IsNullable && !targetType.IsNullable)
 		{
 			Expression defaultExpr = targetType.Reference.FullName == "System.String"
 				? new ConstantExpression("")
 				: Expression.DefaultExpression;
 			return new CoalesceExpression(expression, defaultExpr);
-		}
-		if (expression.Type.Reference.FullName == "System.Object")
-		{
-			return new CastExpression(expression, targetType);
 		}
 		return expression;
 	}

@@ -17,10 +17,10 @@
         <DataTemplate
             x:Key="test1Template"
             x:DataType="viewModels:EntityViewModel">
-					  <Grid>
-              <Picker  x:Name="picker1" />
-							<Label  x:Name="label1"/>
-						</Grid>
+            <Grid>
+                <Picker  x:Name="picker1" />
+                <Label  x:Name="label1" />
+            </Grid>
         </DataTemplate>
     </Page.Resources>
 
@@ -31,11 +31,12 @@
         <Picker
             
              x:Name="picker2" />
-			  <Label  x:Name="label5" />
-			  <Label  x:Name="label6"/>
-			  <Label  x:Name="label7"/>
-			  <Entry  x:Name="entry1"/>
-			
+        <Label  x:Name="label5" />
+        <Label  x:Name="label6" />
+        <Label  x:Name="label7" />
+        <Entry  x:Name="entry1" />
+        <Entry  x:Name="entry2" />
+
     </Grid>
 
 </Page>

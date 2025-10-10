@@ -22,6 +22,7 @@ namespace XFTest.Views
 		private global::Xamarin.Forms.Label label6;
 		private global::Xamarin.Forms.Label label7;
 		private global::Xamarin.Forms.Entry entry1;
+		private global::Xamarin.Forms.Entry entry2;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -39,8 +40,9 @@ namespace XFTest.Views
 			label6 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label6");
 			label7 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Label>(this, "label7");
 			entry1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Entry>(this, "entry1");
+			entry2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Entry>(this, "entry2");
 
-#line (34, 13) - (34, 28) 34 "Page3.xml"
+#line (34, 16) - (34, 31) 34 "Page3.xml"
 			label5.Text = 3.ToString();
 #line default
 
@@ -68,6 +70,7 @@ namespace XFTest.Views
 			global::XFTest.ViewModels.Page3ViewModel _dataRoot;
 			Page3_BindingsTrackings_this _bindingsTrackings;
 			bool _settingBinding6;
+			bool _settingBinding7;
 
 			public void Initialize(Page3 targetRoot, global::XFTest.ViewModels.Page3ViewModel dataRoot)
 			{
@@ -80,6 +83,7 @@ namespace XFTest.Views
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 
 				_targetRoot.entry1.PropertyChanged += OnTargetChanged0;
+				_targetRoot.entry2.PropertyChanged += OnTargetChanged1;
 			}
 
 			public void Cleanup()
@@ -87,6 +91,7 @@ namespace XFTest.Views
 				if (_targetRoot != null)
 				{
 					_targetRoot.entry1.PropertyChanged -= OnTargetChanged0;
+					_targetRoot.entry2.PropertyChanged -= OnTargetChanged1;
 					_bindingsTrackings.Cleanup();
 					_dataRoot = null;
 					_targetRoot = null;
@@ -107,6 +112,7 @@ namespace XFTest.Views
 				Update0_Entity(value);
 				Update0_State(value);
 				Update0_QuantityInput(value);
+				Update0_PortInput(value);
 			}
 
 			private void Update1(global::XFTest.ViewModels.EntityModel value)
@@ -136,14 +142,14 @@ namespace XFTest.Views
 
 			private void Update0_State(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (35, 13) - (35, 43) 35 "Page3.xml"
+#line (35, 16) - (35, 46) 35 "Page3.xml"
 				_targetRoot.label6.Text = value[1, "test"].ToString();
 #line default
 			}
 
 			private void Update0_QuantityInput(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (37, 13) - (37, 74) 37 "Page3.xml"
+#line (37, 16) - (37, 77) 37 "Page3.xml"
 				var value1 = $"{value.QuantityInput:0.###}";
 #line default
 				if (!object.Equals(_targetRoot.entry1.Text, value1))
@@ -151,13 +157,34 @@ namespace XFTest.Views
 					_settingBinding6 = true;
 					try
 					{
-#line (37, 13) - (37, 74) 37 "Page3.xml"
+#line (37, 16) - (37, 77) 37 "Page3.xml"
 						_targetRoot.entry1.Text = value1;
 #line default
 					}
 					finally
 					{
 						_settingBinding6 = false;
+					}
+				}
+			}
+
+			private void Update0_PortInput(global::XFTest.ViewModels.Page3ViewModel value)
+			{
+#line (38, 16) - (38, 53) 38 "Page3.xml"
+				var value1 = value.PortInput.ToString();
+#line default
+				if (!object.Equals(_targetRoot.entry2.Text, value1))
+				{
+					_settingBinding7 = true;
+					try
+					{
+#line (38, 16) - (38, 53) 38 "Page3.xml"
+						_targetRoot.entry2.Text = value1;
+#line default
+					}
+					finally
+					{
+						_settingBinding7 = false;
 					}
 				}
 			}
@@ -178,7 +205,7 @@ namespace XFTest.Views
 
 			private void Update1__field1(global::XFTest.ViewModels.EntityModel value)
 			{
-#line (36, 13) - (36, 43) 36 "Page3.xml"
+#line (36, 16) - (36, 46) 36 "Page3.xml"
 				_targetRoot.label7.Text = value?._field1.ToString();
 #line default
 			}
@@ -193,8 +220,30 @@ namespace XFTest.Views
 						{
 							try
 							{
-#line (37, 13) - (37, 74) 37 "Page3.xml"
+#line (37, 16) - (37, 77) 37 "Page3.xml"
 								dataRoot.QuantityInput = _targetRoot.entry1.Text is var v0 && !global::System.String.IsNullOrEmpty(v0) ? ((global::System.Decimal?)global::System.Convert.ChangeType(v0, typeof(global::System.Decimal), null)) : null;
+#line default
+							}
+							catch
+							{
+							}
+						}
+						break;
+				}
+			}
+
+			private void OnTargetChanged1(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
+			{
+				var dataRoot = _dataRoot;
+				switch (p1.PropertyName)
+				{
+					case "Text":
+						if (!_settingBinding7)
+						{
+							try
+							{
+#line (38, 16) - (38, 53) 38 "Page3.xml"
+								dataRoot.PortInput = _targetRoot.entry2.Text is var v1 && !global::System.String.IsNullOrEmpty(v1) ? ((global::System.Int32)global::System.Convert.ChangeType(v1, typeof(global::System.Int32), null)) : default;
 #line default
 							}
 							catch
@@ -259,6 +308,9 @@ namespace XFTest.Views
 							break;
 						case "QuantityInput":
 							bindings.Update0_QuantityInput(typedSender);
+							break;
+						case "PortInput":
+							bindings.Update0_PortInput(typedSender);
 							break;
 					}
 				}
@@ -387,7 +439,7 @@ namespace XFTest.Views
 
 			private void Update0_Item(global::XFTest.ViewModels.EntityViewModel value)
 			{
-#line (22, 15) - (22, 38) 22 "Page3.xml"
+#line (22, 24) - (22, 47) 22 "Page3.xml"
 				_targetRoot.label1.Text = value[0];
 #line default
 			}
@@ -434,7 +486,7 @@ namespace XFTest.Views
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.EntityModel, global::System.SByte>(
 			dataRoot => dataRoot == null ? (default, false) : (
-#line (21, 23) - (21, 94) 21 "Page3.xml"
+#line (21, 25) - (21, 96) 21 "Page3.xml"
 				dataRoot.SByteProp,
 #line default
 				true),
@@ -442,7 +494,7 @@ namespace XFTest.Views
 			new[]
 			{
 				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.EntityModel, object>, string>(dataRoot =>
-#line (21, 23) - (21, 94) 21 "Page3.xml"
+#line (21, 25) - (21, 96) 21 "Page3.xml"
 					dataRoot,
 #line default
 					"SByteProp"),

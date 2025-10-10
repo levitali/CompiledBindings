@@ -368,9 +368,10 @@ public static class BindingParser
 						var convertMethod = convertType.Methods.First(m => m.Definition.Name == nameof(Convert.ChangeType));
 						var convertTypeExpr = new TypeExpression(convertType);
 
-						if (targetType2.Reference.IsValueNullable())
+						var targetType3 = targetType2;
+						if (targetType3.Reference.IsValueNullable())
 						{
-							targetType2 = targetType2.GetGenericArguments()![0];
+							targetType3 = targetType2.GetGenericArguments()![0];
 						}
 
 						var convertExpression = new CastExpression(
@@ -379,10 +380,11 @@ public static class BindingParser
 								convertMethod,
 								[
 									valueExpr,
-										new TypeofExpression(new TypeExpression(targetType2)),
-										Expression.NullExpression
+									new TypeofExpression(new TypeExpression(targetType3)),
+									Expression.NullExpression
 								]),
-							targetType2);
+							targetType2,
+							false);
 
 						if (prop.MemberType.Reference.IsNullable() || prop.MemberType.Reference.FullName == "System.String")
 						{
@@ -407,7 +409,7 @@ public static class BindingParser
 								check = null;
 							}
 							
-							var @default = sourceType.Reference.IsNullable() ? (Expression)Expression.NullExpression : Expression.DefaultExpression;
+							var @default = targetType2.Reference.IsNullable() ? (Expression)Expression.NullExpression : Expression.DefaultExpression;
 							
 							bindBackExpression = new FallbackExpression(
 								convertExpression,

@@ -10,6 +10,8 @@ public class Page3ViewModel : INotifyPropertyChanged
 
 	public decimal? QuantityInput { get; set; }
 
+	public int PortInput { get; set; }
+
 	public EntityModel? Entity { get; set; }
 
 	public IList<PickItem> PickedItems { get; } = new List<PickItem>();
