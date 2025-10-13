@@ -290,6 +290,7 @@ namespace WPFTest.Views
 			bool _settingBinding26;
 			bool _settingBinding27;
 			bool _settingBinding28;
+			bool _settingBinding29;
 			global::System.Threading.CancellationTokenSource _cts12;
 			global::System.Threading.CancellationTokenSource _cts14;
 			global::System.Threading.CancellationTokenSource _cts25;
@@ -365,6 +366,11 @@ namespace WPFTest.Views
 						global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 						typeof(global::System.Windows.Controls.Primitives.ToggleButton))
 					.AddValueChanged(_targetRoot.radioButton3, OnTargetChanged10);
+				global::System.ComponentModel.DependencyPropertyDescriptor
+					.FromProperty(
+						global::System.Windows.Controls.TextBox.TextProperty,
+						typeof(global::System.Windows.Controls.TextBox))
+					.AddValueChanged(_targetRoot.textBox5, OnTargetChanged11);
 			}
 
 			public void Cleanup()
@@ -426,6 +432,11 @@ namespace WPFTest.Views
 							global::System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty,
 							typeof(global::System.Windows.Controls.Primitives.ToggleButton))
 						.RemoveValueChanged(_targetRoot.radioButton3, OnTargetChanged10);
+					global::System.ComponentModel.DependencyPropertyDescriptor
+						.FromProperty(
+							global::System.Windows.Controls.TextBox.TextProperty,
+							typeof(global::System.Windows.Controls.TextBox))
+						.RemoveValueChanged(_targetRoot.textBox5, OnTargetChanged11);
 					_targetRoot.listView.SelectionChanged -= _eventHandler8;
 					_eventHandler8 = null;
 					_targetRoot.button1.Click -= _eventHandler15;
@@ -507,6 +518,7 @@ namespace WPFTest.Views
 				Update1_CanChangeInput1(value);
 				Update1_BoolInput(value);
 				Update1_ModifyTaskProp(value);
+				Update1_DecimalInput(value);
 			}
 
 			private void Update2(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
@@ -845,6 +857,27 @@ namespace WPFTest.Views
 				}
 			}
 
+			private void Update1_DecimalInput(global::WPFTest.ViewModels.Page1ModifyViewModel value)
+			{
+#line (98, 18) - (98, 118) 98 "Page1.xml"
+				var value1 = value?.DecimalInput?.ToString("0.###");
+#line default
+				if (!object.Equals(_targetRoot.textBox5.Text, value1))
+				{
+					_settingBinding29 = true;
+					try
+					{
+#line (98, 18) - (98, 118) 98 "Page1.xml"
+						_targetRoot.textBox5.Text = value1;
+#line default
+					}
+					finally
+					{
+						_settingBinding29 = false;
+					}
+				}
+			}
+
 			private void Update2_TextInput(global::WPFTest.ViewModels.Page1ModifyTextViewModel value)
 			{
 #line (79, 13) - (79, 86) 79 "Page1.xml"
@@ -1098,6 +1131,29 @@ namespace WPFTest.Views
 				}
 			}
 
+			private void OnTargetChanged11(object sender, global::System.EventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				if (!_settingBinding29)
+				{
+					try
+					{
+#line (98, 18) - (98, 118) 98 "Page1.xml"
+						var value = dataRoot.ModifyViewModel;
+#line default
+						if (value != null)
+						{
+#line (98, 18) - (98, 118) 98 "Page1.xml"
+							value.DecimalInput = _targetRoot.textBox5.Text is var v6 && !global::System.String.IsNullOrEmpty(v6) ? ((global::System.Decimal?)global::System.Convert.ChangeType(v6, typeof(global::System.Decimal), null)) : null;
+#line default
+						}
+					}
+					catch
+					{
+					}
+				}
+			}
+
 			class Page1_BindingsTrackings_this
 			{
 				global::System.WeakReference _bindingsWeakRef;
@@ -1209,6 +1265,9 @@ namespace WPFTest.Views
 							break;
 						case "ModifyTaskProp":
 							bindings.Update1_ModifyTaskProp(typedSender);
+							break;
+						case "DecimalInput":
+							bindings.Update1_DecimalInput(typedSender);
 							break;
 					}
 				}

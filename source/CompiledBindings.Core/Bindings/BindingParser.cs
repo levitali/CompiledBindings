@@ -38,7 +38,7 @@ public static class BindingParser
 				typeExpr = typeExpr.Substring(0, pos);
 			}
 			var type = xamlDomParser.FindType(typeExpr, (XAttribute)prop.XamlNode.Element);
-			dataType = type == null ? null : type.ToNotNullable();
+			dataType = type?.ToNotNullable();
 			dataTypeSet = true;
 
 			sourceType = dataType ?? targetType;
@@ -317,30 +317,24 @@ public static class BindingParser
 
 		if (mode is BindingMode.TwoWay or BindingMode.OneWayToSource)
 		{
-			if (bindBack != null)
+			if (bindBack != null &&
+				(bindBack is CallExpression ||
+				 bindBack.EnumerateTree().Any(e => e is ValueExpression)))
 			{
 				bindBackExpression = bindBack;
-				if (!bindBackExpression.EnumerateTree().Any(e => e is ValueExpression))
-				{
-					if (bindBackExpression is MemberExpression me && me.Member is MethodInfo method)
-					{
-						if (prop.MemberType.Reference.FullName != "System.Delegate")
-						{
-							var targetType2 = method.Parameters.Last().ParameterType;
-							Expression valueExpr = new ValueExpression(prop.MemberType);
-							valueExpr = Expression.Convert(valueExpr, targetType2);
-							bindBackExpression = new CallExpression(me.Expression, method, [valueExpr]);
-						}
-					}
-					else if (bindBackExpression is not CallExpression)
-					{
-						bindBackExpression = new AssignExpression(new ValueExpression(prop.MemberType), bindBackExpression);
-					}
-				}
 			}
 			else
 			{
-				var targetType2 = path!.Type;
+				MethodInfo? method = null;
+				bool generateCall = false;
+				var me = bindBack as MemberExpression;
+				if (me != null)
+				{
+					method = me.Member as MethodInfo;
+					generateCall = method != null && prop.MemberType.Reference.FullName != "System.Delegate";
+				}
+
+				var targetType2 = generateCall ? method!.Parameters.Last().ParameterType : (bindBack ?? path!).Type;
 				var valueExpr = new ValueExpression(prop.MemberType);
 				bindBackExpression = valueExpr;
 
@@ -354,15 +348,15 @@ public static class BindingParser
 						converterParameter ?? Expression.NullExpression,
 						Expression.NullExpression
 					]);
-					if (path.Type.Reference.FullName != "System.Object")
+					if (targetType2.Reference.FullName != "System.Object")
 					{
 						bindBackExpression = new CastExpression(bindBackExpression, targetType2, false);
 					}
 				}
 				else
 				{
-					bindBackExpression = Expression.Convert(bindBackExpression, path!.Type);
-					if (bindBackExpression == valueExpr && !path.Type.IsAssignableFrom(bindBackExpression.Type))
+					bindBackExpression = Expression.Convert(bindBackExpression, targetType2);
+					if (bindBackExpression == valueExpr && !targetType2.IsAssignableFrom(bindBackExpression.Type))
 					{
 						var convertType = TypeInfo.GetTypeThrow(typeof(Convert));
 						var convertMethod = convertType.Methods.First(m => m.Definition.Name == nameof(Convert.ChangeType));
@@ -390,8 +384,8 @@ public static class BindingParser
 						{
 							var localVarName = "v" + localVarIndex++;
 							var localVarExpr = new VariableExpression(prop.MemberType, localVarName);
-							
-							Expression? check;							
+
+							Expression? check;
 							if (prop.MemberType.Reference.FullName == "System.String")
 							{
 								//!string.IsNullOrEmpty(v)"
@@ -408,9 +402,9 @@ public static class BindingParser
 								// Set to null to create v != null expression
 								check = null;
 							}
-							
+
 							var @default = targetType2.Reference.IsNullable() ? (Expression)Expression.NullExpression : Expression.DefaultExpression;
-							
+
 							bindBackExpression = new FallbackExpression(
 								convertExpression,
 								valueExpr,
@@ -425,7 +419,9 @@ public static class BindingParser
 					}
 				}
 
-				bindBackExpression = new AssignExpression(path!, bindBackExpression);
+				bindBackExpression = generateCall
+					? new CallExpression(me!.Expression, method!, [bindBackExpression]) 
+					: new AssignExpression(bindBack ?? path!, bindBackExpression);
 			}
 		}
 

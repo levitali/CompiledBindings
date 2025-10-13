@@ -70,6 +70,8 @@ public class Page1ModifyViewModel : INotifyPropertyChanged
 
 	public int IntInput { get; set; }
 
+	public decimal? DecimalInput { get; set; }
+
 	public bool CanChangeInput1 { get; private set; }
 
 	public Task<string> ModifyTaskProp => Task.FromResult(string.Empty);

@@ -48,5 +48,6 @@
       <RadioButton x:Name="radioButton2" />
       <RadioButton x:Name="radioButton3" />
     </StackPanel>
+    <TextBox x:Name="textBox5" />
   </StackPanel>
 </Page>

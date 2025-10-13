@@ -95,6 +95,7 @@
             <RadioButton IsChecked="{x:Bind QualityState eq Middle, BindBack=SetQualityState(Middle, value)}" />
             <RadioButton IsChecked="{x:Bind QualityState eq Good, BindBack=SetQualityState(Good, value)}" />
         </StackPanel>
+        <TextBox Text="{x:Bind ModifyViewModel.DecimalInput.ToString('0.###'), BindBack=ModifyViewModel.DecimalInput}" />
     </StackPanel>
 
 </Page>
