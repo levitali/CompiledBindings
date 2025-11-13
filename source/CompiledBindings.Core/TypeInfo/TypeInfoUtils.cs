@@ -67,17 +67,34 @@ public static class TypeInfoUtils
 			.Where(t => t.IsStatic())
 			.SelectMany(t => t.NestedTypes)
 			.Where(t => t.IsSealed)
-			.Select(t => (t, m: t.Methods.FirstOrDefault(m =>
-				m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute") &&
-				m.IsStatic && m.IsPrivate && !m.IsGetter && !m.IsSetter)))
+			.Select(t => (t, m: FindExtensionMethod(t)))
 			.Where(e => e.m != null)
 			.Select(e => new ExtensionType
 			{
 				TypeDefinition = e.t,
-				ExtendedType = e.m.Parameters[0].ParameterType
+				ExtendedType = e.m!.Parameters[0].ParameterType
 			})
 		))
 		.Enumerate();
+
+	private static MethodDefinition? FindExtensionMethod(TypeDefinition type)
+	{
+		var method = findExtensionMethod(type, true);
+		if (method == null &&
+			type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ExtensionAttribute") &&
+			type.NestedTypes.Count > 0)
+		{
+			method = findExtensionMethod(type.NestedTypes[0], false);
+		}
+		return method;
+
+		static MethodDefinition? findExtensionMethod(TypeDefinition type, bool isPrivate)
+		{
+			return type.Methods.FirstOrDefault(m =>
+				m.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.CompilerGeneratedAttribute") &&
+				m.IsStatic && ((isPrivate && m.IsPrivate) || m.IsPublic) && !m.IsGetter && !m.IsSetter);
+		}
+	}
 
 	public static TypeDefinition? ResolveEx(this TypeReference type)
 	{
