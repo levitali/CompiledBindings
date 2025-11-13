@@ -42,7 +42,7 @@ namespace XFTest.Views
 			entry1 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Entry>(this, "entry1");
 			entry2 = global::Xamarin.Forms.NameScopeExtensions.FindByName<global::Xamarin.Forms.Entry>(this, "entry2");
 
-#line (34, 16) - (34, 31) 34 "Page3.xml"
+#line (36, 16) - (36, 31) 36 "Page3.xml"
 			label5.Text = 3.ToString();
 #line default
 
@@ -69,8 +69,8 @@ namespace XFTest.Views
 			Page3 _targetRoot;
 			global::XFTest.ViewModels.Page3ViewModel _dataRoot;
 			Page3_BindingsTrackings_this _bindingsTrackings;
-			bool _settingBinding6;
 			bool _settingBinding7;
+			bool _settingBinding8;
 
 			public void Initialize(Page3 targetRoot, global::XFTest.ViewModels.Page3ViewModel dataRoot)
 			{
@@ -101,7 +101,9 @@ namespace XFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
-#line (33, 13) - (33, 46) 33 "Page3.xml"
+#line (30, 13) - (30, 66) 30 "Page3.xml"
+				_targetRoot.label2.Text = $"{XFTest.ViewModels.Page3ViewModel.Empty()}";
+#line (35, 13) - (35, 46) 35 "Page3.xml"
 				_targetRoot.picker2.ItemsSource = dataRoot.PickedItems;
 #line default
 				Update0(dataRoot);
@@ -124,9 +126,9 @@ namespace XFTest.Views
 
 			private void Update0_Entity(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (28, 16) - (28, 64) 28 "Page3.xml"
+#line (29, 13) - (29, 61) 29 "Page3.xml"
 				var value1 = value.Entity;
-#line (28, 16) - (28, 64) 28 "Page3.xml"
+#line (29, 13) - (29, 61) 29 "Page3.xml"
 				_targetRoot.label2.IsVisible = value1 != null && value.IsLoading;
 #line default
 				Update1(value1);
@@ -135,51 +137,30 @@ namespace XFTest.Views
 
 			private void Update0_IsLoading(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (28, 16) - (28, 64) 28 "Page3.xml"
+#line (29, 13) - (29, 61) 29 "Page3.xml"
 				_targetRoot.label2.IsVisible = value.Entity != null && value.IsLoading;
 #line default
 			}
 
 			private void Update0_State(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (35, 16) - (35, 46) 35 "Page3.xml"
+#line (37, 16) - (37, 46) 37 "Page3.xml"
 				_targetRoot.label6.Text = value[1, "test"].ToString();
 #line default
 			}
 
 			private void Update0_QuantityInput(global::XFTest.ViewModels.Page3ViewModel value)
 			{
-#line (37, 16) - (37, 77) 37 "Page3.xml"
+#line (39, 16) - (39, 77) 39 "Page3.xml"
 				var value1 = $"{value.QuantityInput:0.###}";
 #line default
 				if (!object.Equals(_targetRoot.entry1.Text, value1))
 				{
-					_settingBinding6 = true;
-					try
-					{
-#line (37, 16) - (37, 77) 37 "Page3.xml"
-						_targetRoot.entry1.Text = value1;
-#line default
-					}
-					finally
-					{
-						_settingBinding6 = false;
-					}
-				}
-			}
-
-			private void Update0_PortInput(global::XFTest.ViewModels.Page3ViewModel value)
-			{
-#line (38, 16) - (38, 53) 38 "Page3.xml"
-				var value1 = value.PortInput.ToString();
-#line default
-				if (!object.Equals(_targetRoot.entry2.Text, value1))
-				{
 					_settingBinding7 = true;
 					try
 					{
-#line (38, 16) - (38, 53) 38 "Page3.xml"
-						_targetRoot.entry2.Text = value1;
+#line (39, 16) - (39, 77) 39 "Page3.xml"
+						_targetRoot.entry1.Text = value1;
 #line default
 					}
 					finally
@@ -189,23 +170,44 @@ namespace XFTest.Views
 				}
 			}
 
+			private void Update0_PortInput(global::XFTest.ViewModels.Page3ViewModel value)
+			{
+#line (40, 16) - (40, 53) 40 "Page3.xml"
+				var value1 = value.PortInput.ToString();
+#line default
+				if (!object.Equals(_targetRoot.entry2.Text, value1))
+				{
+					_settingBinding8 = true;
+					try
+					{
+#line (40, 16) - (40, 53) 40 "Page3.xml"
+						_targetRoot.entry2.Text = value1;
+#line default
+					}
+					finally
+					{
+						_settingBinding8 = false;
+					}
+				}
+			}
+
 			private void Update1_SByteProp(global::XFTest.ViewModels.EntityModel value)
 			{
-#line (29, 16) - (29, 47) 29 "Page3.xml"
+#line (31, 16) - (31, 47) 31 "Page3.xml"
 				_targetRoot.label3.Text = value?.SByteProp.ToString();
 #line default
 			}
 
 			private void Update1_UShortProp(global::XFTest.ViewModels.EntityModel value)
 			{
-#line (30, 16) - (30, 48) 30 "Page3.xml"
+#line (32, 16) - (32, 48) 32 "Page3.xml"
 				_targetRoot.label4.Text = value?.UShortProp.ToString();
 #line default
 			}
 
 			private void Update1__field1(global::XFTest.ViewModels.EntityModel value)
 			{
-#line (36, 16) - (36, 46) 36 "Page3.xml"
+#line (38, 16) - (38, 46) 38 "Page3.xml"
 				_targetRoot.label7.Text = value?._field1.ToString();
 #line default
 			}
@@ -216,11 +218,11 @@ namespace XFTest.Views
 				switch (p1.PropertyName)
 				{
 					case "Text":
-						if (!_settingBinding6)
+						if (!_settingBinding7)
 						{
 							try
 							{
-#line (37, 16) - (37, 77) 37 "Page3.xml"
+#line (39, 16) - (39, 77) 39 "Page3.xml"
 								dataRoot.QuantityInput = _targetRoot.entry1.Text is var v0 && !global::System.String.IsNullOrEmpty(v0) ? ((global::System.Decimal?)global::System.Convert.ChangeType(v0, typeof(global::System.Decimal), null)) : null;
 #line default
 							}
@@ -238,11 +240,11 @@ namespace XFTest.Views
 				switch (p1.PropertyName)
 				{
 					case "Text":
-						if (!_settingBinding7)
+						if (!_settingBinding8)
 						{
 							try
 							{
-#line (38, 16) - (38, 53) 38 "Page3.xml"
+#line (40, 16) - (40, 53) 40 "Page3.xml"
 								dataRoot.PortInput = _targetRoot.entry2.Text is var v1 && !global::System.String.IsNullOrEmpty(v1) ? ((global::System.Int32)global::System.Convert.ChangeType(v1, typeof(global::System.Int32), null)) : default;
 #line default
 							}
@@ -349,7 +351,7 @@ namespace XFTest.Views
 	{
 		global::Xamarin.Forms.Internals.TypedBindingBase _binding = new global::Xamarin.Forms.Internals.TypedBinding<global::XFTest.ViewModels.PickItem, global::System.String>(
 			dataRoot => dataRoot == null ? (default, false) : (
-#line (32, 13) - (32, 83) 32 "Page3.xml"
+#line (34, 13) - (34, 83) 34 "Page3.xml"
 				dataRoot.Description,
 #line default
 				true),
@@ -357,7 +359,7 @@ namespace XFTest.Views
 			new[]
 			{
 				new global::System.Tuple<global::System.Func<global::XFTest.ViewModels.PickItem, object>, string>(dataRoot =>
-#line (32, 13) - (32, 83) 32 "Page3.xml"
+#line (34, 13) - (34, 83) 34 "Page3.xml"
 					dataRoot,
 #line default
 					"Description"),

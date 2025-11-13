@@ -25,7 +25,9 @@
     </Page.Resources>
 
     <Grid>
-        <Label  x:Name="label2" />
+        <Label
+            
+             x:Name="label2" />
         <Label  x:Name="label3" />
         <Label  x:Name="label4" />
         <Picker

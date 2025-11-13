@@ -25,7 +25,9 @@
     </Page.Resources>
 
     <Grid>
-        <Label IsVisible="{x:Bind Entity ne null and IsLoading}" />
+        <Label
+            IsVisible="{x:Bind Entity ne null and IsLoading}"
+            Text="{x:Bind $'{viewModels:Page3ViewModel.Empty()}'}" />
         <Label Text="{x:Bind Entity.SByteProp}" />
         <Label Text="{x:Bind Entity.UShortProp}" />
         <Picker

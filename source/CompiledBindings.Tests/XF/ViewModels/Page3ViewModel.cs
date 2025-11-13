@@ -32,6 +32,11 @@ public class Page3ViewModel : INotifyPropertyChanged
 	{
 		get => 0;
 	}
+
+	public static string Empty()
+	{
+		return "";
+	}
 }
 
 public class PickItem : INotifyPropertyChanged

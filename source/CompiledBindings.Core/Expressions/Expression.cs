@@ -882,7 +882,20 @@ public class InterpolatedStringExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return string.Format(Format, Expressions.Cast<object>().ToArray());
+		return string.Format(Format, Expressions
+			.Select(e =>
+			{
+				var s = e.ToString();
+				// Strange problem with C# compiler.
+				// An expression cannot start with global:: in interpolated string.
+				if (s.StartsWith("global::"))
+				{
+					s = s.Substring("global::".Length);
+				}
+				return s;
+			})
+			.Cast<object>()
+			.ToArray());
 	}
 }
 
