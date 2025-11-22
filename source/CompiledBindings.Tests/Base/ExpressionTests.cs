@@ -327,4 +327,13 @@ public class ExpressionTests : IDisposable
 		result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
+
+	[Test]
+	public void ArithmeticOperators()
+	{
+		var expression = "1 + 2 - 3 * 4 / 5 mod 6";
+		var expectedCode = "1 + 2 - 3 * 4 / 5 % 6";
+		var result = ExpressionParser.Parse(class1Type, "dataRoot", expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
+	}
 }
