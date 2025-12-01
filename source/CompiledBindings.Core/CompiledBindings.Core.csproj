@@ -7,7 +7,7 @@
 		<Product>CompiledBindings</Product>
 		<Company>levitali</Company>
 		<LangVersion>preview</LangVersion>
-		<Version>1.0.19</Version>
+		<Version>1.0.19.6</Version>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>nullable</WarningsAsErrors>
