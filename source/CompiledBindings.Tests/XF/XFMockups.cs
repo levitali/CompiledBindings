@@ -108,7 +108,6 @@ namespace Xamarin.Forms
 }
 
 
-
 namespace UI
 {
 	public static class Extensions
@@ -121,5 +120,13 @@ namespace UI
 	public class PickerEx : Picker
 	{
 		public string Dummy { get; set; } = "";
+	}
+}
+
+namespace Custom
+{
+	public class CustomInput : VisualElement
+	{
+		public object Value { get; set; }
 	}
 }

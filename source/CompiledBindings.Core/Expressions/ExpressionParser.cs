@@ -725,7 +725,7 @@ public class ExpressionParser
 		else if (e is TypeExpression te)
 		{
 			var expr = ParsePrimary();
-			return new CastExpression(expr, te.Type);
+			return new CastExpression(expr, te.Type, true);
 		}
 		return new ParenExpression(e);
 	}

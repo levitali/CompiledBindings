@@ -12,6 +12,8 @@ public class Page3ViewModel : INotifyPropertyChanged
 
 	public int PortInput { get; set; }
 
+	public object ObjectInput { get; set; } = new object();
+
 	public EntityModel? Entity { get; set; }
 
 	public IList<PickItem> PickedItems { get; } = new List<PickItem>();

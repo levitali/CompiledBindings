@@ -149,7 +149,7 @@ public abstract class Expression
 			}			
 			if (expression.Type.Reference.FullName == "System.Object")
 			{
-				return new CastExpression(expression, targetType);
+				return new CastExpression(expression, targetType, false);
 			}
 		}
 		else if (expression.IsNullable && !targetType.IsNullable)
@@ -548,7 +548,7 @@ public class CastExpression : Expression
 {
 	private readonly bool _checkNull;
 
-	public CastExpression(Expression expression, TypeInfo castType, bool checkNull = true) : base(castType)
+	public CastExpression(Expression expression, TypeInfo castType, bool checkNull) : base(castType)
 	{
 		Expression = expression;
 		_checkNull = checkNull;

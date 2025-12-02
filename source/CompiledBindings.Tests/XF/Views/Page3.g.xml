@@ -1,6 +1,7 @@
 ﻿<Page
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:custom="using:Custom"
     xmlns:extensions="using:XFTest.Extensions"
     xmlns:local="clr-namespace:XFTest"
     xmlns:m="http://compiledbindings.com"
@@ -38,6 +39,7 @@
         <Label  x:Name="label7" />
         <Entry  x:Name="entry1" />
         <Entry  x:Name="entry2" />
+        <custom:CustomInput  x:Name="customInput1" />
 
     </Grid>
 
