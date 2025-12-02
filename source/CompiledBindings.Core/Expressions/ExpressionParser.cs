@@ -279,7 +279,7 @@ public class ExpressionParser
 				}
 				else
 				{
-					if (isNotifiable == false)
+					if (token.id == TokenId.Slash)
 					{
 						_nextToken = _token;
 						_token = token;
