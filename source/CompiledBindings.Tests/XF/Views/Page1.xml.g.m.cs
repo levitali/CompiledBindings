@@ -541,7 +541,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page1_DataTemplate0 : global::CompiledBindings.XF.IGeneratedDataTemplate
+	partial class Page1_DataTemplate0 : global::CompiledBindings.XF.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Label label1;
 		private global::Xamarin.Forms.Label label2;
@@ -688,7 +688,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page1_DataTemplate2 : global::CompiledBindings.XF.IGeneratedDataTemplate
+	partial class Page1_DataTemplate2 : global::CompiledBindings.XF.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Label label3;
 		private global::Xamarin.Forms.Label label4;
@@ -804,7 +804,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page1_DataTemplate3 : global::CompiledBindings.XF.IGeneratedDataTemplate
+	partial class Page1_DataTemplate3 : global::CompiledBindings.XF.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Label label11;
 		private global::Xamarin.Forms.Label label12;

@@ -1299,7 +1299,7 @@ namespace WPFTest.Views
 		}
 	}
 
-	class Page1_DataTemplate0 : global::CompiledBindings.WPF.IGeneratedDataTemplate
+	partial class Page1_DataTemplate0 : global::CompiledBindings.WPF.IGeneratedDataTemplate
 	{
 		private global::System.Windows.Controls.TextBlock textBlock1;
 		private global::System.Windows.Controls.TextBlock textBlock2;
@@ -1477,7 +1477,7 @@ namespace WPFTest.Views
 		}
 	}
 
-	class Page1_DataTemplate1 : global::CompiledBindings.WPF.IGeneratedDataTemplate
+	partial class Page1_DataTemplate1 : global::CompiledBindings.WPF.IGeneratedDataTemplate
 	{
 		private global::System.Windows.Controls.TextBlock textBlock4;
 

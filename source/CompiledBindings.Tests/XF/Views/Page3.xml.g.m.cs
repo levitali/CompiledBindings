@@ -414,7 +414,7 @@ namespace XFTest.Views
 		}
 	}
 
-	class Page3_DataTemplate0 : global::CompiledBindings.XF.IGeneratedDataTemplate
+	partial class Page3_DataTemplate0 : global::CompiledBindings.XF.IGeneratedDataTemplate
 	{
 		private global::Xamarin.Forms.Picker picker1;
 		private global::Xamarin.Forms.Label label1;

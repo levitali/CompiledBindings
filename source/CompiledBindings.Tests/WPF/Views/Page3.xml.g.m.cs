@@ -14,6 +14,7 @@ namespace WPFTest.Views
 	[global::System.CodeDom.Compiler.GeneratedCode("CompiledBindings", null)]
 	partial class Page3
 	{
+		global::System.Windows.Media.Brush SomeBrush;
 		private bool _generatedCodeInitialized;
 
 		private void InitializeAfterConstructor()
@@ -23,6 +24,13 @@ namespace WPFTest.Views
 
 			_generatedCodeInitialized = true;
 
+			SomeBrush = (global::System.Windows.Media.Brush)(this.Resources["SomeBrush"] ?? global::System.Windows.Application.Current.Resources["SomeBrush"] ?? throw new global::System.Exception("Resource 'SomeBrush' not found."));
+
+			var _targetRoot = this;
+
+#line (33, 13) - (33, 43) 33 "Page3.xml"
+			textBlock3.Foreground = _targetRoot.SomeBrush;
+#line default
 
 			this.DataContextChanged += this_DataContextChanged;
 			if (this.DataContext is global::WPFTest.ViewModels.Page1ViewModel dataRoot0)
