@@ -147,8 +147,8 @@ $@"		private bool _generatedCodeInitialized;
 			if (_generatedCodeInitialized)
 				return;
 
-			_generatedCodeInitialized = true;
-");
+			_generatedCodeInitialized = true;");
+		output.AppendLine();
 
 		GenerateInitializeMethodBody(output, parseResult.GeneratedClass, "this", false, parseResult.TargetType);
 
@@ -189,6 +189,10 @@ $@"		private void {viewName}_{_bindingContextStart}ContextChanged(object sender,
 		{
 			GenerateInitializeResources(output, parseResult);
 		}
+
+		output.AppendLine(
+$@"			var _targetRoot = this;");
+		output.AppendLine();
 
 		bool isLineDirective = false;
 		_bindingsCodeGenerator.GenerateSetExpressions(output, parseResult.UpdateMethod, ref isLineDirective);
@@ -262,9 +266,9 @@ $@"			{obj.Name} = {string.Format(_findByNameFormat, obj.Type.Reference.GetCShar
 
 		if (parseResult.GenerateClass)
 		{
+			output.AppendLine();
 			output.AppendLine(
-$@"
-	class {dataTemplateClassName} : global::{_compiledBindingsHelperNs}.IGeneratedDataTemplate
+$@"	partial class {dataTemplateClassName} : global::{_compiledBindingsHelperNs}.IGeneratedDataTemplate
 	{{");
 
 			GenerateVariablesDeclarations(output, parseResult, false);
