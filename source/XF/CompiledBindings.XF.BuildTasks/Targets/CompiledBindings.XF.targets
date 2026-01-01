@@ -86,10 +86,11 @@
                         IntermediateOutputPath="$(IntermediateOutputPath)"
                         ProjectPath="$(MSBuildProjectDirectory)"
                         LangVersion="$(LangVersion)"
-											  MSBuildVersion="$(MSBuildVersion)"
-											  AssemblyName="$(AssemblyName)"
-											  RootNamespace="$(RootNamespace)"
-												Nullable="$(Nullable)">
+                        MSBuildVersion="$(MSBuildVersion)"
+                        AssemblyName="$(AssemblyName)"
+                        RootNamespace="$(RootNamespace)"
+                        Nullable="$(Nullable)"
+                        Usings="@(Using)">
 			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
 		</XFGenerateCodeTask>

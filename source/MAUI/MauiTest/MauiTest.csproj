@@ -62,6 +62,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="Microsoft.Maui.Graphics" Prefix="graphics" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\CompiledBindings.MAUI\CompiledBindings.MAUI.csproj" />
 	</ItemGroup>
 
@@ -83,22 +87,16 @@
 		<CreateItem Include="@(MauiXaml)" Condition="'%(Extension)' == '.xaml'">
 			<Output TaskParameter="Include" ItemName="XamlFiles" />
 		</CreateItem>
-		<MauiGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" ProjectPath="$(MSBuildProjectDirectory)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)"
-		                      AssemblyName="$(AssemblyName)"
-												  RootNamespace="$(RootNamespace)"
-		                      AttachDebugger="false">
+		<MauiGenerateCodeTask XamlFiles="@(XamlFiles)" ReferenceAssemblies="@(ReferencePath)" LocalAssembly="$(IntermediateOutputPath)intermediate\$(TargetName)$(TargetExt)" IntermediateOutputPath="$(IntermediateOutputPath)" ProjectPath="$(MSBuildProjectDirectory)" LangVersion="$(LangVersion)" MSBuildVersion="$(MSBuildVersion)" Nullable="$(Nullable)" AssemblyName="$(AssemblyName)" RootNamespace="$(RootNamespace)"
+		                      Usings="@(Using)" 
+		                      AttachDebugger="true">
 			<Output ItemName="Compile" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="FileWrites" TaskParameter="GeneratedCodeFiles" />
 		</MauiGenerateCodeTask>
 	</Target>
 
 	<Target Name="ProcessXaml" BeforeTargets="XamlC" Condition="'$(DesignTimeBuild)' != 'True'">
-		<MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)"
-		                             Assembly="$(IntermediateOutputPath)$(TargetFileName)"
-		                             AssemblyName="$(AssemblyName)"
-												         RootNamespace="$(RootNamespace)"
-		                             DebugType="$(DebugType)"
-		                             AttachDebugger="true" />
+		<MauiProcessResourceXamlTask ReferenceAssemblies="@(ReferencePath)" Assembly="$(IntermediateOutputPath)$(TargetFileName)" AssemblyName="$(AssemblyName)" RootNamespace="$(RootNamespace)" DebugType="$(DebugType)" AttachDebugger="true" />
 	</Target>
 
 	<Target Name="ProcessAssembly" AfterTargets="AfterCompile" Condition="'$(DesignTimeBuild)' != 'True'">

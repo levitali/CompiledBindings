@@ -125,10 +125,11 @@
 												 ProjectPath="$(MSBuildProjectDirectory)"
 												 IntermediateOutputPath="$(IntermediateOutputPath)"
 												 LangVersion="$(LangVersion)"
-												 MSBuildVersion="$(MSBuildVersion)"
-											   Nullable="$(Nullable)"
-											   AssemblyName="$(AssemblyName)"
-											   RootNamespace="$(RootNamespace)">
+                         MSBuildVersion="$(MSBuildVersion)"
+                         Nullable="$(Nullable)"
+                         AssemblyName="$(AssemblyName)"
+                         RootNamespace="$(RootNamespace)"
+                         Usings="@(Using)">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
 			<Output ItemName="NewPages" TaskParameter="NewPages" />
