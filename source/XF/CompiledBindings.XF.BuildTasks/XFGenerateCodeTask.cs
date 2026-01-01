@@ -57,6 +57,8 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 	[Output]
 	public ITaskItem[] GeneratedCodeFiles { get; private set; } = null!;
 
+	public ITaskItem[]? Usings { get; init; }
+
 	public string? Nullable { get; init; }
 
 	public bool AttachDebugger { get; init; }
@@ -91,8 +93,12 @@ public class XFGenerateCodeTask : Task, ICancelableTask
 				.Select(e => (e.xaml, e.file, xdoc: XDocument.Load(e.file, LoadOptions.PreserveWhitespace | LoadOptions.SetLineInfo)))
 				.ToList();
 
-			var globalNamespaces = XamlNamespace.GetGlobalNamespaces(xamlFiles.Select(e => e.xdoc));
-			xamlDomParser.KnownNamespaces = globalNamespaces;
+			var globalNamespaces1 = XamlNamespace.GetGlobalNamespaces(xamlFiles.Select(e => e.xdoc));
+			var globalNamespaces2 = (Usings ?? Enumerable.Empty<ITaskItem>())
+				.Select(i => (prefix: i.GetMetadata("Prefix"), ns: i.ItemSpec))
+				.Where(i => !string.IsNullOrEmpty(i.prefix))
+				.Select(i => new XamlNamespace(i.prefix, "global using:" + i.ns));
+			xamlDomParser.KnownNamespaces = globalNamespaces1.Union(globalNamespaces2, n => n.Prefix).ToList();
 
 			var intermediateOutputPath = IntermediateOutputPath;
 			bool isIntermediateOutputPathRooted = Path.IsPathRooted(intermediateOutputPath);
@@ -229,7 +235,7 @@ public class XFXamlDomParser : SimpleXamlDomParser
 			}
 		}
 		return _nsMappings[xmlNs];
-	}	
+	}
 
 	protected override ExtenstionType? IsMemExtension(XName name)
 	{
