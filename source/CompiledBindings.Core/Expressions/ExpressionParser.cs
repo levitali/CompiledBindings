@@ -8,7 +8,8 @@ public class ExpressionParser
 		{ "false", new ConstantExpression(false) },
 		{ "null", Expression.NullExpression },
 	};
-	private readonly VariableExpression _root;
+	private readonly VariableExpression _targetRoot;
+	private readonly VariableExpression _dataRoot;
 	private readonly ValueExpression? _valueExpression;
 	private readonly IList<XamlNamespace> _namespaces;
 	private readonly HashSet<string> _clrNamespaces;
@@ -24,15 +25,16 @@ public class ExpressionParser
 	private bool _parsingInterpolatedString;
 	private bool _parsingIs;
 
-	private ExpressionParser(VariableExpression root, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces, bool useValueExpression)
+	private ExpressionParser(VariableExpression targetRoot, VariableExpression dataRoot, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces, bool useValueExpression)
 	{
-		_root = root;
+		_targetRoot = targetRoot;
+		_dataRoot = dataRoot;
 		if (useValueExpression)
 		{
 			_valueExpression = new(resultType);
 		}
 		_namespaces = namespaces;
-		_clrNamespaces = [.. EnumerableExtensions.AsEnumerable(root.Type.Reference.Namespace).Union(namespaces.Select(n => n.ClrNamespace!))];
+		_clrNamespaces = [.. EnumerableExtensions.AsEnumerable(dataRoot.Type.Reference.Namespace).Union(namespaces.Select(n => n.ClrNamespace!))];
 		_text = expression;
 		_textLen = _text.Length;
 		_expectedType = _resultType = resultType;
@@ -41,14 +43,14 @@ public class ExpressionParser
 		NextToken();
 	}
 
-	public static Expression Parse(TypeInfo dataType, string member, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos, bool useValueExpression = false)
+	public static Expression Parse(VariableExpression targetRoot, VariableExpression dataRoot, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos, bool useValueExpression = false)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
 			throw new ParseException(Res.EmptyExpression);
 		}
 
-		var parser = new ExpressionParser(new VariableExpression(dataType, member), expression, resultType, namespaces, useValueExpression);
+		var parser = new ExpressionParser(targetRoot, dataRoot, expression, resultType, namespaces, useValueExpression);
 
 		var res = parser.ParseExpression();
 		if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))
@@ -529,7 +531,7 @@ public class ExpressionParser
 		NextToken();
 		string id = GetIdentifier();
 		NextToken();
-		return new StaticResourceExpression(id, _expectedType ?? TypeInfo.GetTypeThrow(typeof(object)));
+		return new StaticResourceExpression(_targetRoot, id, _expectedType ?? TypeInfo.GetTypeThrow(typeof(object)));
 	}
 
 	private Expression ParseInterpolatedString()
@@ -737,7 +739,7 @@ public class ExpressionParser
 		if (_token.text == "this")
 		{
 			NextToken();
-			return _root;
+			return _dataRoot;
 		}
 
 		if (_token.text == "value" && _valueExpression != null)
@@ -921,7 +923,7 @@ public class ExpressionParser
 			}
 		}
 
-		var inst = instance ?? _root;
+		var inst = instance ?? _dataRoot;
 		var isStatic = instance is TypeExpression;
 
 		var type = inst.Type;

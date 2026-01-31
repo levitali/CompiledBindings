@@ -48,6 +48,9 @@ public static class BindingParser
 			throw new ParseException(Res.NoDataType);
 		}
 
+		var dataRoot = new VariableExpression(sourceType, dataRootName);
+		var targetRoot = new VariableExpression(targetType, "_targetRoot");
+
 		int currentPos = 0, pos1 = 0;
 		while (true)
 		{
@@ -101,7 +104,7 @@ public static class BindingParser
 						_ => TypeInfo.GetTypeThrow(typeof(object))
 					};
 
-					expr = new StaticResourceExpression(resourceName, resourceType);
+					expr = new StaticResourceExpression(targetRoot, resourceName, resourceType);
 
 					int pos2 = str.IndexOf(',');
 					pos1 = pos2 == -1 ? (pos2 = str.Length) : pos2 + 1;
@@ -111,7 +114,7 @@ public static class BindingParser
 					ICollection<string> includeNamespaces2;
 					try
 					{
-						expr = ExpressionParser.Parse(sourceType, dataRootName, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1, name == "BindBack");
+						expr = ExpressionParser.Parse(targetRoot, dataRoot, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1, name == "BindBack");
 					}
 					catch (ParseException ex)
 					{

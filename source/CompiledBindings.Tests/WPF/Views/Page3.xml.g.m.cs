@@ -26,10 +26,8 @@ namespace WPFTest.Views
 
 			SomeBrush = (global::System.Windows.Media.Brush)(this.Resources["SomeBrush"] ?? global::System.Windows.Application.Current.Resources["SomeBrush"] ?? throw new global::System.Exception("Resource 'SomeBrush' not found."));
 
-			var _targetRoot = this;
-
 #line (33, 13) - (33, 43) 33 "Page3.xml"
-			textBlock3.Foreground = _targetRoot.SomeBrush;
+			textBlock3.Foreground = this.SomeBrush;
 #line default
 
 			this.DataContextChanged += this_DataContextChanged;

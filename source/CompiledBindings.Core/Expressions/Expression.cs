@@ -965,10 +965,13 @@ public class IsExpression : Expression
 
 public class StaticResourceExpression : Expression
 {
-	public StaticResourceExpression(string name, TypeInfo type) : base(type)
+	public StaticResourceExpression(VariableExpression targetRoot, string name, TypeInfo type) : base(type)
 	{
+		TargetRoot = targetRoot;
 		Name = name;
 	}
+
+	public VariableExpression TargetRoot { get; }
 
 	public string Name { get; }
 
@@ -976,7 +979,7 @@ public class StaticResourceExpression : Expression
 
 	protected override string GetCSharpCode()
 	{
-		return $"_targetRoot.{Name}";
+		return $"{TargetRoot}.{Name}";
 	}
 }
 

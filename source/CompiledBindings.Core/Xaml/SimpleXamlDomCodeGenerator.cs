@@ -190,10 +190,6 @@ $@"		private void {viewName}_{_bindingContextStart}ContextChanged(object sender,
 			GenerateInitializeResources(output, parseResult);
 		}
 
-		output.AppendLine(
-$@"			var _targetRoot = this;");
-		output.AppendLine();
-
 		bool isLineDirective = false;
 		_bindingsCodeGenerator.GenerateSetExpressions(output, parseResult.UpdateMethod, ref isLineDirective);
 		ResetLineDirective(output, ref isLineDirective);

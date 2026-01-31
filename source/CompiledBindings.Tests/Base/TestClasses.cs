@@ -2,6 +2,10 @@
 
 namespace CompiledBindings.Tests;
 
+public class MyControl
+{ 
+}
+
 public class Class1
 {
 	public object? ObjProp { get; set; }

@@ -336,7 +336,8 @@ public abstract class XamlDomParser
 			try
 			{
 				var staticNode = xamlNode.Children[0];
-				value.StaticValue = ExpressionParser.Parse(TargetType, "this", staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces2, out var dummy);
+				var targetRoot = new VariableExpression(TargetType, "this");
+				value.StaticValue = ExpressionParser.Parse(targetRoot, targetRoot, staticNode.Value!, propType, false, GetNamespaces(xamlNode).ToList(), out var includeNamespaces2, out var dummy);
 				includeNamespaces.UnionWith(includeNamespaces2);
 				value.StaticValue = CorrectSourceExpression(value.StaticValue, objProp);
 				CorrectMethod(objProp, value.StaticValue.Type, clrNamespaces, includeNamespaces);
