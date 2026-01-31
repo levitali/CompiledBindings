@@ -6,7 +6,6 @@
     xmlns:m="http://compiledbindings.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mx="http://compiledbindings.com/x"
-    xmlns:viewModels="clr-namespace:WPFTest.ViewModels"
     mc:Ignorable="d m mx"
     x:Class="WPFTest.Views.MainWindow"
     mx:DataType="viewModels:MainViewModel"

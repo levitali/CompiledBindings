@@ -1,6 +1,5 @@
 ﻿using System.Collections.Specialized;
 using System.Windows;
-using WPFTest.ViewModels;
 
 namespace WPFTest.Views
 {
