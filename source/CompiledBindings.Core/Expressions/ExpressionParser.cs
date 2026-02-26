@@ -10,6 +10,7 @@ public class ExpressionParser
 	};
 	private readonly VariableExpression _targetRoot;
 	private readonly VariableExpression _dataRoot;
+	private readonly IList<VariableExpression>? _eventParams;
 	private readonly ValueExpression? _valueExpression;
 	private readonly IList<XamlNamespace> _namespaces;
 	private readonly HashSet<string> _clrNamespaces;
@@ -25,10 +26,11 @@ public class ExpressionParser
 	private bool _parsingInterpolatedString;
 	private bool _parsingIs;
 
-	private ExpressionParser(VariableExpression targetRoot, VariableExpression dataRoot, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces, bool useValueExpression)
+	private ExpressionParser(VariableExpression targetRoot, VariableExpression dataRoot, IList<VariableExpression>? eventParams, string expression, TypeInfo resultType, IList<XamlNamespace> namespaces, bool useValueExpression)
 	{
 		_targetRoot = targetRoot;
 		_dataRoot = dataRoot;
+		_eventParams = eventParams;
 		if (useValueExpression)
 		{
 			_valueExpression = new(resultType);
@@ -43,14 +45,14 @@ public class ExpressionParser
 		NextToken();
 	}
 
-	public static Expression Parse(VariableExpression targetRoot, VariableExpression dataRoot, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos, bool useValueExpression = false)
+	public static Expression Parse(VariableExpression targetRoot, VariableExpression dataRoot, string expression, TypeInfo resultType, bool validateEnd, IList<XamlNamespace> namespaces, out ICollection<string> includeNamespaces, out int textPos, bool useValueExpression = false, IList<VariableExpression>? eventParams = null)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{
 			throw new ParseException(Res.EmptyExpression);
 		}
 
-		var parser = new ExpressionParser(targetRoot, dataRoot, expression, resultType, namespaces, useValueExpression);
+		var parser = new ExpressionParser(targetRoot, dataRoot, eventParams, expression, resultType, namespaces, useValueExpression);
 
 		var res = parser.ParseExpression();
 		if (!(parser._token.id == TokenId.End || (!validateEnd && parser._token.id == TokenId.Comma)))
@@ -742,6 +744,18 @@ public class ExpressionParser
 			return _dataRoot;
 		}
 
+		if (_eventParams != null)
+		{
+			foreach (var eventParam in _eventParams)
+			{
+				if (_token.text == eventParam.Name)
+				{
+					NextToken();
+					return eventParam;
+				}
+			}
+		}
+
 		if (_token.text == "value" && _valueExpression != null)
 		{
 			NextToken();
@@ -758,6 +772,7 @@ public class ExpressionParser
 		{
 			return ParseNewExpression();
 		}
+		
 		if (_token.text == "typeof")
 		{
 			return ParseTypeofExpression();

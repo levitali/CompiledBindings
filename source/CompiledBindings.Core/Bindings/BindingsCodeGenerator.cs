@@ -373,7 +373,7 @@ $@"			}}");
 			if (ev.TargetChangedEvents != null)
 			{
 				output.AppendLine(
-$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.TargetChangedEvents[0].GetEventHandlerParameterTypes().Select((t, i) => $"global::{t.Reference.GetCSharpFullName()} p{i}"))})");
+$@"			private void OnTargetChanged{ev.Index}({string.Join(", ", ev.TargetChangedEvents[0].GetEventHandlerParameters().Select(p => $"global::{p.ParameterType.Reference.GetCSharpFullName()} {p.Definition.Name}"))})");
 			}
 			else if (ev.Bindings[0].DependencyProperty != null)
 			{
@@ -391,7 +391,7 @@ $@"			{{
 			if (ev.TargetChangedEvents?[0].Definition.Name == "PropertyChanged")
 			{
 				output.AppendLine(
-$@"				switch (p1.PropertyName)
+$@"				switch (e.PropertyName)
 				{{");
 				foreach (var group in ev.Bindings.Where(b => b.Property.TargetProperty != null).GroupBy(b => b.Property.MemberName))
 				{

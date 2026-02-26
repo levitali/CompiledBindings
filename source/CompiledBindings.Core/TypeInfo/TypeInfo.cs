@@ -474,15 +474,15 @@ public class EventInfo : IMemberInfo
 
 	public TypeInfo EventType { get; }
 
-	public string Signature => string.Join(",", GetEventHandlerParameterTypes().Select(t => t.Reference.FullName));
+	public string Signature => string.Join(",", GetEventHandlerParameters().Select(t => t.ParameterType.Reference.FullName));
 
 	IMemberDefinition IMemberInfo.Definition => Definition;
 	TypeInfo IMemberInfo.MemberType => EventType;
 
-	public IEnumerable<TypeInfo> GetEventHandlerParameterTypes()
+	public IEnumerable<ParameterInfo> GetEventHandlerParameters()
 	{
 		var invokeMethod = EventType.Methods.FirstOrDefault(m => m.Definition.Name == "Invoke");
-		return invokeMethod?.Parameters.Select(p => p.ParameterType) ?? Enumerable.Empty<TypeInfo>();
+		return invokeMethod?.Parameters ?? Enumerable.Empty<ParameterInfo>();
 	}
 }
 

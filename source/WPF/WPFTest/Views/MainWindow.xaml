@@ -101,7 +101,8 @@
             <DataGrid
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
-                ItemsSource="{x:Bind ListProp, IsItemsSource=True}">
+                ItemsSource="{x:Bind ListProp, IsItemsSource=True}"
+                SelectionChanged="{x:Bind OnSelectionChanged(e.AddedItems.Count)}">
                 <DataGrid.Columns mx:DefaultBindMode="OneTime">
                     <DataGridTextColumn
                         Binding="{x:Bind DecimalProp}"

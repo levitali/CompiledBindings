@@ -24,11 +24,11 @@ namespace WPFTest.Views
 			_generatedCodeInitialized = true;
 
 #line (18, 17) - (18, 40) 18 "Page2.xml"
-			button3.Click += (p1, p2) => this.OnClick2();
+			button3.Click += (sender, e) => this.OnClick2();
 #line (19, 17) - (19, 46) 19 "Page2.xml"
-			button4.Click += (p1, p2) => this.Confirm(false);
+			button4.Click += (sender, e) => this.Confirm(false);
 #line (20, 17) - (20, 46) 20 "Page2.xml"
-			button5.Click += (p1, p2) => this.Confirm(false);
+			button5.Click += (sender, e) => this.Confirm(false);
 #line default
 
 			Bindings_.Initialize(this);

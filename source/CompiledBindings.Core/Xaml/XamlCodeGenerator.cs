@@ -92,15 +92,15 @@ public class XamlCodeGenerator
 		{
 			if (expression != null)
 			{
-				var types = property.TargetEvent.GetEventHandlerParameterTypes().ToList();
+				var parameters = property.TargetEvent.GetEventHandlerParameters().ToList();
 
 				bool wrap;
 				if (expression is MemberExpression me && me.Member is MethodInfo sourceMethod)
 				{
-					wrap = types.Count > 0 && sourceMethod.Parameters.Count == 0;
+					wrap = parameters.Count > 0 && sourceMethod.Parameters.Count == 0;
 					if (wrap)
 					{
-						expression = new CallExpression(me.Expression, sourceMethod, new Expression[0]);
+						expression = new CallExpression(me.Expression, sourceMethod, []);
 						value = expression.CSharpCode;
 					}
 					else
@@ -108,7 +108,7 @@ public class XamlCodeGenerator
 						wrap = expression.IsNullable;
 						if (wrap)
 						{
-							expression = new CallExpression(me.Expression, sourceMethod, types.Select((t, i) => new VariableExpression(t, "p" + (i + 1))).ToArray());
+							expression = new CallExpression(me.Expression, sourceMethod, parameters.Select(p => new VariableExpression(p.ParameterType, p.Definition.Name)).ToArray());
 							value = expression.CSharpCode;
 						}
 					}
@@ -120,7 +120,7 @@ public class XamlCodeGenerator
 
 				if (wrap)
 				{
-					value = $"({string.Join(", ", Enumerable.Range(1, types.Count).Select(i => "p" + i))}) => {value}";
+					value = $"({string.Join(", ", parameters.Select(p => p.Definition.Name))}) => {value}";
 				}
 
 				if (property.Value.BindValue != null)

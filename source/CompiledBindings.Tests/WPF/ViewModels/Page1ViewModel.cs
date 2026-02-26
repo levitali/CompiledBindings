@@ -55,6 +55,10 @@ public class Page1ViewModel : INotifyPropertyChanged
 		}
 	}
 
+	public void OnClicked(int count)
+	{ 
+	}
+
 	public enum Field
 	{
 		Field1,

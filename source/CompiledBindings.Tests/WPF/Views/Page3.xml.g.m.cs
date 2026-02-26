@@ -53,6 +53,7 @@ namespace WPFTest.Views
 			Page3 _targetRoot;
 			global::WPFTest.ViewModels.Page1ViewModel _dataRoot;
 			Page3_BindingsTrackings_this _bindingsTrackings;
+			global::System.Windows.Input.MouseButtonEventHandler _eventHandler1;
 
 			public void Initialize(Page3 targetRoot, global::WPFTest.ViewModels.Page1ViewModel dataRoot)
 			{
@@ -62,6 +63,11 @@ namespace WPFTest.Views
 
 				Update();
 
+#line (17, 13) - (17, 63) 17 "Page3.xml"
+				_eventHandler1 = (sender, e) => dataRoot.OnClicked(e?.ClickCount ?? default);
+#line default
+				_targetRoot.dataGrid1.MouseDoubleClick += _eventHandler1;
+
 				_bindingsTrackings.SetPropertyChangedEventHandler0(dataRoot);
 			}
 
@@ -69,6 +75,8 @@ namespace WPFTest.Views
 			{
 				if (_targetRoot != null)
 				{
+					_targetRoot.dataGrid1.MouseDoubleClick -= _eventHandler1;
+					_eventHandler1 = null;
 					_bindingsTrackings.Cleanup();
 					_dataRoot = null;
 					_targetRoot = null;
@@ -78,9 +86,9 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _dataRoot;
-#line (28, 20) - (28, 62) 28 "Page3.xml"
+#line (30, 20) - (30, 62) 30 "Page3.xml"
 				var value1 = dataRoot.ObservableCollectionProp;
-#line (15, 19) - (15, 69) 15 "Page3.xml"
+#line (16, 13) - (16, 63) 16 "Page3.xml"
 				_targetRoot.dataGrid1.ItemsSource = dataRoot.ListProp;
 #line default
 				Update0(dataRoot);
@@ -97,28 +105,28 @@ namespace WPFTest.Views
 
 			private void Update0_IntProp(global::WPFTest.ViewModels.Page1ViewModel value)
 			{
-#line (31, 13) - (31, 61) 31 "Page3.xml"
+#line (34, 13) - (34, 61) 34 "Page3.xml"
 				_targetRoot.textBlock3.Text = value.ObservableCollectionProp[value.IntProp];
 #line default
 			}
 
 			private void Update0_BooleanProp(global::WPFTest.ViewModels.Page1ViewModel value)
 			{
-#line (32, 13) - (32, 47) 32 "Page3.xml"
+#line (35, 13) - (35, 47) 35 "Page3.xml"
 				_targetRoot.textBlock3.SetVisible(value.BooleanProp);
 #line default
 			}
 
 			private void Update1_Item0(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
 			{
-#line (28, 20) - (28, 62) 28 "Page3.xml"
+#line (30, 20) - (30, 62) 30 "Page3.xml"
 				_targetRoot.textBlock1.Text = value[0];
 #line default
 			}
 
 			private void Update1_Item1(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
 			{
-#line (29, 20) - (29, 62) 29 "Page3.xml"
+#line (31, 20) - (31, 62) 31 "Page3.xml"
 				_targetRoot.textBlock2.Text = value[1];
 #line default
 			}
@@ -126,7 +134,7 @@ namespace WPFTest.Views
 			private void Update1_Item(global::System.Collections.ObjectModel.ObservableCollection<global::System.String> value)
 			{
 				var dataRoot = _dataRoot;
-#line (31, 13) - (31, 61) 31 "Page3.xml"
+#line (34, 13) - (34, 61) 34 "Page3.xml"
 				_targetRoot.textBlock3.Text = value[dataRoot.IntProp];
 #line default
 			}

@@ -26,6 +26,11 @@ public static class BindingParser
 		bool isItemsSource = false;
 		List<EventInfo> targetChangedEvents = [];
 
+		List<VariableExpression>? eventParams = prop.TargetEvent?
+			.GetEventHandlerParameters()
+			.Select(p => new VariableExpression(p.ParameterType, p.Definition.Name))
+			.ToList();
+
 		// Try to find DataType property in the binding before parsing any expression
 		// TODO: how to match optional comma and not include it in the group?
 		var match = Regex.Match(str, @"^.*DataType\s*(?<!=)=(?!=)(.+)");
@@ -114,7 +119,7 @@ public static class BindingParser
 					ICollection<string> includeNamespaces2;
 					try
 					{
-						expr = ExpressionParser.Parse(targetRoot, dataRoot, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1, name == "BindBack");
+						expr = ExpressionParser.Parse(targetRoot, dataRoot, str, prop.MemberType, false, namespaces, out includeNamespaces2, out pos1, name == "BindBack", eventParams);
 					}
 					catch (ParseException ex)
 					{

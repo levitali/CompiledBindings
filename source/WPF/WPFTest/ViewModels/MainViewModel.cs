@@ -44,6 +44,10 @@ public class MainViewModel : INotifyPropertyChanged
 		img.EndInit();
 		return img;
 	}
+
+	public void OnSelectionChanged(int addedItemsCount)
+	{ 
+	}
 }
 
 public class Page1ModifyViewModel

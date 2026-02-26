@@ -55,7 +55,7 @@ namespace XFTest.Views
 #line (41, 16) - (41, 60) 41 "Page1.xml"
 			label5.Text = value1.Header1;
 #line (72, 13) - (72, 34) 72 "Page1.xml"
-			button1.Clicked += (p1, p2) => this.Save();
+			button1.Clicked += (sender, e) => this.Save();
 #line default
 
 			Bindings_.Initialize(this);
@@ -383,10 +383,10 @@ namespace XFTest.Views
 #line default
 			}
 
-			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
+			private void OnTargetChanged0(global::System.Object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				switch (p1.PropertyName)
+				switch (e.PropertyName)
 				{
 					case "IsFocused":
 						try
@@ -416,10 +416,10 @@ namespace XFTest.Views
 				}
 			}
 
-			private void OnTargetChanged1(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
+			private void OnTargetChanged1(global::System.Object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				switch (p1.PropertyName)
+				switch (e.PropertyName)
 				{
 					case "Text":
 						if (!_settingBinding9)
@@ -438,10 +438,10 @@ namespace XFTest.Views
 				}
 			}
 
-			private void OnTargetChanged2(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
+			private void OnTargetChanged2(global::System.Object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				switch (p1.PropertyName)
+				switch (e.PropertyName)
 				{
 					case "SelectedItem":
 						if (!_settingBinding10)

@@ -12,7 +12,9 @@
     mx:DataType="viewModels:Page1ViewModel">
 
     <Grid>
-        <DataGrid ItemsSource="{x:Bind ListProp, IsItemsSource=true}">
+        <DataGrid
+            ItemsSource="{x:Bind ListProp, IsItemsSource=true}"
+            MouseDoubleClick="{x:Bind OnClicked(e.ClickCount)}">
             <DataGrid.Columns
                 mx:DefaultBindMode="OneTime"
                 mx:UseItemType="true">
@@ -28,9 +30,9 @@
         <TextBlock Text="{x:Bind ObservableCollectionProp[0]}" />
         <TextBlock Text="{x:Bind ObservableCollectionProp[1]}" />
         <TextBlock
+            Foreground="{x:Set $SomeBrush}"
             Text="{x:Bind ObservableCollectionProp[IntProp]}"
-            m:SetVisible="{x:Bind BooleanProp}"
-            Foreground="{x:Set $SomeBrush}"/>
+            m:SetVisible="{x:Bind BooleanProp}" />
     </Grid>
 
 </Page>

@@ -183,10 +183,10 @@ namespace XFTest.Views
 #line default
 			}
 
-			private void OnTargetChanged0(global::System.Object p0, global::System.ComponentModel.PropertyChangedEventArgs p1)
+			private void OnTargetChanged0(global::System.Object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
 			{
 				var dataRoot = _dataRoot;
-				switch (p1.PropertyName)
+				switch (e.PropertyName)
 				{
 					case "Text":
 						if (!_settingBinding6)

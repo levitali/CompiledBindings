@@ -304,11 +304,11 @@ namespace WPFTest.Views
 				Update();
 
 #line (62, 13) - (62, 74) 62 "Page1.xml"
-				_eventHandler8 = (p1, p2) => dataRoot.ModifyViewModel?.OnSelectionChanged(p1, p2);
+				_eventHandler8 = (sender, e) => dataRoot.ModifyViewModel?.OnSelectionChanged(sender, e);
 #line default
 				_targetRoot.listView.SelectionChanged += _eventHandler8;
 #line (71, 13) - (71, 65) 71 "Page1.xml"
-				_eventHandler15 = (p1, p2) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
+				_eventHandler15 = (sender, e) => dataRoot.ModifyViewModel?.OnClick(dataRoot.BooleanProp);
 #line default
 				_targetRoot.button1.Click += _eventHandler15;
 
@@ -920,7 +920,7 @@ namespace WPFTest.Views
 				}
 			}
 
-			private void OnTargetChanged0(global::System.Object p0, global::System.Windows.RoutedEventArgs p1)
+			private void OnTargetChanged0(global::System.Object sender, global::System.Windows.RoutedEventArgs e)
 			{
 				var dataRoot = _dataRoot;
 				if (!_settingBinding20)
