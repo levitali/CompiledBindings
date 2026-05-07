@@ -441,11 +441,7 @@ public abstract class XamlDomParser
 						{
 							scope = bindingScopes.FirstOrDefault(s => s.DataType == null);
 						}
-						if (scope != null)
-						{
-							scope.Bindings.Add(bind);
-						}
-						else
+						if (scope == null)
 						{
 							scope = new ViewBindingScope
 							{
@@ -454,6 +450,7 @@ public abstract class XamlDomParser
 							};
 							bindingScopes.Add(scope);
 						}
+						scope.Bindings.Add(bind);
 					}
 					else
 					{
