@@ -278,6 +278,11 @@ public class ExpressionTests : IDisposable
 		var expectedCode = "$\"{dataRoot.IntProp,2} {dataRoot.RefProp?.DecimalProp:0.###}\"";
 		var result = ExpressionParser.Parse(_targetRoot, _dataRoot, expression, intType, true, ns, out _, out _);
 		Assert.That(result.CSharpCode.Equals(expectedCode));
+
+		expression = "$'{IntProp}{RefProp.DecimalProp gt 0 ? '' : $' / {RefProp.DecimalProp}'}'";
+		expectedCode = "$\"{dataRoot.IntProp}{(dataRoot.RefProp?.DecimalProp > 0 ? \"\" : $\" / {dataRoot.RefProp?.DecimalProp}\")}\"";
+		result = ExpressionParser.Parse(_targetRoot, _dataRoot, expression, intType, true, ns, out _, out _);
+		Assert.That(result.CSharpCode.Equals(expectedCode));
 	}
 
 	[Test]

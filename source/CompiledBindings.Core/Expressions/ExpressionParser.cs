@@ -576,10 +576,11 @@ public class ExpressionParser
 			NextToken();
 
 			// Parse the expression
+			var parsingInterpolatedString = _parsingInterpolatedString;
 			_parsingInterpolatedString = true;
 			var expression = ParseExpression();
 			expressions.Add(expression);
-			_parsingInterpolatedString = false;
+			_parsingInterpolatedString = parsingInterpolatedString;
 
 			// If the current token is comma or colon, there is an alignment and/or format part
 			if (_token.id is TokenId.Comma or TokenId.Colon)
