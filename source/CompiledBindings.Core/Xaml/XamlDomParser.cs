@@ -265,14 +265,27 @@ public abstract class XamlDomParser
 					}
 					else
 					{
-						(var method, ns) = typeInfo.EnumerateAllMethods(memberName, false, clrNamespaces).FirstOrDefault();
+						bool methodWithNameFound = false;
+						(var method, ns) = typeInfo
+							.EnumerateAllMethods(memberName, false, clrNamespaces)
+							.FirstOrDefault(e =>
+							{
+								methodWithNameFound = true;
+								var expectedParamsCount = e.method.IsOldExtension ? 2 : 1;
+								return
+									e.method.Parameters.Count == expectedParamsCount ||
+									(e.method.Parameters.Count > expectedParamsCount && e.method.Parameters[expectedParamsCount].Definition.IsOptional);
+							});
 						if (method == null)
 						{
-							throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
-						}
-						else if (method.Parameters.Count != (method.IsOldExtension ? 2 : 1))
-						{
-							throw new GeneratorException($"Cannot bind to method {obj.Type.Reference.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
+							if (!methodWithNameFound)
+							{
+								throw new GeneratorException($"No target member {memberName} found in type {obj.Type.Reference.FullName}.", CurrentFile, xamlNode);
+							}
+							else
+							{
+								throw new GeneratorException($"Cannot bind to method {obj.Type.Reference.FullName}.{memberName}. To use a method as target, the method must have one parameter.", CurrentFile, xamlNode);
+							}
 						}
 
 						if (ns != null)

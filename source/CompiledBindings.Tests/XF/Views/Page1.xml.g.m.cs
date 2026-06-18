@@ -54,7 +54,7 @@ namespace XFTest.Views
 			Title = value1.Title;
 #line (41, 16) - (41, 60) 41 "Page1.xml"
 			label5.Text = value1.Header1;
-#line (72, 13) - (72, 34) 72 "Page1.xml"
+#line (74, 13) - (74, 34) 74 "Page1.xml"
 			button1.Clicked += (sender, e) => this.Save();
 #line default
 
@@ -108,14 +108,14 @@ namespace XFTest.Views
 
 			private void Update0_BooleanProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
-#line (71, 13) - (71, 92) 71 "Page1.xml"
+#line (73, 13) - (73, 92) 73 "Page1.xml"
 				_targetRoot.button1.IsEnabled = value?.BooleanProp ?? default;
 #line default
 			}
 
 			private void Update1_SelectedItem(global::Xamarin.Forms.CollectionView value)
 			{
-#line (71, 13) - (71, 92) 71 "Page1.xml"
+#line (73, 13) - (73, 92) 73 "Page1.xml"
 				var value1 = (((global::XFTest.ViewModels.EntityViewModel)value.SelectedItem));
 #line default
 				Update0_BooleanProp(value1);
@@ -191,6 +191,7 @@ namespace XFTest.Views
 			bool _settingBinding7;
 			bool _settingBinding9;
 			bool _settingBinding10;
+			bool _settingBinding14;
 
 			public void Initialize(Page1 targetRoot, global::XFTest.ViewModels.Page1ViewModel dataRoot)
 			{
@@ -205,6 +206,7 @@ namespace XFTest.Views
 				_targetRoot.entry1.PropertyChanged += OnTargetChanged0;
 				_targetRoot.entry2.PropertyChanged += OnTargetChanged1;
 				_targetRoot.pickerEx1.PropertyChanged += OnTargetChanged2;
+				_targetRoot.list.PropertyChanged += OnTargetChanged3;
 			}
 
 			public void Cleanup()
@@ -214,6 +216,7 @@ namespace XFTest.Views
 					_targetRoot.entry1.PropertyChanged -= OnTargetChanged0;
 					_targetRoot.entry2.PropertyChanged -= OnTargetChanged1;
 					_targetRoot.pickerEx1.PropertyChanged -= OnTargetChanged2;
+					_targetRoot.list.PropertyChanged -= OnTargetChanged3;
 					_bindingsTrackings.Cleanup();
 					_dataRoot = null;
 					_targetRoot = null;
@@ -229,7 +232,7 @@ namespace XFTest.Views
 				var value2 = value1[0];
 #line (58, 13) - (58, 63) 58 "Page1.xml"
 				_targetRoot.list.ItemsSource = value1;
-#line (75, 7) - (75, 39) 75 "Page1.xml"
+#line (77, 13) - (77, 45) 77 "Page1.xml"
 				_targetRoot.label13.IsVisible = dataRoot.ReadOnlyProp;
 #line default
 				Update0(dataRoot);
@@ -264,6 +267,7 @@ namespace XFTest.Views
 				}
 				Update0_BooleanProp(value);
 				Update0_NullableIntProp(value);
+				Update0_SelectedItem(value);
 				Update0_FocusedField(value);
 				Update0_ArrayProp(value);
 			}
@@ -276,7 +280,7 @@ namespace XFTest.Views
 				_targetRoot.label6.Text = value1.ToString();
 #line (45, 16) - (45, 46) 45 "Page1.xml"
 				_targetRoot.label7.Text = (value1 + 1).ToString();
-#line (76, 13) - (76, 138) 76 "Page1.xml"
+#line (78, 13) - (78, 138) 78 "Page1.xml"
 				_targetRoot.label13.Text = $"Decimal value: {value1:0.###}, Boolean value: {value.BooleanProp}, String value: {value.StringProp?.TrimStart('0')}";
 #line default
 			}
@@ -306,7 +310,7 @@ namespace XFTest.Views
 						_settingBinding7 = false;
 					}
 				}
-#line (76, 13) - (76, 138) 76 "Page1.xml"
+#line (78, 13) - (78, 138) 78 "Page1.xml"
 				_targetRoot.label13.Text = $"Decimal value: {value.DecimalProp:0.###}, Boolean value: {value1}, String value: {value.StringProp?.TrimStart('0')}";
 #line default
 			}
@@ -334,7 +338,7 @@ namespace XFTest.Views
 						_settingBinding9 = false;
 					}
 				}
-#line (74, 13) - (74, 52) 74 "Page1.xml"
+#line (76, 13) - (76, 52) 76 "Page1.xml"
 				global::Xamarin.Forms.Grid.SetRow(_targetRoot.label13, value1 ?? 9);
 #line default
 			}
@@ -364,7 +368,7 @@ namespace XFTest.Views
 						_settingBinding10 = false;
 					}
 				}
-#line (76, 13) - (76, 138) 76 "Page1.xml"
+#line (78, 13) - (78, 138) 78 "Page1.xml"
 				_targetRoot.label13.Text = $"Decimal value: {value.DecimalProp:0.###}, Boolean value: {value.BooleanProp}, String value: {value1?.TrimStart('0')}";
 #line default
 			}
@@ -374,6 +378,28 @@ namespace XFTest.Views
 #line (57, 13) - (57, 53) 57 "Page1.xml"
 				_targetRoot.list.IsVisible = value.ArrayProp?.Length > 0;
 #line default
+			}
+
+			private void Update0_SelectedItem(global::XFTest.ViewModels.Page1ViewModel value)
+			{
+#line (59, 13) - (59, 44) 59 "Page1.xml"
+				var value1 = value.SelectedItem;
+#line (59, 13) - (59, 44) 59 "Page1.xml"
+				_targetRoot.list.ScrollTo(value1);
+				if (!object.Equals(_targetRoot.list.SelectedItem, value1))
+				{
+					_settingBinding14 = true;
+					try
+					{
+#line (60, 13) - (60, 61) 60 "Page1.xml"
+						_targetRoot.list.SelectedItem = value1;
+#line default
+					}
+					finally
+					{
+						_settingBinding14 = false;
+					}
+				}
 			}
 
 			private void Update1_DecimalProp(global::XFTest.ViewModels.EntityViewModel value)
@@ -460,6 +486,28 @@ namespace XFTest.Views
 				}
 			}
 
+			private void OnTargetChanged3(global::System.Object sender, global::System.ComponentModel.PropertyChangedEventArgs e)
+			{
+				var dataRoot = _dataRoot;
+				switch (e.PropertyName)
+				{
+					case "SelectedItem":
+						if (!_settingBinding14)
+						{
+							try
+							{
+#line (60, 13) - (60, 61) 60 "Page1.xml"
+								dataRoot.SelectedItem = ((global::XFTest.ViewModels.EntityViewModel)_targetRoot.list.SelectedItem);
+#line default
+							}
+							catch
+							{
+							}
+						}
+						break;
+				}
+			}
+
 			class Page1_BindingsTrackings_this
 			{
 				global::System.WeakReference _bindingsWeakRef;
@@ -519,6 +567,9 @@ namespace XFTest.Views
 							break;
 						case "ArrayProp":
 							bindings.Update0_ArrayProp(typedSender);
+							break;
+						case "SelectedItem":
+							bindings.Update0_SelectedItem(typedSender);
 							break;
 					}
 				}
@@ -880,14 +931,14 @@ namespace XFTest.Views
 
 			private void Update0_DecimalProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
-#line (63, 32) - (63, 58) 63 "Page1.xml"
+#line (65, 32) - (65, 58) 65 "Page1.xml"
 				_targetRoot.label11.Text = value.DecimalProp.ToString();
 #line default
 			}
 
 			private void Update0_StringProp(global::XFTest.ViewModels.EntityViewModel value)
 			{
-#line (64, 32) - (64, 72) 64 "Page1.xml"
+#line (66, 32) - (66, 72) 66 "Page1.xml"
 				_targetRoot.label12.Text = value.StringProp?.TrimStart('0');
 #line default
 			}

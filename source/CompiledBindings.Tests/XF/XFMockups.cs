@@ -64,6 +64,10 @@ namespace Xamarin.Forms
 		public IEnumerable ItemsSource { get; set; }
 		public DataTemplate ItemTemplate { get; set; }
 		public object SelectedItem { get; set; }
+
+		public void ScrollTo(object item, object group = null/*, ScrollToPosition position = ScrollToPosition.MakeVisible*/, bool animate = true)
+		{ 
+		}
 	}
 
 	public class Picker : VisualElement

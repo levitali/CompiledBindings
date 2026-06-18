@@ -20,6 +20,8 @@ public class Page1ViewModel : INotifyPropertyChanged
 		new EntityViewModel { DecimalProp = 1, BooleanProp = true },
 	};
 
+	public EntityViewModel? SelectedItem { get; set; }
+
 	public int[]? ArrayProp { get; set; }
 
 	public event PropertyChangedEventHandler? PropertyChanged;
