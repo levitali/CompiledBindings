@@ -4,14 +4,8 @@
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<RootNamespace>CompiledBindings</RootNamespace>
 		<AssemblyName>CompiledBindings.Core</AssemblyName>
-		<Product>CompiledBindings</Product>
-		<Company>levitali</Company>
-		<LangVersion>preview</LangVersion>
-		<Version>1.0.19.10</Version>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>nullable</WarningsAsErrors>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,7 +17,7 @@
 	<ItemGroup>
 		<Using Include="System" />
 		<Using Include="System.Collections.ObjectModel" />
-		<Using Include="System.Collections.Specialized"/>
+		<Using Include="System.Collections.Specialized" />
 		<Using Include="System.ComponentModel" />
 		<Using Include="System.Diagnostics" />
 		<Using Include="System.Globalization" />

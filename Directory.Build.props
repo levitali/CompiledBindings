@@ -1,0 +1,12 @@
+<Project ToolsVersion="15.0">
+
+	<PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+		<WarningsAsErrors>nullable</WarningsAsErrors>
+    <Version>1.0.19.11</Version>
+    <Product>CompiledBindings</Product>
+    <Company>levitali</Company>
+  </PropertyGroup>
+
+</Project>

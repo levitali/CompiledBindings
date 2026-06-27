@@ -3,12 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 		<RootNamespace>CompiledBindings</RootNamespace>
-		<Product>CompiledBindings</Product>
-		<Company>levitali</Company>
-		<Version>1.0.19.10</Version>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>nullable</WarningsAsErrors>
 		<OutputPath>..\..\..\bin\winui\build</OutputPath>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<NoWarn>$(NoWarn);8632</NoWarn>

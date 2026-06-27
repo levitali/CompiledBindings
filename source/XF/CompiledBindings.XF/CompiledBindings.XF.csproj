@@ -2,12 +2,6 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Product>CompiledBindings</Product>
-		<Company>levitali</Company>
-		<Version>1.0.19.10</Version>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>nullable</WarningsAsErrors>
 		<OutputPath>..\..\..\bin\xf\lib</OutputPath>
 	</PropertyGroup>
 

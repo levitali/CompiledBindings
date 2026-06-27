@@ -23,7 +23,7 @@ public abstract class XamlDomParser
 		XNamespace defaultNamespace,
 		XNamespace xNamespace,
 		TypeInfo converterType,
-		TypeInfo bindingType,
+		TypeInfo? bindingType,
 		TypeInfo? dependencyObjectType,
 		TypeInfo? dependencyPropertyType)
 	{
@@ -54,7 +54,7 @@ public abstract class XamlDomParser
 	public XName xName { get; }
 	public XName xDataType { get; }
 	public TypeInfo ConverterType { get; }
-	public TypeInfo BindingType { get; }
+	public TypeInfo? BindingType { get; }
 	public IList<XamlNamespace>? KnownNamespaces { get; set; }
 	public string CurrentFile { get; set; } = null!;
 	public string CurrentLineFile { get; set; } = null!;
@@ -367,7 +367,7 @@ public abstract class XamlDomParser
 		{
 			try
 			{
-				bool isPropertyTypeBinding = BindingType.IsAssignableFrom(propType);
+				bool isPropertyTypeBinding = BindingType?.IsAssignableFrom(propType) == true;
 				if (isPropertyTypeBinding && !CanSetBindingTypeProperty)
 				{
 					throw new GeneratorException($"You cannot use x:Bind for this property, because the property type is Binding.", CurrentFile, xamlNode);

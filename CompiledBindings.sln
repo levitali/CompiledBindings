@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11527.330
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8539C80A-72C9-4199-9B58-4F6BFD0EF04B}"
 EndProject
@@ -56,6 +56,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings.MAUI", "source\MAUI\CompiledBindings.MAUI\CompiledBindings.MAUI.csproj", "{2B884120-B513-4C50-978E-A91E7BEF949C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompiledBindings.MAUI.BuildTasks", "source\MAUI\CompiledBindings.MAUI.BuildTasks\CompiledBindings.MAUI.BuildTasks.csproj", "{DC7C53BC-AEDD-422B-880D-D9814F343A00}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6BC4A7A3-8A12-49B6-804E-2B60D3BDB82E}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

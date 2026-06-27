@@ -1,13 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
 	<PropertyGroup>
-		<Company>levitali</Company>
-		<Version>1.0.19.10</Version>
 		<TargetFramework>uap10.0</TargetFramework>
 		<RootNamespace>CompiledBindings</RootNamespace>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
-		<WarningsAsErrors>nullable</WarningsAsErrors>
 		<OutputPath>..\..\..\bin\uwp\lib</OutputPath>
 		<NoWarn>$(NoWarn);8632</NoWarn>
 	</PropertyGroup>

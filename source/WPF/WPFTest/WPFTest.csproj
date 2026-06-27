@@ -4,10 +4,7 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFrameworks>net9.0-windows</TargetFrameworks>
 		<UseWPF>true</UseWPF>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
 		<ImplicitUsings>true</ImplicitUsings>
-		<WarningsAsErrors>nullable</WarningsAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)'=='net461'">
@@ -115,7 +112,7 @@
 		                     AssemblyName="$(AssemblyName)"
 											   RootNamespace="$(RootNamespace)"
 											   Usings="@(Using)"
-		                     AttachDebugger="true">
+		                     AttachDebugger="false">
 			<Output ItemName="GeneratedCodeFiles" TaskParameter="GeneratedCodeFiles" />
 			<Output ItemName="NewApplicationDefinition" TaskParameter="NewApplicationDefinition" />
 			<Output ItemName="NewPages" TaskParameter="NewPages" />
