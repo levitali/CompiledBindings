@@ -842,7 +842,7 @@ public static class BindingParser
 			.OfType<INotifiableExpression>())
 		{
 			var expr2 = expr.Expression;
-			var notifySource2 = notifySources4.SelectTree(_ => _.Properties.SelectMany(_ => _.DependentNotifySources)).FirstOrDefault(s => s.SourceExpression == expr2);
+			var notifySource2 = notifySources4.SelectTree(_ => _.Properties.SelectMany(_ => _.DependentNotifySources)).FirstOrDefault(s => s.SourceExpression.Key == expr2.Key);
 			if (notifySource2 != null && notifySource2 != notifySource && !notifySources1.Any(s => s.Index == notifySource2.Index))
 			{
 				notifySources1.Add(notifySource2.Clone());

@@ -105,18 +105,21 @@ namespace WPFTest.Views
 			public void Update()
 			{
 				var dataRoot = _targetRoot;
+#line (82, 13) - (82, 154) 82 "Page1.xml"
+				var value1 = (((global::WPFTest.ViewModels.EntityViewModel)dataRoot.listView.SelectedItem));
 #line (88, 13) - (88, 87) 88 "Page1.xml"
-				var value1 = dataRoot.listView.SelectedItems;
+				var value2 = dataRoot.listView.SelectedItems;
 #line (46, 13) - (46, 53) 46 "Page1.xml"
 				_targetRoot.textBlock5.Text = dataRoot._viewModel.DecimalProp.ToString();
 #line (82, 13) - (82, 154) 82 "Page1.xml"
-				_targetRoot.textBox4.IsEnabled = (((global::WPFTest.ViewModels.EntityViewModel)dataRoot.listView.SelectedItem)) is var v4 && v4 != null ? v4.DecimalProp == 1 : true;
+				_targetRoot.textBox4.IsEnabled = (value1 != null ? value1.DecimalProp == 1 : true);
 #line default
 				Update1_SelectedItem(dataRoot.listView);
 				Update1_ActualWidth(dataRoot.listView);
-				Update2_Count(value1);
+				Update2_Count(value2);
 				_bindingsTrackings.SetPropertyChangedEventHandler1(dataRoot.listView);
-				_bindingsTrackings.SetPropertyChangedEventHandler2(value1);
+				_bindingsTrackings.SetPropertyChangedEventHandler2(value2);
+				_bindingsTrackings.SetPropertyChangedEventHandler0(value1);
 			}
 
 			private void Update0_Title(global::WPFTest.ViewModels.EntityViewModel value)
